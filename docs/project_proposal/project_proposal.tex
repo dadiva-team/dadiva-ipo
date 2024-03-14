@@ -1,28 +1,28 @@
-\documentclass[a4paper,twoside,11pt]{article}
-\usepackage[utf8]{inputenc}
+\documentclass[a4paper,11pt]{article}
+\usepackage{biblatex}
 \usepackage{graphicx}
-\usepackage{url}
-\usepackage{epsfig}
-\usepackage{natbib}
 
+\addbibresource{references.bib}
 % pdflatex
 
-% redefinição das margens das páginas
+% redefines the page margins
 \setlength{\textheight}{24.00cm}
 \setlength{\textwidth}{15.50cm}
 \setlength{\topmargin}{0.35cm}
 \setlength{\headheight}{0cm}
 \setlength{\headsep}{0cm}
 \setlength{\oddsidemargin}{0.25cm}
-\setlength{\evensidemargin}{0.25cm}
 
-\title{D\'{A}DIVA IPO\\\large Digital Aid and Donor Information Verification Application for IPO}
+\title{%
+\includegraphics{logoISEL}
+D\'{A}DIVA IPO\\\large Digital Aid and Donor Information Verification Application for IPO
+}
 
 \author{
 \begin{tabular}{c}
-             Francisco Medeiros, n.º 46631, e-mail: a46631@alunos.isel.pt, tel.: 913192828\\
-             Luís Macário, n.º 47671, e-mail: a47671@alunos.isel.pt, tel.: 933694131\\
-			 Ricardo Pinto, n.º 47673, e-mail: a47673@alunos.isel.pt, tel.: 927111044\\
+	Francisco Medeiros, No 46631, e-mail: a46631@alunos.isel.pt, tel.: 913192828\\
+	Luís Macário, No.47671, e-mail: a47671@alunos.isel.pt, tel.: 933694131\\
+	Ricardo Pinto, No.47673, e-mail: a47673@alunos.isel.pt, tel.: 927111044\\
 \end{tabular}}
 
 \date{
@@ -37,48 +37,65 @@
 
 \maketitle
 
+\tableofcontents
+
 \section{Introduction}
-Today, the professionals at the Instituto Português de Oncologia (IPO) in Lisbon, within the blood donor service, rely on paper to consult some of the information needed to screen donors. The aim is to create a search portal to properly classify and index information, which will return contextualized results ordered by relevance. This part of the portal will be collaborative, allowing for peer-reviewed information. The portal could also allow the donors to quickly register in the donor system and fill out the pre-donation form. The objective would be to significantly decrease the possibilities of mistakes that storing information in a paper format brings, as well as decrease the time it takes to donate blood by fast-tracking the signup and triage processes.
+Today, the professionals at the Instituto Português de Oncologia (IPO) in Lisbon, within the blood donor service, store and cross-check donor information in physical formats.
+
+Currently, a donor arrives at IPO and is asked to fill and sign a paper pre-donation form. After filling out the form, the donor is then taken to a medical exam, where the doctor will, using the form, ask some questions and do some exams to determine the donor's eligibility. If the donor has a pathology and/or is currently taking medication, this could be a cause for non-eligibility. Currently, the doctor has to check these interactions in a paper format.
+
+This project aims to digitalize the pre-donation form and the medication and/or pathology interaction information. These should be easily updated and customizable, and the pre-donation form should be adaptable to the donor’s answers.
+
+The objective would be to significantly decrease the possibilities of mistakes that storing/consulting information in a paper format brings and decrease the time it takes to donate blood by fast-tracking the signup and triage processes.
 
 \section{System Requirements}
+
 \subsection{Functional Requirements}
-\begin{description}
-	\item[Authentication and Authorization]- The Portal may have an anonymous area aimed at consultation or the presentation of institutional information, but the main areas will require user authentication and the functionalities will be made available through user permissions.
-	\item[Back Office]- The portal will have a back office used for configuring portal parameters. User management will be one of the features of this back office.
-	\item[Workflow for classifying and submitting information with peer review]- Changes made by a user must be approved by another user to guarantee their relevance and accuracy before being integrated into the search results.
-	\item[Google-like search and results by relevance]- Search should be as simple as possible. There may be a need to increase the number of filters, but this complexity should be hidden. The results returned should be sorted based on relevance.
-	\item[Donation registration form]- Donors should be able to quickly fill out a digital sign-up form that automatically inputs their data into the system.
-\end{description}
+\begin{itemize}
+	\item Donors should be able to quickly fill out a digital pre-donation form. The form should be adequate according to the current law, adaptable, and depend on the donor’s answers.
+	
+	\item Doctors should be able to find all relevant data on pathology and/or medication interaction with the donation in a digital format.
+	
+	\item Doctors and administrators should be able to access a back office used for customizing the pre-donation form and for updating the pathology and/or medication interaction information. The back office should also allow for user management.
+	
+	\item Google-like search and results by relevance - Search should be as simple as possible. There may be a need to increase the number of filters, but this complexity should be hidden. The results returned should be sorted based on relevance.
+\end{itemize}
 
 \subsection{Non-Functional Requirements}
-\begin{enumerate}
-	\item Intuitive user experience through a simple user interface and practical/password-less authentication methods.
-	\item The platform will have a digital questionnaire with a few questions about previous illnesses, medication use, recent trips, and other factors that could compromise a safe donation.
-	\item Clear documentation and as automated as possible to ensure it's always up to date.
-	\item Software testing to increase our confidence in the system’s security and features. It should also allow us to move faster without fear of breaking the previous working code.
-	\item Overall good software practices that should allow the system to grow in complexity more easily.
-	\item Service scalability. Making it possible to spin up the new servers running our service in parallel to increase overall system performance and availability.
-	\item Deploying the application components and making them available to the public.
-\end{enumerate}
+\begin{itemize}
+	\item Intuitive user experience through a simple and practical user interface.
+	
+	\item Responsive design that ensures a good user experience both on desktop and mobile.
+	
+	\item Complete and thorough documentation.
+	
+	\item Unit and integration testing with sufficient coverage to ensure confidence that the system is working without flaws.
+	
+	\item Good software engineering practices to ensure the fast development of the system.
+\end{itemize}
 
 \subsection{Optional Features}
-\begin{enumerate}
-	\item On donation scheduling, automatically check vaccination and medication prescription over the last 6 months and cross-check the results with known compounds that warrant a blood donation waiting period, as well as adding tags to donations with the donor's current medication, if any, to check for possible donation recipient allergies or other complications. Would require integration with an external service (Most likely SNS) to receive the donor’s medical history.
-	\item Users can authenticate using the Digital Mobile Key (CMD). Would require integration with the AMA (Administrative Modernization Agency) systems.
-\end{enumerate}
+\begin{itemize}
+	\item After filling out the pre-donation form, the system could automatically check if the donor had any vaccinations and/or prescriptions that could be medically relevant. It would require integration with the IPO system, Infarmed, and/or SNS.
+	\item It is possible that the IPST has already implemented a digital system to maintain pathology and medication interaction information. If so, it would be possible to integrate this into our system, so that this information does not have to be manually updated.
+	\item Users can authenticate using the Digital Mobile Key (CMD). It would require integration with the AMA (Administrative Modernization Agency) systems.
+\end{itemize}
 
 \section{Technologies}
-We plan to use ASP.NET to build the Web API, following DDD (Domain Driven Design) and using the Minimal API architecture. We will use NodeJS and React.js to deliver the front-end experience. We will use ElasticSearch to store the donor’s data and the contextualized information. ElasticSearch will be used due to its searching capabilities, returning search results based on a relevance algorithm.
+We plan to use ASP.NET \cite{aspnet} to build the Web API, following DDD (Domain Driven Design) and using the Minimal API \cite{minimalAPI} architecture. We will use Node.js \cite{nodejs} and React \cite{react} to deliver the front-end experience. We will use ElasticSearch \cite{elasticsearch} to store the donor’s data and the contextualized information. ElasticSearch will be used due to its searching capabilities, returning search results based on a relevance algorithm.
 
 \section{Risks}
 Some factors that might influence our speed on the project development are:
 \begin{enumerate}
-	\item C\# and .NET are technologies that we’re not experienced in, resulting in some time being needed for adaptation.
+	\item C\# \cite{csharp} and Asp.NET are technologies that we’re not experienced in, resulting in some time being needed for adaptation.
 \end{enumerate}
 
-\includegraphics[width=15cm]{gantt.png}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{gantt.png}
+\caption{Provisory Gantt Chart}
+\end{figure}
 
-\bibliographystyle{unsrt}
-\bibliography{references}
+\printbibliography[heading=bibintoc]
 
 \end{document}
