@@ -4,6 +4,6 @@
 \contentsline {subsection}{\numberline {2.2}Non-Functional Requirements}{2}{}%
 \contentsline {subsection}{\numberline {2.3}Optional Features}{2}{}%
 \contentsline {section}{\numberline {3}Technologies}{3}{}%
-\contentsline {section}{\numberline {4}Risks}{3}{}%
+\contentsline {section}{\numberline {4}Risks}{4}{}%
 \contentsline {section}{\numberline {5}Communication}{4}{}%
 \contentsline {section}{References}{4}{}%

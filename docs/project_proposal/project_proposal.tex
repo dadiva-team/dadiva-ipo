@@ -13,7 +13,7 @@
 \setlength{\headsep}{0cm}
 \setlength{\oddsidemargin}{0.25cm}
 
-\title{\vspace{-2.0cm}%
+\title{\vspace{-4.0cm}%
 \includegraphics{logoISEL}
 D\'{A}DIVA IPO\\\large Digital Aid and Donor Information Verification Application for IPO
 }
@@ -36,8 +36,6 @@ D\'{A}DIVA IPO\\\large Digital Aid and Donor Information Verification Applicatio
 \begin{document}
 
 \maketitle
-
-\tableofcontents
 
 \section{Introduction}
 Today, the professionals at the Instituto Português de Oncologia (IPO) in Lisbon, within the blood donor service, store and cross-check donor information in physical formats.
@@ -86,6 +84,12 @@ The objective is to significantly decrease the possibilities of mistakes that st
 \section{Technologies}
 We plan to use ASP.NET \cite{aspnet} to build the Web API, following DDD (Domain-Driven Design) and using the Minimal API \cite{minimalAPI} architecture. We will use Node.js \cite{nodejs} and React \cite{react} to deliver the front-end experience. We will use ElasticSearch \cite{elasticsearch} to store the donor’s data and the contextualized information. ElasticSearch will be used due to its searching capabilities, returning search results based on a relevance algorithm.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{tech_diagram}
+\caption{Provisory Technology Diagram}
+\end{figure}
+
 \section{Risks}
 \begin{enumerate}
 	\item C\# \cite{csharp} and ASP.NET are technologies that we’re not experienced in, resulting in some time being needed for adaptation.
@@ -106,7 +110,7 @@ We plan to use ASP.NET \cite{aspnet} to build the Web API, following DDD (Domain
 \section{Communication}
 The project's scope is based on the specific needs of the IPO. To ensure the development process meets their expectations and follows the outlined plan, maintaining ongoing communication with the IPO is crucial.
 
-The IPO will also assign a person to work alongside us throughout the project. This is designed not only to streamline communication between our team and the IPO, but also to ensure that the IPO has a knowledgeable point of contact who is familiar with our system's architecture and codebase. This is vital for ensuring the system can be maintained and updated after the project is completed, securing the long-term success of the project.
+The IPO will also assign a person to work alongside us throughout the project. This is designed not only to streamline communication between our team and the IPO but also to ensure that the IPO has a knowledgeable point of contact who is familiar with our system's architecture and codebase. This is vital for ensuring the system can be maintained and updated after the project is completed, securing the long-term success of the project.
 
 Within our team, we've established a weekly meeting between the students and the supervisors. This is designed to regularly assess the project's progress and address any concerns or adjustments needed to ensure its successful development.
 

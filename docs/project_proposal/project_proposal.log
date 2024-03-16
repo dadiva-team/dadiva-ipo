@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.3) (preloaded format=pdflatex 2024.3.16)  16 MAR 2024 06:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.3) (preloaded format=pdflatex 2024.3.16)  16 MAR 2024 14:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -395,29 +395,36 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 38.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 38.
- (project_proposal.toc
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 3.
-)
-\tf@toc=\write4
-\openout4 = `project_proposal.toc'.
 
- [1
-
-{C:/Users/Wild/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./logoISEL.pd
-f>]
-Overfull \hbox (5.83116pt too wide) in paragraph at lines 49--50
+Overfull \hbox (5.83116pt too wide) in paragraph at lines 47--48
 []\OT1/cmr/m/n/10.95 The ob-jec-tive is to sig-nif-i-cantly de-crease the pos-s
 i-bil-i-ties of mis-takes that stor-ing/consulting
  []
 
-[2]
+[1
+
+{C:/Users/Wild/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./logoISEL.pd
+f>] [2]
+
+pdfTeX warning: pdflatex.exe (file ./tech_diagram.pdf): PDF inclusion: found PD
+F version <1.7>, but at most version <1.5> allowed
+<tech_diagram.pdf, id=36, 609.23605pt x 409.53pt>
+File: tech_diagram.pdf Graphic file (type pdf)
+<use tech_diagram.pdf>
+Package pdftex.def Info: tech_diagram.pdf  used on input line 89.
+(pdftex.def)             Requested size: 441.02016pt x 296.45483pt.
 <gantt.png, id=37, 2177.13374pt x 488.82625pt>
 File: gantt.png Graphic file (type png)
 <use gantt.png>
-Package pdftex.def Info: gantt.png  used on input line 102.
+Package pdftex.def Info: gantt.png  used on input line 106.
 (pdftex.def)             Requested size: 441.00006pt x 99.0166pt.
- [3 <./gantt.png (PNG copy)>] [4] (project_proposal.aux)
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[3 <./tech_diagram.pdf>]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 117.
+ [4 <./gantt.png (PNG copy)>] (project_proposal.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -428,25 +435,24 @@ Package logreq Info: Writing requests to 'project_proposal.run.xml'.
  ) 
 Here is how much of TeX's memory you used:
  9442 strings out of 474435
- 183199 string characters out of 5742405
+ 183191 string characters out of 5742405
  1935190 words of memory out of 5000000
- 31722 multiletter control sequences out of 15000+600000
- 564396 words of font info for 57 fonts, out of 8000000 for 9000
+ 31726 multiletter control sequences out of 15000+600000
+ 564088 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 66i,13n,81p,691b,1263s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 66i,13n,81p,691b,1298s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Wild\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1
 095.pk><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
-/cm/cmbx10.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type1/public/
-amsfonts/cm/cmbx12.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type1
-/public/amsfonts/cm/cmcsc10.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fo
-nts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Wild/AppData/Local/Programs/Mi
-KTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Wild/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Wild/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Wild/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on project_proposal.pdf (4 pages, 458083 bytes).
+/cm/cmbx12.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type1/public/
+amsfonts/cm/cmcsc10.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type
+1/public/amsfonts/cm/cmr10.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fon
+ts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Wild/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Wild/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Wild/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on project_proposal.pdf (4 pages, 470999 bytes).
 PDF statistics:
- 84 PDF objects out of 1000 (max. 8388607)
+ 89 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
