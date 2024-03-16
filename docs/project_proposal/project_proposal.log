@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.3) (preloaded format=pdflatex 2024.3.14)  14 MAR 2024 12:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.3) (preloaded format=pdflatex 2024.3.16)  16 MAR 2024 06:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -6,12 +6,9 @@ entering extended mode
 (project_proposal.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
-
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cl
-s
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
 Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
-
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/base\size11.clo
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/base\size11.clo
 File: size11.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 )
 \c@part=\count188
@@ -26,61 +23,51 @@ File: size11.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 \belowcaptionskip=\skip49
 \bibindent=\dimen140
 )
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblat
-ex.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblatex.sty
 Package: biblatex 2023/03/05 v3.19 programmable bibliographies (PK/MW)
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pd
-ftexcmds.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds.
+sty
 Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
 )
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\inf
-warerr.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.st
+y
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
-)
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.s
-ty
+) (C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
 Package: iftex 2022/02/03 v1.0f TeX engine tests
 )
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcm
-ds.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
 Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 )
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
 )
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolb
-ox.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count196
 )
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval
-.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \KV@toks@=\toks17
 )
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvopt
-ions.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvset
-keys.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
-))
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.s
-ty
+)) (C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.sty
 Package: logreq 2010/08/04 v1.0 xml request logger
 \lrq@indent=\count197
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.d
-ef
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.def
 File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
 ))
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
-) (C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+)
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
@@ -144,8 +131,7 @@ Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 Package biblatex Info: Trying to load biblatex default data model...
 Package biblatex Info: ... file 'blx-dm.def' found.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-dm
-.def
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-dm.def
 File: blx-dm.def 2023/03/05 v3.19 biblatex localization (PK/MW)
 )
 Package biblatex Info: Trying to load biblatex custom data model...
@@ -235,15 +221,12 @@ Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
 Package biblatex Info: Trying to load compatibility code...
 Package biblatex Info: ... file 'blx-compat.def' found.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-co
-mpat.def
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-compat.def
 File: blx-compat.def 2023/03/05 v3.19 biblatex compatibility (PK/MW)
 )
 Package biblatex Info: Trying to load generic definitions...
 Package biblatex Info: ... file 'biblatex.def' found.
-
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblat
-ex.def
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblatex.def
 File: biblatex.def 2023/03/05 v3.19 biblatex compatibility (PK/MW)
 \c@textcitecount=\count378
 \c@textcitetotal=\count379
@@ -262,14 +245,13 @@ File: biblatex.def 2023/03/05 v3.19 biblatex compatibility (PK/MW)
 Package biblatex Info: Trying to load bibliography style 'numeric'...
 Package biblatex Info: ... file 'numeric.bbx' found.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/bbx\nu
-meric.bbx
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/bbx\numeric.bbx
 File: numeric.bbx 2023/03/05 v3.19 biblatex bibliography style (PK/MW)
 Package biblatex Info: Trying to load bibliography style 'standard'...
 Package biblatex Info: ... file 'standard.bbx' found.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/bbx\st
-andard.bbx
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/bbx\standard.bb
+x
 File: standard.bbx 2023/03/05 v3.19 biblatex bibliography style (PK/MW)
 \c@bbx:relatedcount=\count387
 \c@bbx:relatedtotal=\count388
@@ -277,8 +259,7 @@ File: standard.bbx 2023/03/05 v3.19 biblatex bibliography style (PK/MW)
 Package biblatex Info: Trying to load citation style 'numeric'...
 Package biblatex Info: ... file 'numeric.cbx' found.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/cbx\nu
-meric.cbx
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/cbx\numeric.cbx
 File: numeric.cbx 2023/03/05 v3.19 biblatex citation style (PK/MW)
 Package biblatex Info: Redefining '\cite'.
 Package biblatex Info: Redefining '\parencite'.
@@ -294,20 +275,16 @@ Package biblatex Info: Redefining '\smartcites'.
 )
 Package biblatex Info: Trying to load configuration file...
 Package biblatex Info: ... file 'biblatex.cfg' found.
-
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblat
-ex.cfg
+ (C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblatex.cfg
 File: biblatex.cfg 
 )
 Package biblatex Info: Input encoding 'utf8' detected.
 Package biblatex Info: Document encoding is UTF8 ....
-
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/l3kernel\expl3.
-sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/l3kernel\expl3.sty
 Package: expl3 2024-02-20 L3 programming layer (loader) 
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3bac
-kend-pdftex.def
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdft
+ex.def
 File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count389
 \l__pdf_internal_box=\box51
@@ -317,34 +294,30 @@ Package biblatex Info: ... and expl3
 (biblatex)             is new enough (at least 2020/04/06),
 (biblatex)             setting 'casechanger=expl3'.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-ca
-se-expl3.sty
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/l3packages/xpar
-se\xparse.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-case-expl3.
+sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/l3packages/xparse\xparse
+.sty
 Package: xparse 2024-02-18 L3 Experimental document command parser
 )
 Package: blx-case-expl3 2023/03/05 v3.19 expl3 case changing code for biblatex
 ))
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphi
-cx.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphi
-cs.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
 Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.s
-ty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
 Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
 )
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\gr
-aphics.cfg
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.cf
+g
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pd
-ftex.def
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
 File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
 \Gin@req@height=\dimen141
@@ -372,8 +345,7 @@ LaTeX Font Info:    ... okay on input line 36.
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\en
-glish.lbx
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\english.lbx
 File: english.lbx 2023/03/05 v3.19 biblatex localization (PK/MW)
 )
 Package biblatex Info: Input encoding 'utf8' detected.
@@ -387,8 +359,8 @@ Package biblatex Info: ... file 'project_proposal.bbl' found.
 Package biblatex Info: Reference section=0 on input line 36.
 Package biblatex Info: Reference segment=0 on input line 36.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\sup
-p-pdf.mkii
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mki
+i
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count392
 \scratchdimen=\dimen143
@@ -402,14 +374,14 @@ p-pdf.mkii
 \makeMPintoPDFobject=\count397
 \everyMPtoPDFconversion=\toks19
 )
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\ep
-stopdf-base.sty
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-ba
+se.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
 
-(C:\Users\Ricardo Pinto\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstop
-df-sys.cfg
+(C:\Users\Wild\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.cf
+g
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
 <logoISEL.pdf, id=1, 426.79147pt x 301.59976pt>
@@ -432,12 +404,18 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
  [1
 
-{C:/Users/Ricardo Pinto/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./lo
-goISEL.pdf>] [2]
+{C:/Users/Wild/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./logoISEL.pd
+f>]
+Overfull \hbox (5.83116pt too wide) in paragraph at lines 49--50
+[]\OT1/cmr/m/n/10.95 The ob-jec-tive is to sig-nif-i-cantly de-crease the pos-s
+i-bil-i-ties of mis-takes that stor-ing/consulting
+ []
+
+[2]
 <gantt.png, id=37, 2177.13374pt x 488.82625pt>
 File: gantt.png Graphic file (type png)
 <use gantt.png>
-Package pdftex.def Info: gantt.png  used on input line 101.
+Package pdftex.def Info: gantt.png  used on input line 102.
 (pdftex.def)             Requested size: 441.00006pt x 99.0166pt.
  [3 <./gantt.png (PNG copy)>] [4] (project_proposal.aux)
  ***********
@@ -449,25 +427,24 @@ Package logreq Info: Writing requests to 'project_proposal.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 9439 strings out of 474435
- 184010 string characters out of 5738121
+ 9442 strings out of 474435
+ 183199 string characters out of 5742405
  1935190 words of memory out of 5000000
- 31719 multiletter control sequences out of 15000+600000
+ 31722 multiletter control sequences out of 15000+600000
  564396 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  66i,13n,81p,691b,1263s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\Ricardo Pinto\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi
-600\tcrm1095.pk><C:/Users/Ricardo Pinto/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Ricardo Pinto/AppData/Local/Programs
-/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Ricardo Pinto/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/R
-icardo Pinto/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10
-.pfb><C:/Users/Ricardo Pinto/AppData/Local/Programs/MiKTeX/fonts/type1/public/a
-msfonts/cm/cmr12.pfb><C:/Users/Ricardo Pinto/AppData/Local/Programs/MiKTeX/font
-s/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Ricardo Pinto/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Ricardo Pinto/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on project_proposal.pdf (4 pages, 453790 bytes).
+ <C:\Users\Wild\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1
+095.pk><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
+/cm/cmbx10.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type1/public/
+amsfonts/cm/cmbx12.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fonts/type1
+/public/amsfonts/cm/cmcsc10.pfb><C:/Users/Wild/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Wild/AppData/Local/Programs/Mi
+KTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Wild/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Wild/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Wild/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on project_proposal.pdf (4 pages, 458083 bytes).
 PDF statistics:
  84 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

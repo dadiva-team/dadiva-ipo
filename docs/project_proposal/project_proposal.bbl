@@ -45,6 +45,32 @@
       \verb https://www.elastic.co/elasticsearch
       \endverb
     \endentry
+    \entry{hl7}{online}{}
+      \name{author}{1}{}{%
+        {{hash=d1cbe52c6dab91e0d921095d2644972a}{%
+           family={CloudFoundation},
+           familyi={C\bibinitperiod},
+           given={Team},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{d1cbe52c6dab91e0d921095d2644972a}
+      \strng{fullhash}{d1cbe52c6dab91e0d921095d2644972a}
+      \strng{bibnamehash}{d1cbe52c6dab91e0d921095d2644972a}
+      \strng{authorbibnamehash}{d1cbe52c6dab91e0d921095d2644972a}
+      \strng{authornamehash}{d1cbe52c6dab91e0d921095d2644972a}
+      \strng{authorfullhash}{d1cbe52c6dab91e0d921095d2644972a}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{What is HL7?.}
+      \verb{urlraw}
+      \verb https://cloudfoundation.com/blog/what-is-hl7/
+      \endverb
+      \verb{url}
+      \verb https://cloudfoundation.com/blog/what-is-hl7/
+      \endverb
+    \endentry
     \entry{nodejs}{online}{}
       \name{author}{1}{}{%
         {{hash=37ad480f97bed434bd748fcd4aa11d40}{%
