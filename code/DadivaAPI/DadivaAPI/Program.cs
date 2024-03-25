@@ -1,4 +1,5 @@
 using DadivaAPI.routes;
+using DadivaAPI.routes.users;
 using DadivaAPI.services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +20,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.AddExampleRoutes();
+var group = app.MapGroup("/api");
+
+group.AddExampleRoutes();
+group.AddUsersRoutes();
 
 app.UseHttpsRedirection();
 

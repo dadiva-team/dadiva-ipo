@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DadivaAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e4daaa17bd7280dfd7123aa0c3144c5768fac20")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+68e9f61a76539a972d99e4d08d32aa741df41dc7")]
 [assembly: System.Reflection.AssemblyProductAttribute("DadivaAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DadivaAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
