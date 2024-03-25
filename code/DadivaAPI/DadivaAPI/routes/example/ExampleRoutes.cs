@@ -1,7 +1,7 @@
-using DadivaAPI.routes.models;
-using DadivaAPI.services;
+using DadivaAPI.routes.example.models;
+using DadivaAPI.services.example;
 
-namespace DadivaAPI.routes;
+namespace DadivaAPI.routes.example;
 
 public static class ExampleRoutes
 {

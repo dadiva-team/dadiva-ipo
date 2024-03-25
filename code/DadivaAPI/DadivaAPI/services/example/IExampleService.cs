@@ -1,4 +1,4 @@
-namespace DadivaAPI.services;
+namespace DadivaAPI.services.example;
 
 public interface IExampleService
 {
