@@ -769,26 +769,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Ricardo Pinto\\.nuget\\packages\\": {}
+    "C:\\Users\\quico\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ricardo Pinto\\Desktop\\Cadeiras\\6\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaAPI\\DadivaAPI.csproj",
+      "projectUniqueName": "C:\\Users\\quico\\Documents\\ProjetoFinal\\dadiva-ipo\\code\\DadivaAPI\\DadivaAPI\\DadivaAPI.csproj",
       "projectName": "DadivaAPI",
-      "projectPath": "C:\\Users\\Ricardo Pinto\\Desktop\\Cadeiras\\6\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaAPI\\DadivaAPI.csproj",
-      "packagesPath": "C:\\Users\\Ricardo Pinto\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ricardo Pinto\\Desktop\\Cadeiras\\6\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaAPI\\obj\\",
+      "projectPath": "C:\\Users\\quico\\Documents\\ProjetoFinal\\dadiva-ipo\\code\\DadivaAPI\\DadivaAPI\\DadivaAPI.csproj",
+      "packagesPath": "C:\\Users\\quico\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\quico\\Documents\\ProjetoFinal\\dadiva-ipo\\code\\DadivaAPI\\DadivaAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Ricardo Pinto\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\quico\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -801,6 +799,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -843,7 +846,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
