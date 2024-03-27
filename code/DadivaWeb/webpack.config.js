@@ -1,9 +1,11 @@
 const ESLintPlugin = require('eslint-webpack-plugin');
+
 function delay(ms) {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, ms);
   });
 }
+
 module.exports = {
   mode: 'development',
   devServer: {
@@ -14,7 +16,7 @@ module.exports = {
       '/api': {
         target: 'http://localhost:8080',
         // introducing an API delay to make testing easier
-        pathRewrite: async function (path, req) {
+        pathRewrite: async function(path, req) {
           await delay(1000);
           return path;
         },
@@ -25,7 +27,7 @@ module.exports = {
             }
           });
           res.on('close', () => {
-            console.log("req close");
+            console.log('req close');
             proxyRes.destroy();
           });
         },
@@ -46,6 +48,18 @@ module.exports = {
         test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+        ],
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
+        exclude: /node_modules/,
+        use: ['file-loader?name=[name].[ext]'], // ?name=[name].[ext] is only necessary to preserve the original file name
       },
     ],
   },
