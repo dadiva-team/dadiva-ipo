@@ -44,6 +44,15 @@ builder.Services.AddSingleton<IUsersService, UsersService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
 
+builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost8000",
+        builder => builder.WithOrigins("http://localhost:8000")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,11 +62,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowLocalhost8000");
+
 var group = app.MapGroup("/api");
 
 group.AddExampleRoutes();
 group.AddUsersRoutes();
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
