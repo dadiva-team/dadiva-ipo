@@ -16,5 +16,9 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "react"],
-  "ignorePatterns": ["webpack.config.js"]
+  "ignorePatterns": ["webpack.config.js"],
+
+  "rules": {
+    "@typescript-eslint/no-namespace": "off"
+  }
 }
