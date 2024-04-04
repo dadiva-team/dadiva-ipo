@@ -16,7 +16,6 @@ export async function fetchAPI<T>(
     })
 
     if(!res.ok) {
-        console.log(await res.json())
         throw new Problem(await res.json())
     }
 

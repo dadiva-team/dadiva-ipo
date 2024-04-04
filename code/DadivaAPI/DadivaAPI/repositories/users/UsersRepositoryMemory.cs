@@ -6,7 +6,7 @@ public class UsersRepositoryMemory : IUsersRepository
 
     public bool CheckUserByNicAndPassword(int nic, string hashedPassword)
     {
-        return users[nic] == hashedPassword;
+        return users.ContainsKey(nic) && users[nic] == hashedPassword;
     }
 
     public bool AddUser(int nic, string hashedPassword)

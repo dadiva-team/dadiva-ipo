@@ -18,12 +18,12 @@ public static class UsersRoutes
 
     private static async Task<IResult> CreateToken([FromBody] CreateTokenInputModel input, IUsersService service)
     {
-        Result<Token, string> result = service.CreateToken(input.Nic, input.Password);
+        Result<Token, Problem> result = service.CreateToken(input.Nic, input.Password);
         switch(result)
         {
-            case Result<Token, string>.SuccessResult success:
+            case Result<Token, Problem>.SuccessResult success:
                 return Results.Ok(new CreateTokenOutputModel(success.Value.token));
-            case Result<Token, string>.FailureResult failure:
+            case Result<Token, Problem>.FailureResult failure:
                 return Results.BadRequest(failure.Error);
         }
         return Results.Ok(input);
@@ -31,12 +31,12 @@ public static class UsersRoutes
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)
     {
-        Result<UserExternalInfo, string> result = service.CreateUser(input.Nic, input.Password);
+        Result<UserExternalInfo, Problem> result = service.CreateUser(input.Nic, input.Password);
         switch(result)
         {
-            case Result<UserExternalInfo, string>.SuccessResult success:
+            case Result<UserExternalInfo, Problem>.SuccessResult success:
                 return Results.Created((string)null, new CreateUserOutputModel(success.Value.Nic));
-            case Result<UserExternalInfo, string>.FailureResult failure:
+            case Result<UserExternalInfo, Problem>.FailureResult failure:
                 return Results.BadRequest(failure.Error);
         }
         return Results.Ok(input);

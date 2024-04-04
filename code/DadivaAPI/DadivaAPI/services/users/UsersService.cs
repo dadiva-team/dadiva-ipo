@@ -10,26 +10,34 @@ namespace DadivaAPI.services.users;
 
 public class UsersService(IConfiguration config, IUsersRepository repository) : IUsersService
 {
-    public Result<Token, string> CreateToken(int nic, string password)
+    public Result<Token, Problem> CreateToken(int nic, string password)
     {
         string hashedPassword = $"{password}hashed";
         if (repository.CheckUserByNicAndPassword(nic, hashedPassword))
         {
             Token token = new Token(config["Jwt:Key"], config["Jwt:Issuer"]);
-            return Result<Token, string>.Success(token);
+            return Result<Token, Problem>.Success(token);
         }
-
-        return Result<Token, string>.Failure("Invalid credentials");
+        
+        return Result<Token, Problem>.Failure(UserServicesErrorExtensions.ToResponse(TokenCreationError.UserOrPasswordAreInvalid));
     }
 
-    public Result<UserExternalInfo, string> CreateUser(int nic, string password)
+    public Result<UserExternalInfo, Problem> CreateUser(int nic, string password)
     {
         string hashedPassword = $"{password}hashed";
+        if (!User.IsValidPassword(password))
+        {
+            return Result<UserExternalInfo, Problem>.Failure(UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidPassword));
+        } 
+        if (!User.IsValidNic(nic))
+        {
+            return Result<UserExternalInfo, Problem>.Failure(UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidNic));
+        } 
         if (repository.AddUser(nic, hashedPassword))
         {
-            return Result<UserExternalInfo, string>.Success(new UserExternalInfo(nic));
+            return Result<UserExternalInfo, Problem>.Success(new UserExternalInfo(nic));
         }
 
-        return Result<UserExternalInfo, string>.Failure("User already exists");
+        return Result<UserExternalInfo, Problem>.Failure(UserServicesErrorExtensions.ToResponse(UserServiceError.UserAlreadyExists));
     }
 }

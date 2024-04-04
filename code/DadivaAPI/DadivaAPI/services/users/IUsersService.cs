@@ -6,7 +6,7 @@ namespace DadivaAPI.services.users;
 
 public interface IUsersService
 {
-    public Result<Token, string> CreateToken(int nic, string password);
+    public Result<Token, Problem> CreateToken(int nic, string password);
     
-    public Result<UserExternalInfo, string> CreateUser(int nic, string password);
+    public Result<UserExternalInfo, Problem> CreateUser(int nic, string password);
 }
