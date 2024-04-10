@@ -1,10 +1,17 @@
 using System.Text;
+using System.Text.Json;
+using DadivaAPI.domain;
+using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.example;
+using DadivaAPI.routes.form;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.example;
+using DadivaAPI.services.form;
 using DadivaAPI.services.users;
+using DadivaAPI.utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,8 +48,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IExampleService, ExampleService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
+builder.Services.AddSingleton<IFormService, FormService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
+builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
@@ -68,6 +77,7 @@ var group = app.MapGroup("/api");
 
 group.AddExampleRoutes();
 group.AddUsersRoutes();
+group.AddFormRoutes();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
