@@ -1,79 +1,79 @@
 .login-container {
-    max-width: 300px;
-    margin: auto;
-    padding: 20px;
-    text-align: center;
+  max-width: 300px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
 }
 
 h1 {
-    margin-bottom: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 h1.welcome {
-    font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: bold;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .input-group {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 label.nic {
-    font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: bold;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 label.password {
-    font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: bold;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .input-group label {
-    display: block;
-    margin-bottom: 0.5em;
+  display: block;
+  margin-bottom: 0.5em;
 }
 
 .input-group input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.login-button, .auth-button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #f0e68c;
-    cursor: pointer;
-    font-size: 1em;
+.login-button,
+.auth-button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #f0e68c;
+  cursor: pointer;
+  font-size: 1em;
 }
 
 .login-button {
-    background-color: #d2b48c;
+  background-color: #d2b48c;
 }
 
 .auth-button {
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    margin-top: 1em;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  margin-top: 1em;
 }
 
 .alternative {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
 }
 
 .alternative hr {
-    flex-grow: 1;
-    border: none;
-    border-top: 1px solid #ccc;
+  flex-grow: 1;
+  border: none;
+  border-top: 1px solid #ccc;
 }
 
 .alternative p {
-    margin: 0 10px;
+  margin: 0 10px;
 }
-  

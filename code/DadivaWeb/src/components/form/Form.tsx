@@ -1,96 +1,89 @@
-import * as React from "react";
-import {useState} from "react";
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { getForm } from '../../services/from/FormServices';
 
-class SubQuestion{
-    rule:string
-    question:string
-    responseType:string
+class Question {
+  questionText: string;
+  subQuestions: SubQuestion[] | null;
+}
+
+class SubQuestion {
+  rule: boolean;
+  question: Question;
+  responseType: string;
 }
 
 //TODO:proof of concept
 export default function Form() {
-    const [currentSubQuestions, setCurrentSubQuestions] = useState<
-        Record<string, string | null>
-    >({});
+  const [currentSubQuestions, setCurrentSubQuestions] = useState<Record<string, string | null>>({});
+  const [form, setForm] = useState({ questions: [] });
+  const [isLoading, setIsLoading] = useState(true);
 
-    const form = {
-        "Questions":[
-            {
-                "question":"Tomou ou está a tomar medicamentos?",
-                "subQuestions":[
-                    {
-                        "rule":"yes",
-                        "question": "Por favor indique qual a medicação:",
-                        "responseType": "dropdown"
-                    }
-                ]
-            },
-            {
-                "question":"Alguma vez viajou para forma do pais?",
-                "subQuestions":[
-                    {
-                        "rule":"yes",
-                        "question":"Para que continente?",
-                        "responseType": "dropdown"
-                    }
-                ]
-            },
-            {
-                "question":"Tem sido sempre saudavel?"
-            }
-        ]
+  useEffect(() => {
+    // Function to fetch form data
+    getForm().then(form => {
+      console.log(form);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      setForm(form);
+      setIsLoading(false);
+    });
+  }, []); // Empty array ensures this runs once on mount
+
+  function onQuestionAnswer(value: boolean, mainQuestion: string, subQuestions: SubQuestion[] | undefined) {
+    console.log('Question Answered');
+    if (subQuestions === null) return;
+
+    if (subQuestions[0].rule === value) {
+      console.log('adding [' + mainQuestion + ']: ' + subQuestions[0].question.questionText);
+      setCurrentSubQuestions({
+        ...currentSubQuestions,
+        [mainQuestion]: subQuestions[0].question.questionText,
+      });
+    } else {
+      setCurrentSubQuestions({
+        ...currentSubQuestions,
+        [mainQuestion]: null,
+      });
     }
-    function onQuestionAnswer(value: string, mainQuestion: string, subQuestions: SubQuestion[] | undefined) {
-        console.log("Question Answered");
-        if (subQuestions === undefined) return;
+  }
 
-        if (subQuestions[0].rule === value) {
-            setCurrentSubQuestions({
-                ...currentSubQuestions,
-                [mainQuestion]: subQuestions[0].question
-            });
-        } else {
-            setCurrentSubQuestions({
-                ...currentSubQuestions,
-                [mainQuestion]: null
-            });
-        }
-    }
+  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
+    ev.preventDefault();
+    console.log('Respostas submetidas');
+  }
 
-    async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
-        ev.preventDefault();
-        console.log("Respostas submetidas")
-    }
+  if (isLoading) {
+    return <div>Loading...</div>; // Here you can replace the text with a spinner component or similar
+  }
 
-    return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                    {
-                        form.Questions.map( mainQuestion => (
-                            <div key={mainQuestion.question}>
-                                <h1> {mainQuestion.question} </h1>
-                                <input
-                                    type="radio"
-                                    id="Sim"
-                                    name={mainQuestion.question}
-                                    onChange={()=>onQuestionAnswer("yes", mainQuestion.question, mainQuestion.subQuestions)}
-                                />
-                                <label htmlFor="Sim">Sim</label>
-                                <input
-                                    type="radio"
-                                    id="Nao"
-                                    name={mainQuestion.question}
-                                    onChange={()=>onQuestionAnswer("no", mainQuestion.question, mainQuestion.subQuestions)}
-                                />
-                                <label htmlFor="Nao">Não</label>
-                                {currentSubQuestions[mainQuestion.question] && (
-                                    <div>{currentSubQuestions[mainQuestion.question]}</div>
-                                )}
-                            </div>
-                        ))
-                    }
-                <button type="submit">Submeter</button>
-            </form>
-        </div>
-    );
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        {form.questions.map(mainQuestion => (
+          <div key={mainQuestion.questionText}>
+            <h1> {mainQuestion.questionText} </h1>
+            <input
+              type="radio"
+              id="Sim"
+              name={mainQuestion.questionText}
+              onChange={() => onQuestionAnswer(true, mainQuestion.questionText, mainQuestion.subQuestions)}
+            />
+            <label htmlFor="Sim">Sim</label>
+            <input
+              type="radio"
+              id="Nao"
+              name={mainQuestion.questionText}
+              onChange={() => onQuestionAnswer(false, mainQuestion.questionText, mainQuestion.subQuestions)}
+            />
+            <label htmlFor="Nao">Não</label>
+            {currentSubQuestions[mainQuestion.questionText] && (
+              <div>{currentSubQuestions[mainQuestion.questionText]}</div>
+            )}
+          </div>
+        ))}
+        <button type="submit">Submeter</button>
+      </form>
+    </div>
+  );
 }

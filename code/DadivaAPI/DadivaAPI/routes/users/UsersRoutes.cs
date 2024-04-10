@@ -19,26 +19,23 @@ public static class UsersRoutes
     private static async Task<IResult> CreateToken([FromBody] CreateTokenInputModel input, IUsersService service)
     {
         Result<Token, Problem> result = service.CreateToken(input.Nic, input.Password);
-        switch(result)
+        return result switch
         {
-            case Result<Token, Problem>.SuccessResult success:
-                return Results.Ok(new CreateTokenOutputModel(success.Value.token));
-            case Result<Token, Problem>.FailureResult failure:
-                return Results.BadRequest(failure.Error);
-        }
-        return Results.Ok(input);
+            Result<Token, Problem>.SuccessResult success => Results.Ok(new CreateTokenOutputModel(success.Value.token)),
+            Result<Token, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("never gonna give you up, never gonna let you down")
+        };
     }
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)
     {
         Result<UserExternalInfo, Problem> result = service.CreateUser(input.Nic, input.Password);
-        switch(result)
+        return result switch
         {
-            case Result<UserExternalInfo, Problem>.SuccessResult success:
-                return Results.Created((string)null, new CreateUserOutputModel(success.Value.Nic));
-            case Result<UserExternalInfo, Problem>.FailureResult failure:
-                return Results.BadRequest(failure.Error);
-        }
-        return Results.Ok(input);
+            Result<UserExternalInfo, Problem>.SuccessResult success => Results.Created((string)null,
+                new CreateUserOutputModel(success.Value.Nic)),
+            Result<UserExternalInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("never gonna give you up, never gonna let you down")
+        };
     }
 }

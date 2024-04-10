@@ -8,23 +8,22 @@
  */
 
 export interface IProblem {
-    type: string,
-    title: string,
-    status: number,
-    detail?: string;
+  type: string;
+  title: string;
+  status: number;
+  detail?: string;
 }
 
 export class Problem {
-    type: string;
-    title: string;
-    status: number;
-    detail?: string;
+  type: string;
+  title: string;
+  status: number;
+  detail?: string;
 
-    constructor(problem: IProblem) {
-        this.type = problem.type;
-        this.title = problem.title;
-        this.status = problem.status;
-        this.detail = problem.detail;
-    }
+  constructor(problem: IProblem) {
+    this.type = problem.type;
+    this.title = problem.title;
+    this.status = problem.status;
+    this.detail = problem.detail;
+  }
 }
-

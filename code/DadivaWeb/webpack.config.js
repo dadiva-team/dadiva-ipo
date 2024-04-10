@@ -16,7 +16,7 @@ module.exports = {
       '/api': {
         target: 'http://localhost:8080',
         // introducing an API delay to make testing easier
-        pathRewrite: async function(path, req) {
+        pathRewrite: async function (path, req) {
           await delay(1000);
           return path;
         },
@@ -51,10 +51,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-        ],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|svg|jpg|jpeg|gif|ico)$/,

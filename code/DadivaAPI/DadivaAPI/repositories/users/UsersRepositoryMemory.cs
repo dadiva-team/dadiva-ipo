@@ -2,7 +2,10 @@ namespace DadivaAPI.repositories.users;
 
 public class UsersRepositoryMemory : IUsersRepository
 {
-    Dictionary<int, string> users = new();
+    private Dictionary<int, string> users = new()
+    {
+        {123456789, "MegaPassword123!hashed"}
+    };
 
     public bool CheckUserByNicAndPassword(int nic, string hashedPassword)
     {

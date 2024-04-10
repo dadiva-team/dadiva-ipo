@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 var jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
 var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
 
-if(jwtKey == null || jwtIssuer == null)
+if (jwtKey == null || jwtIssuer == null)
 {
     throw new Exception("Jwt:Issuer and Jwt:Key must be provided in appsettings.json");
 }
@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
-//Jwt configuration ends here
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -53,16 +53,17 @@ builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
 
-builder.Services.AddAuthorization();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowLocalhost8000",
-        builder => builder.WithOrigins("http://localhost:8000")
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
-});
+builder.Services.AddCors();
 
 var app = builder.Build();
+
+app.UseCors(b => b
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -70,8 +71,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("AllowLocalhost8000");
 
 var group = app.MapGroup("/api");
 
