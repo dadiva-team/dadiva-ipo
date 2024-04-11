@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "eslint": "^8.57.0",
+    "json-rules-engine": "^6.5.0",
     "playwright": "^1.42.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

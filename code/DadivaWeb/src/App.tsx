@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import Login from './components/authentication/Login/Login';
 import Register from './components/authentication/Register';
 import Form from './components/form/Form';
+import AnotherForm from './components/form/AnotherForm';
 import { Uris } from './utils/navigation/Uris';
 import Home from './components/home/Home';
 import HOME = Uris.HOME;
@@ -20,6 +21,7 @@ export default function App() {
           <Route path={REGISTER} element={<Register />} />
 
           <Route path={FORM} element={<Form />} />
+          <Route path={FORM + 'a'} element={<AnotherForm />} />
         </Routes>
       </div>
     </div>
