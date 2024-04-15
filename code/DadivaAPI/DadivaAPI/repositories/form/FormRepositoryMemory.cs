@@ -4,25 +4,66 @@ namespace DadivaAPI.repositories.form;
 
 public class FormRepositoryMemory : IFormRepository
 {
-    private readonly List<Question> questions = new()
+    private readonly Form form = new()
     {
-        new Question(
-            "Tomou ou está a tomar medicamentos?",
-            new()
-            {
-                new SubQuestion(true, new Question("Por favor indique qual a medicação:"), ResponseType.DROPDOWN),
-            }),
-        new Question(
-            "Alguma vez viajou para forma do pais?",
-            new()
-            {
-                new SubQuestion(true, new Question("Para que continente?"), ResponseType.DROPDOWN),
-            }),
-        new Question("Tem sido sempre saudavel?")
+        Questions = new List<Question>
+        {
+            new
+            (
+                "hasTraveled",
+                "Ja viajou para fora de Portugal?",
+                ResponseType.BOOLEAN,
+                null
+            ),
+            new
+            (
+                "traveledWhere",
+                "Para onde?",
+                ResponseType.TEXT,
+                null
+            )
+        },
+        Rules = new List<Rule>
+        {
+            new(
+    
+                
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
+                    { ConditionType.any, new List<Evaluation>() }
+                }!
+                ,
+                new Event(
+                    EventType.showQuestion,
+                    new List<EventParams>
+                    {
+                        new("hasTraveled")
+                    })
+            ),
+            new(
+                    new Dictionary<ConditionType, List<Evaluation>?>
+                    {
+                        {
+                            ConditionType.any,
+                            new List<Evaluation>
+                            {
+                                new("hasTraveled", Operator.equal, "yes")
+                            }
+                        }
+                    }!
+                ,
+                new Event(
+                    EventType.showQuestion,
+                    new List<EventParams>
+                    {
+                        new("traveledWhere")
+                    })
+            )
+        }
     };
 
-    public Task<List<Question>> GetQuestions()
+    public Task<Form> GetForm()
     {
-        return Task.FromResult(questions);
+        return Task.FromResult(form);
     }
 }

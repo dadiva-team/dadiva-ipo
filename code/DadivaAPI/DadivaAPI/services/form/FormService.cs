@@ -9,8 +9,8 @@ public class FormService(IFormRepository repository) : IFormService
 {
     public async Task<Result<FormExternalInfo, Problem>> GetForm()
     {
-        List<Question> questions = await repository.GetQuestions();
+        Form form = await repository.GetForm();
 
-        return Result<FormExternalInfo, Problem>.Success(new FormExternalInfo(questions));
+        return Result<FormExternalInfo, Problem>.Success(new FormExternalInfo(form.Questions,form.Rules));
     }
 }

@@ -27,7 +27,7 @@ public static class FormRoutes
         {
             Result<FormExternalInfo, Problem>.SuccessResult success =>
                 //Results.Json(new GetFormOutputModel(success.Value.Questions), options, statusCode: 200),
-                Results.Ok(new GetFormOutputModel(success.Value.Questions)),
+                Results.Ok(new GetFormOutputModel(success.Value.Questions, success.Value.Rules)),
             Result<FormExternalInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
