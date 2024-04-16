@@ -1,16 +1,17 @@
 using System.Text;
 using System.Text.Json;
 using DadivaAPI.domain;
+using DadivaAPI.repositories.dnd;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.users;
+using DadivaAPI.routes.dnd;
 using DadivaAPI.routes.example;
 using DadivaAPI.routes.form;
 using DadivaAPI.routes.users;
+using DadivaAPI.services.dnd;
 using DadivaAPI.services.example;
 using DadivaAPI.services.form;
 using DadivaAPI.services.users;
-using DadivaAPI.utils;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -45,15 +46,17 @@ builder.Services.AddAuthorization();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IExampleService, ExampleService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IFormService, FormService>();
+builder.Services.AddSingleton<IDnDService, DnDService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
+builder.Services.AddSingleton<IDnDRepository, DnDRepositoryMemory>();
 
 builder.Services.AddCors(options =>
 {
@@ -77,8 +80,8 @@ app.UseAuthorization();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 var group = app.MapGroup("/api");
@@ -86,5 +89,6 @@ var group = app.MapGroup("/api");
 group.AddExampleRoutes();
 group.AddUsersRoutes();
 group.AddFormRoutes();
+group.AddDnDRoutes();
 
 app.Run();
