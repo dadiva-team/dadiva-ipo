@@ -3,13 +3,14 @@ import { Route, Routes } from 'react-router-dom';
 import Login from './components/authentication/Login/Login';
 import Register from './components/authentication/Register';
 import Form from './components/form/Form';
-import AnotherForm from './components/form/AnotherForm';
 import { Uris } from './utils/navigation/Uris';
 import Home from './components/home/Home';
 import HOME = Uris.HOME;
 import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
+import RealForm from './components/form/RealForm';
+import AnotherForm from './components/form/AnotherForm';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
 
           <Route path={FORM} element={<Form />} />
           <Route path={FORM + 'a'} element={<AnotherForm />} />
+          <Route path={FORM + 'aa'} element={<RealForm />} />
         </Routes>
       </div>
     </div>

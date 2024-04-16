@@ -25,6 +25,12 @@ export default function Home() {
       <button value="FORM" onClick={() => navigate('/form')} style={{ display: 'block', marginBottom: '10px' }}>
         FORM
       </button>
+      <button value="FORM" onClick={() => navigate('/forma')} style={{ display: 'block', marginBottom: '10px' }}>
+        FORM
+      </button>
+      <button value="FORM" onClick={() => navigate('/formaa')} style={{ display: 'block', marginBottom: '10px' }}>
+        FORM
+      </button>
     </div>
   );
 }
