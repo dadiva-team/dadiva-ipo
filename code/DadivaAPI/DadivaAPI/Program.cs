@@ -10,6 +10,7 @@ using DadivaAPI.services.example;
 using DadivaAPI.services.form;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -34,17 +35,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtIssuer,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+
 builder.Services.AddAuthorization();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IExampleService, ExampleService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
@@ -53,23 +55,30 @@ builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
 
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyCorsPolicy",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:8000") // Frontend server address
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials(); // Important if you are sending credentials (like cookies or basic auth)
+        });
+});
 
 var app = builder.Build();
 
-app.UseCors(b => b
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
-
+app.UseCors("MyCorsPolicy");
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
 
 var group = app.MapGroup("/api");
@@ -77,9 +86,5 @@ var group = app.MapGroup("/api");
 group.AddExampleRoutes();
 group.AddUsersRoutes();
 group.AddFormRoutes();
-
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Run();

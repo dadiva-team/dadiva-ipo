@@ -4,6 +4,7 @@ import './Login.css';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { loginNIC } from '../../../services/users/UserServices';
+import { useSetUser } from '../../../session/Session';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ export default function Login() {
     inputs: { nic: '', password: '' },
   });
   const [showPassword, setShowPassword] = React.useState(false);
+
+  const setUser = useSetUser();
 
   if (state.tag === 'redirect') {
     return <Navigate to={'/me'} replace={true} />;
@@ -42,6 +45,12 @@ export default function Login() {
     if (res === undefined) {
       throw new Error('Response is undefined');
     }
+
+    console.log(res);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    setUser(res.nic);
   }
 
   const nic = state.tag === 'submitting' ? state.nic : state.inputs.nic;

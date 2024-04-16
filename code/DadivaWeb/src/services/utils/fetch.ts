@@ -15,6 +15,7 @@ export async function fetchAPI<T>(
           'Content-Type': 'application/json',
         },
     body,
+    credentials: 'include',
   });
 
   if (!res.ok) {

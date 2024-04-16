@@ -16,15 +16,29 @@ public static class UsersRoutes
         group.MapPost("", CreateUser);
     }
 
-    private static async Task<IResult> CreateToken([FromBody] CreateTokenInputModel input, IUsersService service)
+    private static async Task<IResult> CreateToken(HttpContext http, [FromBody] CreateTokenInputModel input,
+        IUsersService service)
     {
         Result<Token, Problem> result = service.CreateToken(input.Nic, input.Password);
-        return result switch
+        switch (result)
         {
-            Result<Token, Problem>.SuccessResult success => Results.Ok(new CreateTokenOutputModel(success.Value.token)),
-            Result<Token, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("never gonna give you up, never gonna let you down")
-        };
+            case Result<Token, Problem>.SuccessResult success:
+                CookieOptions cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,   // Required if SameSite is None
+                    SameSite = SameSiteMode.None,  // Necessary for cross-origin/cross-site requests
+                    Expires = DateTime.UtcNow.AddDays(1)
+                };
+                http.Response.Cookies.Append("token", success.Value.token, cookieOptions);
+                return Results.Created((string?)null, new CreateTokenOutputModel(input.Nic, success.Value.token));
+            case Result<Token, Problem>.FailureResult failure:
+                return Results.NotFound(failure.Error);
+            default:
+                throw new Exception("never gonna give you up, never gonna let you down");
+        }
+
+        ;
     }
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)

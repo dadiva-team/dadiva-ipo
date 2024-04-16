@@ -1,3 +1,3 @@
 namespace DadivaAPI.routes.users.models;
 
-public record CreateTokenOutputModel(string Token);
+public record CreateTokenOutputModel(int Nic, string Token);

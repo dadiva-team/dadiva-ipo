@@ -1,39 +1,50 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-export interface Session {
-  name: string;
-}
-
-export interface SessionManager {
-  readonly session: Session | null;
-  readonly setSession: (session: Session) => void;
-  readonly clearSession: () => void;
-}
-
-const SessionManagerContext = createContext<SessionManager>({
-  session: null,
-  setSession: () => {},
-  clearSession: () => {},
+type UserManager = {
+  user: string | undefined;
+  setUser: (user: string) => void;
+  clearUser: () => void;
+};
+const LoggedInContext = createContext<UserManager>({
+  user: undefined,
+  setUser: () => {},
+  clearUser: () => {},
 });
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | undefined>(undefined);
-  console.log(`AuthnContainer: ${session}`);
+  const [user, setUser] = useState<string | undefined>(undefined);
+  console.log(`AuthnContainer: ${user}`);
   return (
-    <SessionManagerContext.Provider
+    <LoggedInContext.Provider
       value={{
-        session,
-        setSession: (session: Session) => {
-          setSession(session);
-          sessionStorage.setItem('session', JSON.stringify(session));
+        user: user,
+        setUser: user => {
+          setUser(user);
+          sessionStorage.setItem('user', user);
         },
-        clearSession: () => {
-          setSession(null);
-          sessionStorage.removeItem('session');
+        clearUser: () => {
+          setUser(undefined);
+          sessionStorage.removeItem('user');
         },
       }}
     >
       {children}
-    </SessionManagerContext.Provider>
+    </LoggedInContext.Provider>
   );
+}
+
+export function useCurrentUser() {
+  const context = useContext(LoggedInContext);
+  const contextUser = context.user;
+  const user = contextUser === undefined ? sessionStorage.getItem('user') : contextUser;
+  if (user !== null) context.setUser(user);
+  return user;
+}
+
+export function useSetUser() {
+  return useContext(LoggedInContext).setUser;
+}
+
+export function useUserManager() {
+  return useContext(LoggedInContext);
 }
