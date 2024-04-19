@@ -1,14 +1,20 @@
+using System.Text.Json.Serialization;
 using DadivaAPI.domain;
 
-namespace DadivaAPI.routes.form.models;
-
-public record RuleModel(Dictionary<ConditionType, List<Evaluation>> Condition, Event Event)
+namespace DadivaAPI.routes.form.models
 {
-    public RuleModel(Rule rule) :
-        this(
-            rule.Condition,
-            rule.Event
-        )
+    public class RuleModel
     {
+        [JsonPropertyName("conditions")]
+        public Dictionary<ConditionType, List<Evaluation>> Condition { get; set; }
+
+        [JsonPropertyName("event")]
+        public Event Event { get; set; }
+
+        public RuleModel(Rule rule)
+        {
+            Condition = rule.Conditions;
+            Event = new Event(rule.Event);
+        }
     }
 }

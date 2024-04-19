@@ -1,21 +1,9 @@
-import { Engine, RuleProperties } from 'json-rules-engine';
+/*import { Engine } from 'json-rules-engine';
 import React, { JSX, useEffect, useState } from 'react';
 import { BooleanRadio, DefaultQuestionType, TextInput } from './Inputs';
+import { Form } from '../../domain/Form/Form';
 
-export class Form {
-  questions: Question[];
-  rules: RuleProperties[];
-}
-
-class Question {
-  id: string;
-  text: string;
-  type: string;
-  options: string[] | null;
-  color: Record<string, string> = { yes: 'green', no: 'red' };
-}
-
-const form: Form = {
+export const form: Form = {
   questions: [
     {
       id: 'hasTraveled',
@@ -129,4 +117,4 @@ export default function AnotherForm() {
       </form>
     </div>
   );
-}
+}*/

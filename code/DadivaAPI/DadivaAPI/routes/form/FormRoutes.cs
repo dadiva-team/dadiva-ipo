@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using DadivaAPI.domain;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.services.form;
@@ -19,15 +20,15 @@ public static class FormRoutes
     private static async Task<IResult> GetForm(IFormService service)
     {
         var options = new JsonSerializerOptions();
-        //options.Converters.Add(new QuestionConverter());
+        options.Converters.Add(new JsonStringEnumConverter());
         
         Result<FormExternalInfo, Problem> result = await service.GetForm();
         
         return result switch
         {
             Result<FormExternalInfo, Problem>.SuccessResult success =>
-                //Results.Json(new GetFormOutputModel(success.Value.Questions), options, statusCode: 200),
-                Results.Ok(new GetFormOutputModel(success.Value.Questions, success.Value.Rules)),
+                Results.Json(new GetFormOutputModel(success.Value.Questions, success.Value.Rules), options, statusCode: 200),
+                //Results.Ok(new GetFormOutputModel(success.Value.Questions, success.Value.Rules)),
             Result<FormExternalInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };

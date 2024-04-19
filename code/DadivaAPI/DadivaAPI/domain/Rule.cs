@@ -1,7 +1,7 @@
 namespace DadivaAPI.domain;
 
 public record Rule(
-    Dictionary<ConditionType, List<Evaluation>> Condition,
+    Dictionary<ConditionType, List<Evaluation>> Conditions,
     Event Event
 );
 

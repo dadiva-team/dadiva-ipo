@@ -23,8 +23,6 @@ export default function Form() {
     // Function to fetch form data
     getForm().then(form => {
       console.log(form);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       setForm(form);
       setIsLoading(false);
     });

@@ -40,6 +40,7 @@ export function deleteRequest<T>(input: RequestInfo | URL): Promise<T> {
 export async function handleRequest<T, E = Error>(promise: Promise<T>): Promise<[E, null] | [null, T]> {
   try {
     const res: T = await promise;
+    console.log('res handleRqt: ', res);
     return [null, res];
   } catch (err) {
     return [err as E, null];
