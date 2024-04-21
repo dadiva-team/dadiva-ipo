@@ -1,6 +1,6 @@
-/*import { Engine } from 'json-rules-engine';
+import { Engine } from 'json-rules-engine';
 import React, { JSX, useEffect, useState } from 'react';
-import { BooleanRadio, DefaultQuestionType, TextInput } from './Inputs';
+import { BooleanButtons, DefaultQuestionType, TextInput } from './Inputs';
 import { Form } from '../../domain/Form/Form';
 
 export const form: Form = {
@@ -10,14 +10,14 @@ export const form: Form = {
       text: 'Ja viajou para fora de Portugal?',
       type: 'boolean',
       options: null,
-      color: { yes: 'green', no: 'red' },
+      //color: { yes: 'green', no: 'red' },
     },
     {
       id: 'traveledWhere',
       text: 'Para onde?',
       type: 'text',
       options: null,
-      color: { yes: 'green', no: 'red' },
+      //color: { yes: 'green', no: 'red' },
     },
   ],
   rules: [
@@ -94,13 +94,13 @@ export default function AnotherForm() {
           let input: JSX.Element;
           switch (question.type) {
             case 'boolean':
-              input = BooleanRadio(question.id, answer => onChangeAnswer(question.id, answer ? 'yes' : 'no'));
+              input = <BooleanButtons onChangeAnswer={answer => onChangeAnswer(question.id, answer ? 'yes' : 'no')} />;
               break;
             case 'text':
-              input = TextInput(question.id, answer => onChangeAnswer(question.id, answer));
+              input = <TextInput onChangeAnswer={answer => onChangeAnswer(question.id, answer)} />;
               break;
             default:
-              input = DefaultQuestionType();
+              input = <DefaultQuestionType />;
               break;
           }
           return (
@@ -117,4 +117,4 @@ export default function AnotherForm() {
       </form>
     </div>
   );
-}*/
+}

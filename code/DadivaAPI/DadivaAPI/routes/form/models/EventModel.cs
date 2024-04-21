@@ -9,12 +9,12 @@ namespace DadivaAPI.routes.form.models
         public EventType Type { get; set; }
 
         [JsonPropertyName("params")]
-        public List<EventParams> Params { get; set; }
+        public EventParams Params { get; set; }
         
         public Event(DadivaAPI.domain.Event evt)
         {
             Type = evt.Type;
-            Params = evt.Params.Select(p => new EventParams(p)).ToList();
+            Params = new EventParams(evt.Params);
         }
     }
 

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace DadivaAPI.domain;
 
 public record Rule(
@@ -27,11 +29,24 @@ public enum Operator
     doesNotContain
 }
 
-public record Evaluation(
-    string Fact,
-    Operator Operator,
-    string Value
-);
+public record Evaluation
+{
+    [JsonPropertyName("fact")]
+    public string Fact { get; init; }
+
+    [JsonPropertyName("operator")]
+    public Operator Operator { get; init; }
+
+    [JsonPropertyName("value")]
+    public string Value { get; init; }
+
+    public Evaluation(string fact, Operator @operator, string value)
+    {
+        Fact = fact;
+        Operator = @operator;
+        Value = value;
+    }
+};
 
 public enum EventType
 {
@@ -40,7 +55,7 @@ public enum EventType
 }
 public record Event(
     EventType Type,
-    List<EventParams> Params
+    EventParams Params
 );
 
 public record EventParams(

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using DadivaAPI.domain;
 using DadivaAPI.repositories.dnd;
 using DadivaAPI.repositories.form;
@@ -43,6 +44,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = null; // Preserves original property names
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Correctly serialize enums as strings
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

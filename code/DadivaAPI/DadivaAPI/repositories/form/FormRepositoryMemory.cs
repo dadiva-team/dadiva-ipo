@@ -12,14 +12,14 @@ public class FormRepositoryMemory : IFormRepository
             (
                 "hasTraveled",
                 "Ja viajou para fora de Portugal?",
-                ResponseType.BOOLEAN,
+                ResponseType.boolean,
                 null
             ),
             new
             (
                 "traveledWhere",
                 "Para onde?",
-                ResponseType.TEXT,
+                ResponseType.text,
                 null
             )
         },
@@ -35,10 +35,7 @@ public class FormRepositoryMemory : IFormRepository
                 ,
                 new Event(
                     EventType.showQuestion,
-                    new List<EventParams>
-                    {
-                        new("hasTraveled")
-                    })
+                    new EventParams("hasTraveled"))
             ),
             new(
                     new Dictionary<ConditionType, List<Evaluation>?>
@@ -54,10 +51,7 @@ public class FormRepositoryMemory : IFormRepository
                 ,
                 new Event(
                     EventType.showQuestion,
-                    new List<EventParams>
-                    {
-                        new("traveledWhere")
-                    })
+                    new EventParams("traveledWhere"))
             )
         }
     };

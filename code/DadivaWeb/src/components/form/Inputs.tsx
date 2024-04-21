@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,9 +15,13 @@ export function BooleanRadio(questionName: string, onChangeAnswer: (answer: bool
   );
 }
 
-export function BooleanButtons(onChangeAnswer: (answer: boolean) => void) {
-  const [isYesClicked, setIsYesClicked] = useState(false);
-  const [isNoClicked, setIsNoClicked] = useState(false);
+interface BooleanButtonsProps {
+  onChangeAnswer: (answer: boolean) => void;
+}
+
+export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
+  const [isYesClicked, setIsYesClicked] = React.useState(false);
+  const [isNoClicked, setIsNoClicked] = React.useState(false);
 
   const handleClick = (answer: boolean) => {
     onChangeAnswer(answer);
@@ -66,8 +70,11 @@ export function EditButton({ onChangeAnswer }: EditButtonnProps) {
   );
 }
 
-export function TextInput(questionID: string, onChangeAnswer: (answer: string) => void) {
-  return <input type="text" id={questionID} name={questionID} onChange={e => onChangeAnswer(e.target.value)} />;
+interface TextInputProps {
+  onChangeAnswer: (answer: string) => void;
+}
+export function TextInput({ onChangeAnswer }: TextInputProps) {
+  return <input type="text" onChange={e => onChangeAnswer(e.target.value)} />;
 }
 
 export function DefaultQuestionType() {

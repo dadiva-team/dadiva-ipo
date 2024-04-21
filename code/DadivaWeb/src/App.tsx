@@ -10,6 +10,7 @@ import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
 import RealForm from './components/form/RealForm';
+import AnotherForm from './components/form/AnotherForm';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path={REGISTER} element={<Register />} />
 
           <Route path={FORM} element={<Form />} />
+          <Route path={FORM + 'a'} element={<AnotherForm />} />
           <Route path={FORM + 'aa'} element={<RealForm />} />
         </Routes>
       </div>

@@ -2,8 +2,8 @@ namespace DadivaAPI.domain;
 
 public enum ResponseType
 {
-    BOOLEAN,
-    TEXT
+    boolean,
+    text
 }
 
 public record Question(string Id, string Text, ResponseType Type, object Options);
