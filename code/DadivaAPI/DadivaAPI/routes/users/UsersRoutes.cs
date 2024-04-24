@@ -19,7 +19,7 @@ public static class UsersRoutes
     private static async Task<IResult> CreateToken(HttpContext http, [FromBody] CreateTokenInputModel input,
         IUsersService service)
     {
-        Result<Token, Problem> result = service.CreateToken(input.Nic, input.Password);
+        Result<Token, Problem> result = await service.CreateToken(input.Nic, input.Password);
         switch (result)
         {
             case Result<Token, Problem>.SuccessResult success:
@@ -43,7 +43,7 @@ public static class UsersRoutes
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)
     {
-        Result<UserExternalInfo, Problem> result = service.CreateUser(input.Nic, input.Password);
+        Result<UserExternalInfo, Problem> result = await service.CreateUser(input.Nic, input.Password);
         return result switch
         {
             Result<UserExternalInfo, Problem>.SuccessResult success => Results.Created((string)null,

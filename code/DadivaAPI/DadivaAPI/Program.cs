@@ -1,7 +1,5 @@
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using DadivaAPI.domain;
 using DadivaAPI.repositories.dnd;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.users;
@@ -14,7 +12,6 @@ using DadivaAPI.services.example;
 using DadivaAPI.services.form;
 using DadivaAPI.services.users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,7 +58,7 @@ builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<IDnDService, DnDService>();
 
-builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
 builder.Services.AddSingleton<IDnDRepository, DnDRepositoryMemory>();
 
