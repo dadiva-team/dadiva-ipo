@@ -3,6 +3,7 @@ import { Button } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 export function BooleanRadio(questionName: string, onChangeAnswer: (answer: boolean) => void) {
   return (
@@ -70,9 +71,22 @@ export function EditButton({ onChangeAnswer }: EditButtonnProps) {
   );
 }
 
+type NextQuestionButtonProps = {
+  onNextQuestion: () => void;
+};
+
+export function NextQuestionButton({ onNextQuestion }: NextQuestionButtonProps) {
+  return (
+    <Button variant="contained" onClick={onNextQuestion} startIcon={<NavigateNextIcon />} sx={{ borderRadius: 50 }}>
+      Próxima Pergunta
+    </Button>
+  );
+}
+
 interface TextInputProps {
   onChangeAnswer: (answer: string) => void;
 }
+
 export function TextInput({ onChangeAnswer }: TextInputProps) {
   return <input type="text" onChange={e => onChangeAnswer(e.target.value)} />;
 }

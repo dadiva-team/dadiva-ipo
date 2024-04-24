@@ -10,14 +10,12 @@ export const form: Form = {
       text: 'Ja viajou para fora de Portugal?',
       type: 'boolean',
       options: null,
-      //color: { yes: 'green', no: 'red' },
     },
     {
       id: 'traveledWhere',
       text: 'Para onde?',
       type: 'text',
       options: null,
-      //color: { yes: 'green', no: 'red' },
     },
   ],
   rules: [
