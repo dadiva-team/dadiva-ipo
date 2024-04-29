@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Login from './components/authentication/Login/Login';
 import Register from './components/authentication/Register';
-import Form from './components/form/Form';
 import { Uris } from './utils/navigation/Uris';
 import Home from './components/home/Home';
 import HOME = Uris.HOME;
@@ -10,20 +9,37 @@ import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
 import RealForm from './components/form/RealForm';
-import AnotherForm from './components/form/AnotherForm';
+import { Header } from './components/home/Header';
+import FORM_INFO = Uris.FORM_INFO;
+import { FormInfo } from './components/form/FormInfo';
 
 export default function App() {
+  //const loggedIn = useLoggedIn();
+
+  function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    /*if (!loggedIn) {
+      return <Login />;
+    }*/
+    return children;
+  }
+
   return (
-    <div>
-      <div>
+    <div className="App">
+      <div className="App-content">
+        <Header />
         <Routes>
           <Route path={HOME} element={<Home />} />
           <Route path={LOGIN} element={<Login />} />
           <Route path={REGISTER} element={<Register />} />
-
-          <Route path={FORM} element={<Form />} />
-          <Route path={FORM + 'a'} element={<AnotherForm />} />
-          <Route path={FORM + 'aa'} element={<RealForm />} />
+          <Route path={FORM_INFO} element={<FormInfo />} />
+          <Route
+            path={FORM}
+            element={
+              <ProtectedRoute>
+                <RealForm />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
     </div>

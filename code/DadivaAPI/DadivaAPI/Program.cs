@@ -58,7 +58,7 @@ builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<IDnDService, DnDService>();
 
-builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
 builder.Services.AddSingleton<IDnDRepository, DnDRepositoryMemory>();
 

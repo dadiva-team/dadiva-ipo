@@ -1,38 +1,39 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import SearchBar from '../searchBar/SearchBar';
+import { Box } from '@mui/material';
+import { useLoggedIn } from '../../session/Session';
+import { PreDadivaLoginCard } from './PreDadivaLoginCard';
+import { PreDadivaInfoCard } from './PreDadivaInfoCard';
 
 export default function Home() {
-  const navigate = useNavigate();
+  const loggedIn = useLoggedIn();
+
   return (
     <div>
-      <h1>PLACEHOLDER</h1>
-      <SearchBar />
+      <h1>DEMO</h1>
       <button
         type="button"
-        value="LOGIN"
-        onClick={() => navigate('/login')}
+        value="Clear Session"
+        onClick={() => {
+          sessionStorage.clear();
+          window.location.reload();
+        }}
         style={{ display: 'block', marginBottom: '10px' }}
       >
-        LOGIN
+        Clear Session
       </button>
-      <button
-        type="button"
-        value="REGISTER"
-        onClick={() => navigate('/register')}
-        style={{ display: 'block', marginBottom: '10px' }}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          mt: 4,
+          mb: 4,
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+        }}
       >
-        REGISTER
-      </button>
-      <button value="FORM" onClick={() => navigate('/form')} style={{ display: 'block', marginBottom: '10px' }}>
-        FORM
-      </button>
-      <button value="FORM" onClick={() => navigate('/forma')} style={{ display: 'block', marginBottom: '10px' }}>
-        FORM
-      </button>
-      <button value="FORM" onClick={() => navigate('/formaa')} style={{ display: 'block', marginBottom: '10px' }}>
-        FORM
-      </button>
+        {loggedIn ? <PreDadivaInfoCard /> : <PreDadivaLoginCard />}
+      </Box>
     </div>
   );
 }
