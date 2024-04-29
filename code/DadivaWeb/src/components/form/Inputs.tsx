@@ -4,6 +4,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import PublishIcon from '@mui/icons-material/Publish';
 
 export function BooleanRadio(questionName: string, onChangeAnswer: (answer: boolean) => void) {
   return (
@@ -79,6 +80,18 @@ export function NextQuestionButton({ onNextQuestion }: NextQuestionButtonProps) 
   return (
     <Button variant="contained" onClick={onNextQuestion} startIcon={<NavigateNextIcon />} sx={{ borderRadius: 50 }}>
       Próxima Pergunta
+    </Button>
+  );
+}
+
+type SubmitFormButtonProps = {
+  onSubmit: () => void;
+};
+
+export function SubmitFormButton({ onSubmit }: SubmitFormButtonProps) {
+  return (
+    <Button variant="contained" onClick={onSubmit} startIcon={<PublishIcon />} sx={{ borderRadius: 50 }}>
+      Submeter formulario
     </Button>
   );
 }
