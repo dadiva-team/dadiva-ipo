@@ -1,31 +1,25 @@
 using System.Text.Json.Serialization;
 using DadivaAPI.domain;
 
-namespace DadivaAPI.routes.form.models
+/*namespace DadivaAPI.routes.form.models
 {
-    public class Event
+    public class EventModel
     {
         [JsonPropertyName("type")]
-        public EventType Type { get; set; }
+        public string Type { get; set; }
 
         [JsonPropertyName("params")]
-        public EventParams Params { get; set; }
+        public EventParamsModel ParamsModel { get; set; }
+
+        public EventModel(){}
         
-        public Event(DadivaAPI.domain.Event evt)
-        {
-            Type = evt.Type;
-            Params = new EventParams(evt.Params);
-        }
     }
 
-    public class EventParams
+    public class EventParamsModel
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
-
-        public EventParams(DadivaAPI.domain.EventParams eventParams)
-        {
-            Id = eventParams.Id;
-        }
+        
+        public EventParamsModel(){}
     }
-}
+}*/

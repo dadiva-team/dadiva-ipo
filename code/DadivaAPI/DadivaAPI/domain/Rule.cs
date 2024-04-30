@@ -1,11 +1,12 @@
-using System.Text.Json.Serialization;
-
 namespace DadivaAPI.domain;
 
-public record Rule(
-    Dictionary<ConditionType, List<Evaluation>> Conditions,
-    Event Event
-);
+public record Rule
+{
+
+        public Dictionary<ConditionType, List<Evaluation>> Conditions { get; set; }
+        public Event Event { get; set; }
+
+};
 
 public enum ConditionType
 {
@@ -13,7 +14,6 @@ public enum ConditionType
     all,
     not
 }
-
 
 public enum Operator
 {
@@ -31,13 +31,10 @@ public enum Operator
 
 public record Evaluation
 {
-    [JsonPropertyName("fact")]
     public string Fact { get; init; }
-
-    [JsonPropertyName("operator")]
+    
     public Operator Operator { get; init; }
-
-    [JsonPropertyName("value")]
+    
     public string Value { get; init; }
 
     public Evaluation(string fact, Operator @operator, string value)
@@ -48,15 +45,18 @@ public record Evaluation
     }
 };
 
+public record Event
+{
+    public EventType Type { get; set; }
+    public EventParams Params { get; set; }
+
+};
+
 public enum EventType
 {
     showQuestion,
     hideQuestion
 }
-public record Event(
-    EventType Type,
-    EventParams Params
-);
 
 public record EventParams(
     string Id

@@ -1,28 +1,37 @@
-using System.Text.Json.Serialization;
 using DadivaAPI.domain;
+using DadivaAPI.routes.form.models;
 
 namespace DadivaAPI.routes.form.models
 {
     public class QuestionModel
     {
-        [JsonPropertyName("id")]
         public string Id { get; set; }
-
-        [JsonPropertyName("text")]
         public string Text { get; set; }
+        public string Type { get; set; }
+        public string? Options { get; set; }
 
-        [JsonPropertyName("type")]
-        public ResponseType Type { get; set; }
+        public QuestionModel() {
+        }
 
-        [JsonPropertyName("options")]
-        public object? Option { get; set; }
-
-        public QuestionModel(Question question)
+        public static QuestionModel FromQuestion(Question question)
         {
-            Id = question.Id;
-            Text = question.Text;
-            Type = question.Type;
-            Option = question.Options;
+            return new QuestionModel
+            {
+                Id = question.Id,
+                Text = question.Text,
+                Type = question.Type.ToString(),
+                Options = question.Options
+            };
+        }
+
+        public Question ToQuestion()
+        {
+            return new Question(
+                Id,
+                Text,
+                Enum.Parse<ResponseType>(Type, true),
+                Options
+            );
         }
     }
 }

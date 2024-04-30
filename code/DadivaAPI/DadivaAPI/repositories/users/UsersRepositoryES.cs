@@ -41,6 +41,7 @@ public class UsersRepositoryES : IUsersRepository
         };
         try
         {
+            if (await CheckUserByNicAndPassword(nic, hashedPassword)) throw new Exception("User already exists");
             var response = await _client.IndexAsync(user, idx => idx.Index("users"));
             return response.IsValidResponse;
         }

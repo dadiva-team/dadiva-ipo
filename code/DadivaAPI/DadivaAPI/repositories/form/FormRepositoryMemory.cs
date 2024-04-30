@@ -12,52 +12,62 @@ public class FormRepositoryMemory : IFormRepository
             (
                 "hasTraveled",
                 "Ja viajou para fora de Portugal?",
-                ResponseType.boolean,
+                ResponseType.Boolean,
                 null
             ),
             new
             (
                 "traveledWhere",
                 "Para onde?",
-                ResponseType.text,
+                ResponseType.Text,
                 null
             )
         },
         Rules = new List<Rule>
         {
-            new(
-    
-                
-                new Dictionary<ConditionType, List<Evaluation>?>
+            new Rule 
+            {
+                Conditions = new Dictionary<ConditionType, List<Evaluation>?>
                 {
-                    { ConditionType.any, new List<Evaluation>() }
+                    { ConditionType.any, new List<Evaluation>{} }
                 }!
                 ,
-                new Event(
-                    EventType.showQuestion,
-                    new EventParams("hasTraveled"))
-            ),
-            new(
-                    new Dictionary<ConditionType, List<Evaluation>?>
+                Event = new Event
+                {
+                    Type = EventType.showQuestion,
+                    Params = new EventParams("hasTraveled")
+                }
+            }
+            ,
+            new Rule
+            {
+                Conditions = new Dictionary<ConditionType, List<Evaluation>?>
+                {
                     {
+                        ConditionType.any,
+                        new List<Evaluation>
                         {
-                            ConditionType.any,
-                            new List<Evaluation>
-                            {
-                                new("hasTraveled", Operator.equal, "yes")
-                            }
+                            new("hasTraveled", Operator.equal, "yes")
                         }
-                    }!
+                    }
+                }!
                 ,
-                new Event(
-                    EventType.showQuestion,
-                    new EventParams("traveledWhere"))
-            )
+                Event = new Event
+                {
+                    Type = EventType.showQuestion,
+                    Params = new EventParams("traveledWhere")
+                }
+            }
         }
     };
 
     public Task<Form> GetForm()
     {
         return Task.FromResult(form);
+    }
+
+    public Task<bool> SubmitForm(Form form)
+    {
+        throw new NotImplementedException();
     }
 }

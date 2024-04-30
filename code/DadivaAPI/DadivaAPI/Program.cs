@@ -59,7 +59,7 @@ builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<IDnDService, DnDService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
-builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
+builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
 builder.Services.AddSingleton<IDnDRepository, DnDRepositoryMemory>();
 
 builder.Services.AddCors(options =>
