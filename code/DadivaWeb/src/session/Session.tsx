@@ -1,50 +1,71 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 
-type UserManager = {
-  user: string | undefined;
-  setUser: (user: string) => void;
-  clearUser: () => void;
+export interface Session {
+  readonly name: string;
+  readonly nic: string;
+}
+
+type SessionManager = {
+  session: Session | null;
+  setSession: (user: Session) => void;
+  clearSession: () => void;
 };
-const LoggedInContext = createContext<UserManager>({
-  user: undefined,
-  setUser: () => {},
-  clearUser: () => {},
+const LoggedInContext = createContext<SessionManager>({
+  session: null,
+  setSession: () => {},
+  clearSession: () => {},
 });
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<string | undefined>(undefined);
-  console.log(`AuthnContainer: ${user}`);
-  return (
-    <LoggedInContext.Provider
-      value={{
-        user: user,
-        setUser: user => {
-          setUser(user);
-          sessionStorage.setItem('user', user);
-        },
-        clearUser: () => {
-          setUser(undefined);
-          sessionStorage.removeItem('user');
-        },
-      }}
-    >
-      {children}
-    </LoggedInContext.Provider>
+  const [session, setSession] = useState<Session | null>(() => {
+    const userItem = sessionStorage.getItem('user');
+    console.log(`AuthnContainer 1: ${userItem}`);
+    return userItem && userItem !== 'undefined' ? JSON.parse(userItem) : null;
+  });
+
+  const sessionManager = useMemo<SessionManager>(
+    () => ({
+      session: session,
+      setSession: (user: Session) => {
+        if (!user) {
+          return;
+        }
+        setSession(user);
+        sessionStorage.setItem('user', JSON.stringify(user));
+      },
+      clearSession: () => {
+        setSession(null);
+        sessionStorage.removeItem('user');
+      },
+    }),
+    [session]
   );
+
+  return <LoggedInContext.Provider value={sessionManager}>{children}</LoggedInContext.Provider>;
 }
 
-export function useCurrentUser() {
+export function useCurrentSession() {
   const context = useContext(LoggedInContext);
-  const contextUser = context.user;
-  const user = contextUser === undefined ? sessionStorage.getItem('user') : contextUser;
-  if (user !== null) context.setUser(user);
+  const contextUser = context.session;
+  const userItem = sessionStorage.getItem('user');
+  console.log(`useCurrentSession 1: ${contextUser}`);
+  console.log(`useCurrentSession 2: ${userItem}`);
+  const user = contextUser === null && userItem && userItem !== 'undefined' ? JSON.parse(userItem) : contextUser;
+  if (user !== null) context.setSession(user);
+
   return user;
 }
 
-export function useSetUser() {
-  return useContext(LoggedInContext).setUser;
+export function useSetSession() {
+  return useContext(LoggedInContext).setSession;
 }
 
-export function useUserManager() {
+export function useSessionManager() {
   return useContext(LoggedInContext);
+}
+
+export function useLoggedIn() {
+  const user = useCurrentSession();
+  console.log(`useLoggedIn: ${user}`);
+  return user !== null;
 }

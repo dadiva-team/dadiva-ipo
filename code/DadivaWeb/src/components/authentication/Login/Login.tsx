@@ -4,18 +4,19 @@ import './Login.css';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { loginNIC } from '../../../services/users/UserServices';
-import { useSetUser } from '../../../session/Session';
+import { useSessionManager } from '../../../session/Session';
+import { Session } from '../../../session/Session';
 
 export default function Login() {
   const navigate = useNavigate();
+  const sessionManager = useSessionManager();
+
   const [error, setError] = React.useState<string | null>(null);
   const [state, dispatch] = React.useReducer(reduce, {
     tag: 'editing',
     inputs: { nic: '', password: '' },
   });
   const [showPassword, setShowPassword] = React.useState(false);
-
-  const setUser = useSetUser();
 
   if (state.tag === 'redirect') {
     return <Navigate to={'/me'} replace={true} />;
@@ -48,9 +49,13 @@ export default function Login() {
 
     console.log(res);
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    setUser(res.nic);
+    const mockSession: Session = {
+      name: 'Mock Name',
+      nic: nic,
+    };
+
+    sessionManager.setSession(mockSession);
+    navigate('/');
   }
 
   const nic = state.tag === 'submitting' ? state.nic : state.inputs.nic;

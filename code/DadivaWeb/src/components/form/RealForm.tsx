@@ -1,7 +1,14 @@
 import React, { JSX, useEffect, useState } from 'react';
 import '../../App.css';
-import { BooleanButtons, DefaultQuestionType, EditButton, NextQuestionButton, TextInput } from './Inputs';
-import { UserInfo } from './DadorInfo';
+import {
+  BooleanButtons,
+  DefaultQuestionType,
+  EditButton,
+  NextQuestionButton,
+  SubmitFormButton,
+  TextInput,
+} from './Inputs';
+
 import { Engine } from 'json-rules-engine';
 import { Form } from '../../domain/Form/Form';
 import { handleError, handleRequest } from '../../services/utils/fetch';
@@ -9,174 +16,7 @@ import { getForm } from '../../services/from/FormServices';
 import { useNavigate } from 'react-router-dom';
 import { COLORS } from '../../services/utils/colors';
 import { Question } from './Question';
-
-export const form: Form = {
-  questions: [
-    {
-      id: 'a',
-      text: 'Question A',
-      type: 'boolean',
-      options: null,
-    },
-    {
-      id: 'a1',
-      text: 'Question A1',
-      type: 'boolean',
-      options: null,
-    },
-    {
-      id: 'a2',
-      text: 'Question A2',
-      type: 'boolean',
-      options: null,
-    },
-    {
-      id: 'b',
-      text: 'Question B',
-      type: 'boolean',
-      options: null,
-    },
-    {
-      id: 'b1',
-      text: 'Question B1',
-      type: 'boolean',
-      options: null,
-    },
-  ],
-  rules: [
-    {
-      conditions: {
-        any: [],
-      },
-      event: {
-        type: 'showQuestion',
-        params: {
-          id: 'a',
-          subQuestion: 'a',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a',
-            operator: 'equal',
-            value: 'yes',
-          },
-        ],
-      },
-      event: {
-        type: 'showQuestion',
-        params: {
-          id: 'a1',
-          subQuestion: 'a',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a',
-            operator: 'equal',
-            value: 'no',
-          },
-        ],
-      },
-      event: {
-        type: 'nextQuestion',
-        params: {
-          id: 'b',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a1',
-            operator: 'equal',
-            value: 'yes',
-          },
-        ],
-      },
-      event: {
-        type: 'showQuestion',
-        params: {
-          id: 'a2',
-          subQuestion: 'a',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a1',
-            operator: 'equal',
-            value: 'no',
-          },
-        ],
-      },
-      event: {
-        type: 'nextQuestion',
-        params: {
-          id: 'b',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a2',
-            operator: 'equal',
-            value: 'yes',
-          },
-        ],
-      },
-      event: {
-        type: 'nextQuestion',
-        params: {
-          id: 'b',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'b',
-            operator: 'equal',
-            value: 'yes',
-          },
-        ],
-      },
-      event: {
-        type: 'showQuestion',
-        params: {
-          id: 'b1',
-          subQuestion: 'b',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'b',
-            operator: 'equal',
-            value: 'no',
-          },
-        ],
-      },
-      event: {
-        type: 'final question',
-      },
-    },
-  ],
-};
+import { form } from './MockForm';
 
 export default function RealForm() {
   const [isLoading, setIsLoading] = useState(true);
@@ -193,6 +33,7 @@ export default function RealForm() {
 
   const [questionColors, setQuestionColors] = useState<Record<string, string>>({});
   const [showQuestions, setShowQuestions] = useState<Record<string, boolean>>();
+  const [editingQuestion, setEditingQuestion] = useState<string | null>(null);
 
   const [engine] = useState(new Engine());
 
@@ -247,7 +88,6 @@ export default function RealForm() {
     engine.run(formData).then(result => {
       result.results.forEach(result => {
         if (result.event.type === 'showQuestion' && result.event.params.subQuestion === currentSubQuestion) {
-          //console.log('Showing question: ' + result.event.params.id);
           setShowQuestions(current => {
             return {
               ...current,
@@ -255,29 +95,33 @@ export default function RealForm() {
             };
           });
         }
-        if (result.event.type == 'nextQuestion') {
+        if (result.event.type == 'nextQuestion' && result.event.params.subQuestion != currentSubQuestion) {
           console.log('Can go to Next question: ' + result.event.params.id);
           setNextQuestion(result.event.params.id);
         }
+        if (result.event.type == 'final question') {
+          console.log('Final question');
+        }
       });
     });
-  }, [currentSubQuestion, engine, formData, formFetchData]);
+  }, [currentSubQuestion, editingQuestion, engine, formData, formFetchData]);
+
+  // Monitors
+  /*useEffect(() => {
+    console.log('Form Data: ' + JSON.stringify(formData));
+    console.log('Answered questions: ' + JSON.stringify(answeredQuestions));
+    console.log('Show Questions: ' + JSON.stringify(showQuestions));
+    console.log('Current SubQuestion: ' + currentSubQuestion);
+  }, [answeredQuestions]);*/
 
   function onChangeAnswer(questionId: string, answer: string) {
-    setFormData({
-      ...formData,
-      [questionId]: answer,
-    });
-    setAnsweredQuestions({
-      ...answeredQuestions,
-      [questionId]: true,
-    });
+    const updatedFormData = { ...formData, [questionId]: answer };
+    const updatedAnsweredQuestions = { ...answeredQuestions, [questionId]: true };
 
+    setFormData(updatedFormData);
+    setAnsweredQuestions(updatedAnsweredQuestions);
     setCurrentSubQuestion(questionId[0]);
-
-    console.log('Answered question: ' + questionId + ' with answer: ' + answer);
-    console.log('Answered questions: ' + JSON.stringify(answeredQuestions));
-    console.log('Current SubQuestion: ' + currentSubQuestion);
+    setEditingQuestion(null);
   }
 
   function onEditRequest(questionId: string) {
@@ -286,6 +130,11 @@ export default function RealForm() {
       ...answeredQuestions,
       [questionId]: false,
     });
+    /*setQuestionColors({
+      ...questionColors,
+      [questionId]: '',
+    });*/
+    setEditingQuestion(questionId);
   }
 
   function onNextQuestion(questionId: string) {
@@ -298,81 +147,130 @@ export default function RealForm() {
 
       return { ...current };
     });
-    //setCurrentSubQuestion(questionId[0]);
     setNextQuestion(null);
+  }
+
+  function onFinalQuestion() {
+    console.log('Final question');
+    nav('/');
   }
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <img className="logo" src={'/IPO-logo.png'} alt={'IPO logo'} />
-        <UserInfo name="Pedro" nic="123456789" />
-      </div>
-      <div>
-        {
-          <div>
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : (
-              <div>
-                {formFetchData?.questions.map(question => {
-                  let input: JSX.Element;
+      {
+        <div>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <div>
+              {formFetchData?.questions.map(question => {
+                let input: JSX.Element;
 
-                  switch (question.type) {
-                    case 'boolean':
-                      input = (
-                        <BooleanButtons
-                          onChangeAnswer={answer => {
-                            setQuestionColors({
-                              ...questionColors,
-                              [question.id]: answer ? COLORS.LIGHT_GREEN : COLORS.LIGHT_RED,
-                            });
-                            onChangeAnswer(question.id, answer ? 'yes' : 'no');
-                          }}
-                        />
-                      );
-                      break;
-                    case 'text':
-                      input = <TextInput onChangeAnswer={answer => onChangeAnswer(question.id, answer)} />;
-                      break;
-                    default:
-                      input = <DefaultQuestionType />;
-                      break;
-                  }
-                  return (
-                    showQuestions &&
-                    showQuestions[question.id] && (
-                      <div
-                        key={question.id}
-                        style={{
-                          display: 'center',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
+                switch (question.type) {
+                  case 'boolean':
+                    input = (
+                      <BooleanButtons
+                        onChangeAnswer={answer => {
+                          setQuestionColors({
+                            ...questionColors,
+                            [question.id]: answer ? COLORS.LIGHT_GREEN : COLORS.LIGHT_RED,
+                          });
+                          onChangeAnswer(question.id, answer ? 'yes' : 'no');
                         }}
-                      >
-                        <Question text={question.text} color={questionColors[question.id]} />
-                        {answeredQuestions[question.id] ? (
-                          <EditButton onChangeAnswer={() => onEditRequest(question.id)} />
-                        ) : (
-                          <div style={{ marginTop: '20px', justifyContent: 'space-between' }}>{input}</div>
-                        )}
-                      </div>
-                    )
-                  );
-                })}
-                {nextQuestion != null && (
-                  <NextQuestionButton
-                    onNextQuestion={() => {
-                      onNextQuestion(nextQuestion);
-                    }}
-                  />
+                      />
+                    );
+                    break;
+                  case 'text':
+                    input = <TextInput onChangeAnswer={answer => onChangeAnswer(question.id, answer)} />;
+                    break;
+                  default:
+                    input = <DefaultQuestionType />;
+                    break;
+                }
+                return (
+                  showQuestions &&
+                  showQuestions[question.id] && (
+                    <div
+                      key={question.id}
+                      style={{
+                        display: 'center',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Question text={question.text} color={questionColors[question.id]} />
+                      {answeredQuestions[question.id] ? (
+                        <EditButton onChangeAnswer={() => onEditRequest(question.id)} />
+                      ) : (
+                        <div style={{ marginTop: '20px', justifyContent: 'space-between' }}>{input}</div>
+                      )}
+                    </div>
+                  )
+                );
+              })}
+              {nextQuestion != null && editingQuestion == null && (
+                <NextQuestionButton
+                  onNextQuestion={() => {
+                    onNextQuestion(nextQuestion);
+                  }}
+                />
+              )}
+              {Object.values(answeredQuestions).every(val => val === true) &&
+                Object.keys(answeredQuestions).length === form.questions.length && (
+                  <SubmitFormButton onSubmit={onFinalQuestion} />
                 )}
-              </div>
-            )}
-          </div>
-        }
-      </div>
+            </div>
+          )}
+        </div>
+      }
     </div>
   );
 }
+
+/*
+const style = {
+  position: 'absolute' as const,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+export function MyModal() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  return (
+    <div>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={open}>
+          <Box sx={style}>
+            <Typography id="transition-modal-title" variant="h6" component="h2">
+              A Submeter o seu questionario
+            </Typography>
+            <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+            </Typography>
+          </Box>
+        </Fade>
+      </Modal>
+    </div>
+  );
+}*/
