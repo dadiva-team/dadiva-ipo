@@ -1,6 +1,6 @@
 import { Engine } from 'json-rules-engine';
 import React, { JSX, useEffect, useState } from 'react';
-import { BooleanButtons, DefaultQuestionType, TextInput } from './Inputs';
+import { BooleanButtons, WrongQuestionType, TextInput } from './Inputs';
 import { Form } from '../../domain/Form/Form';
 
 export const form: Form = {
@@ -98,7 +98,7 @@ export default function AnotherForm() {
               input = <TextInput onChangeAnswer={answer => onChangeAnswer(question.id, answer)} />;
               break;
             default:
-              input = <DefaultQuestionType />;
+              input = <WrongQuestionType />;
               break;
           }
           return (
