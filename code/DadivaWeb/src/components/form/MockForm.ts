@@ -3,12 +3,6 @@ import { Form } from '../../domain/Form/Form';
 export const form: Form = {
   questions: [
     {
-      id: 'a',
-      text: 'Question A',
-      type: 'boolean',
-      options: null,
-    },
-    {
       id: 'a1',
       text: 'Question A1',
       type: 'boolean',
@@ -17,18 +11,24 @@ export const form: Form = {
     {
       id: 'a2',
       text: 'Question A2',
-      type: 'boolean',
-      options: null,
+      type: 'dropdown',
+      options: ['portugal', 'espanha', 'france', 'italy'],
     },
     {
-      id: 'b',
-      text: 'Question B',
+      id: 'a3',
+      text: 'Question A3',
       type: 'boolean',
       options: null,
     },
     {
       id: 'b1',
       text: 'Question B1',
+      type: 'boolean',
+      options: null,
+    },
+    {
+      id: 'b2',
+      text: 'Question B2',
       type: 'boolean',
       options: null,
     },
@@ -41,44 +41,8 @@ export const form: Form = {
       event: {
         type: 'showQuestion',
         params: {
-          id: 'a',
-          subQuestion: 'a',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a',
-            operator: 'equal',
-            value: 'yes',
-          },
-        ],
-      },
-      event: {
-        type: 'showQuestion',
-        params: {
           id: 'a1',
           subQuestion: 'a',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a',
-            operator: 'equal',
-            value: 'no',
-          },
-        ],
-      },
-      event: {
-        type: 'nextQuestion',
-        params: {
-          id: 'b',
-          subQuestion: 'b',
         },
       },
     },
@@ -104,17 +68,17 @@ export const form: Form = {
       conditions: {
         any: [
           {
-            fact: 'a1',
-            operator: 'equal',
-            value: 'no',
+            fact: 'a2',
+            operator: 'notEqual',
+            value: '',
           },
         ],
       },
       event: {
-        type: 'nextQuestion',
+        type: 'showQuestion',
         params: {
-          id: 'b',
-          subQuestion: 'b',
+          id: 'a3',
+          subQuestion: 'a',
         },
       },
     },
@@ -122,7 +86,7 @@ export const form: Form = {
       conditions: {
         any: [
           {
-            fact: 'a2',
+            fact: 'a3',
             operator: 'equal',
             value: 'yes',
           },
@@ -131,7 +95,7 @@ export const form: Form = {
       event: {
         type: 'nextQuestion',
         params: {
-          id: 'b',
+          id: 'b1',
           subQuestion: 'b',
         },
       },
@@ -140,7 +104,22 @@ export const form: Form = {
       conditions: {
         any: [
           {
+            fact: 'a1',
+            operator: 'equal',
+            value: 'no',
+          },
+          {
             fact: 'a2',
+            operator: 'equal',
+            value: 'no',
+          },
+          {
+            fact: 'a3',
+            operator: 'equal',
+            value: 'yes',
+          },
+          {
+            fact: 'a3',
             operator: 'equal',
             value: 'no',
           },
@@ -149,7 +128,7 @@ export const form: Form = {
       event: {
         type: 'nextQuestion',
         params: {
-          id: 'b',
+          id: 'b1',
           subQuestion: 'b',
         },
       },
@@ -157,24 +136,6 @@ export const form: Form = {
     {
       conditions: {
         any: [],
-      },
-      event: {
-        type: 'showQuestion',
-        params: {
-          id: 'b',
-          subQuestion: 'b',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'b',
-            operator: 'equal',
-            value: 'yes',
-          },
-        ],
       },
       event: {
         type: 'showQuestion',
@@ -189,6 +150,24 @@ export const form: Form = {
         any: [
           {
             fact: 'b1',
+            operator: 'equal',
+            value: 'yes',
+          },
+        ],
+      },
+      event: {
+        type: 'showQuestion',
+        params: {
+          id: 'b2',
+          subQuestion: 'b',
+        },
+      },
+    },
+    {
+      conditions: {
+        any: [
+          {
+            fact: 'b2',
             operator: 'equal',
             value: 'no',
           },

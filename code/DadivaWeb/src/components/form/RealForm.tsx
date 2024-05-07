@@ -2,7 +2,7 @@ import React, { JSX, useEffect, useState } from 'react';
 import '../../App.css';
 import {
   BooleanButtons,
-  DefaultQuestionType,
+  WrongQuestionType,
   EditButton,
   NextQuestionButton,
   SubmitFormButton,
@@ -11,12 +11,11 @@ import {
 
 import { Engine } from 'json-rules-engine';
 import { Form } from '../../domain/Form/Form';
-import { handleError, handleRequest } from '../../services/utils/fetch';
-import { getForm } from '../../services/from/FormServices';
 import { useNavigate } from 'react-router-dom';
 import { COLORS } from '../../services/utils/colors';
 import { Question } from './Question';
 import { form } from './MockForm';
+import { CheckboxesTags } from './Inputs';
 
 export default function RealForm() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,9 +26,9 @@ export default function RealForm() {
   const [formFetchData, setFormFetchData] = useState<Form>();
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, boolean>>({});
-  const [nextQuestion, setNextQuestion] = useState<string | null>(null);
 
-  const [currentSubQuestion, setCurrentSubQuestion] = useState<string | null>(null);
+  const [nextQuestion, setNextQuestion] = useState<string | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
 
   const [questionColors, setQuestionColors] = useState<Record<string, string>>({});
   const [showQuestions, setShowQuestions] = useState<Record<string, boolean>>();
@@ -39,7 +38,7 @@ export default function RealForm() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [error, res] = await handleRequest(getForm());
+      /*const [error, res] = await handleRequest(getForm());
       if (error) {
         handleError(error, setError, nav);
         return;
@@ -47,7 +46,7 @@ export default function RealForm() {
 
       console.log(res);
 
-      /*setFormFetchData(res as Form);
+      setFormFetchData(res as Form);
       setFormData(Object.fromEntries(res.questions.map(question => [question.id, ''])));
       setAnsweredQuestions(Object.fromEntries(res.questions.map(question => [question.id, false])));
 
@@ -70,9 +69,7 @@ export default function RealForm() {
         engine.addRule(rule);
       });
 
-      //Inital question
-      setCurrentSubQuestion(form.questions[0].id);
-
+      setCurrentQuestion(form.questions[0].id);
       setIsLoading(false);
     };
 
@@ -82,12 +79,15 @@ export default function RealForm() {
   }, [engine, formData, formFetchData, isLoading, nav]);
 
   useEffect(() => {
-    if (!formData && !formFetchData) return;
+    if (!formData && !formFetchData && !currentQuestion) return;
 
     setShowQuestions({});
     engine.run(formData).then(result => {
       result.results.forEach(result => {
-        if (result.event.type === 'showQuestion' && result.event.params.subQuestion === currentSubQuestion) {
+        if (
+          result.event.type === 'showQuestion' &&
+          result.event.params.subQuestion == parseQuestionId(currentQuestion).letter
+        ) {
           setShowQuestions(current => {
             return {
               ...current,
@@ -95,8 +95,10 @@ export default function RealForm() {
             };
           });
         }
-        if (result.event.type == 'nextQuestion' && result.event.params.subQuestion != currentSubQuestion) {
-          console.log('Can go to Next question: ' + result.event.params.id);
+        if (
+          result.event.type == 'nextQuestion' &&
+          result.event.params.subQuestion != parseQuestionId(currentQuestion).letter
+        ) {
           setNextQuestion(result.event.params.id);
         }
         if (result.event.type == 'final question') {
@@ -104,15 +106,15 @@ export default function RealForm() {
         }
       });
     });
-  }, [currentSubQuestion, editingQuestion, engine, formData, formFetchData]);
+  }, [currentQuestion, editingQuestion, engine, formData, formFetchData]);
 
   // Monitors
-  /*useEffect(() => {
+  useEffect(() => {
     console.log('Form Data: ' + JSON.stringify(formData));
     console.log('Answered questions: ' + JSON.stringify(answeredQuestions));
     console.log('Show Questions: ' + JSON.stringify(showQuestions));
-    console.log('Current SubQuestion: ' + currentSubQuestion);
-  }, [answeredQuestions]);*/
+    console.log('Current SubQuestion: ' + currentQuestion);
+  }, [formData, answeredQuestions]);
 
   function onChangeAnswer(questionId: string, answer: string) {
     const updatedFormData = { ...formData, [questionId]: answer };
@@ -120,8 +122,75 @@ export default function RealForm() {
 
     setFormData(updatedFormData);
     setAnsweredQuestions(updatedAnsweredQuestions);
-    setCurrentSubQuestion(questionId[0]);
-    setEditingQuestion(null);
+    setCurrentQuestion(questionId);
+
+    if (editingQuestion != null && questionId == editingQuestion && answer != formData[questionId]) {
+      if (answer == 'no') {
+        resetNextSubQuestions(updatedFormData, questionId, false);
+      } else {
+        resetNextSubQuestions(updatedFormData, questionId, true);
+        setNextQuestion(null);
+      }
+      setEditingQuestion(null);
+    }
+  }
+
+  // Separates the letter and number of the question id
+  function parseQuestionId(questionId: string): { letter: string; number: number } {
+    if (!questionId) return { letter: '', number: -1 };
+    const question = questionId.split(/(\d+)/).filter(Boolean);
+
+    return { letter: question[0], number: parseInt(question[1]) };
+  }
+
+  function resetNextSubQuestions(form: Record<string, string>, questionId: string, answer: boolean) {
+    const { letter, number } = parseQuestionId(questionId);
+
+    const newShowQuestions = { ...showQuestions };
+    const newAnsweredQuestions = { ...answeredQuestions, [questionId]: true };
+    const newFormData = { ...form };
+    const newColor = { ...questionColors, [questionId]: answer ? COLORS.LIGHT_GREEN : COLORS.LIGHT_RED };
+
+    Object.keys(form).forEach(key => {
+      if (key.startsWith(letter)) {
+        const keyNumber = parseQuestionId(key).number;
+
+        // If the question is a subquestion of the current question
+        if (keyNumber > number) {
+          newShowQuestions[key] = answer;
+          newAnsweredQuestions[key] = !answer;
+          newFormData[key] = answer ? '' : 'no';
+          newColor[key] = answer ? '' : COLORS.LIGHT_RED;
+        }
+      }
+    });
+
+    setShowQuestions(newShowQuestions);
+    setAnsweredQuestions(newAnsweredQuestions);
+    setFormData(newFormData);
+    setQuestionColors(newColor);
+  }
+
+  function fillSubQuestions(questionId: string) {
+    const { letter, number } = parseQuestionId(questionId);
+
+    const newAnsweredQuestions = { ...answeredQuestions };
+    const newFormData = { ...formData };
+
+    Object.keys(newFormData).forEach(key => {
+      if (key.startsWith(letter)) {
+        const keyNumber = parseQuestionId(key).number;
+
+        // If the question is a subquestion of the current question
+        if (keyNumber > number) {
+          newAnsweredQuestions[key] = true;
+          newFormData[key] = 'no';
+        }
+      }
+    });
+
+    setAnsweredQuestions(newAnsweredQuestions);
+    setFormData(newFormData);
   }
 
   function onEditRequest(questionId: string) {
@@ -130,24 +199,21 @@ export default function RealForm() {
       ...answeredQuestions,
       [questionId]: false,
     });
-    /*setQuestionColors({
+    setQuestionColors({
       ...questionColors,
       [questionId]: '',
-    });*/
+    });
     setEditingQuestion(questionId);
   }
 
   function onNextQuestion(questionId: string) {
     console.log('Next question: ' + questionId);
-    setShowQuestions(current => {
-      for (const key in current) {
-        current[key] = false;
-      }
-      current[questionId] = true;
 
-      return { ...current };
-    });
+    // Fills the subquestions with 'no' if the event is 'nextQuestion'
+    fillSubQuestions(currentQuestion);
+
     setNextQuestion(null);
+    setCurrentQuestion(questionId);
   }
 
   function onFinalQuestion() {
@@ -183,8 +249,22 @@ export default function RealForm() {
                   case 'text':
                     input = <TextInput onChangeAnswer={answer => onChangeAnswer(question.id, answer)} />;
                     break;
+                  case 'dropdown':
+                    input = (
+                      <CheckboxesTags
+                        options={question.options}
+                        onChangeAnswer={answer => {
+                          setQuestionColors({
+                            ...questionColors,
+                            [question.id]: answer.length > 0 ? COLORS.LIGHT_GREEN : COLORS.LIGHT_RED,
+                          });
+                          onChangeAnswer(question.id, answer);
+                        }}
+                      />
+                    );
+                    break;
                   default:
-                    input = <DefaultQuestionType />;
+                    input = <WrongQuestionType />;
                     break;
                 }
                 return (
@@ -227,50 +307,3 @@ export default function RealForm() {
     </div>
   );
 }
-
-/*
-const style = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
-
-export function MyModal() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  return (
-    <div>
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={open}>
-          <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h6" component="h2">
-              A Submeter o seu questionario
-            </Typography>
-            <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
-          </Box>
-        </Fade>
-      </Modal>
-    </div>
-  );
-}*/
