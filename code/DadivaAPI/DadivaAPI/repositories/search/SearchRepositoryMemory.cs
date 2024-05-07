@@ -1,6 +1,6 @@
 namespace DadivaAPI.repositories.dnd;
 
-public class DnDRepositoryMemory : IDnDRepository
+public class SearchRepositoryMemory : ISearchRepository
 {
     private readonly string[] _dnd = [
         "paracetamol",

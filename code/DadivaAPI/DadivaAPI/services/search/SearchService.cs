@@ -3,7 +3,7 @@ using DadivaAPI.utils;
 
 namespace DadivaAPI.services.dnd;
 
-public class DnDService(IDnDRepository repository):IDnDService
+public class SearchService(ISearchRepository repository):ISearchService
 {
     public async Task<Result<string[], Problem>> GetDnD()
     {

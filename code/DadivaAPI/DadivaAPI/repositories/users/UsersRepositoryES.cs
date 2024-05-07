@@ -5,26 +5,20 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 
 namespace DadivaAPI.repositories.users;
 
-public class UsersRepositoryES : IUsersRepository
+public class UsersRepositoryES(ElasticsearchClient client) : IUsersRepository
 {
-    private readonly ElasticsearchClient _client;
+    private readonly string _index = "users";
 
-    public UsersRepositoryES()
-    {
-        var settings = new ElasticsearchClientSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("users");
-        _client = new ElasticsearchClient(settings);
-    }
 
     public async Task<bool> CheckUserByNicAndPassword(int nic, string hashedPassword)
     {
-        var request = new SearchRequest("users")
+        var request = new SearchRequest(_index)
         {
-            Query = new TermQuery("nic") {Value=nic},
+            Query = new TermQuery("nic") { Value = nic },
         };
-        var searchResponse = await _client.SearchAsync<User>(request);
+        var searchResponse = await client.SearchAsync<User>(request);
 
-        if (searchResponse.IsValidResponse && searchResponse.Documents.First().password==hashedPassword)
+        if (searchResponse.IsValidResponse && searchResponse.Documents.First().password == hashedPassword)
         {
             return true;
         }
@@ -34,15 +28,9 @@ public class UsersRepositoryES : IUsersRepository
 
     public async Task<bool> AddUser(int nic, string hashedPassword)
     {
-        var user = new User
-        {
-            nic=nic,
-            password=hashedPassword
-        };
         try
         {
-            if (await CheckUserByNicAndPassword(nic, hashedPassword)) throw new Exception("User already exists");
-            var response = await _client.IndexAsync(user, idx => idx.Index("users"));
+            var response = await client.IndexAsync(hashedPassword, idx => idx.Index(_index));
             return response.IsValidResponse;
         }
         catch (Exception e)
@@ -50,5 +38,26 @@ public class UsersRepositoryES : IUsersRepository
             Console.WriteLine($"Repository Exception while creating user: '{e}'");
             return false;
         }
+    }
+
+    public async Task<List<User>> GetUsers()
+    {
+        try
+        {
+            var response = await client.SearchAsync<List<User>>(new SearchRequest(_index));
+            if (response.IsValidResponse) return (List<User>)response.Documents;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Repository Exception while getting users: '{e}'");
+        }
+
+        return [];
+    }
+
+    public async Task<User?> GetUserByNic(string nic)
+    {
+        var response = await client.GetAsync<User>(nic, idx => idx.Index(_index));
+        return response.IsValidResponse ? response.Source : null;
     }
 }

@@ -4,23 +4,16 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 
 namespace DadivaAPI.repositories.form;
 
-public class FormRepositoryES : IFormRepository
+public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
 {
-    private readonly ElasticsearchClient _client;
-
-    public FormRepositoryES()
-    {
-        var settings = new ElasticsearchClientSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("form");
-        _client = new ElasticsearchClient(settings);
-    }
+    private readonly string index = "form";
 
     public async Task<Form?> GetForm()
     {
         try
         {
             var request = new SearchRequest("form");
-            var searchResponse = await _client.SearchAsync<Form>(request);
+            var searchResponse = await client.SearchAsync<Form>(request);
             
             if (searchResponse.IsValidResponse)
             {
@@ -40,7 +33,7 @@ public class FormRepositoryES : IFormRepository
     {
         try
         {
-            var response = await _client.IndexAsync(form, idx => idx.Index("form"));
+            var response = await client.IndexAsync(form, idx => idx.Index("form"));
             return response.IsValidResponse;
         }
         catch (Exception e)

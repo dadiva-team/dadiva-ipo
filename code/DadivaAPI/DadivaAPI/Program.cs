@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using DadivaAPI.repositories.dnd;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.users;
-using DadivaAPI.routes.dnd;
+using DadivaAPI.routes.search;
 using DadivaAPI.routes.example;
 using DadivaAPI.routes.form;
 using DadivaAPI.routes.users;
@@ -11,6 +11,7 @@ using DadivaAPI.services.dnd;
 using DadivaAPI.services.example;
 using DadivaAPI.services.form;
 using DadivaAPI.services.users;
+using Elastic.Clients.Elasticsearch;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -53,14 +54,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<ElasticsearchClient>();
+
 builder.Services.AddSingleton<IExampleService, ExampleService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IFormService, FormService>();
-builder.Services.AddSingleton<IDnDService, DnDService>();
+builder.Services.AddSingleton<ISearchService, SearchService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
-builder.Services.AddSingleton<IDnDRepository, DnDRepositoryMemory>();
+builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 
 builder.Services.AddCors(options =>
 {
@@ -93,6 +96,6 @@ var group = app.MapGroup("/api");
 group.AddExampleRoutes();
 group.AddUsersRoutes();
 group.AddFormRoutes();
-group.AddDnDRoutes();
+group.AddSearchRoutes();
 
 app.Run();

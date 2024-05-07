@@ -1,3 +1,5 @@
+using DadivaAPI.domain;
+
 namespace DadivaAPI.repositories.users;
 
 public class UsersRepositoryMemory : IUsersRepository
@@ -16,5 +18,15 @@ public class UsersRepositoryMemory : IUsersRepository
     public Task<bool> AddUser(int nic, string hashedPassword)
     {
         return Task.FromResult(users.TryAdd(nic, hashedPassword));
+    }
+
+    public Task<List<User>> GetUsers()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<User?> GetUserByNic(string nic)
+    {
+        throw new NotImplementedException();
     }
 }
