@@ -66,11 +66,18 @@ export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
 
 type EditButtonnProps = {
   onChangeAnswer: () => void;
+  enableEdit: boolean;
 };
 
-export function EditButton({ onChangeAnswer }: EditButtonnProps) {
+export function EditButton({ onChangeAnswer, enableEdit }: EditButtonnProps) {
   return (
-    <Button variant="outlined" onClick={onChangeAnswer} startIcon={<EditIcon />} sx={{ borderRadius: 50 }}>
+    <Button
+      variant="outlined"
+      onClick={onChangeAnswer}
+      startIcon={<EditIcon />}
+      disabled={enableEdit}
+      sx={{ borderRadius: 50 }}
+    >
       Editar
     </Button>
   );

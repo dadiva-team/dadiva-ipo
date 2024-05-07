@@ -66,7 +66,12 @@ export const form: Form = {
     },
     {
       conditions: {
-        any: [
+        all: [
+          {
+            fact: 'a2',
+            operator: 'notEqual',
+            value: 'no',
+          },
           {
             fact: 'a2',
             operator: 'notEqual',
