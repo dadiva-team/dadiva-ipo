@@ -61,7 +61,7 @@ builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<ISearchService, SearchService>();
 
-builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
 builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 

@@ -25,7 +25,7 @@ public class UsersRepositoryMemory : IUsersRepository
         throw new NotImplementedException();
     }
 
-    public Task<User?> GetUserByNic(string nic)
+    public Task<User?> GetUserByNic(int nic)
     {
         throw new NotImplementedException();
     }

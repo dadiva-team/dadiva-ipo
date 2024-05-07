@@ -1,10 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using DadivaAPI.domain;
 using DadivaAPI.repositories.users;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
-using Microsoft.IdentityModel.Tokens;
 
 namespace DadivaAPI.services.users;
 
@@ -12,43 +9,87 @@ public class UsersService(IConfiguration config, IUsersRepository repository) : 
 {
     public async Task<Result<Token, Problem>> CreateToken(int nic, string password)
     {
-        string hashedPassword = $"{password}hashed";
-        bool isValidUser = await repository.CheckUserByNicAndPassword(nic, hashedPassword);
-        if (isValidUser)
+        try
         {
-            Token token = new Token(config["Jwt:Key"], config["Jwt:Issuer"]);
-            return Result<Token, Problem>.Success(token);
-        }
+            string hashedPassword = $"{password}hashed";
 
-        return Result<Token, Problem>.Failure(
-            UserServicesErrorExtensions.ToResponse(TokenCreationError.UserOrPasswordAreInvalid));
+            bool isValidUser = await repository.CheckUserByNicAndPassword(nic, hashedPassword);
+            if (isValidUser)
+            {
+                Token token = new Token(config["Jwt:Key"], config["Jwt:Issuer"]);
+                return Result<Token, Problem>.Success(token);
+            }
+
+            return Result<Token, Problem>.Failure(
+                UserServicesErrorExtensions.ToResponse(TokenCreationError.UserOrPasswordAreInvalid));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while creating token '{e}'");
+            return Result<Token, Problem>.Failure(UserServicesErrorExtensions.ToResponse(TokenCreationError.Unknown));
+        }
     }
+
 
     public async Task<Result<UserExternalInfo, Problem>> CreateUser(int nic, string password)
     {
-        string hashedPassword = $"{password}hashed";
-        if (!User.IsValidPassword(password))
+        try
         {
+            if (await repository.GetUserByNic(nic) != null)
+            {
+                return Result<UserExternalInfo, Problem>.Failure(
+                    UserServicesErrorExtensions.ToResponse(UserServiceError.UserAlreadyExists));
+            }
+        
+            string hashedPassword = $"{password}hashed";
+            if (!User.IsValidPassword(password))
+            {
+                return
+                    Result<UserExternalInfo, Problem>.Failure(
+                        UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidPassword));
+            }
+
+            if (!User.IsValidNic(nic))
+            {
+                return
+                    Result<UserExternalInfo, Problem>.Failure(
+                        UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidNic));
+            }
+
+            if (await repository.AddUser(nic, hashedPassword))
+            {
+                return Result<UserExternalInfo, Problem>.Success(new UserExternalInfo(nic));
+            }
+            
+            return Result<UserExternalInfo, Problem>.Failure(
+                UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while creating user '{e}'");
             return
                 Result<UserExternalInfo, Problem>.Failure(
-                    UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidPassword));
+                    UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
         }
+    }
 
-        if (!User.IsValidNic(nic))
+    public async Task<Result<List<User>, Problem>> GetUsers(string token)
+    {
+        //TODO add check user authentication
+        try
         {
+            List<User>? users = await repository.GetUsers();
+            if(users != null) return Result<List<User>, Problem>.Success(users);
+            return Result<List<User>, Problem>.Failure(
+                UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while creating user '{e}'");
             return
-                Result<UserExternalInfo, Problem>.Failure(
-                    UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidNic));
+                Result<List<User>, Problem>.Failure(
+                    UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
         }
 
-        bool isUserAdded = await repository.AddUser(nic, hashedPassword);
-        if (isUserAdded)
-        {
-            return Result<UserExternalInfo, Problem>.Success(new UserExternalInfo(nic));
-        }
-
-        return
-            Result<UserExternalInfo, Problem>.Failure(
-                UserServicesErrorExtensions.ToResponse(UserServiceError.UserAlreadyExists));
     }
 }

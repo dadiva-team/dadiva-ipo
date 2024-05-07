@@ -28,34 +28,18 @@ public class UsersRepositoryES(ElasticsearchClient client) : IUsersRepository
 
     public async Task<bool> AddUser(int nic, string hashedPassword)
     {
-        try
-        {
-            var response = await client.IndexAsync(hashedPassword, idx => idx.Index(_index));
-            return response.IsValidResponse;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Repository Exception while creating user: '{e}'");
-            return false;
-        }
+        var response = await client.IndexAsync(hashedPassword, idx => idx.Index(_index));
+        return response.IsValidResponse;
     }
 
-    public async Task<List<User>> GetUsers()
+    public async Task<List<User>?> GetUsers()
     {
-        try
-        {
-            var response = await client.SearchAsync<List<User>>(new SearchRequest(_index));
-            if (response.IsValidResponse) return (List<User>)response.Documents;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Repository Exception while getting users: '{e}'");
-        }
-
-        return [];
+        var response = await client.SearchAsync<List<User>>(new SearchRequest(_index));
+        if (response.IsValidResponse) return (List<User>)response.Documents;
+        return null;
     }
 
-    public async Task<User?> GetUserByNic(string nic)
+    public async Task<User?> GetUserByNic(int nic)
     {
         var response = await client.GetAsync<User>(nic, idx => idx.Index(_index));
         return response.IsValidResponse ? response.Source : null;
