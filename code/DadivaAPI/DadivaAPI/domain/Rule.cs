@@ -1,12 +1,6 @@
 namespace DadivaAPI.domain;
 
-public record Rule
-{
-
-        public Dictionary<ConditionType, List<Evaluation>> Conditions { get; set; }
-        public Event Event { get; set; }
-
-};
+public record Rule(Dictionary<ConditionType, List<Evaluation>> Conditions, Event Event);
 
 public enum ConditionType
 {
@@ -29,28 +23,9 @@ public enum Operator
     doesNotContain
 }
 
-public record Evaluation
-{
-    public string Fact { get; init; }
-    
-    public Operator Operator { get; init; }
-    
-    public string Value { get; init; }
+public record Evaluation(string Fact, Operator Operator, string Value);
 
-    public Evaluation(string fact, Operator @operator, string value)
-    {
-        Fact = fact;
-        Operator = @operator;
-        Value = value;
-    }
-};
-
-public record Event
-{
-    public EventType Type { get; set; }
-    public EventParams Params { get; set; }
-
-};
+public record Event(EventType Type, EventParams Params);
 
 public enum EventType
 {

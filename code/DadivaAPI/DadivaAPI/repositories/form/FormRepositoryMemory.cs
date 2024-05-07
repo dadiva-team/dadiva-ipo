@@ -6,42 +6,45 @@ public class FormRepositoryMemory : IFormRepository
 {
     private readonly Form form = new()
     {
-        Questions = new List<Question>
-        {
-            new
-            (
-                "hasTraveled",
-                "Ja viajou para fora de Portugal?",
-                ResponseType.Boolean,
-                null
-            ),
-            new
-            (
-                "traveledWhere",
-                "Para onde?",
-                ResponseType.Text,
-                null
-            )
-        },
+        Groups =
+        [
+            new QuestionGroup("Main", [
+                new Question
+                (
+                    "hasTraveled",
+                    "Ja viajou para fora de Portugal?",
+                    ResponseType.boolean,
+                    null
+                ),
+
+                new Question
+                (
+                    "traveledWhere",
+                    "Para onde?",
+                    ResponseType.text,
+                    null
+                )
+            ])
+        ],
         Rules = new List<Rule>
         {
             new Rule 
-            {
-                Conditions = new Dictionary<ConditionType, List<Evaluation>?>
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
                 {
                     { ConditionType.any, new List<Evaluation>{} }
                 }!
                 ,
-                Event = new Event
-                {
-                    Type = EventType.showQuestion,
-                    Params = new EventParams("hasTraveled")
-                }
-            }
+                new Event
+                (
+                    EventType.showQuestion,
+                    new EventParams("hasTraveled")
+                )
+            )
             ,
             new Rule
-            {
-                Conditions = new Dictionary<ConditionType, List<Evaluation>?>
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
                 {
                     {
                         ConditionType.any,
@@ -52,12 +55,12 @@ public class FormRepositoryMemory : IFormRepository
                     }
                 }!
                 ,
-                Event = new Event
-                {
-                    Type = EventType.showQuestion,
-                    Params = new EventParams("traveledWhere")
-                }
-            }
+                new Event
+                (
+                    EventType.showQuestion,
+                    new EventParams("traveledWhere")
+                )
+            )
         }
     };
 
@@ -66,8 +69,8 @@ public class FormRepositoryMemory : IFormRepository
         return Task.FromResult(form);
     }
 
-    public Task<bool> SubmitForm(Form form)
+    public Task<Form> SubmitForm(Form form)
     {
-        throw new NotImplementedException();
+        return Task.FromResult(form);
     }
 }

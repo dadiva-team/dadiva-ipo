@@ -6,5 +6,5 @@ public interface IFormRepository
 {
     public Task<Form?> GetForm();
     
-    public Task<bool> SubmitForm(Form form);
+    public Task<Form> SubmitForm(Form form);
 }

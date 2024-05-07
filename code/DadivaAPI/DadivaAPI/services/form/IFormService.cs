@@ -6,7 +6,7 @@ namespace DadivaAPI.services.form;
 
 public interface IFormService
 {
-    public Task<Result<GetFormResponse, Problem>> GetForm();
+    public Task<Result<GetFormOutputModel, Problem>> GetForm();
 
-    public Task<Result<bool, Problem>> SubmitForm(List<QuestionModel> questions, List<RuleModel> rules);//TODO change response on success, currently bool
+    public Task<Result<Form, Problem>> SubmitForm(List<QuestionGroupModel> groups, List<RuleModel> rules);//TODO change response on success, currently Form
 }

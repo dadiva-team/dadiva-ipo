@@ -1,95 +1,78 @@
 using DadivaAPI.domain;
 
-namespace DadivaAPI.routes.form.models
+namespace DadivaAPI.routes.form.models;
+
+public record RuleModel(Dictionary<string, List<EvaluationModel>> Conditions, EventModel Event)
 {
-    public record RuleModel
+    public static RuleModel FromDomain(Rule rule)
     {
-        public Dictionary<string, List<EvaluationModel>> Conditions { get; set; }
-        public EventModel Event { get; set; }
-
-        public static RuleModel FromRule(Rule rule)
-        {
-            var dictionary = new Dictionary<string, List<EvaluationModel>>();
-            if (rule.Conditions.TryGetValue(ConditionType.any, out var anyConditions))
-                dictionary["any"] = ConvertConditions(anyConditions);
-            else if (rule.Conditions.TryGetValue(ConditionType.all, out var allConditions))
-                dictionary["all"] = ConvertConditions(allConditions);
-            else if (rule.Conditions.TryGetValue(ConditionType.not, out var notConditions))
-                dictionary["not"] = ConvertConditions(notConditions);
-            return new RuleModel
-            {
-                Conditions = dictionary,
-                Event = new EventModel
+        return new RuleModel(
+            rule.Conditions.ToDictionary(
+                pair =>
                 {
-                    Type = rule.Event.Type.ToString(),
-                    Params = new Params
-                    {
-                        Id = rule.Event.Params.Id
-                    }
-                }
-            };
-        }
-
-        private static List<EvaluationModel> ConvertConditions(List<Evaluation> conditions)
-        {
-            return conditions.Select(evaluation => new EvaluationModel
-            {
-                Fact = evaluation.Fact,
-                Operator = evaluation.Operator.ToString(),
-                Value = evaluation.Value
-            }).ToList();
-        }
-
-        public Rule ToRule()
-        {
-            return new Rule
-            {
-                Conditions = Conditions.Select(pair => new
-                    {
-                        ConditionType = Enum.TryParse<ConditionType>(pair.Key, true, out var conditionType) 
-                            ? conditionType 
-                            : throw new ArgumentException($"Invalid condition type key: {pair.Key}"),
-                        Evaluations = pair.Value.Select(e => new Evaluation(
-                            e.Fact,
-                            Enum.Parse<Operator>(e.Operator, true),
-                            e.Value
-                        )).ToList()
-                    })
-                    .ToDictionary(x => x.ConditionType, x => x.Evaluations),
-                Event = new Event
-                {
-                    Type = Enum.Parse<EventType>(Event.Type, true),
-                    Params = new EventParams(Event.Params.Id)
-                }
-            };
-        }
-
-        private static List<Evaluation> ConvertEvaluations(List<EvaluationModel> evaluations)
-        {
-            return evaluations.Select(e => new Evaluation
-                (
-                    e.Fact,
-                    Enum.Parse<Operator>(e.Operator, true),
-                    e.Value.ToString()
-                )
-            ).ToList();
-        }
+                    Console.Out.WriteLine(pair.Key.ToString());
+                    return pair.Key.ToString();
+                },
+                pair => pair.Value.Select(EvaluationModel.FromDomain).ToList()
+            ),
+            EventModel.FromDomain(rule.Event)
+        );
     }
-    public record EvaluationModel
+
+    public static Rule ToDomain(RuleModel model)
     {
-        public string Fact { get; set; }
-        public string Operator { get; set; }
-        public string Value { get; set; }
+        return new Rule
+        (
+            model.Conditions.ToDictionary(
+                pair => Enum.Parse<ConditionType>(pair.Key),
+                pair => pair.Value.Select(EvaluationModel.ToDomain).ToList()
+            ),
+            EventModel.ToDomain(model.Event)
+        );
+    }
+};
+
+public record EvaluationModel(string Fact, string Operator, string Value)
+{
+    public static EvaluationModel FromDomain(Evaluation evaluation)
+    {
+        return new EvaluationModel(
+            evaluation.Fact,
+            evaluation.Operator.ToString(),
+            evaluation.Value
+        );
     }
 
-    public record EventModel
+    public static Evaluation ToDomain(EvaluationModel model)
     {
-        public string Type { get; set; }
-        public Params Params { get; set; }
+        return new Evaluation
+        (
+            model.Fact,
+            Enum.Parse<Operator>(model.Operator),
+            model.Value
+        );
     }
+};
 
-    public class Params
+public record EventParamsModel(
+    string Id
+);
+
+public record EventModel(string Type, EventParamsModel Params)
+{
+    public static EventModel FromDomain(Event domain)
     {
-        public string Id { get; set; }
+        return new EventModel(
+            domain.Type.ToString(),
+            new EventParamsModel(domain.Params.Id)
+        );
     }
-}
+    public static Event ToDomain(EventModel model)
+    {
+        return new Event
+        (
+            Enum.Parse<EventType>(model.Type),
+            new EventParams(model.Params.Id)
+        );
+    }
+};

@@ -16,6 +16,8 @@ import { COLORS } from '../../services/utils/colors';
 import { Question } from './Question';
 import { form } from './MockForm';
 import { CheckboxesTags } from './Inputs';
+import { handleError, handleRequest } from '../../services/utils/fetch';
+import { getForm } from '../../services/from/FormServices';
 
 export default function RealForm() {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +40,7 @@ export default function RealForm() {
 
   useEffect(() => {
     const fetch = async () => {
-      /*const [error, res] = await handleRequest(getForm());
+      const [error, res] = await handleRequest(getForm());
       if (error) {
         handleError(error, setError, nav);
         return;
@@ -55,8 +57,8 @@ export default function RealForm() {
       });
       res.rules.forEach(rule => {
         engine.addRule(rule);
-      });*/
-
+      });
+      /*
       // A usar o Form hardcoded
       setFormFetchData(form);
       setFormData(Object.fromEntries(form.questions.map(question => [question.id, ''])));
@@ -68,7 +70,7 @@ export default function RealForm() {
       form.rules.forEach(rule => {
         engine.addRule(rule);
       });
-
+      */
       setCurrentQuestion(form.questions[0].id);
       setIsLoading(false);
     };

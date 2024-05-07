@@ -1,37 +1,27 @@
 using DadivaAPI.domain;
 using DadivaAPI.routes.form.models;
 
-namespace DadivaAPI.routes.form.models
+namespace DadivaAPI.routes.form.models;
+
+public record QuestionModel(string Id, string Text, string Type, string? Options)
 {
-    public class QuestionModel
+    public static QuestionModel FromDomain(Question question)
     {
-        public string Id { get; set; }
-        public string Text { get; set; }
-        public string Type { get; set; }
-        public string? Options { get; set; }
+        return new QuestionModel(
+            question.Id,
+            question.Text,
+            question.Type.ToString(),
+            question.Options
+        );
+    }
 
-        public QuestionModel() {
-        }
-
-        public static QuestionModel FromQuestion(Question question)
-        {
-            return new QuestionModel
-            {
-                Id = question.Id,
-                Text = question.Text,
-                Type = question.Type.ToString(),
-                Options = question.Options
-            };
-        }
-
-        public Question ToQuestion()
-        {
-            return new Question(
-                Id,
-                Text,
-                Enum.Parse<ResponseType>(Type, true),
-                Options
-            );
-        }
+    public static Question ToDomain(QuestionModel model)
+    {
+        return new Question(
+            model.Id,
+            model.Text,
+            Enum.Parse<ResponseType>(model.Type),
+            model.Options
+        );
     }
 }

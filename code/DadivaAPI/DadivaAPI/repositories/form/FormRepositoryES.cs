@@ -4,6 +4,7 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 
 namespace DadivaAPI.repositories.form;
 
+
 public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
 {
     private readonly string index = "form";
@@ -29,17 +30,17 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
         }
     }
 
-    public async Task<bool> SubmitForm(Form form)
+    public async Task<Form> SubmitForm(Form form)
     {
         try
         {
             var response = await client.IndexAsync(form, idx => idx.Index("form"));
-            return response.IsValidResponse;
+            return form;
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error submitting form: '{e}'");
-            return false;
+            return form; //TODO: better error handling
         }
     }
 }
