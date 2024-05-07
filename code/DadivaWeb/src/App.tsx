@@ -8,7 +8,7 @@ import HOME = Uris.HOME;
 import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
-import RealForm from './components/form/RealForm';
+import Form from './components/form/Form';
 import { Header } from './components/home/Header';
 import FORM_INFO = Uris.FORM_INFO;
 import { FormInfo } from './components/form/FormInfo';
@@ -36,7 +36,7 @@ export default function App() {
             path={FORM}
             element={
               <ProtectedRoute>
-                <RealForm />
+                <Form />
               </ProtectedRoute>
             }
           />
