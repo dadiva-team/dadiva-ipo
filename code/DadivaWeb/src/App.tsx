@@ -8,7 +8,7 @@ import HOME = Uris.HOME;
 import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
-import Form from './components/form/Form';
+import FormWithRuleEngine from './components/form/FormWithRuleEngine';
 import { Header } from './components/home/Header';
 import FORM_INFO = Uris.FORM_INFO;
 import { FormInfo } from './components/form/FormInfo';
@@ -36,7 +36,7 @@ export default function App() {
             path={FORM}
             element={
               <ProtectedRoute>
-                <Form />
+                <FormWithRuleEngine />
               </ProtectedRoute>
             }
           />

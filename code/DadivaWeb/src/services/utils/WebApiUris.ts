@@ -1,5 +1,6 @@
 // DO NOT CHANGE!!!
-const API_URL = 'https://localhost:7011/api';
+//const API_URL = 'https://localhost:7011/api';
+const API_URL = 'http://localhost:5231/api';
 export const createTokenUri = `${API_URL}/users/login`;
 export const createUserUri = `${API_URL}/users`;
 

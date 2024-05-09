@@ -16,6 +16,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import PublishIcon from '@mui/icons-material/Publish';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -220,6 +221,44 @@ export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
           Guardar
         </Button>
       </div>
+    </div>
+  );
+}
+
+type NavButtonsProps = {
+  prevEnabled: boolean;
+  onPrevQuestion: () => void;
+  nextEnabled: boolean;
+  onNextQuestion: () => void;
+};
+
+export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQuestion }: NavButtonsProps) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+      }}
+    >
+      <Button
+        variant="contained"
+        onClick={onPrevQuestion}
+        startIcon={<NavigateBeforeIcon />}
+        disabled={!prevEnabled}
+        sx={{ borderRadius: 50 }}
+      >
+        Anterior
+      </Button>
+      <Button
+        variant="contained"
+        onClick={onNextQuestion}
+        disabled={!nextEnabled}
+        endIcon={<NavigateNextIcon />}
+        sx={{ borderRadius: 50 }}
+      >
+        Seguinte
+      </Button>
     </div>
   );
 }

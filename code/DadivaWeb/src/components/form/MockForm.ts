@@ -1,36 +1,46 @@
 import { Form } from '../../domain/Form/Form';
 
 export const form: Form = {
-  questions: [
+  groups: [
     {
-      id: 'a1',
-      text: 'Question A1',
-      type: 'boolean',
-      options: null,
+      name: 'a',
+      questions: [
+        {
+          id: 'hasTraveled',
+          text: 'Ja viajou para fora de Portugal?',
+          type: 'boolean',
+          options: null,
+        },
+        {
+          id: 'traveledWhere',
+          text: 'Para onde?',
+          type: 'dropdown',
+          options: ['portugal', 'espanha', 'france', 'italy'],
+        },
+        {
+          id: 'a3',
+          text: 'Question A3',
+          type: 'boolean',
+          options: null,
+        },
+      ],
     },
     {
-      id: 'a2',
-      text: 'Question A2',
-      type: 'dropdown',
-      options: ['portugal', 'espanha', 'france', 'italy'],
-    },
-    {
-      id: 'a3',
-      text: 'Question A3',
-      type: 'boolean',
-      options: null,
-    },
-    {
-      id: 'b1',
-      text: 'Question B1',
-      type: 'boolean',
-      options: null,
-    },
-    {
-      id: 'b2',
-      text: 'Question B2',
-      type: 'boolean',
-      options: null,
+      name: 'b',
+      questions: [
+        {
+          id: 'b1',
+          text: 'Question B1',
+          type: 'boolean',
+          options: null,
+        },
+        {
+          id: 'b2',
+          text: 'Question B2',
+          type: 'boolean',
+          options: null,
+        },
+      ],
     },
   ],
   rules: [
@@ -41,8 +51,7 @@ export const form: Form = {
       event: {
         type: 'showQuestion',
         params: {
-          id: 'a1',
-          subQuestion: 'a',
+          id: 'hasTraveled',
         },
       },
     },
@@ -50,7 +59,7 @@ export const form: Form = {
       conditions: {
         any: [
           {
-            fact: 'a1',
+            fact: 'hasTraveled',
             operator: 'equal',
             value: 'yes',
           },
@@ -59,8 +68,7 @@ export const form: Form = {
       event: {
         type: 'showQuestion',
         params: {
-          id: 'a2',
-          subQuestion: 'a',
+          id: 'traveledWhere',
         },
       },
     },
@@ -68,12 +76,12 @@ export const form: Form = {
       conditions: {
         all: [
           {
-            fact: 'a2',
+            fact: 'traveledWhere',
             operator: 'notEqual',
             value: 'no',
           },
           {
-            fact: 'a2',
+            fact: 'traveledWhere',
             operator: 'notEqual',
             value: '',
           },
@@ -83,7 +91,6 @@ export const form: Form = {
         type: 'showQuestion',
         params: {
           id: 'a3',
-          subQuestion: 'a',
         },
       },
     },
@@ -91,30 +98,12 @@ export const form: Form = {
       conditions: {
         any: [
           {
-            fact: 'a3',
-            operator: 'equal',
-            value: 'yes',
-          },
-        ],
-      },
-      event: {
-        type: 'nextQuestion',
-        params: {
-          id: 'b1',
-          subQuestion: 'b',
-        },
-      },
-    },
-    {
-      conditions: {
-        any: [
-          {
-            fact: 'a1',
+            fact: 'hasTraveled',
             operator: 'equal',
             value: 'no',
           },
           {
-            fact: 'a2',
+            fact: 'traveledWhere',
             operator: 'equal',
             value: 'no',
           },
@@ -131,10 +120,9 @@ export const form: Form = {
         ],
       },
       event: {
-        type: 'nextQuestion',
+        type: 'nextGroup',
         params: {
           id: 'b1',
-          subQuestion: 'b',
         },
       },
     },
@@ -146,7 +134,6 @@ export const form: Form = {
         type: 'showQuestion',
         params: {
           id: 'b1',
-          subQuestion: 'b',
         },
       },
     },
@@ -164,7 +151,6 @@ export const form: Form = {
         type: 'showQuestion',
         params: {
           id: 'b2',
-          subQuestion: 'b',
         },
       },
     },
