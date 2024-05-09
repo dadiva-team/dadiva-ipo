@@ -4,9 +4,10 @@ namespace DadivaAPI.repositories.form;
 
 public class FormRepositoryMemory : IFormRepository
 {
-    private readonly Form form = new()
-    {
-        Groups =
+    private Dictionary<int, Submission> submissions = new();
+    
+    private Form form = new Form
+    (
         [
             new QuestionGroup("Main", [
                 new Question
@@ -26,7 +27,7 @@ public class FormRepositoryMemory : IFormRepository
                 )
             ])
         ],
-        Rules = new List<Rule>
+        new List<Rule>
         {
             new Rule 
             (
@@ -62,15 +63,26 @@ public class FormRepositoryMemory : IFormRepository
                 )
             )
         }
-    };
+    );
 
     public Task<Form> GetForm()
     {
         return Task.FromResult(form);
     }
 
-    public Task<Form> SubmitForm(Form form)
+    public Task<Form> EditForm(Form form)
     {
         return Task.FromResult(form);
+    }
+
+    public async Task<bool> SubmitForm(Submission submission, int nic)
+    {
+        submissions.Add(nic, submission);
+        return true;
+    }
+
+    public async Task<Dictionary<int, Submission>> GetSubmissions()
+    {
+        return submissions;
     }
 }

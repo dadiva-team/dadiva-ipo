@@ -27,15 +27,15 @@ public class FormService(IFormRepository repository) : IFormService
         );
     }
 
-    public async Task<Result<Form, Problem>> SubmitForm(List<QuestionGroupModel> groups, List<RuleModel> rules)
+    public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules)
     {
         Form form = new Form
-        {
-            Groups = groups.ConvertAll(QuestionGroupModel.ToDomain).ToList(),
-            Rules = rules.ConvertAll(RuleModel.ToDomain).ToList()
-        };
+        (
+            groups.ConvertAll(QuestionGroupModel.ToDomain).ToList(),
+            rules.ConvertAll(RuleModel.ToDomain).ToList()
+        );
 
-        return Result<Form, Problem>.Success(await repository.SubmitForm(form));
+        return Result<Form, Problem>.Success(await repository.EditForm(form));
         /*
         if (isSubmited) return Result<bool, Problem>.Success(true);
         return Result<bool, Problem>.Failure(
@@ -46,5 +46,26 @@ public class FormService(IFormRepository repository) : IFormService
                 "An error ocurred while submitting form"
             )); //TODO Create Problems types for form
             */
+    }
+
+    public async Task<Result<bool, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic)
+    {
+        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList());
+        bool isSubmitted = await repository.SubmitForm(submission, nic);
+        if(isSubmitted) return Result<bool, Problem>.Success(true);
+        
+        return Result<bool, Problem>.Failure(
+            new Problem(
+                "errorSubmitingForm.com",
+                "Error submitting form",
+                400,
+                "An error ocurred while submitting form"
+            )); //TODO Create Problems types for form
+        
+    }
+
+    public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()
+    {
+        return Result<Dictionary<int, Submission>, Problem>.Success(await repository.GetSubmissions());
     }
 }

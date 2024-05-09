@@ -1,7 +1,3 @@
 namespace DadivaAPI.domain;
 
-public record Form
-{
-    public List<QuestionGroup> Groups { get; set; }
-    public List<Rule> Rules { get; set; }
-}
+public record Form(List<QuestionGroup> Groups, List<Rule> Rules);

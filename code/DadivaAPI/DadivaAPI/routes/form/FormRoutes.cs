@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DadivaAPI.domain;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.services.form;
 using DadivaAPI.utils;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DadivaAPI.routes.form;
@@ -12,9 +14,29 @@ public static class FormRoutes
 {
     public static void AddFormRoutes(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/form");
-        group.MapGet("", GetForm);
-        group.MapPost("", SubmitForm);
+        var group = app.MapGroup("/forms");
+        group.MapGet("/structure", GetForm);
+        group.MapGet("/submissions", GetSubmissions);
+        //group.MapGet("/submissions/{nic}", GetSubmission);
+        //group.MapDelete("/submissions/{nic}", DeleteSubmission);
+        group.MapPost("/submissions", SubmitForm);
+        group.MapPut("/structure", EditForm);
+    }
+
+    private static async Task<IResult> GetSubmissions(IFormService service)
+    {
+        Result<Dictionary<int, Submission>, Problem> result = await service.GetSubmissions();
+        return result switch
+        {
+            Result<Dictionary<int, Submission>, Problem>.SuccessResult success => Results.Ok(
+                new GetSubmissionsOutputModel(
+                    success.Value.Select(pair => new SubmissionModel(
+                        pair.Key,
+                        pair.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList()
+                    )).ToList())),
+            Result<Dictionary<int, Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+        };
     }
 
     private static async Task<IResult> GetForm(IFormService service)
@@ -33,16 +55,42 @@ public static class FormRoutes
                     ),
                     options,
                     statusCode: 200),
-            Result<GetFormOutputModel, Problem>.FailureResult failure => 
+            Result<GetFormOutputModel, Problem>.FailureResult failure =>
                 Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
 
+    private static IAnswer ToAnswer(this JsonElement element)
+    {
+        return element.ValueKind switch
+        {
+            JsonValueKind.String => new StringAnswer(element.GetString()),
+            JsonValueKind.True or JsonValueKind.False => new BooleanAnswer(element.GetBoolean()),
+            JsonValueKind.Array => new StringListAnswer(element.EnumerateArray().Select(e => e.GetString()).ToList()),
+            _ => throw new Exception("Invalid answer type")
+        };
+    }
 
     private static async Task<IResult> SubmitForm([FromBody] SubmitFormRequest input, IFormService service)
     {
-        Result<Form, Problem> result = await service.SubmitForm(input.Groups, input.Rules);
+        Dictionary<string, IAnswer> answers = input.AnsweredQuestions.ToDictionary(
+            question => question.QuestionId,
+            question => question.Answer.ToAnswer()
+        );
+        const int hardcodedNic = 123456789;
+        Result<bool, Problem> result = await service.SubmitForm(answers, hardcodedNic);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult => Results.NoContent(),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+        };
+    }
+
+    private static async Task<IResult> EditForm([FromBody] EditFormRequest input, IFormService service)
+    {
+        Result<Form, Problem> result = await service.EditForm(input.Groups, input.Rules);
         return result switch
         {
             Result<Form, Problem>.SuccessResult success => Results.Json(

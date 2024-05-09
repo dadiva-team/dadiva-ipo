@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using DadivaAPI.domain;
 using DadivaAPI.repositories.dnd;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.users;
@@ -12,8 +13,11 @@ using DadivaAPI.services.example;
 using DadivaAPI.services.form;
 using DadivaAPI.services.users;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Serialization;
+using Elastic.Transport;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,10 +47,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
-    options.JsonSerializerOptions.PropertyNamingPolicy = null; // Preserves original property names
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Correctly serialize enums as strings
+    options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
 });
 
 // Add services to the container.
@@ -54,7 +57,19 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ElasticsearchClient>();
+var nodePool = new SingleNodePool(new Uri("http://localhost:9200"));
+var settings = new ElasticsearchClientSettings(
+    nodePool,
+    sourceSerializer: (_, settings) =>
+    {
+        return new DefaultSourceSerializer(settings, options =>
+        {
+            options.Converters.Add(new AnswerConverter());
+        });
+    });
+
+// Register the Elasticsearch client as a singleton
+builder.Services.AddSingleton(new ElasticsearchClient(settings));
 
 builder.Services.AddSingleton<IExampleService, ExampleService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
@@ -62,7 +77,7 @@ builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<ISearchService, SearchService>();
 
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
-builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
+builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
 builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 
 builder.Services.AddCors(options =>
@@ -97,5 +112,63 @@ group.AddExampleRoutes();
 group.AddUsersRoutes();
 group.AddFormRoutes();
 group.AddSearchRoutes();
+
+(app.Services.GetService(typeof(IFormRepository)) as FormRepositoryES)?.EditForm(new Form
+(
+    [
+        new QuestionGroup("Main", [
+            new Question
+            (
+                "hasTraveled",
+                "Ja viajou para fora de Portugal?",
+                ResponseType.boolean,
+                null
+            ),
+
+            new Question
+            (
+                "traveledWhere",
+                "Para onde?",
+                ResponseType.text,
+                null
+            )
+        ])
+    ],
+    new List<Rule>
+    {
+        new Rule
+        (
+            new Dictionary<ConditionType, List<Evaluation>?>
+            {
+                { ConditionType.any, new List<Evaluation> { } }
+            }!
+            ,
+            new Event
+            (
+                EventType.showQuestion,
+                new EventParams("hasTraveled")
+            )
+        ),
+        new Rule
+        (
+            new Dictionary<ConditionType, List<Evaluation>?>
+            {
+                {
+                    ConditionType.any,
+                    new List<Evaluation>
+                    {
+                        new("hasTraveled", Operator.equal, "yes")
+                    }
+                }
+            }!
+            ,
+            new Event
+            (
+                EventType.showQuestion,
+                new EventParams("traveledWhere")
+            )
+        )
+    }
+));
 
 app.Run();

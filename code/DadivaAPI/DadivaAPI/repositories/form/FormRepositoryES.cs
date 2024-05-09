@@ -4,7 +4,6 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 
 namespace DadivaAPI.repositories.form;
 
-
 public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
 {
     private readonly string index = "form";
@@ -15,10 +14,10 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
         {
             var request = new SearchRequest("form");
             var searchResponse = await client.SearchAsync<Form>(request);
-            
+
             if (searchResponse.IsValidResponse)
             {
-                return  searchResponse.Documents.First();
+                return searchResponse.Documents.First();
             }
 
             return null;
@@ -30,7 +29,7 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
         }
     }
 
-    public async Task<Form> SubmitForm(Form form)
+    public async Task<Form> EditForm(Form form)
     {
         try
         {
@@ -42,5 +41,22 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
             Console.WriteLine($"Error submitting form: '{e}'");
             return form; //TODO: better error handling
         }
+    }
+
+    public async Task<bool> SubmitForm(Submission submission, int nic)
+    {
+        var response = await client.IndexAsync(submission, idx => idx.Index("submissions").Id(nic));
+        return response.IsValidResponse;
+    }
+
+    public async Task<Dictionary<int, Submission>> GetSubmissions()
+    {
+        var response = client.SearchAsync<Submission>("submissions");
+        foreach (var resultHit in response.Result.Hits)
+        {
+            Console.Out.WriteLine("Hit: " + resultHit.Id);
+            Console.Out.WriteLine("Source: " + resultHit.Source);
+        }
+        return response.Result.Hits.ToDictionary(h => int.Parse(h.Id), h => h.Source)!;
     }
 }
