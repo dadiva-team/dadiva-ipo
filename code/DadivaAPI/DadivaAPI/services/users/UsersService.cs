@@ -40,8 +40,7 @@ public class UsersService(IConfiguration config, IUsersRepository repository) : 
                 return Result<UserExternalInfo, Problem>.Failure(
                     UserServicesErrorExtensions.ToResponse(UserServiceError.UserAlreadyExists));
             }
-        
-            string hashedPassword = $"{password}hashed";
+            
             if (!User.IsValidPassword(password))
             {
                 return
@@ -55,8 +54,9 @@ public class UsersService(IConfiguration config, IUsersRepository repository) : 
                     Result<UserExternalInfo, Problem>.Failure(
                         UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidNic));
             }
-
-            if (await repository.AddUser(nic, hashedPassword))
+            
+            string hashedPassword = $"{password}hashed";
+            if (await repository.AddUser(new User{nic = nic, password = hashedPassword}))
             {
                 return Result<UserExternalInfo, Problem>.Success(new UserExternalInfo(nic));
             }
