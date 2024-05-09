@@ -1,4 +1,4 @@
-import { Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -12,28 +12,44 @@ type QuestionProps = {
   isEditing: boolean;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function Question({ text, color, answer, isEditing, type }: QuestionProps) {
-  const dropdownAnswers = answer ? answer.split(',') : [];
+  //const dropdownAnswers = answer ? answer.split(',') : [];
   return (
-    <Paper elevation={4} sx={{ padding: 2, maxWidth: 500, my: 2, bgcolor: color }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
-          {text}
-        </Typography>
+    <Paper
+      elevation={2}
+      sx={{
+        width: '550px',
+        height: '75px',
+        bgcolor: color,
+        p: 1,
+      }}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          mt: 1,
+        }}
+      >
+        <Typography variant="h6">{text}</Typography>
+
         {!isEditing &&
           (answer === 'yes' ? (
-            <CheckCircleIcon sx={{ fontSize: 50 }} />
+            <CheckCircleIcon sx={{ fontSize: 40 }} />
           ) : answer === 'no' ? (
-            <CancelIcon sx={{ fontSize: 50 }} />
+            <CancelIcon sx={{ fontSize: 40 }} />
           ) : null)}
-      </div>
-      {type === 'dropdown' && dropdownAnswers.length > 0 && (
-        <ul>
-          {dropdownAnswers.map((option, index) => (
-            <li key={index}>{option}</li>
-          ))}
-        </ul>
-      )}
+        {/*type === 'dropdown' && dropdownAnswers.length > 0 && (
+          <ul>
+            {dropdownAnswers.map((option, index) => (
+              <li key={index}>{option}</li>
+            ))}
+          </ul>
+        )*/}
+      </Box>
     </Paper>
   );
 }

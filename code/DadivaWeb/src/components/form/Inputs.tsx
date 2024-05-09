@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Autocomplete,
-  Button,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from '@mui/material';
+import { Autocomplete, Box, Button, Checkbox, TextField } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
@@ -42,13 +30,20 @@ export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
   };
 
   return (
-    <div>
+    <Box
+      sx={{
+        width: '100%',
+        display: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+      }}
+    >
       <Button
         variant={isNoClicked ? 'contained' : 'outlined'}
         onClick={() => handleClick(false)}
         color={!isNoClicked && !isYesClicked ? 'error' : isNoClicked ? 'error' : 'inherit'}
         startIcon={<CloseIcon />}
-        sx={{ borderRadius: 50 }}
+        sx={{ borderRadius: 50, marginRight: 2 }}
       >
         Não
       </Button>
@@ -61,7 +56,7 @@ export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
       >
         Sim
       </Button>
-    </div>
+    </Box>
   );
 }
 
@@ -77,7 +72,7 @@ export function EditButton({ onChangeAnswer, enableEdit }: EditButtonnProps) {
       onClick={onChangeAnswer}
       startIcon={<EditIcon />}
       disabled={enableEdit}
-      sx={{ borderRadius: 50 }}
+      sx={{ borderRadius: 50, height: '50%' }}
     >
       Editar
     </Button>
@@ -113,7 +108,37 @@ interface TextInputProps {
 }
 
 export function TextInput({ onChangeAnswer }: TextInputProps) {
-  return <input type="text" onChange={e => onChangeAnswer(e.target.value)} />;
+  const [value, setValue] = useState<string>('');
+  const handleChange = (value: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(value.target.value);
+  };
+  return (
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+      }}
+    >
+      <TextField
+        variant="outlined"
+        required
+        onChange={handleChange}
+        label="Responda Aqui"
+        sx={{ width: '100%', mb: 1 }}
+      />
+      <Button
+        variant="outlined"
+        onClick={() => onChangeAnswer(value)}
+        startIcon={<Save />}
+        disabled={value.length === 0}
+        sx={{ borderRadius: 50 }}
+      >
+        Guardar
+      </Button>
+    </Box>
+  );
 }
 
 export function WrongQuestionType() {
@@ -124,59 +149,6 @@ type DropdownProps = {
   options: string[];
   onChangeAnswer: (answer: string) => void;
 };
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-export function MultipleSelectCheckmarks(options: string[]) {
-  const [optionName, setOptionName] = React.useState<string[]>([]);
-
-  const handleChange = (event: SelectChangeEvent<typeof optionName>) => {
-    const {
-      target: { value },
-    } = event;
-    setOptionName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value
-    );
-  };
-
-  return (
-    <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
-        <Select
-          labelId="demo-multiple-checkbox-label"
-          id="demo-multiple-checkbox"
-          multiple
-          value={optionName}
-          onChange={handleChange}
-          input={<OutlinedInput label="Paises" />}
-          renderValue={selected => selected.join(', ')}
-          MenuProps={MenuProps}
-        >
-          {options.map(name => (
-            <MenuItem key={name} value={name}>
-              <Checkbox checked={optionName.indexOf(name) > -1} />
-              <ListItemText primary={name} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
-  );
-}
-
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
   const [selectedOptions, setSelectedOptions] = useState<string>('');
@@ -202,7 +174,12 @@ export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
           onChange={(event, value) => handleChange(value)}
           renderOption={(props, option, { selected }) => (
             <li {...props}>
-              <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                checkedIcon={<CheckBoxIcon fontSize="small" />}
+                style={{ marginRight: 8 }}
+                checked={selected}
+              />
               {option}
             </li>
           )}
@@ -234,11 +211,14 @@ type NavButtonsProps = {
 
 export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQuestion }: NavButtonsProps) {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
+        width: '100%',
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 1,
+        pb: 2,
       }}
     >
       <Button
@@ -259,6 +239,6 @@ export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQue
       >
         Seguinte
       </Button>
-    </div>
+    </Box>
   );
 }
