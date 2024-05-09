@@ -1,6 +1,6 @@
-using System.Security.Cryptography;
 using DadivaAPI.domain;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Nodes;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 
 namespace DadivaAPI.repositories.users;
@@ -8,7 +8,6 @@ namespace DadivaAPI.repositories.users;
 public class UsersRepositoryES(ElasticsearchClient client) : IUsersRepository
 {
     private readonly string _index = "users";
-
 
     public async Task<bool> CheckUserByNicAndPassword(int nic, string hashedPassword)
     {
@@ -26,9 +25,12 @@ public class UsersRepositoryES(ElasticsearchClient client) : IUsersRepository
         return false;
     }
 
-    public async Task<bool> AddUser(int nic, string hashedPassword)
+    public async Task<bool> AddUser(User user)
     {
-        var response = await client.IndexAsync(hashedPassword, idx => idx.Index(_index));
+        var response = await client.IndexAsync(
+            user,
+            idx => idx.Index(_index).Id(user.nic)
+            );
         return response.IsValidResponse;
     }
 

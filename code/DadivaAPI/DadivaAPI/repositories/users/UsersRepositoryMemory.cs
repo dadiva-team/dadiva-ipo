@@ -15,9 +15,9 @@ public class UsersRepositoryMemory : IUsersRepository
         return Task.FromResult(users.ContainsKey(nic) && users[nic] == hashedPassword);
     }
 
-    public Task<bool> AddUser(int nic, string hashedPassword)
+    public Task<bool> AddUser(User user)
     {
-        return Task.FromResult(users.TryAdd(nic, hashedPassword));
+        return Task.FromResult(users.TryAdd(user.nic, user.password));
     }
 
     public Task<List<User>> GetUsers()
