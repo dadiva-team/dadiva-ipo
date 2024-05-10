@@ -1,7 +1,7 @@
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 function delay(ms) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
 }
@@ -12,27 +12,17 @@ module.exports = {
     port: 8000,
     historyApiFallback: true,
     compress: false,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'https://localhost:7011',
         // introducing an API delay to make testing easier
-        pathRewrite: async function (path, req) {
+        pathRewrite: async function (path) {
           await delay(1000);
           return path;
         },
-        onProxyRes: (proxyRes, req, res) => {
-          proxyRes.on('close', () => {
-            if (!res.writableEnded) {
-              res.destroy();
-            }
-          });
-          res.on('close', () => {
-            console.log('req close');
-            proxyRes.destroy();
-          });
-        },
       },
-    },
+    ],
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
