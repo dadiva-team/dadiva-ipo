@@ -33,6 +33,10 @@ export function post<T>(input: RequestInfo | URL, body?: BodyInit): Promise<T> {
   return fetchAPI<T>(input, 'POST', body);
 }
 
+export function put<T>(input: RequestInfo | URL, body?: BodyInit): Promise<T> {
+  return fetchAPI<T>(input, 'PUT', body);
+}
+
 export function deleteRequest<T>(input: RequestInfo | URL): Promise<T> {
   return fetchAPI<T>(input, 'DELETE', undefined);
 }

@@ -1,6 +1,7 @@
-import { get } from '../utils/fetch';
-import { getFormUri } from '../utils/WebApiUris';
+import { get, put } from '../utils/fetch';
+import { editFormUri, getFormUri } from '../utils/WebApiUris';
 import { FormOutputModel } from './models/FormOutputModel';
+import { Form } from '../../domain/Form/Form';
 
 function toCamelCase(s: string): string {
   return s.replace(/([A-Z])/g, (c, first) => (first ? c.toLowerCase() : c));
@@ -39,6 +40,11 @@ function convertKeysToCamelCase<T>(obj: T): ConvertKeysToCamelCase<T> {
 export namespace FormServices {
   export async function getForm(): Promise<FormOutputModel> {
     return convertKeysToCamelCase(await get<FormOutputModel>(getFormUri));
+  }
+
+  export async function saveForm(form: Form): Promise<boolean> {
+    await put(editFormUri, JSON.stringify(form));
+    return true;
   }
 }
 

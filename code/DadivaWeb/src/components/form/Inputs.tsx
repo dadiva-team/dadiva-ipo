@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Autocomplete, Box, Button, Checkbox, TextField } from '@mui/material';
+import { Autocomplete, Box, Button, Checkbox, Chip, TextField } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
@@ -173,7 +173,7 @@ export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
           getOptionLabel={option => option}
           onChange={(event, value) => handleChange(value)}
           renderOption={(props, option, { selected }) => (
-            <li {...props}>
+            <li {...props} key={option}>
               <Checkbox
                 icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                 checkedIcon={<CheckBoxIcon fontSize="small" />}
@@ -183,6 +183,9 @@ export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
               {option}
             </li>
           )}
+          renderTags={(tagValue, getTagProps) => {
+            return tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
+          }}
           style={{ width: 430 }}
           renderInput={params => <TextField {...params} label="Countrys" />}
         />
