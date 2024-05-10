@@ -3,7 +3,7 @@ using DadivaAPI.routes.form.models;
 
 namespace DadivaAPI.routes.form.models;
 
-public record QuestionModel(string Id, string Text, string Type, string? Options)
+public record QuestionModel(string Id, string Text, string Type, List<string>? Options)
 {
     public static QuestionModel FromDomain(Question question)
     {

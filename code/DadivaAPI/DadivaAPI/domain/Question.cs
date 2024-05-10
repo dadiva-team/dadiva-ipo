@@ -5,7 +5,8 @@ namespace DadivaAPI.domain;
 public enum ResponseType
 {
     boolean,
-    text
+    text,
+    dropdown
 }
 
-public record Question(string Id, string Text, ResponseType Type, string? Options);
+public record Question(string Id, string Text, ResponseType Type, List<string>? Options);

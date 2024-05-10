@@ -8,4 +8,5 @@ export namespace Uris {
   export const FORM_INFO = '/form-info';
 
   export const FORM = '/form';
+  export const BACK_OFFICE = '/backoffice';
 }

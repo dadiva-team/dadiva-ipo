@@ -17,7 +17,7 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
 
             if (searchResponse.IsValidResponse)
             {
-                return searchResponse.Documents.First();
+                return searchResponse.Documents.Last();
             }
 
             return null;
@@ -34,6 +34,7 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
         try
         {
             var response = await client.IndexAsync(form, idx => idx.Index("form"));
+            if(!response.IsValidResponse) throw new Exception("Error editing form");
             return form;
         }
         catch (Exception e)
