@@ -18,9 +18,15 @@ export const form: Form = {
           options: ['portugal', 'espanha', 'france', 'italy'],
         },
         {
-          id: 'a3',
-          text: 'Question A3',
+          id: 'hasTakenMedication',
+          text: 'Já alguma vez tomou medicação para a malária?',
           type: 'boolean',
+          options: null,
+        },
+        {
+          id: 'whichMedication',
+          text: 'Qual medicação?',
+          type: 'text',
           options: null,
         },
       ],
@@ -90,7 +96,24 @@ export const form: Form = {
       event: {
         type: 'showQuestion',
         params: {
-          id: 'a3',
+          id: 'hasTakenMedication',
+        },
+      },
+    },
+    {
+      conditions: {
+        all: [
+          {
+            fact: 'hasTakenMedication',
+            operator: 'equal',
+            value: 'yes',
+          },
+        ],
+      },
+      event: {
+        type: 'showQuestion',
+        params: {
+          id: 'whichMedication',
         },
       },
     },
@@ -108,14 +131,14 @@ export const form: Form = {
             value: 'no',
           },
           {
-            fact: 'a3',
-            operator: 'equal',
-            value: 'yes',
-          },
-          {
-            fact: 'a3',
+            fact: 'hasTakenMedication',
             operator: 'equal',
             value: 'no',
+          },
+          {
+            fact: 'whichMedication',
+            operator: 'notEqual',
+            value: '',
           },
         ],
       },
@@ -142,8 +165,8 @@ export const form: Form = {
         any: [
           {
             fact: 'b1',
-            operator: 'equal',
-            value: 'yes',
+            operator: 'notEqual',
+            value: '',
           },
         ],
       },
@@ -159,13 +182,13 @@ export const form: Form = {
         any: [
           {
             fact: 'b2',
-            operator: 'equal',
-            value: 'no',
+            operator: 'notEqual',
+            value: '',
           },
         ],
       },
       event: {
-        type: 'final question',
+        type: 'endForm',
       },
     },
   ],
