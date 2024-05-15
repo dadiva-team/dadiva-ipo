@@ -7,6 +7,7 @@ interface GroupProps {
   group: { name: string; questions: Question[] };
   onDrop: (questionID: string, groupName: string, index: number) => void;
   onEditRequest: (question: Question) => void;
+  onDeleteRequest: (question: Question) => void;
 }
 
 export function Group(props: GroupProps) {
@@ -41,6 +42,7 @@ export function Group(props: GroupProps) {
               event.dataTransfer.setData('questionIndex', index.toString());
             }}
             onEditRequest={props.onEditRequest}
+            onDeleteRequest={props.onDeleteRequest}
           />
         ))}
       </List>

@@ -6,10 +6,12 @@ import { FormServices } from '../../services/from/FormServices';
 import { Group } from './Group';
 import { Button } from '@mui/material';
 import { QuestionEditDialog } from './QuestionEditDialog';
+import { QuestionAddDialog } from './QuestionAddDialog';
 
 export function Backoffice() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState<Question>(null);
+  const [creatingQuestion, setCreatingQuestion] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, setError] = React.useState<string | null>(null);
   const nav = useNavigate();
@@ -29,7 +31,7 @@ export function Backoffice() {
     if (isLoading) fetch();
   }, [isLoading, nav]);
 
-  const handleDrop = (questionID: string, groupName: string, index: number) => {
+  function handleDrop(questionID: string, groupName: string, index: number) {
     setFormFetchData(oldForm => {
       let newQuestion: Question = null;
       const form: Form = {
@@ -58,7 +60,20 @@ export function Backoffice() {
       };
       return form;
     });
-  };
+  }
+
+  function handleDeleteQuestion(question: Question) {
+    setFormFetchData(oldForm => {
+      const form: Form = {
+        groups: oldForm.groups.map(group => ({
+          name: group.name,
+          questions: group.questions.filter(q => q.id !== question.id),
+        })),
+        rules: oldForm.rules,
+      };
+      return form;
+    });
+  }
 
   function saveForm() {
     FormServices.saveForm(formFetchData).then(() => {
@@ -73,11 +88,15 @@ export function Backoffice() {
           <div>Loading...</div>
         ) : (
           <div>
+            <Button disabled={formFetchData.groups.length === 0} onClick={() => setCreatingQuestion(true)}>
+              Create Question
+            </Button>
             {formFetchData.groups.map(group => (
               <Group
                 group={group}
                 onDrop={handleDrop}
                 onEditRequest={question => setEditingQuestion(question)}
+                onDeleteRequest={question => handleDeleteQuestion(question)}
                 key={group.name}
               />
             ))}
@@ -96,6 +115,24 @@ export function Backoffice() {
                 }));
               }}
               onClose={() => setEditingQuestion(null)}
+            />
+            <QuestionAddDialog
+              open={creatingQuestion}
+              groups={formFetchData.groups.map(group => group.name)}
+              onAnswer={(question, groupName) => {
+                setFormFetchData((oldForm: Form) => {
+                  return {
+                    groups: oldForm.groups.map(group => {
+                      if (group.name === groupName) {
+                        return { name: group.name, questions: [...(group.questions ?? []), question] };
+                      }
+                      return group;
+                    }),
+                    rules: oldForm.rules,
+                  };
+                });
+              }}
+              onClose={() => setCreatingQuestion(false)}
             />
             <Button onClick={saveForm}>Save Form</Button>
           </div>

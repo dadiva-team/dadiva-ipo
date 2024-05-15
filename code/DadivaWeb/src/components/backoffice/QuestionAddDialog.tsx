@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Button,
@@ -22,24 +22,18 @@ import Typography from '@mui/material/Typography';
 
 export interface QuestionEditDialogProps {
   open: boolean;
-  question: Question;
-  onAnswer: (id: string, text: string, type: string, options: string[] | null) => void;
+  groups: string[];
+  onAnswer: (question: Question, groupName: string) => void;
   onClose: () => void;
 }
 
-export function QuestionEditDialog({ open, question, onAnswer, onClose }: QuestionEditDialogProps) {
-  const [questionText, setQuestionText] = React.useState(question?.text ?? '');
-  const [questionType, setQuestionType] = React.useState('');
+//TODO: Reuse functions from [QuestionEditDialog.tsx]
+export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionEditDialogProps) {
+  const [questionText, setQuestionText] = React.useState('Corpo da Pergunta');
+  const [questionType, setQuestionType] = React.useState('boolean');
   const [questionOptions, setQuestionOptions] = React.useState<string[]>(null);
   const [optionInput, setOptionInput] = React.useState('');
-
-  useEffect(() => {
-    if (question) {
-      setQuestionText(question.text);
-      setQuestionType(question.type);
-      setQuestionOptions(question.options);
-    }
-  }, [question]);
+  const [questionGroup, setQuestionGroup] = React.useState(groups[0]);
 
   const handleAddOption = () => {
     if (optionInput.trim() !== '') {
@@ -75,9 +69,18 @@ export function QuestionEditDialog({ open, question, onAnswer, onClose }: Questi
   };
 
   const handleCloseAndAnswer = React.useCallback(() => {
-    onAnswer(question.id, questionText, questionType, questionOptions);
+    onAnswer(
+      {
+        id: crypto.randomUUID(),
+        text: questionText,
+        type: questionType,
+        options: questionOptions,
+      },
+      questionGroup
+    );
     onClose();
-  }, [onAnswer, onClose, question, questionOptions, questionText, questionType]);
+  }, [onAnswer, onClose, questionOptions, questionText, questionType, questionGroup]);
+
   return (
     <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
       <DialogTitle id="edit-dialog-title">Editar a Questão</DialogTitle>
@@ -112,6 +115,24 @@ export function QuestionEditDialog({ open, question, onAnswer, onClose }: Questi
                 setQuestionText(event.target.value);
               }}
             />
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel id="selecionar-grupo-label">Grupo da Resposta</InputLabel>
+            <Select
+              labelId="selecionar-grupo-label"
+              id="selecionar-grupo"
+              value={questionGroup}
+              label="Grupo da Resposta"
+              onChange={event => {
+                setQuestionGroup(event.target.value);
+              }}
+            >
+              {groups.map(group => (
+                <MenuItem key={group} value={group}>
+                  {group}
+                </MenuItem>
+              ))}
+            </Select>
           </FormControl>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Tipo de Resposta</InputLabel>

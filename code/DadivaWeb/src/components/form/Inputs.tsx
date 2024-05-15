@@ -201,7 +201,7 @@ export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
             return tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option} label={option} />);
           }}
           style={{ width: 430 }}
-          renderInput={params => <TextField {...params} label="Countrys" />}
+          renderInput={params => <TextField {...params} label="Opções" />}
         />
       </div>
       <div>

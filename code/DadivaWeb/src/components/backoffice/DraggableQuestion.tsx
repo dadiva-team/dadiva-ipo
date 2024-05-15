@@ -1,8 +1,9 @@
 import React from 'react';
-import { Box, ListItem } from '@mui/material';
+import { Box, Button, ListItem } from '@mui/material';
 import { Question } from '../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
 import { EditButton } from '../form/Inputs';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface DraggableQuestionProps {
   question: Question;
@@ -10,6 +11,7 @@ interface DraggableQuestionProps {
   index: number;
   onDragStart: (event: React.DragEvent) => void;
   onEditRequest: (question: Question) => void;
+  onDeleteRequest: (question: Question) => void;
 }
 
 export function DraggableQuestion(props: DraggableQuestionProps) {
@@ -30,6 +32,9 @@ export function DraggableQuestion(props: DraggableQuestionProps) {
           flexDirection: 'row',
           justifyContent: 'space-between',
           mt: 1,
+          '@media (max-width: 600px)': {
+            flexDirection: 'column',
+          },
         }}
       >
         <Box
@@ -43,7 +48,30 @@ export function DraggableQuestion(props: DraggableQuestionProps) {
             {props.question.text}
           </Typography>
         </Box>
-        <EditButton onChangeAnswer={() => props.onEditRequest(props.question)} enableEdit={true} />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            gap: 1,
+            '@media (max-width: 600px)': {
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+            },
+          }}
+        >
+          <EditButton onChangeAnswer={() => props.onEditRequest(props.question)} enableEdit={true} />
+          <Button
+            color="warning"
+            variant="outlined"
+            onClick={() => props.onDeleteRequest(props.question)}
+            startIcon={<DeleteIcon />}
+            sx={{ borderRadius: 50, height: 40 }}
+          >
+            Apagar
+          </Button>
+        </Box>
       </Box>
     </ListItem>
   );
