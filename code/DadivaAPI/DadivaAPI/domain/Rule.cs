@@ -30,6 +30,8 @@ public record Event(EventType Type, EventParams Params);
 public enum EventType
 {
     showQuestion,
+    nextGroup,
+    showReview,
     hideQuestion
 }
 

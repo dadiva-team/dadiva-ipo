@@ -168,6 +168,20 @@ group.AddSearchRoutes();
                 ),
                 new Question
                 (
+                    "Q8-1",
+                    "Quando mudou de país de residência?",
+                    ResponseType.text,
+                    null
+                ),
+                new Question
+                (
+                    "Q8-2",
+                    "Quando mudou de país de residência?",
+                    ResponseType.dropdown,
+                    ["Antes de 2000"," Depois de 2000"]
+                ),
+                new Question
+                (
                     "Q9",
                     "Alguma vez viajou para fora do país?",
                     ResponseType.boolean,
@@ -385,7 +399,12 @@ group.AddSearchRoutes();
             (
                 new Dictionary<ConditionType, List<Evaluation>?>
                 {
-                    { ConditionType.any, new List<Evaluation> { } }
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q2", Operator.notEqual, ""),
+                        }
+                    }
                 }!,
                 new Event
                 (
@@ -427,6 +446,23 @@ group.AddSearchRoutes();
                 (
                     EventType.showQuestion,
                     new EventParams("Q6")
+                )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q6", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.nextGroup,
+                    new EventParams("Q3")
                 )
             ),
             new Rule
@@ -487,6 +523,23 @@ group.AddSearchRoutes();
                 (
                     EventType.showQuestion,
                     new EventParams("Q11")
+                )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q11", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.nextGroup,
+                    new EventParams("Q3")
                 )
             ),
             new Rule
@@ -577,6 +630,23 @@ group.AddSearchRoutes();
             (
                 new Dictionary<ConditionType, List<Evaluation>?>
                 {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q18", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.nextGroup,
+                    new EventParams("Q3")
+                )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
                     { ConditionType.any, new List<Evaluation> { } }
                 }!,
                 new Event
@@ -595,6 +665,23 @@ group.AddSearchRoutes();
                 (
                     EventType.showQuestion,
                     new EventParams("Q20")
+                )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q20", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.nextGroup,
+                    new EventParams("Q3")
                 )
             ),
             new Rule
@@ -685,6 +772,23 @@ group.AddSearchRoutes();
             (
                 new Dictionary<ConditionType, List<Evaluation>?>
                 {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q27", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.nextGroup,
+                    new EventParams("Q3")
+                )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
                     { ConditionType.any, new List<Evaluation> { } }
                 }!,
                 new Event
@@ -702,6 +806,23 @@ group.AddSearchRoutes();
                 new Event
                 (
                     EventType.showQuestion,
+                    new EventParams("Q29")
+                )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q29", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.nextGroup,
                     new EventParams("Q29")
                 )
             ),
@@ -776,7 +897,41 @@ group.AddSearchRoutes();
                     EventType.showQuestion,
                     new EventParams("Q35")
                 )
-            )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q35", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.showReview,
+                    new EventParams("Q35")
+                )
+            ),
+            new Rule
+            (
+                new Dictionary<ConditionType, List<Evaluation>?>
+                {
+                    {
+                        ConditionType.any, new List<Evaluation>
+                        {
+                            new Evaluation("Q6", Operator.notEqual, ""),
+                        }
+                    }
+                }!,
+                new Event
+                (
+                    EventType.nextGroup,
+                    new EventParams("Q3")
+                )
+            ),
         }
     )
 );

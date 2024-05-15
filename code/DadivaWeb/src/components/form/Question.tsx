@@ -11,16 +11,17 @@ type QuestionProps = {
   type: string;
   isEditing: boolean;
 };
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function Question({ text, color, answer, isEditing, type }: QuestionProps) {
-  //const dropdownAnswers = answer ? answer.split(',') : [];
+  const isAnswerYes = answer === 'yes';
+  const isAnswerNo = answer === 'no';
+
   return (
     <Paper
       elevation={2}
       sx={{
-        width: '550px',
-        height: '75px',
+        width: '90%',
+        height: '300%',
+        justifyContent: 'left',
         bgcolor: color,
         p: 1,
       }}
@@ -34,21 +35,41 @@ export function Question({ text, color, answer, isEditing, type }: QuestionProps
           mt: 1,
         }}
       >
-        <Typography variant="h6">{text}</Typography>
-
-        {!isEditing &&
-          (answer === 'yes' ? (
-            <CheckCircleIcon sx={{ fontSize: 40 }} />
-          ) : answer === 'no' ? (
-            <CancelIcon sx={{ fontSize: 40 }} />
-          ) : null)}
-        {/*type === 'dropdown' && dropdownAnswers.length > 0 && (
-          <ul>
-            {dropdownAnswers.map((option, index) => (
-              <li key={index}>{option}</li>
-            ))}
-          </ul>
-        )*/}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            {text}
+          </Typography>
+          {type != 'boolean' && answer && (
+            <Box
+              sx={{
+                justifyContent: 'left',
+                border: 2,
+                borderColor: 'darkgreen',
+                borderRadius: 1,
+                bgcolor: 'grey.200',
+                p: 1,
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{ maxWidth: '100%', whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-all' }}
+              >
+                Resposta: {answer}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+        {!isEditing && isAnswerYes ? (
+          <CheckCircleIcon sx={{ fontSize: 40 }} />
+        ) : !isEditing && isAnswerNo ? (
+          <CancelIcon sx={{ fontSize: 40 }} />
+        ) : null}
       </Box>
     </Paper>
   );
