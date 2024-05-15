@@ -6,9 +6,11 @@ import { Form, Question } from '../../domain/Form/Form';
 import { FormServices } from '../../services/from/FormServices';
 import { Group } from './Group';
 import { Button } from '@mui/material';
+import { QuestionEditDialog } from './QuestionEditDialog';
 
 export function Backoffice() {
   const [isLoading, setIsLoading] = useState(true);
+  const [editingQuestion, setEditingQuestion] = useState<Question>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, setError] = React.useState<string | null>(null);
   const nav = useNavigate();
@@ -30,37 +32,37 @@ export function Backoffice() {
 
   const handleDrop = (questionID: string, groupName: string) => {
     setFormFetchData(oldForm => {
-      const form = new Form();
-
       let newQuestion: Question = null;
-
-      form.groups = oldForm.groups.map(group => {
-        return {
-          name: group.name,
-          questions: group.questions.filter(q => {
-            if (q.id === questionID) {
-              newQuestion = q;
-              return false;
+      const form: Form = {
+        groups: oldForm.groups
+          .map(group => {
+            return {
+              name: group.name,
+              questions: group.questions.filter(q => {
+                if (q.id === questionID) {
+                  newQuestion = q;
+                  return false;
+                }
+                return true;
+              }),
+            };
+          })
+          .map(group => {
+            if (group.name === groupName) {
+              return { name: group.name, questions: [...group.questions, newQuestion] };
             }
-            return true;
+            return group;
           }),
-        };
-      });
-
-      form.groups = form.groups.map(group => {
-        if (group.name === groupName) {
-          return { name: group.name, questions: [...group.questions, newQuestion] };
-        }
-        return group;
-      });
-
-      form.rules = oldForm.rules;
+        rules: oldForm.rules,
+      };
       return form;
     });
   };
 
   function saveForm() {
-    FormServices.saveForm(formFetchData);
+    FormServices.saveForm(formFetchData).then(() => {
+      nav('/');
+    });
   }
 
   return (
@@ -72,13 +74,44 @@ export function Backoffice() {
           ) : (
             <div>
               {formFetchData.groups.map(group => {
-                return <Group group={group} onDrop={handleDrop} key={group.name} />;
+                return (
+                  <Group
+                    group={group}
+                    onDrop={handleDrop}
+                    onEditRequest={question => setEditingQuestion(question)}
+                    key={group.name}
+                  />
+                );
               })}
+              <QuestionEditDialog
+                open={editingQuestion !== null}
+                question={editingQuestion}
+                onAnswer={(id, text, type, options) => {
+                  setFormFetchData((oldForm: Form) => {
+                    return {
+                      groups: oldForm.groups.map(group => {
+                        return {
+                          name: group.name,
+                          questions: group.questions.map(question => {
+                            if (question.id === id)
+                              return { id: id, text: text, type: type, options: options } as Question;
+                            return question;
+                          }),
+                        };
+                      }),
+                      rules: oldForm.rules,
+                    } as Form;
+                  });
+                }}
+                onClose={() => {
+                  setEditingQuestion(null);
+                }}
+              />
+              <Button onClick={saveForm}>Save Form</Button>
             </div>
           )}
         </div>
       }
-      <Button onClick={saveForm}>Save Form</Button>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { RuleProperties } from 'json-rules-engine';
 
-export class Form {
+export interface Form {
   groups: { name: string; questions: Question[] }[];
   rules: RuleProperties[];
 }

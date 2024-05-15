@@ -6,6 +6,7 @@ import { DraggableQuestion } from './DraggableQuestion';
 interface GroupProps {
   group: { name: string; questions: Question[] };
   onDrop: (questionID: string, groupName: string) => void;
+  onEditRequest: (question: Question) => void;
 }
 
 export function Group(props: GroupProps) {
@@ -34,6 +35,7 @@ export function Group(props: GroupProps) {
             onDragStart={event => {
               event.dataTransfer.setData('questionID', question.id);
             }}
+            onEditRequest={props.onEditRequest}
           />
         ))}
       </List>

@@ -71,7 +71,7 @@ export function EditButton({ onChangeAnswer, enableEdit }: EditButtonnProps) {
       variant="outlined"
       onClick={onChangeAnswer}
       startIcon={<EditIcon />}
-      disabled={enableEdit}
+      disabled={!enableEdit}
       sx={{ borderRadius: 50, height: 40 }}
     >
       Editar

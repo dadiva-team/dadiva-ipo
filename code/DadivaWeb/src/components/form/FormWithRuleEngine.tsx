@@ -113,7 +113,7 @@ export default function FormWithRuleEngine({
                       {answeredQuestions[question.id] && (
                         <EditButton
                           onChangeAnswer={() => onEditRequest(question.id, question.type)}
-                          enableEdit={editingQuestion != null}
+                          enableEdit={editingQuestion == null}
                         />
                       )}
                     </Box>
