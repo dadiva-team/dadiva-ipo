@@ -21,6 +21,16 @@ export default function Home() {
       >
         Clear Session
       </button>
+      <button
+        type="button"
+        value="Clear Session"
+        onClick={() => {
+          window.location.href = '/backoffice';
+        }}
+        style={{ display: 'block', marginBottom: '10px' }}
+      >
+        BACK OFFICE
+      </button>
       <Box
         sx={{
           display: 'flex',

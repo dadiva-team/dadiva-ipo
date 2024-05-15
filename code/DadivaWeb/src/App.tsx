@@ -9,11 +9,11 @@ import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
 import BACK_OFFICE = Uris.BACK_OFFICE;
-import FormWithRuleEngine from './components/form/FormWithRuleEngine';
 import { Header } from './components/home/Header';
 import FORM_INFO = Uris.FORM_INFO;
 import { FormInfo } from './components/form/FormInfo';
 import { Backoffice } from './components/backoffice/Backoffice';
+import { Form } from './components/form/Form';
 
 export default function App() {
   //const loggedIn = useLoggedIn();
@@ -38,7 +38,7 @@ export default function App() {
             path={FORM}
             element={
               <ProtectedRoute>
-                <FormWithRuleEngine />
+                <Form />
               </ProtectedRoute>
             }
           />

@@ -18,8 +18,22 @@ export function updateFormAnswers(
   ];
 }
 
+export const updateShowQuestions = (
+  showQuestions: Record<string, boolean>[],
+  currentGroup: number,
+  questionId: string,
+  show: boolean
+) => {
+  return showQuestions.map((group, index) => {
+    if (index === currentGroup) {
+      return { ...group, [questionId]: show };
+    }
+    return group;
+  });
+};
+
 export function updateQuestionColors(questionId: string, questionType: string, answer: string) {
-  if (questionType === 'dropdown') {
+  if (questionType === 'dropdown' || questionType === 'text') {
     return answer.length > 0 ? COLORS.LIGHT_GREEN : COLORS.LIGHT_RED;
   } else {
     return answer == 'yes' ? COLORS.LIGHT_GREEN : COLORS.LIGHT_RED;

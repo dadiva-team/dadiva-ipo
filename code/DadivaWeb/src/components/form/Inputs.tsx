@@ -43,7 +43,7 @@ export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
         onClick={() => handleClick(false)}
         color={!isNoClicked && !isYesClicked ? 'error' : isNoClicked ? 'error' : 'inherit'}
         startIcon={<CloseIcon />}
-        sx={{ borderRadius: 50, marginRight: 2 }}
+        sx={{ borderRadius: 50, marginRight: 5 }}
       >
         Não
       </Button>
@@ -72,7 +72,7 @@ export function EditButton({ onChangeAnswer, enableEdit }: EditButtonnProps) {
       onClick={onChangeAnswer}
       startIcon={<EditIcon />}
       disabled={enableEdit}
-      sx={{ borderRadius: 50, height: '50%' }}
+      sx={{ borderRadius: 50, height: 40 }}
     >
       Editar
     </Button>
@@ -103,6 +103,18 @@ export function SubmitFormButton({ onSubmit }: SubmitFormButtonProps) {
   );
 }
 
+type ReviewFormButtonProps = {
+  onReview: () => void;
+};
+
+export function ReviewFormButton({ onReview }: ReviewFormButtonProps) {
+  return (
+    <Button variant="contained" onClick={onReview} startIcon={<PublishIcon />} sx={{ borderRadius: 50 }}>
+      Rever o formulario
+    </Button>
+  );
+}
+
 interface TextInputProps {
   onChangeAnswer: (answer: string) => void;
 }
@@ -119,14 +131,16 @@ export function TextInput({ onChangeAnswer }: TextInputProps) {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        p: 1,
       }}
     >
       <TextField
         variant="outlined"
         required
+        rows={2}
         onChange={handleChange}
         label="Responda Aqui"
-        sx={{ width: '100%', mb: 1 }}
+        sx={{ mr: 2, width: '80%' }}
       />
       <Button
         variant="outlined"
@@ -229,7 +243,7 @@ export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQue
         onClick={onPrevQuestion}
         startIcon={<NavigateBeforeIcon />}
         disabled={!prevEnabled}
-        sx={{ borderRadius: 50 }}
+        sx={{ borderRadius: 50, border: 1, borderColor: 'black' }}
       >
         Anterior
       </Button>
@@ -238,7 +252,7 @@ export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQue
         onClick={onNextQuestion}
         disabled={!nextEnabled}
         endIcon={<NavigateNextIcon />}
-        sx={{ borderRadius: 50 }}
+        sx={{ borderRadius: 50, border: 1, borderColor: 'black' }}
       >
         Seguinte
       </Button>

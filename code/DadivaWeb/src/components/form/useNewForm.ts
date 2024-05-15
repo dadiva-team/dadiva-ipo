@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form } from '../../domain/Form/Form';
 import { Engine } from 'json-rules-engine';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
+import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
 import { form } from './MockForm';
-import { updateFormAnswers, updateQuestionColors } from './utils/FormUtils';
-import { COLORS } from '../../services/utils/colors';
 
 export function useNewForm() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
 
   const [formRawFetchData, setFormRawFetchData] = useState<Form>();
   const [formAnswers, setFormAnswers] = useState<Record<string, string>[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, boolean>>({});
-  const [showQuestions, setShowQuestions] = useState<Record<string, boolean>>();
+  const [showQuestions, setShowQuestions] = useState<Record<string, boolean>[]>();
   const [questionColors, setQuestionColors] = useState<Record<string, string>>({});
 
   const [currentGroup, setCurrentGroup] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [totalQuestions, setTotalQuestions] = useState<number>(0);
   const [canGoNext, setCanGoNext] = useState<boolean>(false);
+  const [canGoReview, setCanGoReview] = useState<boolean>(false);
   const [editingQuestion, setEditingQuestion] = useState<{ id: string; type: string } | null>(null);
 
   const [engine] = useState(new Engine());
@@ -28,6 +30,7 @@ export function useNewForm() {
   // Monitors
   /*useEffect(() => {
     //console.log('Form Data: ' + JSON.stringify(formRawFetchData));
+    console.log('formRawFetchData: ' + JSON.stringify(formRawFetchData));
     console.log('Show Questions: ' + JSON.stringify(showQuestions));
     console.log('Answered Questions: ' + JSON.stringify(answeredQuestions));
     console.log('Form answers: ' + JSON.stringify(formAnswers));
@@ -50,6 +53,8 @@ export function useNewForm() {
     if (isLoading) {
       fetch().then(res => {
         setFormRawFetchData(res as Form);
+        // setTotalQuestions(res.groups.reduce((total, group) => total + group.questions.length, 0));
+
         setFormAnswers(
           res.groups.map(group => {
             const groupAnswers: Record<string, string> = {};
@@ -60,11 +65,22 @@ export function useNewForm() {
           })
         );
 
+        setShowQuestions(
+          res.groups.map(group => {
+            const groupAnswers: Record<string, boolean> = {};
+            group.questions.forEach(question => {
+              groupAnswers[question.id] = false;
+            });
+            return groupAnswers;
+          })
+        );
+
         res.groups.forEach(group => {
           group.questions.forEach(question => {
             engine.addFact(question.id, () => '');
           });
         });
+
         res.rules.forEach(rule => {
           engine.addRule(rule);
         });
@@ -76,27 +92,51 @@ export function useNewForm() {
 
   useEffect(() => {
     if (!formRawFetchData) return;
-    setShowQuestions({});
+
+    // Reset showQuestions for the current group
+    setShowQuestions(prevShowQuestions =>
+      prevShowQuestions.map((group, index) => {
+        if (index === currentGroup) {
+          const updatedGroup = { ...group };
+          Object.keys(updatedGroup).forEach(key => {
+            updatedGroup[key] = false;
+          });
+          return updatedGroup;
+        }
+        return group;
+      })
+    );
 
     engine.run(formAnswers[currentGroup]).then(result => {
       result.results.forEach(result => {
         if (result.event.type === 'showQuestion') {
-          setShowQuestions(current => {
-            return {
-              ...current,
-              [result.event.params.id]: true,
-            };
-          });
+          setShowQuestions(prevShowQuestions =>
+            updateShowQuestions(prevShowQuestions, currentGroup, result.event.params.id, true)
+          );
         }
         if (result.event.type == 'nextGroup') {
+          console.log('Next Group');
           setCanGoNext(true);
         }
-        if (result.event.type == 'endForm') {
-          //nav('/end');
+        if (result.event.type == 'showReview') {
+          console.log('Show Review');
+          setCanGoReview(true);
         }
       });
     });
   }, [currentGroup, editingQuestion, engine, formAnswers, formRawFetchData]);
+
+  useEffect(() => {
+    const checkAllQuestionsAnswered: () => boolean = () => {
+      const totalAnsweredQuestions = Object.values(answeredQuestions).filter(answered => answered).length;
+      return totalQuestions === totalAnsweredQuestions;
+    };
+
+    if (checkAllQuestionsAnswered()) {
+      //console.log('All questions answered');
+      //setCanGoReview(true);
+    }
+  }, [formAnswers, answeredQuestions, totalQuestions]);
 
   function onChangeAnswer(questionId: string, questionType: string, answer: string) {
     const updatedFormAnswers = updateFormAnswers(formAnswers, currentGroup, questionId, answer);
@@ -116,14 +156,14 @@ export function useNewForm() {
     }
 
     // Dropdown em principio n tem respostas erradas por isso sempre q é editada n ha problema
-    if (editingQuestion.type === 'dropdown' || answer == formAnswers[currentGroup][questionId]) {
+    if (editingQuestion.type !== 'boolean' || answer == formAnswers[currentGroup][questionId]) {
       setEditingQuestion(null);
     } else {
-      resetAndSetNextQuestion(updatedFormAnswers[currentGroup], questionId, answer);
+      setEditingQuestion(null);
     }
   }
 
-  function resetAndSetNextQuestion(updatedFormData: Record<string, string>, questionId: string, answer: string) {
+  /*function resetAndSetNextQuestion(updatedFormData: Record<string, string>, questionId: string, answer: string) {
     const isAnswerYes = answer !== 'no';
     console.log('isAnswerYes: ' + isAnswerYes);
     resetNextSubQuestions(updatedFormData, questionId, isAnswerYes);
@@ -133,9 +173,9 @@ export function useNewForm() {
     }
 
     setEditingQuestion(null);
-  }
+  }*/
 
-  function resetNextSubQuestions(form: Record<string, string>, questionId: string, answer: boolean) {
+  /*function resetNextSubQuestions(form: Record<string, string>, questionId: string, answer: boolean) {
     const newShowQuestions = { ...showQuestions };
     const newFormAnswers = updateFormAnswers(formAnswers, currentGroup, questionId, answer ? 'yes' : 'no');
     const newAnsweredQuestions = { ...answeredQuestions, [questionId]: true };
@@ -158,7 +198,7 @@ export function useNewForm() {
     setFormAnswers(newFormAnswers);
     setShowQuestions(newShowQuestions);
     setQuestionColors(newColor);
-  }
+  }*/
 
   function onEditRequest(questionId: string, type: string) {
     if (editingQuestion != null) return;
@@ -194,6 +234,7 @@ export function useNewForm() {
     showQuestions,
     currentGroup,
     canGoNext,
+    canGoReview,
     editingQuestion,
     questionColors,
     onChangeAnswer,

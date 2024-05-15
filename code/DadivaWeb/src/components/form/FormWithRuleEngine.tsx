@@ -1,33 +1,53 @@
 import React, { JSX } from 'react';
 import '../../App.css';
-import { BooleanButtons, WrongQuestionType, EditButton, NextQuestionButton, TextInput, NavButtons } from './Inputs';
+import { EditButton, NextQuestionButton, NavButtons, ReviewFormButton } from './Inputs';
 
 import { Question } from './Question';
-import { CheckboxesTags } from './Inputs';
 import { Box, Container, Paper } from '@mui/material';
 import LoadingSpinner from '../shared/LoadingSpinner';
-import { useNewForm } from './useNewForm';
 import { ErrorAlert } from '../shared/ErrorAlert';
+import { Form } from '../../domain/Form/Form';
+import { getInputComponent } from './utils/GetInputComponent';
 
-export default function FormWithRuleEngine() {
-  const {
-    isLoading,
-    error,
-    cleanError,
-    formRawFetchData,
-    formAnswers,
-    answeredQuestions,
-    showQuestions,
-    currentGroup,
-    canGoNext,
-    editingQuestion,
-    questionColors,
-    onChangeAnswer,
-    onEditRequest,
-    onNextQuestion,
-    onPrevQuestion,
-  } = useNewForm();
+interface FormWithRuleEngineProps {
+  isLoading: boolean;
+  error: string | null;
+  cleanError: () => void;
+  formRawFetchData: Form;
+  formAnswers: Record<string, string>[];
+  answeredQuestions: Record<string, boolean>;
+  showQuestions: Record<string, boolean>[];
+  currentGroup: number;
+  canGoNext: boolean;
+  canGoReview: boolean;
+  editingQuestion: { id: string; type: string } | null;
+  questionColors: Record<string, string>;
+  onChangeAnswer: (id: string, type: string, answer: string) => void;
+  onEditRequest: (id: string, type: string) => void;
+  onNextQuestion: () => void;
+  onPrevQuestion: () => void;
+  onReviewMode: () => void;
+}
 
+export default function FormWithRuleEngine({
+  isLoading,
+  error,
+  cleanError,
+  formRawFetchData,
+  formAnswers,
+  answeredQuestions,
+  showQuestions,
+  currentGroup,
+  canGoNext,
+  canGoReview,
+  editingQuestion,
+  questionColors,
+  onChangeAnswer,
+  onEditRequest,
+  onNextQuestion,
+  onPrevQuestion,
+  onReviewMode,
+}: FormWithRuleEngineProps) {
   return (
     <Container>
       {
@@ -47,6 +67,7 @@ export default function FormWithRuleEngine() {
                 mt: 2,
                 alignItems: 'center',
                 width: '70%',
+                borderRadius: 5,
               }}
             >
               <NavButtons
@@ -56,38 +77,11 @@ export default function FormWithRuleEngine() {
                 nextEnabled={currentGroup <= formRawFetchData.groups.length - 1 && canGoNext && !editingQuestion}
               />
               {formRawFetchData.groups[currentGroup]?.questions.map(question => {
-                let input: JSX.Element;
-
-                switch (question.type) {
-                  case 'boolean':
-                    input = (
-                      <BooleanButtons
-                        onChangeAnswer={answer => {
-                          onChangeAnswer(question.id, question.type, answer ? 'yes' : 'no');
-                        }}
-                      />
-                    );
-                    break;
-                  case 'text':
-                    input = <TextInput onChangeAnswer={answer => onChangeAnswer(question.id, question.type, answer)} />;
-                    break;
-                  case 'dropdown':
-                    input = (
-                      <CheckboxesTags
-                        options={question.options}
-                        onChangeAnswer={answer => {
-                          onChangeAnswer(question.id, question.type, answer);
-                        }}
-                      />
-                    );
-                    break;
-                  default:
-                    input = <WrongQuestionType />;
-                    break;
-                }
+                const input: JSX.Element = getInputComponent(question, onChangeAnswer);
                 return (
                   showQuestions &&
-                  showQuestions[question.id] && (
+                  showQuestions[currentGroup] &&
+                  showQuestions[currentGroup][question.id] && (
                     <Box
                       key={question.id}
                       sx={{
@@ -95,6 +89,7 @@ export default function FormWithRuleEngine() {
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: 'space-between',
+                        alignItems: 'center',
                         p: 1,
                       }}
                     >
@@ -113,7 +108,7 @@ export default function FormWithRuleEngine() {
                           isEditing={editingQuestion?.id === question.id}
                           type={question.type}
                         />
-                        {!answeredQuestions[question.id] && <Box sx={{ height: 50, p: 1 }}> {input} </Box>}
+                        {!answeredQuestions[question.id] && <Box sx={{ pt: 1.5, width: '75%' }}> {input} </Box>}
                       </Box>
                       {answeredQuestions[question.id] && (
                         <EditButton
@@ -125,16 +120,20 @@ export default function FormWithRuleEngine() {
                   )
                 );
               })}
-              {editingQuestion == null && canGoNext && (
-                <NextQuestionButton
-                  onNextQuestion={() => {
-                    onNextQuestion();
-                  }}
-                />
-              )}
-              {/*Object.values(formAnswers)
-                .flat()
-                .every(val => val !== '') && <SubmitFormButton onSubmit={onFinalQuestion*/}
+              {editingQuestion == null &&
+                (canGoReview ? (
+                  <ReviewFormButton
+                    onReview={() => {
+                      onReviewMode();
+                    }}
+                  />
+                ) : canGoNext ? (
+                  <NextQuestionButton
+                    onNextQuestion={() => {
+                      onNextQuestion();
+                    }}
+                  />
+                ) : null)}
             </Paper>
           )}
         </Box>
