@@ -5,7 +5,7 @@ import { DraggableQuestion } from './DraggableQuestion';
 
 interface GroupProps {
   group: { name: string; questions: Question[] };
-  onDrop: (questionID: string, groupName: string) => void;
+  onDrop: (questionID: string, groupName: string, index: number) => void;
   onEditRequest: (question: Question) => void;
 }
 
@@ -16,10 +16,13 @@ export function Group(props: GroupProps) {
 
   const handleDrop = (event: React.DragEvent) => {
     const questionID = event.dataTransfer.getData('questionID');
-    props.onDrop(questionID, props.group.name);
+    const dropPosition = event.clientY;
+    const questionIndex = Array.from(event.currentTarget.children).findIndex(child => {
+      const rect = (child as HTMLElement).getBoundingClientRect();
+      return dropPosition < rect.bottom;
+    });
+    props.onDrop(questionID, props.group.name, questionIndex === -1 ? props.group.questions.length : questionIndex);
   };
-
-  console.log(props.group.questions);
 
   return (
     <Card sx={{ margin: 2 }}>
@@ -27,13 +30,15 @@ export function Group(props: GroupProps) {
         {props.group.name}
       </Typography>
       <List onDragOver={handleDragOver} onDrop={handleDrop}>
-        {props.group.questions.map(question => (
+        {props.group.questions.map((question, index) => (
           <DraggableQuestion
             key={question.id}
             question={question}
             groupName={props.group.name}
+            index={index}
             onDragStart={event => {
               event.dataTransfer.setData('questionID', question.id);
+              event.dataTransfer.setData('questionIndex', index.toString());
             }}
             onEditRequest={props.onEditRequest}
           />

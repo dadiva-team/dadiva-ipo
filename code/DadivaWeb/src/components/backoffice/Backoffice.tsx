@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { handleError, handleRequest } from '../../services/utils/fetch';
-//import { getForm } from '../../services/from/FormServices';
 import { useNavigate } from 'react-router-dom';
 import { Form, Question } from '../../domain/Form/Form';
 import { FormServices } from '../../services/from/FormServices';
@@ -30,7 +29,7 @@ export function Backoffice() {
     if (isLoading) fetch();
   }, [isLoading, nav]);
 
-  const handleDrop = (questionID: string, groupName: string) => {
+  const handleDrop = (questionID: string, groupName: string, index: number) => {
     setFormFetchData(oldForm => {
       let newQuestion: Question = null;
       const form: Form = {
@@ -49,7 +48,9 @@ export function Backoffice() {
           })
           .map(group => {
             if (group.name === groupName) {
-              return { name: group.name, questions: [...group.questions, newQuestion] };
+              const newQuestions = [...group.questions];
+              newQuestions.splice(index, 0, newQuestion);
+              return { name: group.name, questions: newQuestions };
             }
             return group;
           }),
@@ -67,51 +68,39 @@ export function Backoffice() {
 
   return (
     <div>
-      {
-        <div>
-          {isLoading ? (
-            <div>Loading...</div>
-          ) : (
-            <div>
-              {formFetchData.groups.map(group => {
-                return (
-                  <Group
-                    group={group}
-                    onDrop={handleDrop}
-                    onEditRequest={question => setEditingQuestion(question)}
-                    key={group.name}
-                  />
-                );
-              })}
-              <QuestionEditDialog
-                open={editingQuestion !== null}
-                question={editingQuestion}
-                onAnswer={(id, text, type, options) => {
-                  setFormFetchData((oldForm: Form) => {
-                    return {
-                      groups: oldForm.groups.map(group => {
-                        return {
-                          name: group.name,
-                          questions: group.questions.map(question => {
-                            if (question.id === id)
-                              return { id: id, text: text, type: type, options: options } as Question;
-                            return question;
-                          }),
-                        };
-                      }),
-                      rules: oldForm.rules,
-                    } as Form;
-                  });
-                }}
-                onClose={() => {
-                  setEditingQuestion(null);
-                }}
+      <div>
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <div>
+            {formFetchData.groups.map(group => (
+              <Group
+                group={group}
+                onDrop={handleDrop}
+                onEditRequest={question => setEditingQuestion(question)}
+                key={group.name}
               />
-              <Button onClick={saveForm}>Save Form</Button>
-            </div>
-          )}
-        </div>
-      }
+            ))}
+            <QuestionEditDialog
+              open={editingQuestion !== null}
+              question={editingQuestion}
+              onAnswer={(id, text, type, options) => {
+                setFormFetchData((oldForm: Form) => ({
+                  groups: oldForm.groups.map(group => ({
+                    name: group.name,
+                    questions: group.questions.map(question =>
+                      question.id === id ? ({ id, text, type, options } as Question) : question
+                    ),
+                  })),
+                  rules: oldForm.rules,
+                }));
+              }}
+              onClose={() => setEditingQuestion(null)}
+            />
+            <Button onClick={saveForm}>Save Form</Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
