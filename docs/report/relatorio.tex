@@ -1,0 +1,154 @@
+% Classe do documento e parâmetros gerais.
+\documentclass[a4paper,openright,twoside,11pt]{report}
+
+% Packages utilizadas e respetivos parâmetros.
+\usepackage[utf8]{inputenc}
+
+\usepackage{lipsum} % gerador de texto
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[Algoritmo]{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{float}
+\renewcommand{\algorithmicrequire}{\textbf{Dados: }}
+\renewcommand{\algorithmicensure}{\textbf{Resultado: }}
+
+% Definições das dimensões das páginas
+\setlength{\textheight}{24.00cm}
+\setlength{\textwidth}{15.50cm}
+\setlength{\topmargin}{0.35cm}
+\setlength{\headheight}{0cm}
+\setlength{\headsep}{0cm}
+\setlength{\oddsidemargin}{0.25cm}
+\setlength{\evensidemargin}{0.25cm}
+
+%\renewcommand{\baselinestretch}{1}
+
+% Página inicial (capa)
+\title{
+   \vspace{-50mm}
+   \begin{minipage}[l]{\textwidth}
+      \hspace{-20mm}\resizebox{75mm}{!}{\includegraphics{./figures/logoISEL.png}}\\
+   \end{minipage}\\[10mm]
+   \textbf{\Huge DADIVA IPO}\\
+   \textbf{D}igital \textbf{A}id and \textbf{D}onor \textbf{I}nformation \textbf{V}erification \textbf{A}pplication for \textbf{IPO}\\[5mm]
+}
+
+% Nome dos autores (um por linha)
+\author{
+\begin{tabular}{cr}
+             & Francisco Medeiros  \\
+             & Luís Macário \\
+             & Ricardo Pinto \\[50mm]
+\end{tabular}}
+
+\date{
+\begin{tabular}{ll}
+  {Orientadores:} & Filipe Freitas, ISEL \\
+                  & João Pereira, COFIDIS\\
+\end{tabular}\\[10mm]
+% Deixar o indicador respetivo em função da versão do relatório.
+Relatório do projeto realizado no âmbito de Projecto e Seminário\\
+Licenciatura em Engenharia Informática e de Computadores\\[20mm]
+*Junho* de 2024}
+
+
+\begin{document}
+\pagenumbering{roman}
+\thispagestyle{empty}
+\maketitle
+
+\baselineskip 18pt % line spacing: 12pt for single, 18pt for 1 1/2, and 24pt for double spacing
+
+\newpage
+\thispagestyle{empty}
+% Fim da contracapa
+
+% Página com identificação completa (número e nome) e assinaturas do(s) estudante(s) e do(s) orientador(es)
+\cleardoublepage
+\setcounter{page}{1}
+\begin{center}
+\textsc{\LARGE Instituto Superior de Engenharia de Lisboa}\\[20mm]
+
+\textbf{\Huge DADIVA IPO}\\
+\textbf{D}igital \textbf{A}id and \textbf{D}onor \textbf{I}nformation \textbf{V}erification \textbf{A}pplication for \textbf{IPO}\\[15mm]
+
+\begin{tabular}{rl}
+  46331  & Francisco Rodrigues Medeiros\\[10mm]
+           & \rule{75mm}{0.5pt}\\[5mm]
+  47671  & Luís Miguel Teixeira Macário\\[10mm]
+           & \rule{75mm}{0.5pt}\\
+  47673  & Ricardo Parreira Pinto\\[10mm]
+           & \rule{75mm}{0.5pt}\\
+\end{tabular}\\[10mm]
+
+\begin{tabular}{rl}
+  Orientadores: & Filipe Freitas, ISEL\\[10mm]
+                & \rule{75mm}{0.5pt}\\[5mm]
+                & Joao Pereira, COFIDIS\\[10mm]
+                & \rule{75mm}{0.5pt}\\
+\end{tabular}\\[10mm]
+
+Relatório do projeto realizado no âmbito de Projecto e Seminário\\
+Licenciatura em Engenharia Informática e de Computadores\\[20mm]
+*Junho* de 2024\\
+\end{center}
+
+% Página de resumo em Português
+\cleardoublepage
+\chapter*{Resumo}
+Texto do resumo.
+Breve descrição do projeto, dos resultados importantes e das conclusões: o objetivo é dar ao leitor uma visão global do projeto (não deve exceder uma página).
+
+% Página de resumo em Inglês
+\cleardoublepage
+\chapter*{Abstract}
+The Instituto Português de Oncologia (IPO) in Lisbon currently employs a manual system for managing blood donor information. This involves donors completing a pre-donation form on paper, followed by a medical interview where a doctor assesses eligibility based on the form and additional verbal questions. This manual process of handling and verifying medical and medication details is prone to errors and inefficiency.
+
+The proposed project aims to digitalize the blood donation process at IPO. This includes creating a digital version of the pre-donation form and developing a system to manage and cross-reference medication and pathology data. The digital system will allow for easy updating, customization, and retrieval of information. By automating the form and data handling, the project seeks to reduce errors associated with manual data management and decrease the overall time required for the donation process, thereby streamlining both donor signup and triage procedures.
+
+%{\bf Palavras-chave:} lista de palavras-chave separadas por ;.
+
+%% Página de agradecimentos
+%\cleardoublepage
+%\chapter*{Agradecimentos}
+%Texto dos agradecimentos. É opcional.\\
+
+% Geração do índice de conteúdos
+\cleardoublepage
+\tableofcontents \cleardoublepage
+
+% Geração do índice de figuras e de tabelas
+%\listoffigures \cleardoublepage
+%\listoftables \cleardoublepage
+
+% Reiniciar a numeração de páginas
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+% Capitulo 1
+\include{introducao}
+
+% Capitulo 2
+\include{capenquadramento}
+
+% Capitulo 3
+\include{architecture}
+
+% Capitulo 4
+\include{capexemplos}
+
+% Capitulo 5
+\include{captestes}
+
+% Referências
+\bibliographystyle{unsrt}
+\bibliography{referencias}
+\addcontentsline{toc}{chapter}{Refer\^{e}ncias}
+
+% Apêndices (opcional)
+\appendix
+\include{apendiceex}
+
+\end{document} 
