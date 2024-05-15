@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Input } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Input, MenuItem, Select } from '@mui/material';
 //import { getInputComponent } from '../form/utils/GetInputComponent';
 import { Close } from '@mui/icons-material';
 import { Question } from '../../domain/Form/Form';
@@ -77,6 +77,16 @@ export function QuestionEditDialog({ open, question, onAnswer, onClose }: Questi
               }}
             />
           </Box>
+          <Select
+            value={questionType}
+            label="Tipo de Resposta"
+            onChange={event => {
+              setQuestionType(event.target.value);
+            }}
+          >
+            <MenuItem value={'text'}>Texto</MenuItem>
+            <MenuItem value={'boolean'}>Sim ou Não</MenuItem>
+          </Select>
         </Box>
         <Button
           onClick={() => {

@@ -5,7 +5,6 @@ import { Engine } from 'json-rules-engine';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
 import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
-import { form } from './MockForm';
 
 export function useNewForm() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -46,7 +45,7 @@ export function useNewForm() {
         return;
       }
       // HARD CODED FORM for tests
-      res = form;
+      //res = form;
       return res;
     };
 
