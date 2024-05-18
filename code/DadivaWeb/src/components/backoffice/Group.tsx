@@ -1,13 +1,18 @@
 import React from 'react';
-import { Card, List, Typography } from '@mui/material';
+import { Card, List, Typography, Box, IconButton } from '@mui/material';
 import { Question } from '../../domain/Form/Form';
 import { DraggableQuestion } from './DraggableQuestion';
+import { ArrowDownward, ArrowUpward, Delete, Edit } from '@mui/icons-material';
 
 interface GroupProps {
   group: { name: string; questions: Question[] };
   onDrop: (questionID: string, groupName: string, index: number) => void;
   onEditRequest: (question: Question) => void;
   onDeleteRequest: (question: Question) => void;
+  onMoveUp: () => void | null;
+  onMoveDown: () => void;
+  onRename: () => void;
+  onDelete: () => void;
 }
 
 export function Group(props: GroupProps) {
@@ -27,9 +32,23 @@ export function Group(props: GroupProps) {
 
   return (
     <Card sx={{ margin: 2 }}>
-      <Typography variant="h6" sx={{ padding: 2 }}>
-        {props.group.name}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 2 }}>
+        <Typography variant="h6">{props.group.name}</Typography>
+        <Box>
+          <IconButton disabled={!props.onMoveUp} edge="end" aria-label="up" onClick={() => props.onMoveUp()}>
+            <ArrowUpward />
+          </IconButton>
+          <IconButton disabled={!props.onMoveDown} edge="end" aria-label="down" onClick={() => props.onMoveDown()}>
+            <ArrowDownward />
+          </IconButton>
+          <IconButton edge="end" aria-label="down" onClick={() => props.onRename()}>
+            <Edit />
+          </IconButton>
+          <IconButton disabled={!props.onDelete} edge="end" aria-label="delete" onClick={() => props.onDelete()}>
+            <Delete />
+          </IconButton>
+        </Box>
+      </Box>
       <List onDragOver={handleDragOver} onDrop={handleDrop}>
         {props.group.questions.map((question, index) => (
           <DraggableQuestion

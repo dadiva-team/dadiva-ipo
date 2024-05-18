@@ -1,5 +1,6 @@
 import { NavigateFunction } from 'react-router-dom';
 import { Problem } from './Problem';
+import React from 'react';
 
 export async function fetchAPI<T>(
   input: RequestInfo | URL,

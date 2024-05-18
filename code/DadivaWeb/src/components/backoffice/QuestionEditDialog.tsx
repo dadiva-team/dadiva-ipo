@@ -155,13 +155,23 @@ export function QuestionEditDialog({ open, question, onAnswer, onClose }: Questi
                   <ListItem key={index}>
                     <ListItemText primary={option} />
                     <ListItemSecondaryAction>
-                      <IconButton edge="end" aria-label="up" onClick={() => moveOptionUp(index)}>
+                      <IconButton disabled={index === 0} edge="end" aria-label="up" onClick={() => moveOptionUp(index)}>
                         <ArrowUpward />
                       </IconButton>
-                      <IconButton edge="end" aria-label="down" onClick={() => moveOptionDown(index)}>
+                      <IconButton
+                        disabled={index === questionOptions.length - 1}
+                        edge="end"
+                        aria-label="down"
+                        onClick={() => moveOptionDown(index)}
+                      >
                         <ArrowDownward />
                       </IconButton>
-                      <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveOption(index)}>
+                      <IconButton
+                        disabled={questionOptions.length === 1}
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveOption(index)}
+                      >
                         <Delete />
                       </IconButton>
                     </ListItemSecondaryAction>
