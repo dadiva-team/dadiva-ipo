@@ -24,6 +24,12 @@ export function DraggableQuestion(props: DraggableQuestionProps) {
         props.onDragStart(event);
       }}
       style={{ cursor: 'grab' }}
+      sx={{
+        bgcolor: '#ffffff',
+        '&:hover': {
+          bgcolor: '#aaaaaa',
+        },
+      }}
     >
       <Box
         sx={{

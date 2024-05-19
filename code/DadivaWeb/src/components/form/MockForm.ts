@@ -186,9 +186,23 @@ export const form: Form = {
           {
             all: [
               {
-                fact: 'traveledWhere',
-                operator: 'notEqual',
-                value: '',
+                fact: 'hasTraveled',
+                operator: 'equal',
+                value: 'no',
+              },
+              {
+                fact: 'hasTakenMedication',
+                operator: 'equal',
+                value: 'no',
+              },
+            ],
+          },
+          {
+            all: [
+              {
+                fact: 'hasTraveled',
+                operator: 'equal',
+                value: 'no',
               },
               {
                 fact: 'whichMedication',
@@ -214,12 +228,7 @@ export const form: Form = {
           {
             all: [
               {
-                fact: 'hasTraveled',
-                operator: 'equal',
-                value: 'no',
-              },
-              {
-                fact: 'hasTakenMedication',
+                fact: 'traveledWhere',
                 operator: 'notEqual',
                 value: '',
               },
@@ -227,20 +236,6 @@ export const form: Form = {
                 fact: 'whichMedication',
                 operator: 'notEqual',
                 value: '',
-              },
-            ],
-          },
-          {
-            all: [
-              {
-                fact: 'hasTraveled',
-                operator: 'equal',
-                value: 'no',
-              },
-              {
-                fact: 'hasTakenMedication',
-                operator: 'equal',
-                value: 'no',
               },
             ],
           },

@@ -1,7 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DadivaAPI.domain;
-using Elastic.Clients.Elasticsearch;
+
+namespace DadivaAPI.utils;
 
 public class AnswerConverter : JsonConverter<IAnswer>
 {

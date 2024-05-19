@@ -1,13 +1,13 @@
 namespace DadivaAPI.domain;
 
-public record Rule(Dictionary<ConditionType, List<Evaluation>> Conditions, Event Event);
+public record Rule(LogicalCondition Conditions, Event Event);
 
-public enum ConditionType
-{
-    any,
-    all,
-    not
-}
+public abstract record Condition;
+
+public record LogicalCondition(List<Condition>? All, List<Condition>? Any)
+    : Condition;
+
+public record EvaluationCondition(string Fact, Operator Operator, string Value) : Condition;
 
 public enum Operator
 {
@@ -23,9 +23,7 @@ public enum Operator
     doesNotContain
 }
 
-public record Evaluation(string Fact, Operator Operator, string Value);
-
-public record Event(EventType Type, EventParams Params);
+public record Event(EventType Type, EventParams? Params);
 
 public enum EventType
 {

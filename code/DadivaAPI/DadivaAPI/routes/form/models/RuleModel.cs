@@ -1,78 +1,165 @@
+using System.Text.Json.Serialization;
 using DadivaAPI.domain;
+using DadivaAPI.utils;
 
-namespace DadivaAPI.routes.form.models;
-
-public record RuleModel(Dictionary<string, List<EvaluationModel>> Conditions, EventModel Event)
+namespace DadivaAPI.routes.form.models
 {
-    public static RuleModel FromDomain(Rule rule)
+    [JsonConverter(typeof(ConditionModelConverter))]
+    public abstract class ConditionModel
     {
-        return new RuleModel(
-            rule.Conditions.ToDictionary(
-                pair =>
+        protected static List<ConditionModel>? FromDomain(List<Condition>? conditions)
+        {
+            return conditions?.Select<Condition, ConditionModel>(condition =>
+            {
+                return condition switch
                 {
-                    Console.Out.WriteLine(pair.Key.ToString());
-                    return pair.Key.ToString();
-                },
-                pair => pair.Value.Select(EvaluationModel.FromDomain).ToList()
-            ),
-            EventModel.FromDomain(rule.Event)
-        );
+                    EvaluationCondition evalCondition => new EvaluationConditionModel(evalCondition.Fact,
+                        evalCondition.Operator.ToString(), evalCondition.Value),
+                    LogicalCondition logCondition => LogicalConditionModel.FromDomain(logCondition),
+                    _ => throw new Exception("Never going to happen, c# doesn't have proper sealed classes")
+                };
+            }).ToList();
+        }
+
+        protected static List<Condition>? ToDomain(List<ConditionModel>? models)
+        {
+            return models?.Select<ConditionModel, Condition>(model =>
+            {
+                return model switch
+                {
+                    EvaluationConditionModel evalModel => new EvaluationCondition(
+                        Fact: evalModel.Fact,
+                        Operator: Enum.Parse<Operator>(evalModel.Operator),
+                        Value: evalModel.Value
+                    ),
+                    LogicalConditionModel logModel => LogicalConditionModel.ToDomain(logModel),
+                    _ => throw new Exception("Never going to happen, c# doesn't have proper sealed classes")
+                };
+            }).ToList();
+        }
     }
 
-    public static Rule ToDomain(RuleModel model)
+    public class EvaluationConditionModel : ConditionModel
     {
-        return new Rule
-        (
-            model.Conditions.ToDictionary(
-                pair => Enum.Parse<ConditionType>(pair.Key),
-                pair => pair.Value.Select(EvaluationModel.ToDomain).ToList()
-            ),
-            EventModel.ToDomain(model.Event)
-        );
-    }
-};
+        public string Fact { get; set; }
+        public string Operator { get; set; }
+        public string Value { get; set; }
 
-public record EvaluationModel(string Fact, string Operator, string Value)
-{
-    public static EvaluationModel FromDomain(Evaluation evaluation)
-    {
-        return new EvaluationModel(
-            evaluation.Fact,
-            evaluation.Operator.ToString(),
-            evaluation.Value
-        );
+        [JsonConstructor]
+        public EvaluationConditionModel(string fact, string @operator, string value)
+        {
+            Fact = fact;
+            Operator = @operator;
+            Value = value;
+        }
     }
 
-    public static Evaluation ToDomain(EvaluationModel model)
+    public class LogicalConditionModel : ConditionModel
     {
-        return new Evaluation
-        (
-            model.Fact,
-            Enum.Parse<Operator>(model.Operator),
-            model.Value
-        );
-    }
-};
+        public List<ConditionModel>? All { get; set; }
+        public List<ConditionModel>? Any { get; set; }
+        
 
-public record EventParamsModel(
-    string Id
-);
+        [JsonConstructor]
+        public LogicalConditionModel(List<ConditionModel>? all, List<ConditionModel>? any)
+        {
+            All = all;
+            Any = any;
+        }
 
-public record EventModel(string Type, EventParamsModel Params)
-{
-    public static EventModel FromDomain(Event domain)
-    {
-        return new EventModel(
-            domain.Type.ToString(),
-            new EventParamsModel(domain.Params.Id)
-        );
+        public static LogicalConditionModel FromDomain(LogicalCondition conditions)
+        {
+            return new LogicalConditionModel(
+                ConditionModel.FromDomain(conditions.All),
+                ConditionModel.FromDomain(conditions.Any)
+            );
+        }
+
+        public static LogicalCondition ToDomain(LogicalConditionModel model)
+        {
+            return new LogicalCondition(
+                All: ConditionModel.ToDomain(model.All),
+                Any: ConditionModel.ToDomain(model.Any)
+            );
+        }
     }
-    public static Event ToDomain(EventModel model)
+
+    public class RuleModel
     {
-        return new Event
-        (
-            Enum.Parse<EventType>(model.Type),
-            new EventParams(model.Params.Id)
-        );
+        public LogicalConditionModel Conditions { get; set; }
+        public EventModel Event { get; set; }
+
+        [JsonConstructor]
+        public RuleModel(LogicalConditionModel conditions, EventModel @event)
+        {
+            Conditions = conditions;
+            Event = @event;
+        }
+
+        public static RuleModel FromDomain(Rule rule)
+        {
+            return new RuleModel(
+                LogicalConditionModel.FromDomain(rule.Conditions),
+                EventModel.FromDomain(rule.Event)
+            );
+        }
+
+        public static Rule ToDomain(RuleModel model)
+        {
+            return new Rule(
+                Conditions: LogicalConditionModel.ToDomain(model.Conditions),
+                Event: EventModel.ToDomain(model.Event)
+            );
+        }
     }
-};
+
+    public class EventModel
+    {
+        public string Type { get; set; }
+        public EventParamsModel? Params { get; set; }
+
+        [JsonConstructor]
+        public EventModel(string type, EventParamsModel? @params)
+        {
+            Type = type;
+            Params = @params;
+        }
+
+        public static EventModel FromDomain(Event e)
+        {
+            return new EventModel(
+                e.Type.ToString(),
+                EventParamsModel.FromDomain(e.Params)
+            );
+        }
+
+        public static Event ToDomain(EventModel model)
+        {
+            return new Event(
+                Type: Enum.Parse<EventType>(model.Type),
+                Params: EventParamsModel.ToDomain(model.Params)
+            );
+        }
+    }
+
+    public class EventParamsModel
+    {
+        public string Id { get; set; }
+
+        [JsonConstructor]
+        public EventParamsModel(string id)
+        {
+            Id = id;
+        }
+
+        public static EventParamsModel? FromDomain(EventParams? eParams)
+        {
+            return eParams == null ? null : new EventParamsModel(eParams.Id);
+        }
+
+        public static EventParams? ToDomain(EventParamsModel? model)
+        {
+            return model == null ? null : new EventParams(model.Id);
+        }
+    }
+}

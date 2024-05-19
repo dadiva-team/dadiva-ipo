@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, List, Typography, Box, IconButton } from '@mui/material';
+import { Box, Card, Divider, IconButton, List, Typography } from '@mui/material';
 import { Question } from '../../domain/Form/Form';
 import { DraggableQuestion } from './DraggableQuestion';
 import { ArrowDownward, ArrowUpward, Delete, Edit } from '@mui/icons-material';
@@ -32,7 +32,14 @@ export function Group(props: GroupProps) {
 
   return (
     <Card sx={{ margin: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: 2,
+        }}
+      >
         <Typography variant="h6">{props.group.name}</Typography>
         <Box>
           <IconButton disabled={!props.onMoveUp} edge="end" aria-label="up" onClick={() => props.onMoveUp()}>
@@ -49,6 +56,7 @@ export function Group(props: GroupProps) {
           </IconButton>
         </Box>
       </Box>
+      <Divider />
       <List onDragOver={handleDragOver} onDrop={handleDrop}>
         {props.group.questions.map((question, index) => (
           <DraggableQuestion

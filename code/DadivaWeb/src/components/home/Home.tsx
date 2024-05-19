@@ -3,9 +3,11 @@ import { Box } from '@mui/material';
 import { useLoggedIn } from '../../session/Session';
 import { PreDadivaLoginCard } from './PreDadivaLoginCard';
 import { PreDadivaInfoCard } from './PreDadivaInfoCard';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const loggedIn = useLoggedIn();
+  const nav = useNavigate();
 
   return (
     <div>
@@ -25,7 +27,7 @@ export default function Home() {
         type="button"
         value="Clear Session"
         onClick={() => {
-          window.location.href = '/backoffice';
+          nav('/backoffice');
         }}
         style={{ display: 'block', marginBottom: '10px' }}
       >

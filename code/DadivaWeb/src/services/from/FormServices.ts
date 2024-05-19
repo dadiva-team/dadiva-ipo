@@ -1,6 +1,6 @@
 import { get, put } from '../utils/fetch';
 import { editFormUri, getFormUri } from '../utils/WebApiUris';
-import { FormOutputModel } from './models/FormOutputModel';
+import { FormOutputModel, ModelToDomain } from './models/FormOutputModel';
 import { Form } from '../../domain/Form/Form';
 
 function toCamelCase(s: string): string {
@@ -38,8 +38,10 @@ function convertKeysToCamelCase<T>(obj: T): ConvertKeysToCamelCase<T> {
 }
 
 export namespace FormServices {
-  export async function getForm(): Promise<FormOutputModel> {
-    return convertKeysToCamelCase(await get<FormOutputModel>(getFormUri));
+  export async function getForm(): Promise<Form> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    return ModelToDomain(convertKeysToCamelCase(await get<FormOutputModel>(getFormUri)));
   }
 
   export async function saveForm(form: Form): Promise<boolean> {
