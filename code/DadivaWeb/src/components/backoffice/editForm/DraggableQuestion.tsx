@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Button, ListItem } from '@mui/material';
-import { Question } from '../../domain/Form/Form';
+import { Question } from '../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
-import { EditButton } from '../form/Inputs';
+import { EditButton } from '../../form/Inputs';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface DraggableQuestionProps {

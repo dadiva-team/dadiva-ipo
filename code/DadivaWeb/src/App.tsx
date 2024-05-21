@@ -8,12 +8,15 @@ import HOME = Uris.HOME;
 import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
-import BACK_OFFICE = Uris.BACK_OFFICE;
+import EDIT_FORM = Uris.EDIT_FORM;
 import { Header } from './components/home/Header';
 import FORM_INFO = Uris.FORM_INFO;
 import { FormInfo } from './components/form/FormInfo';
-import { Backoffice } from './components/backoffice/Backoffice';
+import { EditFormPage } from './components/backoffice/editForm/EditFormPage';
 import { Form } from './components/form/Form';
+import BACKOFFICE = Uris.BACKOFFICE;
+import { BackofficeLayout } from './components/backoffice/BackofficeLayout';
+import { Backoffice } from './components/backoffice/Backoffice';
 
 export default function App() {
   //const loggedIn = useLoggedIn();
@@ -42,7 +45,17 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path={BACK_OFFICE} element={<Backoffice />} />
+          <Route
+            path={BACKOFFICE}
+            element={
+              <ProtectedRoute>
+                <BackofficeLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="" element={<Backoffice />} />
+            <Route path={EDIT_FORM} element={<EditFormPage />} />
+          </Route>
         </Routes>
       </div>
     </div>

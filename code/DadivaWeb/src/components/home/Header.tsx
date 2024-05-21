@@ -17,6 +17,7 @@ export function Header() {
         mt: 1,
         alignItems: 'center',
         justifyContent: 'space-between',
+        gap: 1,
       }}
     >
       <LogoIPO />

@@ -18,7 +18,7 @@ import {
   TextField,
 } from '@mui/material';
 import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
-import { Question, ShowCondition } from '../../domain/Form/Form';
+import { Question, ShowCondition } from '../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
 
 export interface QuestionEditDialogProps {
