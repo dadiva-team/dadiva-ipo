@@ -10,9 +10,15 @@ export interface Group {
   questions: Question[];
 }
 
+export interface ShowCondition {
+  after?: string[];
+  if?: Record<string, string>;
+}
+
 export class Question {
   id: string;
   text: string;
   type: string;
   options: string[] | null;
+  showCondition?: ShowCondition;
 }

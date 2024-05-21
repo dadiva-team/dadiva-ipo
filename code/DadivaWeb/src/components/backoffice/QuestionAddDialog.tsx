@@ -79,7 +79,7 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
       questionGroup
     );
     onClose();
-  }, [onAnswer, onClose, questionOptions, questionText, questionType, questionGroup]);
+  }, [onAnswer, questionText, questionType, questionOptions, questionGroup, onClose]);
 
   return (
     <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
