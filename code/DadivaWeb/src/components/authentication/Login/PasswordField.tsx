@@ -1,0 +1,57 @@
+import { Box, IconButton, InputAdornment, TextField } from '@mui/material';
+import React from 'react';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import LockIcon from '@mui/icons-material/Lock';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+interface PasswordFieldProps {
+  value: string;
+  handleChangePassword: (ev: React.FormEvent<HTMLInputElement>) => void;
+  showPassword: boolean;
+  handleClickShowPassword: () => void;
+}
+
+export function PasswordField({
+  value,
+  showPassword,
+  handleChangePassword,
+  handleClickShowPassword,
+}: PasswordFieldProps) {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <LockIcon sx={{ pr: 1 }} />
+      <TextField
+        id="password"
+        type={showPassword ? 'text' : 'password'}
+        name="password"
+        label="Palavra-passe"
+        required
+        fullWidth
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChangePassword(event)}
+        sx={{ mb: 2 }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} edge="end">
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+      {value && value.length > 0 ? (
+        <CheckCircleIcon sx={{ fontSize: 20, ml: 1 }} />
+      ) : (
+        <CancelIcon sx={{ fontSize: 20, ml: 1 }} />
+      )}
+    </Box>
+  );
+}

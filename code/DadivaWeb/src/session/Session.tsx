@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 export interface Session {
   readonly name: string;
@@ -19,7 +19,6 @@ const LoggedInContext = createContext<SessionManager>({
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(() => {
     const userItem = sessionStorage.getItem('user');
-    console.log(`AuthnContainer 1: ${userItem}`);
     return userItem && userItem !== 'undefined' ? JSON.parse(userItem) : null;
   });
 
@@ -48,10 +47,14 @@ export function useCurrentSession() {
   const context = useContext(LoggedInContext);
   const contextUser = context.session;
   const userItem = sessionStorage.getItem('user');
-  console.log(`useCurrentSession 1: ${contextUser}`);
-  console.log(`useCurrentSession 2: ${userItem}`);
+
   const user = contextUser === null && userItem && userItem !== 'undefined' ? JSON.parse(userItem) : contextUser;
-  if (user !== null) context.setSession(user);
+
+  useEffect(() => {
+    if (user !== null && contextUser === null) {
+      context.setSession(user);
+    }
+  }, [user, contextUser, context]);
 
   return user;
 }

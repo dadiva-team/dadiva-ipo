@@ -5,13 +5,11 @@
   text-align: center;
 }
 
-h1 {
-  margin-bottom: 0.5em;
-}
 
 h1.welcome {
   font-weight: bold;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
 }
 
 .input-group {

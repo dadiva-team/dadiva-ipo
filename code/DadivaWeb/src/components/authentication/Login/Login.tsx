@@ -1,107 +1,61 @@
 import * as React from 'react';
-import reduce from '../utils/Reduce';
 import './Login.css';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { handleError, handleRequest } from '../../../services/utils/fetch';
-import { loginNIC } from '../../../services/users/UserServices';
-import { useSessionManager } from '../../../session/Session';
-import { Session } from '../../../session/Session';
+import { PasswordField } from './PasswordField';
+import { useLogin } from './useLogin';
+import { Box, Button, CircularProgress, Divider, Paper } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import { ErrorAlert } from '../../shared/ErrorAlert';
+import { NicField } from './NicField';
 
 export default function Login() {
-  const navigate = useNavigate();
-  const sessionManager = useSessionManager();
-
-  const [error, setError] = React.useState<string | null>(null);
-  const [state, dispatch] = React.useReducer(reduce, {
-    tag: 'editing',
-    inputs: { nic: '', password: '' },
-  });
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  if (state.tag === 'redirect') {
-    return <Navigate to={'/me'} replace={true} />;
-  }
-
-  function handleChange(ev: React.FormEvent<HTMLInputElement>) {
-    dispatch({ type: 'edit', inputName: ev.currentTarget.name, inputValue: ev.currentTarget.value });
-  }
-
-  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
-    ev.preventDefault();
-    if (state.tag !== 'editing') {
-      return;
-    }
-
-    dispatch({ type: 'submit' });
-    const nic = state.inputs.nic;
-    const password = state.inputs.password;
-
-    const [error, res] = await handleRequest(loginNIC(nic, password));
-    if (error) {
-      handleError(error, setError, navigate);
-      dispatch({ type: 'error', message: `${error}` });
-      return;
-    }
-
-    if (res === undefined) {
-      throw new Error('Response is undefined');
-    }
-
-    console.log(res);
-
-    const mockSession: Session = {
-      name: 'Mock Name',
-      nic: nic,
-    };
-
-    sessionManager.setSession(mockSession);
-    navigate('/');
-  }
-
-  const nic = state.tag === 'submitting' ? state.nic : state.inputs.nic;
-  const password = state.tag === 'submitting' ? '' : state.inputs.password;
+  const { error, setError, nic, password, showPassword, handleChange, handleSubmit, setShowPassword, loading } =
+    useLogin();
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit}>
-        <h1 className="welcome">Bem-Vindo</h1>
-        <p className="login">Entre na sua conta</p>
+    <Box display="flex" justifyContent="center">
+      <Paper
+        sx={{
+          p: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '30%',
+          border: 1,
+          borderColor: 'black',
+          borderRadius: 2,
+        }}
+      >
+        <form onSubmit={handleSubmit}>
+          <Typography variant="h4" component="h1" className="welcome">
+            Bem-Vindo
+          </Typography>
+          <Typography variant="subtitle1" align="center">
+            Entre na sua conta
+          </Typography>
 
-        <div className="input-group">
-          <label htmlFor="nic" className="nic">
-            NIC
-          </label>
-          <input type="text" id="nic" name="nic" value={nic} onChange={handleChange} />
-        </div>
-        <div className="input-group">
-          <label htmlFor="password" className="password">
-            Palavra-passe
-          </label>
-          <input
-            type={showPassword ? 'text' : 'password'}
-            id="password"
-            name="password"
-            value={password}
-            onChange={handleChange}
-          />
-          <br />
-          <br />
-          <label htmlFor="check">Mostrar Password</label>
-          <input id="check" type="checkbox" onChange={() => setShowPassword(prev => !prev)} />
-        </div>
-        <button type="submit" className="login-button">
-          Entrar
-        </button>
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        <div className="alternative">
-          <hr />
-          <p>Alternativamente</p>
-          <hr />
-        </div>
-        <button type="button" className="auth-button">
-          AUTENTICAÇÃO.GOV
-        </button>
-      </form>
-    </div>
+          <Box sx={{ flexDirection: 'row', justifyContent: 'space-around', mt: 2 }}>
+            <NicField value={nic} onChange={handleChange} />
+            <PasswordField
+              value={password}
+              showPassword={showPassword}
+              handleChangePassword={handleChange}
+              handleClickShowPassword={() => setShowPassword(!showPassword)}
+            />
+          </Box>
+          <ErrorAlert error={error} clearError={() => setError(null)} />
+          <Button type="submit" variant="contained" className="login-button" disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : 'Entrar'}
+          </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
+            <Divider sx={{ flex: 1, borderBottomWidth: '1,5px', borderColor: 'primary' }} />
+            <Typography sx={{ margin: '0 8px' }}>Alternativamente</Typography>
+            <Divider sx={{ flex: 1, borderBottomWidth: '1,5px', borderColor: 'primary' }} />
+          </Box>
+          <Button type="button" variant="outlined" className="auth-button">
+            AUTENTICAÇÃO.GOV
+          </Button>
+        </form>
+      </Paper>
+    </Box>
   );
 }
