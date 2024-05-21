@@ -17,7 +17,7 @@ import {
   TextField,
 } from '@mui/material';
 import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
-import { Question } from '../../domain/Form/Form';
+import { Question } from '../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
 
 export interface QuestionEditDialogProps {
@@ -79,7 +79,7 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
       questionGroup
     );
     onClose();
-  }, [onAnswer, onClose, questionOptions, questionText, questionType, questionGroup]);
+  }, [onAnswer, questionText, questionType, questionOptions, questionGroup, onClose]);
 
   return (
     <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>

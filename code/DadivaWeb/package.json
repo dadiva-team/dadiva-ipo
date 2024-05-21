@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "homepage": ".",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve",
@@ -15,6 +16,7 @@
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.17",
     "@mui/material": "^5.15.17",
+    "@mui/x-charts": "^7.5.0",
     "json-rules-engine": "^6.5.0",
     "playwright": "^1.44.0",
     "react": "^18.3.1",

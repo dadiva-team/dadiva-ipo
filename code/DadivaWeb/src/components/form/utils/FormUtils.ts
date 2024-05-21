@@ -24,12 +24,16 @@ export const updateShowQuestions = (
   questionId: string,
   show: boolean
 ) => {
-  return showQuestions.map((group, index) => {
+  const newShowQuestions = showQuestions.map((group, index) => {
     if (index === currentGroup) {
       return { ...group, [questionId]: show };
     }
     return group;
   });
+
+  console.log(newShowQuestions);
+
+  return newShowQuestions;
 };
 
 export function updateQuestionColors(questionId: string, questionType: string, answer: string) {

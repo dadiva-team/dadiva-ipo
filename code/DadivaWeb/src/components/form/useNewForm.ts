@@ -5,6 +5,7 @@ import { Engine } from 'json-rules-engine';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
 import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { form } from './MockForm';
 
 export function useNewForm() {
@@ -46,7 +47,7 @@ export function useNewForm() {
         return;
       }
       // Mock form for tests
-      res = form;
+      //res = form;
       return res;
     };
 
@@ -84,6 +85,8 @@ export function useNewForm() {
         res.rules.forEach(rule => {
           engine.addRule(rule);
         });
+        console.log('Adding the following rules');
+        console.log(res.rules);
 
         setIsLoading(false);
       });
@@ -106,8 +109,25 @@ export function useNewForm() {
         return group;
       })
     );
-
+    console.log(formAnswers[currentGroup]);
     engine.run(formAnswers[currentGroup]).then(result => {
+      setCanGoNext(false);
+      setCanGoReview(false);
+      setShowQuestions(prevShowQuestions =>
+        prevShowQuestions.map((group, index) => {
+          if (index === currentGroup) {
+            const updatedGroup = { ...group };
+            Object.keys(updatedGroup).forEach(key => {
+              updatedGroup[key] = false;
+            });
+            return updatedGroup;
+          }
+          return group;
+        })
+      );
+
+      console.log('||||||||||||');
+      console.log(result.results);
       result.results.forEach(result => {
         if (result.event.type === 'showQuestion') {
           setShowQuestions(prevShowQuestions =>

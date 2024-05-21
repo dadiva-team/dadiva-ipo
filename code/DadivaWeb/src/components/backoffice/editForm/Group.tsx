@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Card, Divider, IconButton, List, Typography } from '@mui/material';
-import { Question } from '../../domain/Form/Form';
+import { Question } from '../../../domain/Form/Form';
 import { DraggableQuestion } from './DraggableQuestion';
 import { ArrowDownward, ArrowUpward, Delete, Edit } from '@mui/icons-material';
 
