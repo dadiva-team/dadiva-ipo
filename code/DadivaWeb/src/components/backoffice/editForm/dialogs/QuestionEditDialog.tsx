@@ -18,9 +18,10 @@ import {
   TextField,
 } from '@mui/material';
 import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
-import { Question, ShowCondition } from '../../../domain/Form/Form';
+import { Question, ShowCondition } from '../../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
-import { ErrorAlert } from '../../shared/ErrorAlert';
+import { ErrorAlert } from '../../../shared/ErrorAlert';
+import { useDialog } from './useDialog';
 
 export interface QuestionEditDialogProps {
   open: boolean;
@@ -32,11 +33,25 @@ export interface QuestionEditDialogProps {
 }
 
 export function QuestionEditDialog({ open, question, questions, onAnswer, onClose, isFirst }: QuestionEditDialogProps) {
-  const [error, setError] = React.useState<string | null>(null);
-  const [questionText, setQuestionText] = React.useState(question?.text ?? '');
-  const [questionType, setQuestionType] = React.useState(question?.type ?? '');
-  const [questionOptions, setQuestionOptions] = React.useState<string[]>(question?.options ?? []);
-  const [optionInput, setOptionInput] = React.useState('');
+  const {
+    questionId,
+    setQuestionId,
+    questionText,
+    setQuestionText,
+    questionType,
+    setQuestionType,
+    questionOptions,
+    setQuestionOptions,
+    optionInput,
+    setOptionInput,
+    error,
+    setError,
+    handleAddOption,
+    handleRemoveOption,
+    moveOptionUp,
+    moveOptionDown,
+  } = useDialog();
+
   const [questionShowConditionType, setQuestionShowConditionType] = React.useState<'sequential' | 'subordinate'>(
     question?.showCondition ? 'subordinate' : 'sequential'
   );
@@ -46,46 +61,14 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
 
   useEffect(() => {
     if (question) {
+      setQuestionId(question.id);
       setQuestionText(question.text);
       setQuestionType(question.type);
       setQuestionOptions(question.options ?? []);
       setQuestionShowConditionType(question.showCondition ? 'subordinate' : 'sequential');
       setShowCondition(question.showCondition ?? { if: {} });
     }
-  }, [question]);
-
-  const handleAddOption = () => {
-    if (optionInput.trim() !== '') {
-      setQuestionOptions(oldOptions => [...(oldOptions ?? []), optionInput.trim()]);
-      setOptionInput('');
-    }
-  };
-
-  const handleRemoveOption = (index: number) => {
-    setQuestionOptions(oldOptions => oldOptions.filter((_, i) => i !== index));
-  };
-
-  const moveOptionUp = (index: number) => {
-    if (index > 0) {
-      setQuestionOptions(oldOptions => {
-        const newOptions = [...oldOptions];
-        const temp = newOptions[index];
-        newOptions[index] = newOptions[index - 1];
-        newOptions[index - 1] = temp;
-        return newOptions;
-      });
-    }
-  };
-
-  const moveOptionDown = (index: number) => {
-    if (index < questionOptions.length - 1) {
-      const newOptions = [...questionOptions];
-      const temp = newOptions[index];
-      newOptions[index] = newOptions[index + 1];
-      newOptions[index + 1] = temp;
-      setQuestionOptions(newOptions);
-    }
-  };
+  }, [question, setQuestionId, setQuestionOptions, setQuestionText, setQuestionType]);
 
   const handleCloseAndAnswer = React.useCallback(() => {
     if (questionText.trim() === '') {
@@ -96,8 +79,13 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
       setError('Uma pergunta de escolha múltipla deve ter pelo menos duas opções');
       return;
     }
+
+    if (questionShowConditionType === 'subordinate' && questionCondition === null) {
+      setError('Uma pergunta subordinada deve ter uma condição');
+      return;
+    }
     onAnswer(
-      question.id,
+      questionId,
       questionText,
       questionType,
       questionOptions,
@@ -105,14 +93,16 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
     );
     onClose();
   }, [
-    onAnswer,
-    onClose,
-    question,
-    questionOptions,
-    questionShowConditionType,
+    questionId,
     questionText,
     questionType,
+    questionOptions,
+    questionShowConditionType,
+    questionCondition,
+    onAnswer,
     showCondition,
+    onClose,
+    setError,
   ]);
 
   function handleRemoveCondition(fact: string) {
@@ -296,12 +286,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
                       >
                         <ArrowDownward />
                       </IconButton>
-                      <IconButton
-                        disabled={questionOptions.length === 1}
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => handleRemoveOption(index)}
-                      >
+                      <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveOption(index)}>
                         <Delete />
                       </IconButton>
                     </ListItemSecondaryAction>

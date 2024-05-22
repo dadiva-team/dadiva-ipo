@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Box, Button, Dialog, DialogContent, DialogTitle, FormControl, IconButton, TextField } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { Group } from '../../../domain/Form/Form';
+import { Group } from '../../../../domain/Form/Form';
 
 export interface GroupEditDialogProps {
   open: boolean;

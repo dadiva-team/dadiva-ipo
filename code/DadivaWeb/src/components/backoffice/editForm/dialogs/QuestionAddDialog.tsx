@@ -17,58 +17,36 @@ import {
   TextField,
 } from '@mui/material';
 import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
-import { Question } from '../../../domain/Form/Form';
+import { Question } from '../../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
-import { ErrorAlert } from '../../shared/ErrorAlert';
+import { ErrorAlert } from '../../../shared/ErrorAlert';
+import { useDialog } from './useDialog';
 
-export interface QuestionEditDialogProps {
+export interface QuestionAddDialogProps {
   open: boolean;
   groups: string[];
   onAnswer: (question: Question, groupName: string) => void;
   onClose: () => void;
 }
 
-//TODO: Reuse functions from [QuestionEditDialog.tsx]
-export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionEditDialogProps) {
-  const [questionText, setQuestionText] = React.useState('');
-  const [questionType, setQuestionType] = React.useState('boolean');
-  const [questionOptions, setQuestionOptions] = React.useState<string[]>(null);
-  const [optionInput, setOptionInput] = React.useState('');
+export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionAddDialogProps) {
+  const {
+    questionText,
+    setQuestionText,
+    questionType,
+    setQuestionType,
+    questionOptions,
+    optionInput,
+    setOptionInput,
+    error,
+    setError,
+    handleAddOption,
+    handleRemoveOption,
+    moveOptionUp,
+    moveOptionDown,
+  } = useDialog();
+
   const [questionGroup, setQuestionGroup] = React.useState(groups[0]);
-  const [error, setError] = React.useState<string | null>(null);
-
-  const handleAddOption = () => {
-    if (optionInput.trim() !== '') {
-      setQuestionOptions(oldOptions => [...(oldOptions ?? []), optionInput.trim()]);
-      setOptionInput('');
-    }
-  };
-
-  const handleRemoveOption = (index: number) => {
-    setQuestionOptions(oldOptions => oldOptions.filter((_, i) => i !== index));
-  };
-
-  const moveOptionUp = (index: number) => {
-    if (index > 0) {
-      setQuestionOptions(oldOptions => {
-        const newOptions = [...oldOptions];
-        const temp = newOptions[index];
-        newOptions[index] = newOptions[index - 1];
-        newOptions[index - 1] = temp;
-        return newOptions;
-      });
-    }
-  };
-
-  const moveOptionDown = (index: number) => {
-    if (index < questionOptions.length - 1) {
-      const newOptions = [...questionOptions];
-      const temp = newOptions[index];
-      newOptions[index] = newOptions[index + 1];
-      newOptions[index + 1] = temp;
-      setQuestionOptions(newOptions);
-    }
-  };
 
   const handleCloseAndAnswer = React.useCallback(() => {
     if (questionText.trim() === '') {
@@ -90,7 +68,7 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
       questionGroup
     );
     onClose();
-  }, [onAnswer, questionText, questionType, questionOptions, questionGroup, onClose]);
+  }, [questionText, questionType, questionOptions, onAnswer, questionGroup, onClose, setError]);
 
   return (
     <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
@@ -190,10 +168,15 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
                   <ListItem key={index}>
                     <ListItemText primary={option} />
                     <ListItemSecondaryAction>
-                      <IconButton edge="end" aria-label="up" onClick={() => moveOptionUp(index)}>
+                      <IconButton disabled={index === 0} edge="end" aria-label="up" onClick={() => moveOptionUp(index)}>
                         <ArrowUpward />
                       </IconButton>
-                      <IconButton edge="end" aria-label="down" onClick={() => moveOptionDown(index)}>
+                      <IconButton
+                        disabled={index === questionOptions.length - 1}
+                        edge="end"
+                        aria-label="down"
+                        onClick={() => moveOptionDown(index)}
+                      >
                         <ArrowDownward />
                       </IconButton>
                       <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveOption(index)}>

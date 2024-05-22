@@ -35,7 +35,7 @@ export function useLogin() {
 
     if (isNaN(Number(state.inputs.nic))) {
       dispatch({ type: 'error', message: 'O NIC deve ter só numeros' });
-      setError('O NIC deve ter só numeros');
+      setError('O NIC só deve conter numeros');
       return;
     }
     if (state.inputs.nic.length !== 9) {
