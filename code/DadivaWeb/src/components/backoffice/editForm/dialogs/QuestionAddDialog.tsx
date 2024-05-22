@@ -8,19 +8,15 @@ import {
   FormControl,
   IconButton,
   InputLabel,
-  List,
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
   MenuItem,
   Select,
   TextField,
 } from '@mui/material';
-import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import { Question } from '../../../../domain/Form/Form';
-import Typography from '@mui/material/Typography';
 import { ErrorAlert } from '../../../shared/ErrorAlert';
 import { useDialog } from './useDialog';
+import { DropdownOptionsForm } from './DropdownOptionsForm';
 
 export interface QuestionAddDialogProps {
   open: boolean;
@@ -143,50 +139,15 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionA
             </Select>
           </FormControl>
           {questionType === 'dropdown' && (
-            <FormControl fullWidth margin="normal">
-              <TextField
-                id="option-input"
-                value={optionInput}
-                label="Adicionar Opção"
-                onChange={event => setOptionInput(event.target.value)}
-                fullWidth
-              />
-              <Button
-                onClick={handleAddOption}
-                sx={{
-                  mt: 1,
-                  alignSelf: 'center',
-                }}
-              >
-                Add Option
-              </Button>
-              <Typography variant="h6" sx={{ mt: 2 }}>
-                Escolhas Possíveis
-              </Typography>
-              <List>
-                {questionOptions?.map((option, index) => (
-                  <ListItem key={index}>
-                    <ListItemText primary={option} />
-                    <ListItemSecondaryAction>
-                      <IconButton disabled={index === 0} edge="end" aria-label="up" onClick={() => moveOptionUp(index)}>
-                        <ArrowUpward />
-                      </IconButton>
-                      <IconButton
-                        disabled={index === questionOptions.length - 1}
-                        edge="end"
-                        aria-label="down"
-                        onClick={() => moveOptionDown(index)}
-                      >
-                        <ArrowDownward />
-                      </IconButton>
-                      <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveOption(index)}>
-                        <Delete />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            </FormControl>
+            <DropdownOptionsForm
+              optionInput={optionInput}
+              questionOptions={questionOptions}
+              setOptionInput={setOptionInput}
+              handleAddOption={handleAddOption}
+              handleRemoveOption={handleRemoveOption}
+              moveOptionUp={moveOptionUp}
+              moveOptionDown={moveOptionDown}
+            />
           )}
           {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
           <Button

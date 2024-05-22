@@ -1,4 +1,4 @@
-import { Form, Question } from '../../../domain/Form/Form';
+import { Form, Question, ShowCondition } from '../../../domain/Form/Form';
 import { RuleProperties, TopLevelCondition, Event } from 'json-rules-engine';
 
 export interface FormOutputModel {
@@ -11,6 +11,7 @@ export class QuestionModel {
   text: string;
   type: string;
   options: string[] | null;
+  showcondition?: ShowCondition;
 }
 
 export interface Rule {
@@ -91,7 +92,7 @@ export function ModelToDomain(model: FormOutputModel): Form {
           text: questionModel.text,
           type: questionModel.type,
           options: questionModel.options,
-          showCondition: null, //TODO: Implement showCondition, by transforming rules into domain
+          showCondition: questionModel.showcondition,
         } as Question;
       }),
     };

@@ -23,6 +23,7 @@ export function Group(props: GroupProps) {
   };
 
   const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
     const questionID = event.dataTransfer.getData('questionID');
     const dropPosition = event.clientY;
     const questionIndex = Array.from(event.currentTarget.children).findIndex(child => {
@@ -30,6 +31,33 @@ export function Group(props: GroupProps) {
       return dropPosition < rect.bottom;
     });
     props.onDrop(questionID, props.group.name, questionIndex === -1 ? props.group.questions.length : questionIndex);
+  };
+
+  const renderQuestions = (questions: Question[], parentQuestionId: string | null = null) => {
+    /*console.log('renderQuestions:');
+    questions.forEach(console.log);
+    console.log('q.showCondition.if');
+    questions.forEach(q => q.showCondition && console.log(q.showCondition.if));*/
+
+    return questions
+      .filter(q => (parentQuestionId ? q.showCondition?.if?.[parentQuestionId] : !q.showCondition))
+      .map((question, index) => (
+        <React.Fragment key={question.id}>
+          <DraggableQuestion
+            question={question}
+            subordinateQuestions={questions.filter(q => q.showCondition?.if?.[question.id])}
+            groupName={props.group.name}
+            index={index}
+            onDragStart={event => {
+              event.dataTransfer.setData('questionID', question.id);
+              event.dataTransfer.setData('questionIndex', index.toString());
+            }}
+            onEditRequest={props.onEditRequest}
+            onDeleteRequest={props.onDeleteRequest}
+          />
+          <Divider />
+        </React.Fragment>
+      ));
   };
 
   return (
@@ -66,22 +94,7 @@ export function Group(props: GroupProps) {
       </Box>
       <Divider sx={{ borderColor: 'black', borderWidth: 1 }} />
       <List onDragOver={handleDragOver} onDrop={handleDrop}>
-        {props.group.questions.map((question, index) => (
-          <React.Fragment key={question.id}>
-            <DraggableQuestion
-              question={question}
-              groupName={props.group.name}
-              index={index}
-              onDragStart={event => {
-                event.dataTransfer.setData('questionID', question.id);
-                event.dataTransfer.setData('questionIndex', index.toString());
-              }}
-              onEditRequest={props.onEditRequest}
-              onDeleteRequest={props.onDeleteRequest}
-            />
-            <Divider />
-          </React.Fragment>
-        ))}
+        {renderQuestions(props.group.questions)}
       </List>
       <Box
         sx={{

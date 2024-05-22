@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import {
   Box,
   Button,
@@ -7,27 +7,35 @@ import {
   DialogTitle,
   Divider,
   FormControl,
-  IconButton,
   InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
+  TextField,
+  Typography,
   List,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
-  MenuItem,
-  Select,
-  TextField,
 } from '@mui/material';
-import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
+import { Close, Delete } from '@mui/icons-material';
 import { Question, ShowCondition } from '../../../../domain/Form/Form';
-import Typography from '@mui/material/Typography';
 import { ErrorAlert } from '../../../shared/ErrorAlert';
 import { useDialog } from './useDialog';
+import { DropdownOptionsForm } from './DropdownOptionsForm';
 
 export interface QuestionEditDialogProps {
   open: boolean;
   question: Question;
   questions: Question[];
-  onAnswer: (id: string, text: string, type: string, options: string[] | null, showCondition?: ShowCondition) => void;
+  onAnswer: (
+    id: string,
+    text: string,
+    type: string,
+    options: string[] | null,
+    showCondition?: ShowCondition,
+    parentQuestionId?: string | null
+  ) => void;
   onClose: () => void;
   isFirst: boolean;
 }
@@ -52,12 +60,12 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
     moveOptionDown,
   } = useDialog();
 
-  const [questionShowConditionType, setQuestionShowConditionType] = React.useState<'sequential' | 'subordinate'>(
+  const [questionShowConditionType, setQuestionShowConditionType] = useState<'sequential' | 'subordinate'>(
     question?.showCondition ? 'subordinate' : 'sequential'
   );
-  const [showCondition, setShowCondition] = React.useState<ShowCondition>(question?.showCondition ?? { if: {} });
-  const [questionCondition, setQuestionCondition] = React.useState<string>(null);
-  const [conditionAnswer, setConditionAnswer] = React.useState<string>(null);
+  const [showCondition, setShowCondition] = useState<ShowCondition>(question?.showCondition ?? { if: {} });
+  const [questionCondition, setQuestionCondition] = useState<string | null>(null);
+  const [conditionAnswer, setConditionAnswer] = useState<string | null>(null);
 
   useEffect(() => {
     if (question) {
@@ -67,10 +75,17 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
       setQuestionOptions(question.options ?? []);
       setQuestionShowConditionType(question.showCondition ? 'subordinate' : 'sequential');
       setShowCondition(question.showCondition ?? { if: {} });
+
+      // para tirar um warning
+      if (question.showCondition) {
+        const validConditionKey = Object.keys(question.showCondition.if)[0];
+        setQuestionCondition(validConditionKey);
+        setConditionAnswer(question.showCondition.if[validConditionKey]);
+      }
     }
   }, [question, setQuestionId, setQuestionOptions, setQuestionText, setQuestionType]);
 
-  const handleCloseAndAnswer = React.useCallback(() => {
+  const handleCloseAndAnswer = useCallback(() => {
     if (questionText.trim() === '') {
       setError('O texto da pergunta não pode estar vazio');
       return;
@@ -80,26 +95,37 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
       return;
     }
 
-    if (questionShowConditionType === 'subordinate' && questionCondition === null) {
+    if (
+      questionShowConditionType === 'subordinate' &&
+      (questionCondition === null || conditionAnswer === null || conditionAnswer === '')
+    ) {
       setError('Uma pergunta subordinada deve ter uma condição');
       return;
     }
+
+    if (questionShowConditionType === 'subordinate' && Object.keys(showCondition.if).length === 0) {
+      setError('Não se esqueça de guardar a condição!');
+      return;
+    }
+
     onAnswer(
       questionId,
       questionText,
       questionType,
       questionOptions,
-      questionShowConditionType === 'subordinate' ? showCondition : null
+      questionShowConditionType === 'subordinate' ? showCondition : undefined,
+      questionCondition
     );
     onClose();
   }, [
-    questionId,
     questionText,
     questionType,
     questionOptions,
     questionShowConditionType,
     questionCondition,
+    conditionAnswer,
     onAnswer,
+    questionId,
     showCondition,
     onClose,
     setError,
@@ -134,6 +160,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
             disabled={true}
             labelId="selecionar-resposta-label"
             id="selecionar-resposta-label"
+            value=""
             label="Resposta"
           ></Select>
         </>
@@ -238,7 +265,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={questionType}
+              value={questionType ?? ''}
               label="Tipo de Resposta"
               onChange={event => {
                 setQuestionType(event.target.value);
@@ -250,50 +277,15 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
             </Select>
           </FormControl>
           {questionType === 'dropdown' && (
-            <FormControl fullWidth margin="normal">
-              <TextField
-                id="option-input"
-                value={optionInput}
-                label="Adicionar Opção"
-                onChange={event => setOptionInput(event.target.value)}
-                fullWidth
-              />
-              <Button
-                onClick={handleAddOption}
-                sx={{
-                  mt: 1,
-                  alignSelf: 'center',
-                }}
-              >
-                Add Option
-              </Button>
-              <Typography variant="h6" sx={{ mt: 2 }}>
-                Escolhas Possíveis
-              </Typography>
-              <List>
-                {questionOptions?.map((option, index) => (
-                  <ListItem key={index}>
-                    <ListItemText primary={option} />
-                    <ListItemSecondaryAction>
-                      <IconButton disabled={index === 0} edge="end" aria-label="up" onClick={() => moveOptionUp(index)}>
-                        <ArrowUpward />
-                      </IconButton>
-                      <IconButton
-                        disabled={index === questionOptions.length - 1}
-                        edge="end"
-                        aria-label="down"
-                        onClick={() => moveOptionDown(index)}
-                      >
-                        <ArrowDownward />
-                      </IconButton>
-                      <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveOption(index)}>
-                        <Delete />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            </FormControl>
+            <DropdownOptionsForm
+              optionInput={optionInput}
+              questionOptions={questionOptions}
+              setOptionInput={setOptionInput}
+              handleAddOption={handleAddOption}
+              handleRemoveOption={handleRemoveOption}
+              moveOptionUp={moveOptionUp}
+              moveOptionDown={moveOptionDown}
+            />
           )}
           <Divider />
           {isFirst && (
@@ -302,7 +294,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
               <Select
                 labelId="selecionar-condicao-label"
                 id="selecionar-condicao"
-                value={questionShowConditionType}
+                value={questionShowConditionType ?? ''}
                 label="Grupo da Resposta"
                 onChange={event => {
                   setQuestionShowConditionType(event.target.value as 'sequential' | 'subordinate');
@@ -332,7 +324,14 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
                     value={questionCondition ?? ''}
                     label="Questão"
                     onChange={event => {
-                      setQuestionCondition(event.target.value);
+                      const newValue = event.target.value;
+                      setQuestionCondition(newValue);
+
+                      // Ensure conditionAnswer is also valid for the selected question
+                      const selectedQuestion = questions.find(q => q.id === newValue);
+                      if (selectedQuestion) {
+                        setConditionAnswer('');
+                      }
                     }}
                     fullWidth
                   >
@@ -344,7 +343,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
                   </Select>
                 </FormControl>
                 <FormControl fullWidth margin="normal">
-                  {createQuestionAnswersInput(questions?.find(q => q.id == questionCondition))}
+                  {createQuestionAnswersInput(questions?.find(q => q.id === questionCondition))}
                 </FormControl>
               </Box>
               <FormControl fullWidth>
@@ -356,7 +355,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
                     alignSelf: 'center',
                   }}
                 >
-                  Add Option
+                  Add Condition
                 </Button>
                 <Typography variant="h6" sx={{ mt: 2 }}>
                   Condições

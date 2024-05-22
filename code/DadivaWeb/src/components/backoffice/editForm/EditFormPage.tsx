@@ -5,7 +5,7 @@ import LoadingSpinner from '../../shared/LoadingSpinner';
 import { ErrorAlert } from '../../shared/ErrorAlert';
 import { useEditFormPage } from './useEditFormPage';
 import { QuestionEditDialog } from './dialogs/QuestionEditDialog';
-import { Form, Question } from '../../../domain/Form/Form';
+import { Form } from '../../../domain/Form/Form';
 import { QuestionAddDialog } from './dialogs/QuestionAddDialog';
 import { GroupAddDialog } from './dialogs/GroupAddDialog';
 import { DeleteQuestionDialog } from './dialogs/DeleteQuestionDialog';
@@ -36,6 +36,7 @@ export function EditFormPage() {
     setError,
     handleDrop,
     handleDeleteQuestion,
+    handleUpdateQuestion,
     moveGroup,
     deleteGroup,
     saveForm,
@@ -77,24 +78,14 @@ export function EditFormPage() {
               question={editingQuestion}
               questions={formFetchData.groups
                 .find(group => group.questions.includes(editingQuestion))
-                ?.questions.filter(q => q.id != editingQuestion.id)}
-              onAnswer={(id, text, type, options, showCondition) => {
-                setFormFetchData((oldForm: Form) => {
-                  const newGroups = oldForm.groups.map(group => ({
-                    name: group.name,
-                    questions: group.questions.map(question =>
-                      question.id === id ? ({ id, text, type, options, showCondition } as Question) : question
-                    ),
-                  }));
-                  return {
-                    groups: newGroups,
-                    rules: calculateRules(newGroups),
-                  };
-                });
-              }}
+                ?.questions.filter(q => q.id !== editingQuestion.id)}
+              onAnswer={(id, text, type, options, showCondition, parentQuestionId) =>
+                handleUpdateQuestion(id, text, type, options, showCondition, parentQuestionId)
+              }
               onClose={() => setEditingQuestion(null)}
               isFirst={formFetchData.groups.some(group => group.questions.indexOf(editingQuestion) > 0)}
             />
+
             <QuestionAddDialog
               open={creatingQuestion}
               groups={

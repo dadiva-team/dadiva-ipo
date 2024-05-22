@@ -39,10 +39,18 @@ function convertKeysToCamelCase<T>(obj: T): ConvertKeysToCamelCase<T> {
 
 export namespace FormServices {
   export async function getForm(): Promise<Form> {
-    return ModelToDomain(convertKeysToCamelCase(await get<FormOutputModel>(getFormUri)));
+    console.log('GET FORM |||||||||||||||');
+    const res = await get<FormOutputModel>(getFormUri);
+    console.log(res);
+    console.log(convertKeysToCamelCase(res));
+    console.log(ModelToDomain(convertKeysToCamelCase(res)));
+    return ModelToDomain(convertKeysToCamelCase(res));
   }
 
   export async function saveForm(form: Form): Promise<boolean> {
+    console.log('SAVE FORM |||||||||||||||');
+    console.log(DomainToModel(form));
+    console.log(JSON.stringify(DomainToModel(form)));
     await put(editFormUri, JSON.stringify(DomainToModel(form)));
     return true;
   }

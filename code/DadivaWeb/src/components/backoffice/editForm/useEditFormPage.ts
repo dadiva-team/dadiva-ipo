@@ -29,6 +29,10 @@ export function useEditFormPage() {
       }
       setFormFetchData(res as Form);
       setIsLoading(false);
+      console.log('Groups:');
+      res.groups.forEach(console.log);
+      console.log('Rules first fetch:');
+      res.rules.forEach(console.log);
     };
 
     if (isLoading) fetch();
@@ -108,6 +112,7 @@ export function useEditFormPage() {
       if (group.questions.length === 0) return;
 
       group.questions.forEach((question, i) => {
+        console.log(question);
         if (question.showCondition) {
           rules.push({
             conditions: calculateFromShowConditions(question.showCondition),
@@ -175,42 +180,101 @@ export function useEditFormPage() {
         },
       });
     });
+    console.log('NEW Rules:');
+    console.log(rules);
     return rules;
+  }
+
+  function updateQuestionOrder(groups: GroupDomain[]) {
+    return groups.map(group => {
+      const newQuestions = [...group.questions];
+      const reorderedQuestions: Question[] = [];
+
+      newQuestions.forEach(question => {
+        if (!reorderedQuestions.some(q => q.id === question.id)) {
+          reorderedQuestions.push(question);
+          const subQuestions = newQuestions.filter(subQ => subQ.showCondition?.if?.[question.id]);
+          reorderedQuestions.push(...subQuestions);
+        }
+      });
+
+      return {
+        ...group,
+        questions: reorderedQuestions,
+      };
+    });
+  }
+
+  function handleUpdateQuestion(
+    id: string,
+    text: string,
+    type: string,
+    options: string[] | null,
+    showCondition?: ShowCondition,
+    parentQuestionId?: string | null
+  ) {
+    setFormFetchData(oldForm => {
+      const newQuestion: Question = { id, text, type, options, showCondition };
+
+      const updatedGroups = oldForm.groups.map(group => {
+        if (group.questions.some(q => q.id === id)) {
+          const newQuestions = group.questions.filter(q => q.id !== id);
+          if (parentQuestionId) {
+            const parentIndex = newQuestions.findIndex(q => q.id === parentQuestionId);
+            newQuestions.splice(parentIndex + 1, 0, newQuestion);
+          } else {
+            newQuestions.push(newQuestion);
+          }
+          return { ...group, questions: newQuestions };
+        }
+        return group;
+      });
+
+      const reorderedGroups = updateQuestionOrder(updatedGroups);
+      const newRules = calculateRules(reorderedGroups);
+
+      return {
+        ...oldForm,
+        groups: reorderedGroups,
+        rules: newRules,
+      };
+    });
   }
 
   function handleDrop(questionID: string, groupName: string, index: number) {
     setFormFetchData(oldForm => {
-      let newQuestion: Question = null;
-      const newGroups = oldForm.groups
-        .map(group => {
-          return {
-            name: group.name,
-            questions: group.questions.filter(q => {
-              if (q.id === questionID) {
-                newQuestion = q;
-                return false;
-              }
-              return true;
-            }),
-          };
-        })
-        .map(group => {
-          if (group.name === groupName) {
-            const newQuestions = [...group.questions];
-            newQuestions.splice(index, 0, newQuestion);
-            return { name: group.name, questions: newQuestions };
-          }
-          return group;
-        });
+      let draggedQuestion: Question = null;
+      let subQuestions: Question[] = [];
 
-      const newRules = calculateRules(newGroups);
+      const updatedGroups = oldForm.groups.map(group => {
+        // Remove the dragged question and its subordinates from their original position
+        if (group.questions.some(q => q.id === questionID)) {
+          draggedQuestion = group.questions.find(q => q.id === questionID);
+          subQuestions = group.questions.filter(q => q.showCondition?.if?.[draggedQuestion.id]);
+          group.questions = group.questions.filter(
+            q => q.id !== questionID && !subQuestions.some(subQ => subQ.id === q.id)
+          );
+        }
+        return group;
+      });
 
-      const form: Form = {
-        groups: newGroups,
+      // Insert the dragged question and its subordinates into the new position
+      updatedGroups.forEach(group => {
+        if (group.name === groupName) {
+          const newQuestions = [...group.questions];
+          newQuestions.splice(index, 0, draggedQuestion, ...subQuestions);
+          group.questions = newQuestions;
+        }
+      });
+
+      const reorderedGroups = updateQuestionOrder(updatedGroups);
+      const newRules = calculateRules(reorderedGroups);
+
+      return {
+        ...oldForm,
+        groups: reorderedGroups,
         rules: newRules,
       };
-
-      return form;
     });
   }
 
@@ -220,9 +284,10 @@ export function useEditFormPage() {
         name: group.name,
         questions: group.questions.filter(q => q.id !== question.id),
       }));
+      const reorderedGroups = updateQuestionOrder(newGroups);
       return {
-        groups: newGroups,
-        rules: calculateRules(newGroups),
+        groups: reorderedGroups,
+        rules: calculateRules(reorderedGroups),
       };
     });
   }
@@ -232,7 +297,9 @@ export function useEditFormPage() {
       const groups = [...oldForm.groups];
       const [movedGroup] = groups.splice(oldIndex, 1);
       groups.splice(newIndex, 0, movedGroup);
-      return { ...oldForm, groups };
+      const reorderedGroups = updateQuestionOrder(groups);
+      const newRules = calculateRules(reorderedGroups);
+      return { ...oldForm, groups: reorderedGroups, rules: newRules };
     });
   }
 
@@ -244,7 +311,8 @@ export function useEditFormPage() {
       const insertIndex = index === groups.length ? index - 1 : index;
 
       if (groups.length !== 0) groups[insertIndex].questions.push(...oldForm.groups[index].questions);
-      return { groups: groups, rules: calculateRules(groups) };
+      const reorderedGroups = updateQuestionOrder(groups);
+      return { groups: reorderedGroups, rules: calculateRules(reorderedGroups) };
     });
   }
 
@@ -277,6 +345,7 @@ export function useEditFormPage() {
     setError,
     handleDrop,
     handleDeleteQuestion,
+    handleUpdateQuestion,
     moveGroup,
     deleteGroup,
     saveForm,
