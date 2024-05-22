@@ -20,6 +20,7 @@ import {
 import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
 import { Question, ShowCondition } from '../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
+import { ErrorAlert } from '../../shared/ErrorAlert';
 
 export interface QuestionEditDialogProps {
   open: boolean;
@@ -31,16 +32,15 @@ export interface QuestionEditDialogProps {
 }
 
 export function QuestionEditDialog({ open, question, questions, onAnswer, onClose, isFirst }: QuestionEditDialogProps) {
+  const [error, setError] = React.useState<string | null>(null);
   const [questionText, setQuestionText] = React.useState(question?.text ?? '');
-  const [questionType, setQuestionType] = React.useState('');
-  const [questionOptions, setQuestionOptions] = React.useState<string[]>(null);
+  const [questionType, setQuestionType] = React.useState(question?.type ?? '');
+  const [questionOptions, setQuestionOptions] = React.useState<string[]>(question?.options ?? []);
   const [optionInput, setOptionInput] = React.useState('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [questionShowConditionType, setQuestionShowConditionType] = React.useState<'sequential' | 'subordinate'>(
-    'sequential'
+    question?.showCondition ? 'subordinate' : 'sequential'
   );
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [showCondition, setShowCondition] = React.useState<ShowCondition>({ if: {} });
+  const [showCondition, setShowCondition] = React.useState<ShowCondition>(question?.showCondition ?? { if: {} });
   const [questionCondition, setQuestionCondition] = React.useState<string>(null);
   const [conditionAnswer, setConditionAnswer] = React.useState<string>(null);
 
@@ -48,8 +48,9 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
     if (question) {
       setQuestionText(question.text);
       setQuestionType(question.type);
-      setQuestionOptions(question.options);
+      setQuestionOptions(question.options ?? []);
       setQuestionShowConditionType(question.showCondition ? 'subordinate' : 'sequential');
+      setShowCondition(question.showCondition ?? { if: {} });
     }
   }, [question]);
 
@@ -87,6 +88,14 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
   };
 
   const handleCloseAndAnswer = React.useCallback(() => {
+    if (questionText.trim() === '') {
+      setError('O texto da pergunta não pode estar vazio');
+      return;
+    }
+    if (questionType === 'dropdown' && (questionOptions == null || questionOptions.length < 2)) {
+      setError('Uma pergunta de escolha múltipla deve ter pelo menos duas opções');
+      return;
+    }
     onAnswer(
       question.id,
       questionText,
@@ -126,8 +135,8 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
     return response === 'yes' ? 'Sim' : response === 'no' ? 'Não' : response;
   }
 
-  function createQuestionAnswersInput(question: Question) {
-    if (!question)
+  function createQuestionAnswersInput(question?: Question) {
+    if (!question) {
       return (
         <>
           <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
@@ -139,6 +148,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
           ></Select>
         </>
       );
+    }
 
     switch (question.type) {
       case 'boolean':
@@ -149,7 +159,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
               disabled={!questionCondition}
               labelId="selecionar-resposta-label"
               id="selecionar-resposta-label"
-              value={conditionAnswer}
+              value={conditionAnswer ?? ''}
               label="Resposta"
               onChange={event => {
                 setConditionAnswer(event.target.value);
@@ -168,7 +178,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
               disabled={!questionCondition}
               id="selecionar-resposta"
               label="Resposta"
-              value={conditionAnswer}
+              value={conditionAnswer ?? ''}
               onChange={event => setConditionAnswer(event.target.value)}
             />
           </>
@@ -181,7 +191,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
               disabled={!questionCondition}
               labelId="selecionar-resposta-label"
               id="selecionar-resposta-label"
-              value={conditionAnswer}
+              value={conditionAnswer ?? ''}
               label="Resposta"
               onChange={event => {
                 setConditionAnswer(event.target.value);
@@ -334,7 +344,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
                   <Select
                     labelId="selecionar-questao-label"
                     id="selecionar-questao"
-                    value={questionCondition}
+                    value={questionCondition ?? ''}
                     label="Questão"
                     onChange={event => {
                       setQuestionCondition(event.target.value);
@@ -370,7 +380,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
                   {Object.keys(showCondition?.if).map((fact, index) => (
                     <ListItem key={index}>
                       <ListItemText
-                        primary={`${questions?.find(q => q.id === fact).text} = ${translateResponse(showCondition.if[fact])}`}
+                        primary={`${questions?.find(q => q.id === fact)?.text} = ${translateResponse(showCondition.if[fact])}`}
                       />
                       <ListItemSecondaryAction>
                         <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveCondition(fact)}>
@@ -383,6 +393,7 @@ export function QuestionEditDialog({ open, question, questions, onAnswer, onClos
               </FormControl>
             </>
           )}
+          {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
           <Button
             onClick={() => {
               handleCloseAndAnswer();

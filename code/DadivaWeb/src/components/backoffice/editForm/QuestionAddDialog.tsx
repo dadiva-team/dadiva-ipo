@@ -19,6 +19,7 @@ import {
 import { ArrowDownward, ArrowUpward, Close, Delete } from '@mui/icons-material';
 import { Question } from '../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
+import { ErrorAlert } from '../../shared/ErrorAlert';
 
 export interface QuestionEditDialogProps {
   open: boolean;
@@ -29,11 +30,12 @@ export interface QuestionEditDialogProps {
 
 //TODO: Reuse functions from [QuestionEditDialog.tsx]
 export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionEditDialogProps) {
-  const [questionText, setQuestionText] = React.useState('Corpo da Pergunta');
+  const [questionText, setQuestionText] = React.useState('');
   const [questionType, setQuestionType] = React.useState('boolean');
   const [questionOptions, setQuestionOptions] = React.useState<string[]>(null);
   const [optionInput, setOptionInput] = React.useState('');
   const [questionGroup, setQuestionGroup] = React.useState(groups[0]);
+  const [error, setError] = React.useState<string | null>(null);
 
   const handleAddOption = () => {
     if (optionInput.trim() !== '') {
@@ -69,6 +71,15 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
   };
 
   const handleCloseAndAnswer = React.useCallback(() => {
+    if (questionText.trim() === '') {
+      setError('O texto da pergunta não pode estar vazio');
+      return;
+    }
+    if (questionType === 'dropdown' && (questionOptions == null || questionOptions.length < 2)) {
+      setError('Uma pergunta de escolha múltipla deve ter pelo menos duas opções');
+      return;
+    }
+
     onAnswer(
       {
         id: crypto.randomUUID(),
@@ -83,7 +94,7 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
 
   return (
     <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
-      <DialogTitle id="edit-dialog-title">Editar a Questão</DialogTitle>
+      <DialogTitle id="edit-dialog-title">Adicionar uma Questão</DialogTitle>
       <IconButton
         aria-label="close"
         color="inherit"
@@ -107,19 +118,10 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
           }}
         >
           <FormControl fullWidth>
-            <TextField
-              id="demo-simple-textfield"
-              value={questionText}
-              label="Corpo da Pergunta"
-              onChange={event => {
-                setQuestionText(event.target.value);
-              }}
-            />
-          </FormControl>
-          <FormControl fullWidth>
             <InputLabel id="selecionar-grupo-label">Grupo da Resposta</InputLabel>
             <Select
               labelId="selecionar-grupo-label"
+              disabled={groups.length === 1}
               id="selecionar-grupo"
               value={questionGroup}
               label="Grupo da Resposta"
@@ -134,6 +136,18 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
               ))}
             </Select>
           </FormControl>
+          <FormControl fullWidth>
+            <TextField
+              id="demo-simple-textfield"
+              value={questionText}
+              required
+              label="Corpo da Pergunta"
+              onChange={event => {
+                setQuestionText(event.target.value);
+              }}
+            />
+          </FormControl>
+
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Tipo de Resposta</InputLabel>
             <Select
@@ -191,6 +205,7 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionE
               </List>
             </FormControl>
           )}
+          {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
           <Button
             onClick={() => {
               handleCloseAndAnswer();

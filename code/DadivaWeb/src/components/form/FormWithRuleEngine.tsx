@@ -20,7 +20,7 @@ interface FormWithRuleEngineProps {
   currentGroup: number;
   canGoNext: boolean;
   canGoReview: boolean;
-  editingQuestion: { id: string; type: string } | null;
+  editingQuestion: string | null;
   questionColors: Record<string, string>;
   onChangeAnswer: (id: string, type: string, answer: string) => void;
   onEditRequest: (id: string, type: string) => void;
@@ -105,7 +105,7 @@ export default function FormWithRuleEngine({
                           text={question.text}
                           color={questionColors[question.id]}
                           answer={formAnswers[currentGroup][question.id]}
-                          isEditing={editingQuestion?.id === question.id}
+                          isEditing={editingQuestion === question.id}
                           type={question.type}
                         />
                         {!answeredQuestions[question.id] && <Box sx={{ pt: 1.5, width: '75%' }}> {input} </Box>}

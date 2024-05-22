@@ -20,11 +20,9 @@ export function useNewForm() {
   const [questionColors, setQuestionColors] = useState<Record<string, string>>({});
 
   const [currentGroup, setCurrentGroup] = useState<number>(0);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [totalQuestions, setTotalQuestions] = useState<number>(0);
   const [canGoNext, setCanGoNext] = useState<boolean>(false);
   const [canGoReview, setCanGoReview] = useState<boolean>(false);
-  const [editingQuestion, setEditingQuestion] = useState<{ id: string; type: string } | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<string>(null);
 
   const [engine] = useState(new Engine());
 
@@ -54,7 +52,6 @@ export function useNewForm() {
     if (isLoading) {
       fetch().then(res => {
         setFormRawFetchData(res as Form);
-        // setTotalQuestions(res.groups.reduce((total, group) => total + group.questions.length, 0));
 
         setFormAnswers(
           res.groups.map(group => {
@@ -146,18 +143,6 @@ export function useNewForm() {
     });
   }, [currentGroup, editingQuestion, engine, formAnswers, formRawFetchData]);
 
-  useEffect(() => {
-    const checkAllQuestionsAnswered: () => boolean = () => {
-      const totalAnsweredQuestions = Object.values(answeredQuestions).filter(answered => answered).length;
-      return totalQuestions === totalAnsweredQuestions;
-    };
-
-    if (checkAllQuestionsAnswered()) {
-      //console.log('All questions answered');
-      //setCanGoReview(true);
-    }
-  }, [formAnswers, answeredQuestions, totalQuestions]);
-
   function onChangeAnswer(questionId: string, questionType: string, answer: string) {
     const updatedFormAnswers = updateFormAnswers(formAnswers, currentGroup, questionId, answer);
 
@@ -171,56 +156,18 @@ export function useNewForm() {
       [questionId]: true,
     });
 
-    if (!editingQuestion || questionId !== editingQuestion.id) {
+    if (!editingQuestion || questionId !== editingQuestion) {
       return;
     }
 
-    // Dropdown em principio n tem respostas erradas por isso sempre q é editada n ha problema
-    if (editingQuestion.type !== 'boolean' || answer == formAnswers[currentGroup][questionId]) {
+    if (editingQuestion !== 'boolean' || answer == formAnswers[currentGroup][questionId]) {
       setEditingQuestion(null);
     } else {
       setEditingQuestion(null);
     }
   }
 
-  /*function resetAndSetNextQuestion(updatedFormData: Record<string, string>, questionId: string, answer: string) {
-    const isAnswerYes = answer !== 'no';
-    console.log('isAnswerYes: ' + isAnswerYes);
-    resetNextSubQuestions(updatedFormData, questionId, isAnswerYes);
-
-    if (isAnswerYes) {
-      setCanGoNext(false);
-    }
-
-    setEditingQuestion(null);
-  }*/
-
-  /*function resetNextSubQuestions(form: Record<string, string>, questionId: string, answer: boolean) {
-    const newShowQuestions = { ...showQuestions };
-    const newFormAnswers = updateFormAnswers(formAnswers, currentGroup, questionId, answer ? 'yes' : 'no');
-    const newAnsweredQuestions = { ...answeredQuestions, [questionId]: true };
-    const newColor = { ...questionColors, [questionId]: answer ? COLORS.LIGHT_GREEN : COLORS.LIGHT_RED };
-
-    let resetMode = false;
-
-    Object.keys(form).forEach(key => {
-      if (key === questionId) {
-        resetMode = true;
-      } else if (resetMode) {
-        newShowQuestions[key] = answer;
-        newFormAnswers[currentGroup][key] = answer ? '' : 'no';
-        newAnsweredQuestions[key] = !answer;
-        newColor[key] = answer ? '' : COLORS.LIGHT_RED;
-      }
-    });
-
-    setAnsweredQuestions(newAnsweredQuestions);
-    setFormAnswers(newFormAnswers);
-    setShowQuestions(newShowQuestions);
-    setQuestionColors(newColor);
-  }*/
-
-  function onEditRequest(questionId: string, type: string) {
+  function onEditRequest(questionId: string) {
     if (editingQuestion != null) return;
 
     setAnsweredQuestions({
@@ -232,7 +179,7 @@ export function useNewForm() {
       [questionId]: '',
     });
 
-    setEditingQuestion({ id: questionId, type: type });
+    setEditingQuestion(questionId);
   }
 
   function onNextQuestion() {

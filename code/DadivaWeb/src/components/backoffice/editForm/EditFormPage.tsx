@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Group as GroupDomain, Question, ShowCondition } from '../../../domain/Form/Form';
 import { FormServices } from '../../../services/from/FormServices';
 import { Group } from './Group';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { QuestionEditDialog } from './QuestionEditDialog';
 import { QuestionAddDialog } from './QuestionAddDialog';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -14,6 +14,8 @@ import { DeleteQuestionDialog } from './DeleteQuestionDialog';
 import { GroupAddDialog } from './GroupAddDialog';
 import { GroupEditDialog } from './GroupEditDialog';
 import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
+import LoadingSpinner from '../../shared/LoadingSpinner';
+import { ErrorAlert } from '../../shared/ErrorAlert';
 
 export function EditFormPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,9 +26,10 @@ export function EditFormPage() {
   const [editingGroup, setEditingGroup] = useState<GroupDomain>(null);
   const [deletingGroup, setDeletingGroup] = useState<GroupDomain>(null);
   const [creatingGroup, setCreatingGroup] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, setError] = React.useState<string | null>(null);
+  const [creatingQuestionInGroup, setCreatingQuestionInGroup] = useState<GroupDomain>(null);
+
   const nav = useNavigate();
+  const [error, setError] = useState<string | null>(null);
   const [formFetchData, setFormFetchData] = useState<Form>();
 
   useEffect(() => {
@@ -278,7 +281,10 @@ export function EditFormPage() {
     <div>
       <div>
         {isLoading ? (
-          <div>Loading...</div>
+          <Box sx={{ mt: 1 }}>
+            <LoadingSpinner text={'A carregar as perguntas...'} />
+            <ErrorAlert error={error} clearError={() => setError(null)} />
+          </Box>
         ) : (
           <div>
             <Button disabled={formFetchData.groups.length === 0} onClick={() => setCreatingQuestion(true)}>
@@ -289,6 +295,10 @@ export function EditFormPage() {
               <Group
                 group={group}
                 onDrop={handleDrop}
+                onAddQuestion={() => {
+                  setCreatingQuestion(true);
+                  setCreatingQuestionInGroup(group);
+                }}
                 onEditRequest={question => setEditingQuestion(question)}
                 onDeleteRequest={question => setDeletingQuestion(question)}
                 onMoveUp={index === 0 ? null : () => moveGroup(index, index - 1)}
@@ -324,7 +334,11 @@ export function EditFormPage() {
             />
             <QuestionAddDialog
               open={creatingQuestion}
-              groups={formFetchData.groups.map(group => group.name)}
+              groups={
+                creatingQuestionInGroup == null
+                  ? formFetchData.groups.map(group => group.name)
+                  : [creatingQuestionInGroup.name]
+              }
               onAnswer={(question, groupName) => {
                 setFormFetchData((oldForm: Form) => {
                   const newGroups = oldForm.groups.map(group => {
@@ -339,7 +353,10 @@ export function EditFormPage() {
                   };
                 });
               }}
-              onClose={() => setCreatingQuestion(false)}
+              onClose={() => {
+                setCreatingQuestion(false);
+                setCreatingQuestionInGroup(null);
+              }}
             />
             <DeleteQuestionDialog
               open={deletingQuestion !== null}
