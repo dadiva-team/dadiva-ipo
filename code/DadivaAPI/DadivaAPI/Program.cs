@@ -121,40 +121,45 @@ group.AddSearchRoutes();
             new QuestionGroup("Dádivas Anteriores", [
                 new Question
                 (
-                    "Q2",
+                    "q2",
                     "Sente-se bem de saúde e em condições de dar sangue?",
                     ResponseType.boolean,
+                    null,
                     null
                 ),
                 new Question
                 (
-                    "Q3",
+                    "q3",
                     "Alguma vez deu sangue ou componentes sanguíneos?",
                     ResponseType.boolean,
+                    null,
                     null
                 ),
                 new Question
                 (
-                    "Q4",
+                    "q4",
                     "Deu sangue há menos de 2 meses?",
                     ResponseType.boolean,
+                    null,
                     null
                 ),
                 new Question
                 (
-                    "Q5",
+                    "q5",
                     "Alguma vez lhe foi aplicada uma suspensão para a dádiva de sangue?",
                     ResponseType.boolean,
+                    null,
                     null
                 ),
                 new Question
                 (
-                    "Q6",
+                    "q6",
                     "Ocorreu alguma reação ou incidente nas dádivas anteriores?",
                     ResponseType.boolean,
+                    null,
                     null
                 )
-            ]),
+            ])/*,
             new QuestionGroup("Viagens", [
                 new Question
                 (
@@ -383,7 +388,7 @@ group.AddSearchRoutes();
                     ResponseType.boolean,
                     null
                 )
-            ])
+            ])*/
         ],
         []
     )

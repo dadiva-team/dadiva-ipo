@@ -29,12 +29,21 @@ public class FormService(IFormRepository repository) : IFormService
 
     public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules)
     {
+        foreach (var group in groups)
+        {
+            System.Console.WriteLine($"Group Name: {group.name}");
+            foreach (var question in group.Questions)
+            {
+                System.Console.WriteLine($"Question: {question.Text}");
+            }
+        }
+        
         Form form = new Form
         (
             groups.ConvertAll(QuestionGroupModel.ToDomain).ToList(),
             rules.ConvertAll(RuleModel.ToDomain).ToList()
         );
-
+        
         return Result<Form, Problem>.Success(await repository.EditForm(form));
         /*
         if (isSubmited) return Result<bool, Problem>.Success(true);
