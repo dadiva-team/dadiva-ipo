@@ -29,4 +29,9 @@ public class UsersRepositoryMemory : IUsersRepository
     {
         throw new NotImplementedException();
     }
+
+    public async Task<bool> DeleteUser(int nic)
+    {
+        return users.Remove(nic);
+    }
 }

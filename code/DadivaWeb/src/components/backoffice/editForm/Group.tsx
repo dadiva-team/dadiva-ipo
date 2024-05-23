@@ -30,7 +30,7 @@ export function Group(props: GroupProps) {
       const rect = (child as HTMLElement).getBoundingClientRect();
       return dropPosition < rect.bottom;
     });
-    props.onDrop(questionID, props.group.name, questionIndex === -1 ? props.group.questions.length : questionIndex);
+    props.onDrop(questionID, props.group.name, questionIndex === -1 ? props.group.questions.length : questionIndex / 2);
   };
 
   const renderQuestions = (questions: Question[], parentQuestionId: string | null = null) => {

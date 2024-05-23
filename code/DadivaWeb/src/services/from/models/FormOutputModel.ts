@@ -11,7 +11,6 @@ export class QuestionModel {
   text: string;
   type: string;
   options: string[] | null;
-  showcondition?: ShowCondition;
 }
 
 export interface Rule {
@@ -57,14 +56,13 @@ function transformTopLevelCondition(condition: TopLevelCondition): ConditionMode
     return { all: condition.all.map(transformTopLevelCondition) };
   } else if ('any' in condition && condition.any) {
     return { any: condition.any.map(transformTopLevelCondition) };
-  } else {
-    // If it's already a ConditionModel without nested TopLevelCondition, return as is
-    return condition as ConditionModel;
   }
+
+  return condition;
 }
 
 function DomainToRule(rule: RuleProperties): Rule {
-  const conditions = transformTopLevelCondition(rule.conditions) as ConditionModel;
+  const conditions = transformTopLevelCondition(rule.conditions);
   return {
     conditions: conditions as ConditionModel,
     event: rule.event,
@@ -82,6 +80,12 @@ export function DomainToModel(form: Form): FormOutputModel {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function buildShowCondition(model: FormOutputModel, questionId: string): ShowCondition | undefined {
+  //TODO: Implement this function
+  return undefined;
+}
+
 export function ModelToDomain(model: FormOutputModel): Form {
   const groups = model.groups.map(group => {
     return {
@@ -92,7 +96,7 @@ export function ModelToDomain(model: FormOutputModel): Form {
           text: questionModel.text,
           type: questionModel.type,
           options: questionModel.options,
-          showCondition: questionModel.showcondition,
+          showCondition: buildShowCondition(model, questionModel.id),
         } as Question;
       }),
     };

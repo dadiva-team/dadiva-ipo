@@ -3,7 +3,7 @@ using DadivaAPI.routes.form.models;
 
 namespace DadivaAPI.routes.form.models;
 
-public record QuestionModel(string Id, string Text, string Type, List<string>? Options, ShowCondition? ShowCondition)
+public record QuestionModel(string Id, string Text, string Type, List<string>? Options)
 {
     public static QuestionModel FromDomain(Question question)
     {
@@ -11,8 +11,7 @@ public record QuestionModel(string Id, string Text, string Type, List<string>? O
             question.Id,
             question.Text,
             question.Type.ToString(),
-            question.Options,
-            question.ShowCondition
+            question.Options
         );
     }
 
@@ -22,8 +21,7 @@ public record QuestionModel(string Id, string Text, string Type, List<string>? O
             model.Id,
             model.Text,
             Enum.Parse<ResponseType>(model.Type),
-            model.Options,
-            model.ShowCondition
+            model.Options
         );
     }
 }

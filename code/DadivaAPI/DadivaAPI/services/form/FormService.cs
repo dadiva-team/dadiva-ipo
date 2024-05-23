@@ -10,7 +10,6 @@ public class FormService(IFormRepository repository) : IFormService
     public async Task<Result<GetFormOutputModel, Problem>> GetForm()
     {
         Form? form = await repository.GetForm();
-
         if (form is null)
             return Result<GetFormOutputModel, Problem>.Failure(
                 new Problem(
@@ -29,21 +28,31 @@ public class FormService(IFormRepository repository) : IFormService
 
     public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules)
     {
-        foreach (var group in groups)
+        foreach (var rule in rules.ConvertAll(RuleModel.ToDomain).ToList())
         {
-            System.Console.WriteLine($"Group Name: {group.name}");
-            foreach (var question in group.Questions)
-            {
-                System.Console.WriteLine($"Question: {question.Text}");
-            }
+            Console.Out.WriteLine("||| All |||");
+            if (rule.Conditions.All != null)
+                foreach (var condition in rule.Conditions.All)
+                {
+                    await Console.Out.WriteLineAsync($"Condition: {condition}");
+                }
+
+            Console.Out.WriteLine("||| Any |||");
+            if (rule.Conditions.Any != null)
+                foreach (var condition in rule.Conditions.Any)
+                {
+                    await Console.Out.WriteLineAsync($"Condition: {condition}");
+                }
+
+            await Console.Out.WriteLineAsync($"Question: {rule.Event}");
         }
-        
+
         Form form = new Form
         (
             groups.ConvertAll(QuestionGroupModel.ToDomain).ToList(),
             rules.ConvertAll(RuleModel.ToDomain).ToList()
         );
-        
+
         return Result<Form, Problem>.Success(await repository.EditForm(form));
         /*
         if (isSubmited) return Result<bool, Problem>.Success(true);
@@ -61,8 +70,8 @@ public class FormService(IFormRepository repository) : IFormService
     {
         var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList());
         bool isSubmitted = await repository.SubmitForm(submission, nic);
-        if(isSubmitted) return Result<bool, Problem>.Success(true);
-        
+        if (isSubmitted) return Result<bool, Problem>.Success(true);
+
         return Result<bool, Problem>.Failure(
             new Problem(
                 "errorSubmitingForm.com",
@@ -70,7 +79,6 @@ public class FormService(IFormRepository repository) : IFormService
                 400,
                 "An error ocurred while submitting form"
             )); //TODO Create Problems types for form
-        
     }
 
     public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()

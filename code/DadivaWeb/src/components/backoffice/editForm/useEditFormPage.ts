@@ -29,10 +29,6 @@ export function useEditFormPage() {
       }
       setFormFetchData(res as Form);
       setIsLoading(false);
-      console.log('Groups:');
-      res.groups.forEach(console.log);
-      console.log('Rules first fetch:');
-      res.rules.forEach(console.log);
     };
 
     if (isLoading) fetch();
@@ -112,7 +108,6 @@ export function useEditFormPage() {
       if (group.questions.length === 0) return;
 
       group.questions.forEach((question, i) => {
-        console.log(question);
         if (question.showCondition) {
           rules.push({
             conditions: calculateFromShowConditions(question.showCondition),
@@ -180,8 +175,6 @@ export function useEditFormPage() {
         },
       });
     });
-    console.log('NEW Rules:');
-    console.log(rules);
     return rules;
   }
 
@@ -243,6 +236,7 @@ export function useEditFormPage() {
 
   function handleDrop(questionID: string, groupName: string, index: number) {
     setFormFetchData(oldForm => {
+      console.log(questionID, groupName, index);
       let draggedQuestion: Question = null;
       let subQuestions: Question[] = [];
 

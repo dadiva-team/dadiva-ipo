@@ -66,7 +66,11 @@ var settings = new ElasticsearchClientSettings(
     nodePool,
     sourceSerializer: (_, settings) =>
     {
-        return new DefaultSourceSerializer(settings, options => { options.Converters.Add(new AnswerConverter()); });
+        return new DefaultSourceSerializer(settings, options =>
+        {
+            options.Converters.Add(new AnswerConverter());
+            options.Converters.Add(new ConditionConverter());
+        });
     });
 
 // Register the Elasticsearch client as a singleton
@@ -77,8 +81,8 @@ builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<ISearchService, SearchService>();
 
-builder.Services.AddSingleton<IUsersRepository, UsersRepositoryMemory>();
-builder.Services.AddSingleton<IFormRepository, FormRepositoryMemory>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
+builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
 builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 
 builder.Services.AddCors(options =>
@@ -114,6 +118,7 @@ group.AddUsersRoutes();
 group.AddFormRoutes();
 group.AddSearchRoutes();
 
+Console.Out.WriteLine(
 (app.Services.GetService(typeof(IFormRepository)) as IFormRepository)?.EditForm(
     new Form
     (
@@ -124,7 +129,6 @@ group.AddSearchRoutes();
                     "q2",
                     "Sente-se bem de saúde e em condições de dar sangue?",
                     ResponseType.boolean,
-                    null,
                     null
                 ),
                 new Question
@@ -132,7 +136,6 @@ group.AddSearchRoutes();
                     "q3",
                     "Alguma vez deu sangue ou componentes sanguíneos?",
                     ResponseType.boolean,
-                    null,
                     null
                 ),
                 new Question
@@ -140,7 +143,6 @@ group.AddSearchRoutes();
                     "q4",
                     "Deu sangue há menos de 2 meses?",
                     ResponseType.boolean,
-                    null,
                     null
                 ),
                 new Question
@@ -148,7 +150,6 @@ group.AddSearchRoutes();
                     "q5",
                     "Alguma vez lhe foi aplicada uma suspensão para a dádiva de sangue?",
                     ResponseType.boolean,
-                    null,
                     null
                 ),
                 new Question
@@ -156,10 +157,9 @@ group.AddSearchRoutes();
                     "q6",
                     "Ocorreu alguma reação ou incidente nas dádivas anteriores?",
                     ResponseType.boolean,
-                    null,
                     null
                 )
-            ])/*,
+            ]),
             new QuestionGroup("Viagens", [
                 new Question
                 (
@@ -388,10 +388,10 @@ group.AddSearchRoutes();
                     ResponseType.boolean,
                     null
                 )
-            ])*/
+            ])
         ],
         []
     )
-);
+).Result);
 
 app.Run();
