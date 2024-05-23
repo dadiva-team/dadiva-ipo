@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import { useLoggedIn } from '../../session/Session';
-import { PreDadivaLoginCard } from './PreDadivaLoginCard';
-import { PreDadivaInfoCard } from './PreDadivaInfoCard';
+import { PreDadivaLoginCard } from '../../components/home/PreDadivaLoginCard';
+import { PreDadivaInfoCard } from '../../components/home/PreDadivaInfoCard';
 import { useNavigate } from 'react-router-dom';
 
 export default function Home() {

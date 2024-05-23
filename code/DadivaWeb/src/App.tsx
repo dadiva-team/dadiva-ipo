@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Login from './components/authentication/Login/Login';
-import Register from './components/authentication/Register';
+import Login from './pages/authentication/Login';
+import Register from './pages/authentication/Register';
 import { Uris } from './utils/navigation/Uris';
-import Home from './components/home/Home';
+import Home from './pages/home/Home';
 import HOME = Uris.HOME;
 import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
@@ -11,12 +11,12 @@ import REGISTER = Uris.REGISTER;
 import EDIT_FORM = Uris.EDIT_FORM;
 import { Header } from './components/home/Header';
 import FORM_INFO = Uris.FORM_INFO;
-import { FormInfo } from './components/form/FormInfo';
+import { FormInfo } from './pages/form/FormInfo';
 import { EditFormPage } from './components/backoffice/editForm/EditFormPage';
-import { Form } from './components/form/Form';
+import { Form } from './pages/form/Form';
 import BACKOFFICE = Uris.BACKOFFICE;
-import { BackofficeLayout } from './components/backoffice/BackofficeLayout';
-import { Backoffice } from './components/backoffice/Backoffice';
+import { Backoffice } from './pages/backoffice/Backoffice';
+import { BackofficeMockChart } from './components/backoffice/BackofficeMockChart';
 
 export default function App() {
   //const loggedIn = useLoggedIn();
@@ -49,11 +49,11 @@ export default function App() {
             path={BACKOFFICE}
             element={
               <ProtectedRoute>
-                <BackofficeLayout />
+                <Backoffice />
               </ProtectedRoute>
             }
           >
-            <Route path="" element={<Backoffice />} />
+            <Route path="" element={<BackofficeMockChart />} />
             <Route path={EDIT_FORM} element={<EditFormPage />} />
           </Route>
         </Routes>

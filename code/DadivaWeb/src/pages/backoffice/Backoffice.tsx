@@ -1,9 +1,9 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
-import { BackofficeNavBar } from './BackofficeNavBar';
+import { BackofficeNavBar } from '../../components/backoffice/BackofficeNavBar';
 
-export function BackofficeLayout() {
+export function Backoffice() {
   return (
     <Box display="flex">
       <BackofficeNavBar />

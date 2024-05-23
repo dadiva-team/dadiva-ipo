@@ -1,11 +1,11 @@
 import * as React from 'react';
-import './Login.css';
-import { PasswordField } from './PasswordField';
-import { useLogin } from './useLogin';
+import '../../components/authentication/Login/Login.css';
+import { PasswordField } from '../../components/authentication/Login/PasswordField';
+import { useLogin } from '../../components/authentication/Login/useLogin';
 import { Box, Button, CircularProgress, Divider, Paper } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { ErrorAlert } from '../../shared/ErrorAlert';
-import { NicField } from './NicField';
+import { ErrorAlert } from '../../components/shared/ErrorAlert';
+import { NicField } from '../../components/authentication/Login/NicField';
 
 export default function Login() {
   const { error, setError, nic, password, showPassword, handleChange, handleSubmit, setShowPassword, loading } =

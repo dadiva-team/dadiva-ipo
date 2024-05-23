@@ -46,4 +46,10 @@ public class UsersRepositoryES(ElasticsearchClient client) : IUsersRepository
         var response = await client.GetAsync<User>(nic, idx => idx.Index(_index));
         return response.IsValidResponse ? response.Source : null;
     }
+    
+    public async Task<Boolean> DeleteUser(int nic)
+    {
+        var response = await client.DeleteAsync(_index, nic);
+        return response.IsValidResponse;
+    }
 }

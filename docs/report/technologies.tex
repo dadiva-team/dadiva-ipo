@@ -1,0 +1,85 @@
+%
+% Capítulo 3
+%
+\chapter{Technologies} \label{cap:technologies}
+
+ In this chapter we introduce the most relevant technologies that support the different
+components of the DADIVA IPO Platform, explaining what they are and why they are being used in the context of our project.
+We will start by introducing the technologies that are used in the backend, then
+we will introduce the technologies that are used in the frontend, and finally we will
+present the tools that enable version control.
+We obtained experience in some of these throughout the several courses of our
+bachelor’s degree in computer science, which highly influenced us in choosing them in
+our project:
+\begin{itemize}
+	\item Introduction to Web Programming (Introdução á Programação na Web) - Express.js;
+	\item WebApplication Development (Desenvolvimento de Aplicações Web)- Docker, React, Material-UI, Webpack;
+	\item Systems Virtualization Techniques (Técnicas de Virtualização de Sistema) - Docker;
+	\item Software Laboratory (Laboratório de Software) - Docker;
+	\item Informatic Security (Segurança Informática) - RBAC;
+	\item Git and Github where used during most of the course.
+\end{itemize}
+
+\section{Backend Technologies}
+
+The backend technologies used in the DADIVA IPO are similar, at least conceptually, to those used in Software Laboratory and Introduction to Web Programming. These technologies encompass the server-side components that handle data processing, database management, and API integrations. In this section, we will explore the key backend technologies employed in our project, providing a comprehensive overview of their functionalities, benefits, and relevance to our system. We will explore how these technologies work together to support the seamless operation and performance of the DADIVA IPO platform.
+
+The programming language used in the backend was C\#, which is a general purpose, object-oriented programming language. C\# was chosen since it is part of the technology stack at Cofidis, the employer of João Pereira, and it presented a opportunity to use a new, industry prevalent, language in  a large project that would prepare us for possible development environments upon course conclusion.
+
+Other options where Kotlin, which was extensively used during our course and Java, which, much like C\#, is already a staple language for backend development. However C\# presented an interesting novelty challenge that wasn't as present in these alternatives.
+
+\subsection{.NET}
+.NET is a comprehensive development framework created by Microsoft. It serves as the backbone for building a variety of applications, including web, mobile, desktop, gaming, and Internet of Things (IoT) applications.
+
+.NET provides a built-in dependency injection container that is straightforward to use. This container is integrated into various application types, including ASP.NET Core, and is conceptually similar to Spring, as well as a Role Based Access Control(RBAC). This framework also allows to create Minimal API's which are controller free API's similar to the Express.js API created during Introduction to Web Programming.
+
+\subsection{Docker}
+
+Docker is an open-source project which wraps and extends Linux containers technology to create a complete solution for the creation and distribution of containers.
+The Docker platform provides a vast number of commands to conveniently manipulate
+containers.
+
+A container is an isolated, yet interactive, environment configured with all the dependencies necessary to execute an application. The use of containers brings advantages
+such as:
+\begin{itemize}
+	\item Having little to no overhead compared to running an application natively, as it interacts directly with the host OS kernel and no layer exists between the application running and the OS;
+	\item Providing high portability since the application runs in the environment provided by the container; bugs related to runtime environment configurations will almost certainly not occur;
+	\item Running dozens of containers at the same time, thanks to their lightweight nature;
+	\item Executing an application by downloading the container and running it, avoiding going through possible complex installations and setup.
+\end{itemize}
+
+To easily configure the virtual environment that the container hosts, Docker provides Docker images. Images are snapshots of all the necessary tools and files to execute an application. 
+Containers can be started from images, the same way virtual machines run snapshots. To effortlessly distribute images, Docker provides registries. These are public or private stores where users may upload or download images. Docker provides a cloud-based registry service called DockerHub.
+
+In addition to the Docker platform, we use Docker Compose to orchestrate the containers. Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, we can define a multi-container application in a single file, then spin it up in a single command which does everything that needs to be done to get it running. Compose is especially useful in development environments, testing environments, and CI workflows. 
+
+We use Docker as an alternative for software containerization because it is the most well known, actively developed and supported in the area. Many frameworks already support it or are starting to support it.
+
+\section{Frontend Technologies}
+
+\subsection{React}
+
+React is a JavaScript library for building user interfaces. It is maintained by Facebook and a community of individual developers and companies. React can be used as a base in the development of single-page or mobile applications.
+
+React is a component-based library, which means that the application is built by assembling components. Each component is a small piece of code that can be reused in different parts of the application. React is also declarative, which means that it is possible to describe the user interface without specifying how the user interface should be updated.
+
+In DADIVA IPO, we use React to create the user interface. We also use React Router to manage the routing of the application. React Router is a collection of navigational components that compose declaratively with your application.
+
+\subsection{JSON-Rules-Engine}
+
+JSON-Rules-Engine is a library that enables the evaluation of business rules based on data inputs, providing a way to separate business logic from the core application code. Rules are defined in JSON format, making them easy to read, write, and maintain. The engine evaluates these rules against provided facts (data inputs) and triggers actions based on the results.
+
+\subsection{Material-UI}
+
+In addition to React, we also use Material-UI to create the user interface. Material-UI is a React component library that implements Google’s Material Design, which is a design language that combines the classic principles of successful design along with innovation and technology. Material-UI provides a set of components that can be used to create a user interface that follows the Material Design guidelines, such as buttons, cards, and tables. This makes it easier to create a consistent user interface.
+
+\subsection{Webpack}
+
+Webpack is a module bundler. It takes modules with dependencies and generates static assets representing those modules. Webpack is used to bundle JavaScript files for usage in a browser. It also provides a set of plugins that can be used to optimize the application, such as minification and code splitting.
+
+In DADIVA IPO, we use Webpack to bundle the JavaScript files of the application, optimizing them for production. The technology also provides a development server, which is used to serve the application during development. We also use ts-loader to compile TypeScript files into JavaScript.
+
+\section{DevOps Technologies}
+
+\subsection{ Git and GitHub}
+Git and GitHub are widely used version control tools that play a critical role in modern DevOps practices. Git is a distributed version control system that allows teams to efficiently manage changes to source code, track them over time and streamlines developer collaboration. GitHub, on the other hand, is a web-based hosting service for Git repositories that provides additional collaboration and project management features. Both of these technologies where extensively used trough our course.

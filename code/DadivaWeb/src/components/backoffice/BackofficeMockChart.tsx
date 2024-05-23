@@ -3,7 +3,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 
 const series = [{ data: [-2, -9, 12, 11, 6, -4] }];
 
-export function Backoffice() {
+export function BackofficeMockChart() {
   return (
     <BarChart
       height={300}

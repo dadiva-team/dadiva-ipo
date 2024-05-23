@@ -1,7 +1,7 @@
-import { useNewForm } from './useNewForm';
+import { useNewForm } from '../../components/form/useNewForm';
 import React, { useState } from 'react';
-import FormWithRuleEngine from './FormWithRuleEngine';
-import { ReviewForm } from './ReviewForm';
+import FormWithRuleEngine from '../../components/form/FormWithRuleEngine';
+import { ReviewForm } from '../../components/form/ReviewForm';
 import { Box, Button } from '@mui/material';
 
 export function Form() {

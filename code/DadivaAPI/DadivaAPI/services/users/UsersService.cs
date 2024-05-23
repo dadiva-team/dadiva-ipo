@@ -90,6 +90,27 @@ public class UsersService(IConfiguration config, IUsersRepository repository) : 
                 Result<List<User>, Problem>.Failure(
                     UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
         }
+    }
+    
+    public async Task<Result<Boolean, Problem>> DeleteUser(int nic)
+    {
+        //TODO add check user authentication
+        try
+        {
+            User? user = await repository.GetUserByNic(nic);
+            if(user == null) 
+                return Result<Boolean, Problem>.Failure(
+                    UserServicesErrorExtensions.ToResponse(UserServiceError.InvalidNic));
+            return Result<Boolean, Problem>.Success(true);
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while creating user '{e}'");
+            return
+                Result<Boolean, Problem>.Failure(
+                    UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
+        }
 
     }
 }
