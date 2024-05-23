@@ -47,7 +47,7 @@ function RuleToDomain(rule: Rule): RuleProperties {
   };
 }
 
-function RulesToDomain(rules: Rule[]): RuleProperties[] {
+export function RulesToDomain(rules: Rule[]): RuleProperties[] {
   return rules.map(RuleToDomain);
 }
 
@@ -69,7 +69,7 @@ function DomainToRule(rule: RuleProperties): Rule {
   };
 }
 
-function DomainToRules(rules: RuleProperties[]): Rule[] {
+export function DomainToRules(rules: RuleProperties[]): Rule[] {
   return rules.map(DomainToRule);
 }
 

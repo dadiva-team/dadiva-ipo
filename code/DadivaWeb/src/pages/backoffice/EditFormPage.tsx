@@ -1,16 +1,16 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
-import { Group } from './Group';
-import LoadingSpinner from '../../shared/LoadingSpinner';
-import { ErrorAlert } from '../../shared/ErrorAlert';
-import { useEditFormPage } from './useEditFormPage';
-import { QuestionEditDialog } from './dialogs/QuestionEditDialog';
-import { Form } from '../../../domain/Form/Form';
-import { QuestionAddDialog } from './dialogs/QuestionAddDialog';
-import { GroupAddDialog } from './dialogs/GroupAddDialog';
-import { DeleteQuestionDialog } from './dialogs/DeleteQuestionDialog';
-import { DeleteGroupDialog } from './dialogs/DeleteGroupDialog';
-import { GroupEditDialog } from './dialogs/GroupEditDialog';
+import { Group } from '../../components/backoffice/editForm/Group';
+import LoadingSpinner from '../../components/shared/LoadingSpinner';
+import { ErrorAlert } from '../../components/shared/ErrorAlert';
+import { useEditFormPage } from '../../components/backoffice/editForm/useEditFormPage';
+import { QuestionEditDialog } from '../../components/backoffice/editForm/dialogs/QuestionEditDialog';
+import { Form } from '../../domain/Form/Form';
+import { QuestionAddDialog } from '../../components/backoffice/editForm/dialogs/QuestionAddDialog';
+import { GroupAddDialog } from '../../components/backoffice/editForm/dialogs/GroupAddDialog';
+import { DeleteQuestionDialog } from '../../components/backoffice/editForm/dialogs/DeleteQuestionDialog';
+import { DeleteGroupDialog } from '../../components/backoffice/editForm/dialogs/DeleteGroupDialog';
+import { GroupEditDialog } from '../../components/backoffice/editForm/dialogs/GroupEditDialog';
 
 export function EditFormPage() {
   const {

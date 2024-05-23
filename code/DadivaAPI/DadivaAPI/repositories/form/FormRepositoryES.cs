@@ -60,4 +60,43 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
         }
         return response.Result.Hits.ToDictionary(h => int.Parse(h.Id), h => h.Source)!;
     }
+    
+    public async Task<Inconsistencies> GetInconsistencies()
+    {
+        try
+        {
+            var request = new SearchRequest("inconsistencies");
+            var searchResponse = await client.SearchAsync<Inconsistencies>(request);
+
+            if (searchResponse.IsValidResponse)
+            {
+                Inconsistencies inconsistencies = searchResponse.Documents.Last();
+                // Elastic search does not respect the non-nullability of Inconsistencies.InconsistencyList,
+                // so we need to check for null here
+                if (inconsistencies.InconsistencyList == null)
+                    inconsistencies = new Inconsistencies([]);
+                return inconsistencies;
+            }
+
+            return null;
+        } catch (Exception e)
+        {
+            Console.WriteLine($"Error getting inconsisntnieisseeffef eg: '{e}'");
+            return null; //TODO: better error handling
+        }
+    }
+    
+    public async Task<bool> EditInconsistencies(Inconsistencies inconsistencies)
+    {
+        try
+        {
+            var response = await client.IndexAsync(inconsistencies, idx => idx.Index("inconsistencies"));
+            return response.IsValidResponse;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error submitting form: '{e}'");
+            return false; //TODO: better error handling
+        }
+    }
 }

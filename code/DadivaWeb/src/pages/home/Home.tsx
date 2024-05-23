@@ -4,6 +4,8 @@ import { useLoggedIn } from '../../session/Session';
 import { PreDadivaLoginCard } from '../../components/home/PreDadivaLoginCard';
 import { PreDadivaInfoCard } from '../../components/home/PreDadivaInfoCard';
 import { useNavigate } from 'react-router-dom';
+import { Uris } from '../../utils/navigation/Uris';
+import BACKOFFICE = Uris.BACKOFFICE;
 
 export default function Home() {
   const loggedIn = useLoggedIn();
@@ -25,9 +27,9 @@ export default function Home() {
       </button>
       <button
         type="button"
-        value="Clear Session"
+        value="Go to Backoffice"
         onClick={() => {
-          nav('/backoffice');
+          nav(BACKOFFICE);
         }}
         style={{ display: 'block', marginBottom: '10px' }}
       >

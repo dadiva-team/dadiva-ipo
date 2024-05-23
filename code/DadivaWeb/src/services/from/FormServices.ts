@@ -1,7 +1,9 @@
 import { get, put } from '../utils/fetch';
-import { editFormUri, getFormUri } from '../utils/WebApiUris';
-import { DomainToModel, FormOutputModel, ModelToDomain } from './models/FormOutputModel';
+import { editFormUri, editInconsistenciesUri, getFormUri, getInconsistenciesUri } from '../utils/WebApiUris';
+import { DomainToModel, DomainToRules, FormOutputModel, ModelToDomain, RulesToDomain } from './models/FormOutputModel';
 import { Form } from '../../domain/Form/Form';
+import { RuleProperties } from 'json-rules-engine';
+import { InconsistenciesOutputModel } from './models/InconsistenciesOutputModel';
 
 function toCamelCase(s: string): string {
   return s.replace(/([A-Z])/g, (c, first) => (first ? c.toLowerCase() : c));
@@ -52,6 +54,16 @@ export namespace FormServices {
     console.log(DomainToModel(form));
     console.log(JSON.stringify(DomainToModel(form)));
     await put(editFormUri, JSON.stringify(DomainToModel(form)));
+    return true;
+  }
+
+  export async function getInconsistencies(): Promise<RuleProperties[]> {
+    const res = await get<InconsistenciesOutputModel>(getInconsistenciesUri);
+    return RulesToDomain(convertKeysToCamelCase(res.inconsistencies));
+  }
+
+  export async function editInconsistencies(inconsistencies: RuleProperties[]): Promise<boolean> {
+    await put(editInconsistenciesUri, JSON.stringify(DomainToRules(inconsistencies)));
     return true;
   }
 }

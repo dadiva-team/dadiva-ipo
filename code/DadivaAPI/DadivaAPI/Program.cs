@@ -7,6 +7,7 @@ using DadivaAPI.repositories.users;
 using DadivaAPI.routes.search;
 using DadivaAPI.routes.example;
 using DadivaAPI.routes.form;
+using DadivaAPI.routes.form.models;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.dnd;
 using DadivaAPI.services.example;
@@ -119,7 +120,7 @@ group.AddFormRoutes();
 group.AddSearchRoutes();
 
 Console.Out.WriteLine(
-(app.Services.GetService(typeof(IFormRepository)) as IFormRepository)?.EditForm(
+(app.Services.GetService(typeof(FormRepositoryMemory)) as FormRepositoryMemory)?.EditForm(
     new Form
     (
         [
@@ -393,5 +394,7 @@ Console.Out.WriteLine(
         []
     )
 ).Result);
+
+(app.Services.GetService(typeof(FormRepositoryMemory)) as FormRepositoryMemory)?.EditInconsistencies(new Inconsistencies([]));
 
 app.Run();

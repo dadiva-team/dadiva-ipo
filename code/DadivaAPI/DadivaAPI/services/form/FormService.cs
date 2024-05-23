@@ -28,24 +28,6 @@ public class FormService(IFormRepository repository) : IFormService
 
     public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules)
     {
-        foreach (var rule in rules.ConvertAll(RuleModel.ToDomain).ToList())
-        {
-            Console.Out.WriteLine("||| All |||");
-            if (rule.Conditions.All != null)
-                foreach (var condition in rule.Conditions.All)
-                {
-                    await Console.Out.WriteLineAsync($"Condition: {condition}");
-                }
-
-            Console.Out.WriteLine("||| Any |||");
-            if (rule.Conditions.Any != null)
-                foreach (var condition in rule.Conditions.Any)
-                {
-                    await Console.Out.WriteLineAsync($"Condition: {condition}");
-                }
-
-            await Console.Out.WriteLineAsync($"Question: {rule.Event}");
-        }
 
         Form form = new Form
         (
@@ -84,5 +66,16 @@ public class FormService(IFormRepository repository) : IFormService
     public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()
     {
         return Result<Dictionary<int, Submission>, Problem>.Success(await repository.GetSubmissions());
+    }
+    
+    public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()
+    {
+        return Result<Inconsistencies, Problem>.Success(await repository.GetInconsistencies());
+    }
+    
+    public async Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies)
+    {
+
+        return Result<bool, Problem>.Success(await repository.EditInconsistencies(inconsistencies));
     }
 }

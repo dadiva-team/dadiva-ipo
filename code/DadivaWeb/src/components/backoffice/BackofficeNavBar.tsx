@@ -10,6 +10,11 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useLocation, useNavigate, Location } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
+import { Uris } from '../../utils/navigation/Uris';
+import BACKOFFICE = Uris.BACKOFFICE;
+import EDIT_FORM = Uris.EDIT_FORM;
+import MANAGE_USERS = Uris.MANAGE_USERS;
+import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
 
 interface NavItem {
   text: string;
@@ -34,11 +39,11 @@ export function BackofficeNavBar() {
   const nav = useNavigate();
 
   const navItems: NavItem[] = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/backoffice', disabled: false },
-    { text: 'Editar Formulário', icon: <FormIcon />, path: '/backoffice/edit-form', disabled: false },
-    { text: 'Editar Medicação', icon: <MedicationIcon />, path: '/edit-medication', disabled: true },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: BACKOFFICE, disabled: false },
+    { text: 'Editar Formulário', icon: <FormIcon />, path: EDIT_FORM, disabled: false },
+    { text: 'Editar Incoerências', icon: <MedicationIcon />, path: EDIT_INCONSISTENCIES, disabled: false },
     { text: 'Estatísticas', icon: <StatsIcon />, path: '/statistics', disabled: true },
-    { text: 'Dadores', icon: <DonorsIcon />, path: '/donors', disabled: true },
+    { text: 'Utilizadores', icon: <DonorsIcon />, path: MANAGE_USERS, disabled: false },
     { text: 'Doutores', icon: <DoctorsIcon />, path: '/doctors', disabled: true },
     { text: 'Notificações', icon: <NotificationsIcon />, path: '/notifications', disabled: true },
     { text: 'Definições', icon: <SettingsIcon />, path: '/settings', disabled: true },

@@ -7,6 +7,8 @@ public class FormRepositoryMemory : IFormRepository
     private readonly Dictionary<int, Submission> _submissions = new();
 
     private Form _form = new([], []);
+    
+    private List<Rule> _inconsistencies = [];
 
     public async Task<Form> GetForm()
     {
@@ -28,5 +30,16 @@ public class FormRepositoryMemory : IFormRepository
     public async Task<Dictionary<int, Submission>> GetSubmissions()
     {
         return _submissions;
+    }
+
+    public async Task<Inconsistencies> GetInconsistencies()
+    {
+        return new Inconsistencies(_inconsistencies);
+    }
+    
+    public async Task<bool> EditInconsistencies(Inconsistencies inconsistencies)
+    {
+        _inconsistencies = inconsistencies.InconsistencyList;
+        return true;
     }
 }

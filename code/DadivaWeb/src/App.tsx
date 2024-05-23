@@ -12,11 +12,13 @@ import EDIT_FORM = Uris.EDIT_FORM;
 import { Header } from './components/home/Header';
 import FORM_INFO = Uris.FORM_INFO;
 import { FormInfo } from './pages/form/FormInfo';
-import { EditFormPage } from './components/backoffice/editForm/EditFormPage';
+import { EditFormPage } from './pages/backoffice/EditFormPage';
 import { Form } from './pages/form/Form';
 import BACKOFFICE = Uris.BACKOFFICE;
 import { Backoffice } from './pages/backoffice/Backoffice';
 import { BackofficeMockChart } from './components/backoffice/BackofficeMockChart';
+import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
+import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
 
 export default function App() {
   //const loggedIn = useLoggedIn();
@@ -55,6 +57,7 @@ export default function App() {
           >
             <Route path="" element={<BackofficeMockChart />} />
             <Route path={EDIT_FORM} element={<EditFormPage />} />
+            <Route path={EDIT_INCONSISTENCIES} element={<EditInconsistenciesPage />} />
           </Route>
         </Routes>
       </div>
