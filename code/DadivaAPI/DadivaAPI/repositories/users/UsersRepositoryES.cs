@@ -36,8 +36,12 @@ public class UsersRepositoryES(ElasticsearchClient client) : IUsersRepository
 
     public async Task<List<User>?> GetUsers()
     {
-        var response = await client.SearchAsync<List<User>>(new SearchRequest(_index));
-        if (response.IsValidResponse) return (List<User>)response.Documents;
+        var response = await client.SearchAsync<User>(new SearchRequest(_index));
+        if (response.IsValidResponse)
+        {
+            var users = response.Documents.ToList();
+            return users;
+        }
         return null;
     }
 

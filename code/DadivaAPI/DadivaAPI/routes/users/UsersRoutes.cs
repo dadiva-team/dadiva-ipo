@@ -3,6 +3,7 @@ using DadivaAPI.routes.users.models;
 using DadivaAPI.services.users;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DadivaAPI.routes.users;
@@ -14,6 +15,8 @@ public static class UsersRoutes
         var group = app.MapGroup("/users");
         group.MapPost("/login", CreateToken);
         group.MapPost("", CreateUser);
+        group.MapGet("", GetUsers);
+        group.MapDelete("/{nic}", DeleteUser);
     }
 
     private static async Task<IResult> CreateToken(HttpContext http, [FromBody] CreateTokenInputModel input,
@@ -49,6 +52,28 @@ public static class UsersRoutes
             Result<UserExternalInfo, Problem>.SuccessResult success => Results.Created((string)null,
                 new CreateUserOutputModel(success.Value.Nic)),
             Result<UserExternalInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("never gonna give you up, never gonna let you down")
+        };
+    }
+    
+    private static async Task<IResult> GetUsers(IUsersService service)
+    {
+        Result<List<UserExternalInfo>, Problem> result = await service.GetUsers("Need to validate role");
+        return result switch
+        {
+            Result<List<UserExternalInfo>, Problem>.SuccessResult success => Results.Ok( success.Value),
+            Result<List<UserExternalInfo>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("never gonna give you up, never gonna let you down")
+        };
+    }
+    
+    private static async Task<IResult> DeleteUser([FromQuery] int nic ,IUsersService service)
+    {
+        Result<bool, Problem> result = await service.DeleteUser(nic);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult success => Results.Ok(success.Value),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("never gonna give you up, never gonna let you down")
         };
     }

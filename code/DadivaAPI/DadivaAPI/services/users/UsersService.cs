@@ -73,21 +73,24 @@ public class UsersService(IConfiguration config, IUsersRepository repository) : 
         }
     }
 
-    public async Task<Result<List<User>, Problem>> GetUsers(string token)
+    public async Task<Result<List<UserExternalInfo>, Problem>> GetUsers(string token)
     {
-        //TODO add check user authentication
+        //TODO add check user authentication, can users be null(beyond an error case)?
         try
         {
             List<User>? users = await repository.GetUsers();
-            if(users != null) return Result<List<User>, Problem>.Success(users);
-            return Result<List<User>, Problem>.Failure(
+            if(users != null) 
+                return Result<List<UserExternalInfo>, Problem>.Success(
+                    users.Select( user => new UserExternalInfo(user.nic)).ToList());
+            
+            return Result<List<UserExternalInfo>, Problem>.Failure(
                 UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Exception while creating user '{e}'");
+            Console.WriteLine($"Exception while getting all users '{e}'");
             return
-                Result<List<User>, Problem>.Failure(
+                Result<List<UserExternalInfo>, Problem>.Failure(
                     UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
         }
     }
@@ -106,7 +109,7 @@ public class UsersService(IConfiguration config, IUsersRepository repository) : 
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Exception while creating user '{e}'");
+            Console.WriteLine($"Exception while deleting user '{e}'");
             return
                 Result<Boolean, Problem>.Failure(
                     UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
