@@ -15,20 +15,19 @@ import {
     Typography,
     List,
     ListItem,
-    ListItemSecondaryAction,
     ListItemText,
 } from '@mui/material';
-import {Close, Delete} from '@mui/icons-material';
+import {Close, Edit} from '@mui/icons-material';
 import {Question, ShowCondition} from '../../../../domain/Form/Form';
 import {ErrorAlert} from '../../../shared/ErrorAlert';
 import {useDialog} from './useDialog';
 import {DropdownOptionsForm} from './DropdownOptionsForm';
+import {PendingActionAlert} from "../../../shared/PendingActionAlert";
 
-export interface QuestionEditDialogProps {
+export interface SubQuestionEditDialogProps {
     open: boolean;
     question: Question;
     questions: Question[];
-    subQuestions: Question[] | null;
     onAnswer: (
         id: string,
         text: string,
@@ -37,19 +36,19 @@ export interface QuestionEditDialogProps {
         showCondition?: ShowCondition,
         parentQuestionId?: string | null
     ) => void;
+    onDeleteSubQuestion: (question: Question, isSubQuestion: boolean, parentQuestionId: string | null) => void;
     onClose: () => void;
-    isFirst: boolean;
 }
 
-export function QuestionEditDialog({
-                                       open,
-                                       question,
-                                       subQuestions,
-                                       questions,
-                                       onAnswer,
-                                       onClose,
-                                       isFirst
-                                   }: QuestionEditDialogProps) {
+export function SubQuestionEditDialog(
+    {
+        open,
+        question,
+        questions,
+        onAnswer,
+        onDeleteSubQuestion,
+        onClose
+    }: SubQuestionEditDialogProps) {
     const {
         questionId,
         setQuestionId,
@@ -69,12 +68,12 @@ export function QuestionEditDialog({
         moveOptionDown,
     } = useDialog();
 
-    const [questionShowConditionType, setQuestionShowConditionType] = useState<'sequential' | 'subordinate'>(
-        question?.showCondition ? 'subordinate' : 'sequential'
-    );
     const [showCondition, setShowCondition] = useState<ShowCondition>(question?.showCondition ?? {if: {}});
     const [questionCondition, setQuestionCondition] = useState<string | null>(null);
     const [conditionAnswer, setConditionAnswer] = useState<string | null>(null);
+    const [editingCondition, setEditingCondition] = useState<boolean>(false);
+    const [intendedAction, setIntendedAction] = useState<'remove' | 'return'>(null);
+    const [alert, setAlert] = useState<string | null>(null);
 
     useEffect(() => {
         if (question) {
@@ -82,8 +81,13 @@ export function QuestionEditDialog({
             setQuestionText(question.text);
             setQuestionType(question.type);
             setQuestionOptions(question.options ?? []);
-            setQuestionShowConditionType(question.showCondition ? 'subordinate' : 'sequential');
             setShowCondition(question.showCondition ?? {if: {}});
+
+            if (question.showCondition) {
+                const validConditionKey = Object.keys(question.showCondition.if)[0];
+                setQuestionCondition(validConditionKey);
+                setConditionAnswer(question.showCondition.if[validConditionKey]);
+            }
         }
     }, [question, setQuestionId, setQuestionOptions, setQuestionText, setQuestionType]);
 
@@ -96,54 +100,33 @@ export function QuestionEditDialog({
             setError('Uma pergunta de escolha múltipla deve ter pelo menos duas opções');
             return;
         }
-
-        if (
-            questionShowConditionType === 'subordinate' &&
-            (questionCondition === null || conditionAnswer === null || conditionAnswer === '')
-        ) {
-            setError('Uma pergunta subordinada deve ter uma condição');
+        if (questionCondition && !conditionAnswer) {
+            setError('A condição de ativação da pergunta não pode estar vazia');
+            return;
+        }
+        if (questionCondition && !questions.find(q => q.id === questionCondition)) {
+            setError('A pergunta de ativação não existe');
+            return;
+        }
+        if (editingCondition) {
+            setError('Termine de editar a condição de ativação');
             return;
         }
 
-        if (questionShowConditionType === 'subordinate' && Object.keys(showCondition.if).length === 0) {
-            setError('Não se esqueça de guardar a condição!');
-            return;
+        if (intendedAction === 'remove') {
+            onDeleteSubQuestion(question, false, null);
+            onClose();
+        } else if (intendedAction === 'return') {
+            onDeleteSubQuestion(question, true, questions?.find(q => q.id === questionCondition)?.id);
+            onClose();
+        } else {
+            onAnswer(questionId, questionText, questionType, questionOptions, showCondition, questionCondition);
+            onClose();
         }
 
+    }, [questionText, questionType, questionOptions, questionCondition, conditionAnswer, questions, editingCondition, onAnswer, questionId, showCondition, onClose, setError, intendedAction, onDeleteSubQuestion, question]);
 
-        onAnswer(
-            questionId,
-            questionText,
-            questionType,
-            questionOptions,
-            questionShowConditionType === 'subordinate' ? showCondition : undefined,
-            questionCondition
-        );
-        setQuestionCondition(null)
-        onClose();
-    }, [
-        questionText,
-        questionType,
-        questionOptions,
-        questionShowConditionType,
-        questionCondition,
-        conditionAnswer,
-        onAnswer,
-        questionId,
-        showCondition,
-        onClose,
-        setError,
-    ]);
-
-    function handleRemoveCondition(fact: string) {
-        setShowCondition(oldShowCondition => {
-            const newShowCondition = {...oldShowCondition};
-            delete newShowCondition.if[fact];
-            return newShowCondition;
-        });
-    }
-
-    function handleAddCondition() {
+    function handleChangeCondition() {
         setShowCondition(oldShowCondition => {
             const newShowCondition = {...oldShowCondition};
             newShowCondition.if[questionCondition] = conditionAnswer;
@@ -213,7 +196,7 @@ export function QuestionEditDialog({
                             labelId="selecionar-resposta-label"
                             id="selecionar-resposta-label"
                             value={conditionAnswer ?? ''}
-                            label="Resposta"
+                            label="Reesposta"
                             onChange={event => {
                                 setConditionAnswer(event.target.value);
                             }}
@@ -231,7 +214,7 @@ export function QuestionEditDialog({
 
     return (
         <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
-            <DialogTitle id="edit-dialog-title">Editar a Questão</DialogTitle>
+            <DialogTitle id="edit-dialog-title">Editar a Questão Subordinada</DialogTitle>
             <IconButton
                 aria-label="close"
                 color="inherit"
@@ -291,117 +274,77 @@ export function QuestionEditDialog({
                             moveOptionDown={moveOptionDown}
                         />
                     )}
+                    <Box>
+                        <Button
+                            onClick={() => {
+                                setIntendedAction('remove');
+                                setAlert('Tem a certeza que deseja remover esta pergunta?')
+                            }}>
+                            Remover pergunta
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setIntendedAction('return');
+                                setAlert('Tem a certeza que deseja devolver esta pergunta à pool?')
+                            }}>
+                            Devolver pergunta à pool
+                        </Button>
+                    </Box>
+
                     <Divider/>
-                    {isFirst && subQuestions.length == 0 && (
-                        <FormControl fullWidth>
-                            <InputLabel id="selecionar-condicao-label">Condição</InputLabel>
-                            <Select
-                                labelId="selecionar-condicao-label"
-                                id="selecionar-condicao"
-                                value={questionShowConditionType ?? ''}
-                                label="Grupo da Resposta"
-                                onChange={event => {
-                                    setQuestionShowConditionType(event.target.value as 'sequential' | 'subordinate');
-                                }}
-                            >
-                                <MenuItem value="sequential">Sequencial</MenuItem>
-                                <MenuItem value="subordinate">Subordinada</MenuItem>
-                            </Select>
-                        </FormControl>
-                    )}
-                    {subQuestions.length > 0 && (
-                        <FormControl fullWidth>
-                            <Typography variant="h6" sx={{mt: 2}}>
-                                SubQuestões
-                            </Typography>
+                    {
+                        intendedAction === null && (
 
-                            <List>
-                                {subQuestions.map(subQuestion => (
-                                    <ListItem key={subQuestion.id}>
-                                        <ListItemText sx={{width: "70%"}} primary={subQuestion.text}/>
-                                        <IconButton aria-label="delete" disabled={true}
-                                                    onClick={() => handleRemoveCondition(subQuestion.id)}>
-                                            <Delete/>
-                                        </IconButton>
-
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </FormControl>
-                    )}
-                    {questionShowConditionType === 'subordinate' && (
-                        <>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    gap: 1,
-                                    width: '100%',
-                                }}
-                            >
-                                <FormControl fullWidth margin="normal">
-                                    <InputLabel id="selecionar-questao-label">Questão</InputLabel>
-                                    <Select
-                                        labelId="selecionar-questao-label"
-                                        id="selecionar-questao"
-                                        value={questionCondition ?? ''}
-                                        label="Questão"
-                                        onChange={event => {
-                                            const newValue = event.target.value;
-                                            setQuestionCondition(newValue);
-
-                                            const selectedQuestion = questions.find(q => q.id === newValue);
-                                            if (selectedQuestion) {
-                                                setConditionAnswer('');
-                                            }
-                                        }}
-                                        fullWidth
-                                    >
-                                        {questions?.filter(q => q.id !== questionId && !q.showCondition).map(q => (
-                                            <MenuItem key={q.id} value={q.id}>
-                                                {q.text}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                <FormControl fullWidth margin="normal">
-                                    {createQuestionAnswersInput(questions?.find(q => q.id === questionCondition))}
-                                </FormControl>
-                            </Box>
                             <FormControl fullWidth>
-                                <Button
-                                    disabled={!questionCondition || !conditionAnswer}
-                                    onClick={handleAddCondition}
-                                    sx={{
-                                        mt: 1,
-                                        alignSelf: 'center',
-                                    }}
-                                >
-                                    Add Condition
-                                </Button>
-                                <Typography variant="h6" sx={{mt: 2}}>
-                                    Condições
+                                <Typography variant="h6" sx={{mt: 1}}>
+                                    Condições que ativam a pergunta
                                 </Typography>
                                 <List>
                                     {Object.keys(showCondition?.if).map((fact, index) => (
                                         <ListItem key={index}>
                                             <ListItemText
+                                                sx={{width: "70%"}}
                                                 primary={`${questions?.find(q => q.id === fact)?.text} = ${translateResponse(showCondition.if[fact])}`}
                                             />
-                                            <ListItemSecondaryAction>
-                                                <IconButton edge="end" aria-label="delete"
-                                                            onClick={() => handleRemoveCondition(fact)}>
-                                                    <Delete/>
-                                                </IconButton>
-                                            </ListItemSecondaryAction>
+                                            {editingCondition && (
+                                                <Box flexDirection="column" sx={{width: "25%"}}>
+                                                    <FormControl fullWidth margin="normal" sx={{width: "100%"}}>
+                                                        {createQuestionAnswersInput(questions?.find(q => q.id === questionCondition))}
+                                                    </FormControl>
+                                                    <Button
+                                                        disabled={!questionCondition || !conditionAnswer}
+                                                        onClick={() => {
+                                                            handleChangeCondition();
+                                                            setEditingCondition(false);
+                                                        }}
+                                                    >
+                                                        Guardar
+                                                    </Button>
+                                                </Box>
+                                            )}
+                                            {!editingCondition && (
+                                                <Box sx={{
+                                                    width: "25%",
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    justifyContent: "flex-end"
+                                                }}>
+                                                    <IconButton aria-label="edit" onClick={() => setEditingCondition(true)}>
+                                                        <Edit/>
+                                                    </IconButton>
+                                                </Box>
+                                            )}
                                         </ListItem>
                                     ))}
                                 </List>
                             </FormControl>
-                        </>
-                    )}
+                        )}
                     {error && <ErrorAlert error={error} clearError={() => setError(null)}/>}
+                    {alert && <PendingActionAlert actionMessage={alert} clearActionMessage={() => {
+                        setAlert(null);
+                        setIntendedAction(null)
+                    }}/>}
+
                     <Button
                         onClick={() => {
                             handleCloseAndAnswer();
@@ -412,6 +355,5 @@ export function QuestionEditDialog({
                 </Box>
             </DialogContent>
         </Dialog>
-    )
-        ;
+    );
 }

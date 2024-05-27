@@ -43,8 +43,6 @@ export namespace FormServices {
   export async function getForm(): Promise<Form> {
     console.log('GET FORM |||||||||||||||');
     const res = await get<FormOutputModel>(getFormUri);
-    console.log(res);
-    console.log(convertKeysToCamelCase(res));
     console.log(ModelToDomain(convertKeysToCamelCase(res)));
     return ModelToDomain(convertKeysToCamelCase(res));
   }

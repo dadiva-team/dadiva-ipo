@@ -18,6 +18,7 @@
     "@mui/material": "^5.15.17",
     "@mui/x-charts": "^7.5.0",
     "json-rules-engine": "^6.5.0",
+    "node-fetch": "^3.3.2",
     "playwright": "^1.44.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

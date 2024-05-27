@@ -80,11 +80,55 @@ export function DomainToModel(form: Form): FormOutputModel {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function buildShowCondition(model: FormOutputModel, questionId: string): ShowCondition | undefined {
-  //TODO: Implement this function
-  return undefined;
+function findRuleForQuestion(rules: Rule[], questionId: string): Rule | undefined {
+  return rules.find(rule => rule.event.params?.id === questionId);
 }
+
+function convertConditionsToShowCondition(conditions: Condition): ShowCondition | undefined {
+  const showCondition: ShowCondition = {
+    if: {}
+  };
+
+  let hasCondition = false;
+
+  if ("all" in conditions && conditions.all) {
+    conditions.all.forEach(condition => {
+      if ("fact" in condition && condition.fact && condition.operator === 'equal') {
+        showCondition.if[condition.fact] = condition.value;
+        hasCondition = true;
+      }
+    });
+  }
+
+  if ("any" in conditions && conditions.any) {
+    conditions.any.forEach(condition => {
+      if ("fact" in condition && condition.fact && condition.operator === 'equal') {
+        showCondition.if[condition.fact] = condition.value;
+        hasCondition = true;
+      } else if ("all" in condition && condition.all) {
+        // Handle nested conditions
+        const nestedShowCondition = convertConditionsToShowCondition(condition);
+        if (nestedShowCondition && nestedShowCondition.if) {
+          Object.assign(showCondition.if, nestedShowCondition.if);
+          hasCondition = true;
+        }
+      }
+    });
+  }
+
+  return hasCondition ? showCondition : undefined;
+}
+
+function buildShowCondition(model: FormOutputModel, questionId: string): ShowCondition | undefined {
+  const rule = findRuleForQuestion(model.rules, questionId);
+
+  if (!rule) {
+    return undefined;
+  }
+
+  return convertConditionsToShowCondition(rule.conditions as Condition);
+}
+
 
 export function ModelToDomain(model: FormOutputModel): Form {
   const groups = model.groups.map(group => {
