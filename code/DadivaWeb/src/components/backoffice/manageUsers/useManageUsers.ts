@@ -8,6 +8,7 @@ export function useManageUsers() {
   const nav = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [nics, setNics] = useState<number[]>([]);
+  const [isDeleting, setIsDeleting] = useState<number>(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -37,6 +38,8 @@ export function useManageUsers() {
     error,
     setError,
     nics,
+    isDeleting,
+    setIsDeleting,
     handleDeleteUser,
   };
 }

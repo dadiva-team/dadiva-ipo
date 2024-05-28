@@ -22,7 +22,7 @@ export function Inconsistency({ inconsistency, groups, onAddCondition }: Inconsi
         border: 1,
       }}
     >
-      <Typography>Inconsistencia</Typography>
+      <Typography>Incoerência</Typography>
       {(inconsistency.conditions as AllConditions).all.map((_condition, index) => {
         const condition = _condition as ConditionProperties;
         return (

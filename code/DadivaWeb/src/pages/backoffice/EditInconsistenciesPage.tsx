@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Divider, IconButton, List, ListItem } from '@mui/material';
+import { Box, Button, Divider, IconButton, List, ListItem } from '@mui/material';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
 import { Group } from '../../components/backoffice/inconsistencies/Group';
@@ -7,7 +7,7 @@ import { Form } from '../../domain/Form/Form';
 import { useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
-import { RuleProperties } from 'json-rules-engine';
+import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { Inconsistency } from '../../components/backoffice/inconsistencies/Inconsistency';
 import Typography from '@mui/material/Typography';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
@@ -50,11 +50,27 @@ export function EditInconsistenciesPage() {
   }, [isLoading, nav]);
 
   function onAddInconsistency() {
-    setAddingInconsistency(true);
+    setInconsistencies(old => {
+      return [...old, { conditions: { all: [] } } as RuleProperties];
+    });
   }
 
   function onAddCondition(index: number) {
     setAddingCondition(index);
+  }
+
+  function conditionAllIsEmpty(conditions: TopLevelCondition) {
+    if ('all' in conditions) return conditions.all.length == 0;
+    return false;
+  }
+
+  function saveInconsistencies() {
+    const filteredInconsistencies = inconsistencies.filter(
+      inc => 'all' in inc.conditions && inc.conditions.all.length !== 0
+    );
+    FormServices.saveInconsistencies(filteredInconsistencies).then(res => {
+      if (res) nav('/');
+    });
   }
 
   return (
@@ -72,7 +88,7 @@ export function EditInconsistenciesPage() {
                 formFetchData.groups.map(group => <Group group={group} key={group.name} />)}
             </Box>
             <Box sx={{ width: '100%' }}>
-              <Typography variant="h6">Inconsistências</Typography>
+              <Typography variant="h6">Incoerências</Typography>
               <List sx={{ width: '100%' }}>
                 {inconsistencies.map((inc, index) => (
                   <ListItem key={index}>
@@ -101,7 +117,11 @@ export function EditInconsistenciesPage() {
                   alignItems: 'center',
                 }}
               >
-                <IconButton color="primary" onClick={() => onAddInconsistency()}>
+                <IconButton
+                  disabled={conditionAllIsEmpty(inconsistencies[inconsistencies.length - 1].conditions)}
+                  color="primary"
+                  onClick={() => onAddInconsistency()}
+                >
                   <ControlPointIcon />
                 </IconButton>
               </Box>
@@ -126,6 +146,9 @@ export function EditInconsistenciesPage() {
               }}
               onClose={() => setAddingCondition(null)}
             />
+            <Button disabled={inconsistencies.length == 0} onClick={saveInconsistencies}>
+              Guardar Incoerências
+            </Button>
           </>
         )}
       </div>

@@ -110,7 +110,7 @@ public static class FormRoutes
         Result<bool, Problem> result = await service.EditInconsistencies(new Inconsistencies(input.Inconsistencies.ConvertAll(RuleModel.ToDomain).ToList()));
         return result switch
         {
-            Result<bool, Problem>.SuccessResult success => Results.Ok(),
+            Result<bool, Problem>.SuccessResult success => Results.Ok(input),
             Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };

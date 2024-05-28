@@ -1,4 +1,4 @@
-import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { DeleteConfirmDialog } from '../../../shared/DeleteConfirmDialog';
 
 export interface DeleteGroupDialogProps {
   open: boolean;

@@ -60,9 +60,16 @@ export namespace FormServices {
     return RulesToDomain(convertKeysToCamelCase(res.inconsistencies));
   }
 
-  export async function editInconsistencies(inconsistencies: RuleProperties[]): Promise<boolean> {
-    await put(editInconsistenciesUri, JSON.stringify(DomainToRules(inconsistencies)));
-    return true;
+  export async function saveInconsistencies(inconsistencies: RuleProperties[]): Promise<boolean> {
+    try {
+      console.log(JSON.stringify({ inconsistencies: DomainToRules(inconsistencies) }));
+      console.log('WEWWEWEWEWEWEWEWWWWWWWWWWWWWWWWWWWWWWWWWww');
+      await put(editInconsistenciesUri, JSON.stringify({ inconsistencies: DomainToRules(inconsistencies) }));
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 }
 
