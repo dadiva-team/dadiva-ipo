@@ -39,8 +39,8 @@ export function useLogin() {
       return;
     }
     if (state.inputs.nic.length !== 9) {
-      dispatch({ type: 'error', message: 'O NIC deve ter 9 dígitos' });
-      setError('O NIC deve ter 9 dígitos');
+      dispatch({ type: 'error', message: 'O NIC deve ter 8 dígitos' });
+      setError('O NIC deve ter 8 dígitos');
       return;
     }
 
@@ -71,7 +71,6 @@ export function useLogin() {
     sessionManager.setSession(mockSession);
     dispatch({ type: 'success' });
     setLoading(false);
-    navigate('/');
   }
 
   const { nic, password } = state.inputs;

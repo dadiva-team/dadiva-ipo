@@ -1,14 +1,11 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { useLoggedIn } from '../../session/Session';
-import { PreDadivaLoginCard } from '../../components/home/PreDadivaLoginCard';
 import { PreDadivaInfoCard } from '../../components/home/PreDadivaInfoCard';
 import { useNavigate } from 'react-router-dom';
 import { Uris } from '../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
 
 export default function Home() {
-  const loggedIn = useLoggedIn();
   const nav = useNavigate();
 
   return (
@@ -46,7 +43,7 @@ export default function Home() {
           width: '100%',
         }}
       >
-        {loggedIn ? <PreDadivaInfoCard /> : <PreDadivaLoginCard />}
+        <PreDadivaInfoCard />
       </Box>
     </div>
   );

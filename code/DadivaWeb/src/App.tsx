@@ -5,7 +5,6 @@ import Register from './pages/authentication/Register';
 import { Uris } from './utils/navigation/Uris';
 import Home from './pages/home/Home';
 import HOME = Uris.HOME;
-import LOGIN = Uris.LOGIN;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
 import EDIT_FORM = Uris.EDIT_FORM;
@@ -21,14 +20,15 @@ import { ManageUsersPage } from './components/backoffice/manageUsers/ManageUsers
 import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
 import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
 import { EditFormPage } from './pages/backoffice/EditFormPage';
+import { useLoggedIn } from './session/Session';
 
 export default function App() {
-  //const loggedIn = useLoggedIn();
+  const loggedIn = useLoggedIn();
 
   function ProtectedRoute({ children }: { children: React.ReactNode }) {
-    /*if (!loggedIn) {
+    if (!loggedIn) {
       return <Login />;
-    }*/
+    }
     return children;
   }
 
@@ -38,9 +38,15 @@ export default function App() {
         <Header />
         <Routes>
           <Route path={HOME} element={<Home />} />
-          <Route path={LOGIN} element={<Login />} />
           <Route path={REGISTER} element={<Register />} />
-          <Route path={FORM_INFO} element={<FormInfo />} />
+          <Route
+            path={FORM_INFO}
+            element={
+              <ProtectedRoute>
+                <FormInfo />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path={FORM}
             element={
