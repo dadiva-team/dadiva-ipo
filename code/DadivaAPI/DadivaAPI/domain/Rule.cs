@@ -30,7 +30,8 @@ public enum EventType
     showQuestion,
     nextGroup,
     showReview,
-    hideQuestion
+    hideQuestion,
+    showInconsistency,
 }
 
 public record EventParams(

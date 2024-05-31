@@ -51,7 +51,7 @@ export function EditInconsistenciesPage() {
 
   function onAddInconsistency() {
     setInconsistencies(old => {
-      return [...old, { conditions: { all: [] } } as RuleProperties];
+      return [...old, { conditions: { all: [] }, event: { type: 'showInconsistency' } } as RuleProperties];
     });
   }
 
@@ -59,8 +59,8 @@ export function EditInconsistenciesPage() {
     setAddingCondition(index);
   }
 
-  function conditionAllIsEmpty(conditions: TopLevelCondition) {
-    if ('all' in conditions) return conditions.all.length == 0;
+  function conditionAllIsEmpty(conditions?: TopLevelCondition) {
+    if (conditions && 'all' in conditions) return conditions.all.length == 0;
     return false;
   }
 
@@ -118,7 +118,7 @@ export function EditInconsistenciesPage() {
                 }}
               >
                 <IconButton
-                  disabled={conditionAllIsEmpty(inconsistencies[inconsistencies.length - 1].conditions)}
+                  disabled={conditionAllIsEmpty(inconsistencies[inconsistencies.length - 1]?.conditions)}
                   color="primary"
                   onClick={() => onAddInconsistency()}
                 >

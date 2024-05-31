@@ -90,7 +90,6 @@ public static class FormRoutes
 
     private static async Task<IResult> EditForm([FromBody] EditFormRequest input, IFormService service)
     {
-        
         Result<Form, Problem> result = await service.EditForm(input.Groups, input.Rules);
         return result switch
         {
@@ -103,11 +102,13 @@ public static class FormRoutes
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
-    
-    private static async Task<IResult> EditInconsistencies([FromBody] EditInconsistenciesRequest input, IFormService service)
+
+    private static async Task<IResult> EditInconsistencies([FromBody] EditInconsistenciesRequest input,
+        IFormService service)
     {
-        
-        Result<bool, Problem> result = await service.EditInconsistencies(new Inconsistencies(input.Inconsistencies.ConvertAll(RuleModel.ToDomain).ToList()));
+        Result<bool, Problem> result =
+            await service.EditInconsistencies(
+                new Inconsistencies(input.Inconsistencies.ConvertAll(RuleModel.ToDomain).ToList()));
         return result switch
         {
             Result<bool, Problem>.SuccessResult success => Results.Ok(input),
@@ -119,18 +120,11 @@ public static class FormRoutes
     private static async Task<IResult> GetInconsistencies(IFormService service)
     {
         Result<Inconsistencies, Problem> result = await service.GetInconsistencies();
-        if (result is Result<Inconsistencies, Problem>.SuccessResult successResult)
-        {
-            Console.Out.WriteLine("Hello World");
-            foreach(var rule in successResult.Value.InconsistencyList)
-            {
-                Console.Out.WriteLine(rule);
-            }
-        }
         return result switch
         {
-            Result<Inconsistencies, Problem>.SuccessResult success => Results.Json(new GetInconsistenciesOutputModel(
-                success.Value.InconsistencyList.Select(RuleModel.FromDomain).ToList())),
+            Result<Inconsistencies, Problem>.SuccessResult success => Results.Json(
+                new GetInconsistenciesOutputModel(
+                    success.Value.InconsistencyList.Select(RuleModel.FromDomain).ToList())),
             Result<Inconsistencies, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
