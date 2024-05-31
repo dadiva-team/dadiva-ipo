@@ -109,10 +109,8 @@ export function EditFormPage() {
                         <SubQuestionEditDialog
                             open={editingSubQuestion !== null}
                             question={editingSubQuestion}
-                            questions={/*Object.keys(editingSubQuestion.showCondition.if).map(id => {
-                                return formFetchData.groups.flatMap(group => group.questions).find(question => question.id === id);
-                            })*/
-                                formFetchData.groups.flatMap(group => group.questions)}
+                            questions={formFetchData.groups.find(group => group.questions.includes(editingSubQuestion))?.questions.filter(q => q.id !== editingSubQuestion?.id)}
+                            //formFetchData.groups.flatMap(group => group.questions)}
                             onDeleteSubQuestion={handleDeleteQuestion}
                             onRemoveCondition={(questionId, conditionId) => handleRemoveCondition(questionId, conditionId)}
                             onAnswer={handleUpdateQuestion}
@@ -139,7 +137,14 @@ export function EditFormPage() {
                             questionText={deletingQuestion?.question?.text}
                             onAnswer={del => {
                                 if (!del) return;
-
+                                const subQuestions = Array.from(new Set(formFetchData.groups
+                                    .find(group => group.questions.includes(deletingQuestion.question))?.questions.filter(q => q.showCondition?.if?.[deletingQuestion?.question?.id])))
+                                console.log(subQuestions)
+                                if (subQuestions.length > 0) {
+                                    subQuestions.forEach(subQuestion => {
+                                        handleRemoveCondition(deletingQuestion.question.id, subQuestion.id)
+                                    })
+                                }
                                 handleDeleteQuestion(deletingQuestion.question, deletingQuestion.isSubQuestion, deletingQuestion.parentQuestionId);
                             }}
                             onClose={() => setDeletingQuestion(null)}

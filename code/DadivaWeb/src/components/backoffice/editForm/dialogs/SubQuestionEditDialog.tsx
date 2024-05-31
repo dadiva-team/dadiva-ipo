@@ -18,6 +18,9 @@ import {
     ListItemText,
 } from '@mui/material';
 import {Close, Delete, Edit} from '@mui/icons-material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import PushPinIcon from '@mui/icons-material/PushPin';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import {Question, ShowCondition} from '../../../../domain/Form/Form';
 import {ErrorAlert} from '../../../shared/ErrorAlert';
 import {useDialog} from './useDialog';
@@ -73,6 +76,10 @@ export function SubQuestionEditDialog(
     const [showCondition, setShowCondition] = useState<ShowCondition>(question?.showCondition ?? {if: {}});
     const [questionCondition, setQuestionCondition] = useState<string | null>(null);
     const [conditionAnswer, setConditionAnswer] = useState<string | null>(null);
+
+    const [newConditionQuestion, setNewConditionQuestion] = useState<string | null>(null);
+    const [isAddingCondition, setIsAddingCondition] = useState<boolean>(false);
+
     const [editingConditionKey, setEditingConditionKey] = useState<string | null>(null);
     const [intendedAction, setIntendedAction] = useState<'remove' | 'return' | 'condition'>(null);
     const [conditionToDelete, setConditionToDelete] = useState<string>(null);
@@ -103,10 +110,6 @@ export function SubQuestionEditDialog(
             setError('Uma pergunta de escolha múltipla deve ter pelo menos duas opções');
             return;
         }
-        if (questionCondition && !conditionAnswer) {
-            setError('A condição de ativação da pergunta não pode estar vazia');
-            return;
-        }
         if (questionCondition && !questions.find(q => q.id === questionCondition)) {
             setError('A pergunta de ativação não existe');
             return;
@@ -119,29 +122,26 @@ export function SubQuestionEditDialog(
         if (intendedAction === 'remove') {
             onDeleteSubQuestion(question, false, null);
             setIntendedAction(null);
-            setConditionToDelete(null)
+            setConditionToDelete(null);
             setAlert(null);
             onClose();
         } else if (intendedAction === 'return') {
             onDeleteSubQuestion(question, true, questions?.find(q => q.id === questionCondition)?.id);
             setIntendedAction(null);
-            setConditionToDelete(null)
+            setConditionToDelete(null);
             setAlert(null);
             onClose();
-        } else if( intendedAction === 'condition') {
+        } else if (intendedAction === 'condition') {
             onRemoveCondition(conditionToDelete, question.id);
             setIntendedAction(null);
-            setConditionToDelete(null)
+            setConditionToDelete(null);
             setAlert(null);
             onClose();
-        }
-
-        else {
+        } else {
             onAnswer(questionId, questionText, questionType, questionOptions, showCondition, questionCondition);
             onClose();
         }
-
-    }, [questionText, questionType, questionOptions, questionCondition, conditionAnswer, questions, editingConditionKey, intendedAction, setError, onDeleteSubQuestion, question, onClose, onRemoveCondition, conditionToDelete, onAnswer, questionId, showCondition]);
+    }, [questionText, questionType, questionOptions, questionCondition, questions, editingConditionKey, intendedAction, setError, onDeleteSubQuestion, question, onClose, onRemoveCondition, conditionToDelete, onAnswer, questionId, showCondition]);
 
     function handleChangeCondition() {
         setShowCondition(oldShowCondition => {
@@ -229,6 +229,25 @@ export function SubQuestionEditDialog(
         }
     }
 
+    function handleAddNewCondition() {
+        console.log('handleAddNewCondition');
+        console.log(newConditionQuestion, conditionAnswer);
+        console.log(showCondition);
+        if (newConditionQuestion && conditionAnswer) {
+            setShowCondition((oldShowCondition) => {
+                const newShowCondition = {...oldShowCondition};
+                newShowCondition.if[newConditionQuestion] = conditionAnswer;
+                return newShowCondition;
+            });
+            setNewConditionQuestion(null);
+            setConditionAnswer(null);
+            setIsAddingCondition(false);
+        } else {
+            setError('Por favor, selecione uma pergunta e uma resposta para a nova condição.');
+        }
+    }
+
+
     return (
         <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
             <DialogTitle id="edit-dialog-title">Editar a Questão Subordinada</DialogTitle>
@@ -313,14 +332,84 @@ export function SubQuestionEditDialog(
                         (intendedAction === null || intendedAction === 'condition') && (
 
                             <FormControl fullWidth>
-                                <Typography variant="h6" sx={{mt: 1}}>
-                                    Condições que ativam a pergunta
-                                </Typography>
+                                <>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            width: '100%',
+                                        }}
+                                    >
+                                        <Typography variant="h6" sx={{mt: 1}}>
+                                            Condições que ativam a pergunta
+                                        </Typography>
+                                        <IconButton
+                                            aria-label="add-condition"
+                                            color="primary"
+                                            onClick={() => setIsAddingCondition(() => !isAddingCondition)}
+                                        >
+                                            {isAddingCondition ? <CancelPresentationIcon/> :
+                                                <AddCircleOutlineIcon/>}
+                                        </IconButton>
+                                    </Box>
+                                    {isAddingCondition &&
+                                        questions?.filter(q => q.id !== questionId && !q.showCondition && !Object.keys(showCondition.if).includes(q.id)).length > 0 && (
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                    width: '100%',
+                                                }}
+                                            >
+                                                <FormControl fullWidth margin="normal">
+                                                    <InputLabel id="new-condition-question-label">Questão</InputLabel>
+                                                    <Select
+                                                        labelId="new-condition-question-label"
+                                                        id="new-condition-question"
+                                                        value={newConditionQuestion ?? ''}
+                                                        label="Questão"
+                                                        onChange={(event) => {
+                                                            const newValue = event.target.value;
+                                                            setNewConditionQuestion(newValue);
+                                                            setConditionAnswer('');
+                                                        }}
+                                                        fullWidth
+                                                    >
+                                                        {questions?.filter(q => q.id !== questionId && !q.showCondition && !Object.keys(showCondition.if).includes(q.id)).map(q => (
+                                                            <MenuItem key={q.id} value={q.id}>
+                                                                {q.text}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                                <FormControl fullWidth margin="normal">
+                                                    {createQuestionAnswersInput(questions?.find(q => q.id === newConditionQuestion))}
+                                                </FormControl>
+                                                <IconButton
+                                                    aria-label="add"
+                                                    color="primary"
+                                                    onClick={handleAddNewCondition}
+                                                    disabled={!newConditionQuestion || !conditionAnswer}
+                                                >
+                                                    <PushPinIcon/>
+                                                </IconButton>
+                                            </Box>
+                                        )}
+                                </>
+
+
                                 <List>
                                     {Object.keys(showCondition?.if).map((fact, index) => (
                                         <ListItem key={index}>
                                             <ListItemText
-                                                sx={{ width: '70%', textDecoration: conditionToDelete === fact ? 'line-through' : 'none' }}
+                                                sx={{
+                                                    width: '70%',
+                                                    textDecoration: conditionToDelete === fact ? 'line-through' : 'none'
+                                                }}
                                                 primary={`${questions?.find((q) => q.id === fact)?.text} = ${translateResponse(showCondition.if[fact])}`}
                                             />
 
@@ -346,11 +435,12 @@ export function SubQuestionEditDialog(
                                                     flexDirection: "row",
                                                     justifyContent: "flex-end"
                                                 }}>
-                                                    <IconButton aria-label="edit" disabled={conditionToDelete !== null} onClick={() => {
-                                                        setEditingConditionKey(fact);
-                                                        setQuestionCondition(fact);
-                                                        setConditionAnswer(showCondition.if[fact]);
-                                                    }}>
+                                                    <IconButton aria-label="edit" disabled={conditionToDelete !== null}
+                                                                onClick={() => {
+                                                                    setEditingConditionKey(fact);
+                                                                    setQuestionCondition(fact);
+                                                                    setConditionAnswer(showCondition.if[fact]);
+                                                                }}>
                                                         <Edit/>
                                                     </IconButton>
                                                     <IconButton aria-label="delete" onClick={() => {
@@ -358,7 +448,7 @@ export function SubQuestionEditDialog(
                                                         setConditionToDelete(fact);
                                                         setAlert(`Esta condição será apagada ao guardar: ${questions?.find(q => q.id === fact)?.text}`);
                                                     }}>
-                                                        <Delete />
+                                                        <Delete/>
                                                     </IconButton>
                                                 </Box>
                                             )}
