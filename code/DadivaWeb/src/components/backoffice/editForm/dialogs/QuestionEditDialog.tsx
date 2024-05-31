@@ -16,13 +16,15 @@ import {
     List,
     ListItem,
     ListItemSecondaryAction,
-    ListItemText,
+    ListItemText, FormHelperText,
 } from '@mui/material';
 import {Close, Delete} from '@mui/icons-material';
 import {Question, ShowCondition} from '../../../../domain/Form/Form';
 import {ErrorAlert} from '../../../shared/ErrorAlert';
 import {useDialog} from './useDialog';
 import {DropdownOptionsForm} from './DropdownOptionsForm';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import {PendingActionAlert} from "../../../shared/PendingActionAlert";
 
 export interface QuestionEditDialogProps {
     open: boolean;
@@ -37,19 +39,24 @@ export interface QuestionEditDialogProps {
         showCondition?: ShowCondition,
         parentQuestionId?: string | null
     ) => void;
+    onRemoveCondition: (parentQuestionId: string, subQuestionId: string) => void;
+    onOpenSubQuestionDialog: (question: Question) => void;
     onClose: () => void;
     isFirst: boolean;
 }
 
-export function QuestionEditDialog({
-                                       open,
-                                       question,
-                                       subQuestions,
-                                       questions,
-                                       onAnswer,
-                                       onClose,
-                                       isFirst
-                                   }: QuestionEditDialogProps) {
+export function QuestionEditDialog(
+    {
+        open,
+        question,
+        subQuestions,
+        questions,
+        onAnswer,
+        onRemoveCondition,
+        onOpenSubQuestionDialog,
+        onClose,
+        isFirst
+    }: QuestionEditDialogProps) {
     const {
         questionId,
         setQuestionId,
@@ -75,6 +82,9 @@ export function QuestionEditDialog({
     const [showCondition, setShowCondition] = useState<ShowCondition>(question?.showCondition ?? {if: {}});
     const [questionCondition, setQuestionCondition] = useState<string | null>(null);
     const [conditionAnswer, setConditionAnswer] = useState<string | null>(null);
+    const [intendedAction, setIntendedAction] = useState<'remove' | 'return'>(null);
+    const [conditionToDelete, setConditionToDelete] = useState<string>(null);
+    const [alert, setAlert] = useState<string | null>(null);
 
     useEffect(() => {
         if (question) {
@@ -110,30 +120,26 @@ export function QuestionEditDialog({
             return;
         }
 
+        if (intendedAction === 'remove') {
+            onRemoveCondition(question.id, conditionToDelete);
+            setIntendedAction(null);
+            setConditionToDelete(null)
+            setAlert(null);
+            onClose();
+        } else {
+            onAnswer(
+                questionId,
+                questionText,
+                questionType,
+                questionOptions.length == 0 ? null : questionOptions,
+                questionShowConditionType === 'subordinate' ? showCondition : undefined,
+                questionCondition
+            );
+            setQuestionCondition(null);
+            onClose();
+        }
 
-        onAnswer(
-            questionId,
-            questionText,
-            questionType,
-            questionOptions,
-            questionShowConditionType === 'subordinate' ? showCondition : undefined,
-            questionCondition
-        );
-        setQuestionCondition(null)
-        onClose();
-    }, [
-        questionText,
-        questionType,
-        questionOptions,
-        questionShowConditionType,
-        questionCondition,
-        conditionAnswer,
-        onAnswer,
-        questionId,
-        showCondition,
-        onClose,
-        setError,
-    ]);
+    }, [questionText, questionType, questionOptions, questionShowConditionType, questionCondition, conditionAnswer, showCondition, intendedAction, setError, onRemoveCondition, question?.id, conditionToDelete, onClose, onAnswer, questionId]);
 
     function handleRemoveCondition(fact: string) {
         setShowCondition(oldShowCondition => {
@@ -271,6 +277,7 @@ export function QuestionEditDialog({
                             id="demo-simple-select"
                             value={questionType ?? ''}
                             label="Tipo de Resposta"
+                            disabled={subQuestions.length > 0}
                             onChange={event => {
                                 setQuestionType(event.target.value);
                             }}
@@ -279,6 +286,9 @@ export function QuestionEditDialog({
                             <MenuItem value={'text'}>Texto</MenuItem>
                             <MenuItem value={'dropdown'}>Escolha Múltipla</MenuItem>
                         </Select>
+                        {subQuestions.length > 0 && (
+                            <FormHelperText>Não pode alterar o tipo de resposta enquanto existirem subquestões que
+                                dependem desta</FormHelperText>)}
                     </FormControl>
                     {questionType === 'dropdown' && (
                         <DropdownOptionsForm
@@ -312,17 +322,35 @@ export function QuestionEditDialog({
                     {subQuestions.length > 0 && (
                         <FormControl fullWidth>
                             <Typography variant="h6" sx={{mt: 2}}>
-                                SubQuestões
+                                SubQuestões que dependem desta questão:
                             </Typography>
 
                             <List>
                                 {subQuestions.map(subQuestion => (
                                     <ListItem key={subQuestion.id}>
-                                        <ListItemText sx={{width: "70%"}} primary={subQuestion.text}/>
-                                        <IconButton aria-label="delete" disabled={true}
-                                                    onClick={() => handleRemoveCondition(subQuestion.id)}>
-                                            <Delete/>
-                                        </IconButton>
+                                        <ListItemText sx={{
+                                            width: '70%',
+                                            textDecoration: conditionToDelete === subQuestion.id ? 'line-through' : 'none'
+                                        }} primary={subQuestion.text}/>
+                                        <Box sx={{
+                                            width: "25%",
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            justifyContent: "flex-end"
+                                        }}>
+                                            <IconButton aria-label="delete"
+                                                        onClick={() => onOpenSubQuestionDialog(subQuestion)}>
+                                                <OpenInNewIcon/>
+                                            </IconButton>
+                                            <IconButton aria-label="delete"
+                                                        onClick={() => {
+                                                            setConditionToDelete(subQuestion.id);
+                                                            setIntendedAction('remove');
+                                                            setAlert(`Esta questão será removida das condições que ativam essa subquestão. Guardar para confirmar.`);
+                                                        }}>
+                                                <Delete/>
+                                            </IconButton>
+                                        </Box>
 
                                     </ListItem>
                                 ))}
@@ -402,6 +430,11 @@ export function QuestionEditDialog({
                         </>
                     )}
                     {error && <ErrorAlert error={error} clearError={() => setError(null)}/>}
+                    {alert && <PendingActionAlert actionMessage={alert} clearActionMessage={() => {
+                        setAlert(null);
+                        setIntendedAction(null);
+                        setConditionToDelete(null);
+                    }}/>}
                     <Button
                         onClick={() => {
                             handleCloseAndAnswer();

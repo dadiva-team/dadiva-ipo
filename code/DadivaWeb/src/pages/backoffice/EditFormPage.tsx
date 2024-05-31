@@ -25,6 +25,7 @@ export function EditFormPage() {
         creatingGroup,
         creatingQuestionInGroup,
         error,
+        dropError,
         formFetchData,
         calculateRules,
         setFormFetchData,
@@ -37,9 +38,12 @@ export function EditFormPage() {
         setCreatingGroup,
         setCreatingQuestionInGroup,
         setError,
+        setDropError,
         handleDrop,
         handleDeleteQuestion,
+        handleRemoveCondition,
         handleUpdateQuestion,
+        handleAddQuestion,
         moveGroup,
         deleteGroup,
         saveForm,
@@ -76,6 +80,8 @@ export function EditFormPage() {
                                 })}
                                 onMoveUp={index === 0 ? null : () => moveGroup(index, index - 1)}
                                 onMoveDown={index === formFetchData.groups.length - 1 ? null : () => moveGroup(index, index + 1)}
+                                onDropError={dropError}
+                                onDropErrorClear={() => setDropError(null)}
                                 onRename={() => setEditingGroup(group)}
                                 onDelete={formFetchData.groups.length === 1 ? null : () => setDeletingGroup(group)}
                                 key={group.name}
@@ -90,15 +96,25 @@ export function EditFormPage() {
                             onAnswer={(id, text, type, options, showCondition, parentQuestionId) =>
                                 handleUpdateQuestion(id, text, type, options, showCondition, parentQuestionId)
                             }
-                            subQuestions={formFetchData.groups.flatMap(group => group.questions).filter(q => q.showCondition?.if?.[editingQuestion?.id])}
+                            subQuestions={Array.from(new Set(formFetchData.groups
+                                .find(group => group.questions.includes(editingQuestion))?.questions.filter(q => q.showCondition?.if?.[editingQuestion?.id])))}
+                            onRemoveCondition={(questionId, conditionId) => handleRemoveCondition(questionId, conditionId)}
+                            onOpenSubQuestionDialog={(question) => {
+                                setEditingQuestion(null)
+                                setEditingSubQuestion(question)
+                            }}
                             onClose={() => setEditingQuestion(null)}
                             isFirst={formFetchData.groups.some(group => group.questions.indexOf(editingQuestion) > 0)}
                         />
                         <SubQuestionEditDialog
                             open={editingSubQuestion !== null}
                             question={editingSubQuestion}
-                            questions={formFetchData.groups.flatMap(group => group.questions)}
+                            questions={/*Object.keys(editingSubQuestion.showCondition.if).map(id => {
+                                return formFetchData.groups.flatMap(group => group.questions).find(question => question.id === id);
+                            })*/
+                                formFetchData.groups.flatMap(group => group.questions)}
                             onDeleteSubQuestion={handleDeleteQuestion}
+                            onRemoveCondition={(questionId, conditionId) => handleRemoveCondition(questionId, conditionId)}
                             onAnswer={handleUpdateQuestion}
                             onClose={() => setEditingSubQuestion(null)}
                         />
@@ -111,21 +127,7 @@ export function EditFormPage() {
                                     : [creatingQuestionInGroup.name]
                             }
                             onAnswer={(question, groupName) => {
-                                setFormFetchData((oldForm: Form) => {
-                                    const newGroups = oldForm.groups.map(group => {
-                                        if (group.name === groupName) {
-                                            return {
-                                                name: group.name,
-                                                questions: [...(group.questions ?? []), question]
-                                            };
-                                        }
-                                        return group;
-                                    });
-                                    return {
-                                        groups: newGroups,
-                                        rules: calculateRules(newGroups),
-                                    };
-                                });
+                                handleAddQuestion(question, groupName);
                             }}
                             onClose={() => {
                                 setCreatingQuestion(false);

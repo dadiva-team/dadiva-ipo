@@ -17,7 +17,7 @@ import {
     ListItem,
     ListItemText,
 } from '@mui/material';
-import {Close, Edit} from '@mui/icons-material';
+import {Close, Delete, Edit} from '@mui/icons-material';
 import {Question, ShowCondition} from '../../../../domain/Form/Form';
 import {ErrorAlert} from '../../../shared/ErrorAlert';
 import {useDialog} from './useDialog';
@@ -37,6 +37,7 @@ export interface SubQuestionEditDialogProps {
         parentQuestionId?: string | null
     ) => void;
     onDeleteSubQuestion: (question: Question, isSubQuestion: boolean, parentQuestionId: string | null) => void;
+    onRemoveCondition: (parentQuestionId: string, subQuestionId: string) => void;
     onClose: () => void;
 }
 
@@ -47,6 +48,7 @@ export function SubQuestionEditDialog(
         questions,
         onAnswer,
         onDeleteSubQuestion,
+        onRemoveCondition,
         onClose
     }: SubQuestionEditDialogProps) {
     const {
@@ -71,8 +73,9 @@ export function SubQuestionEditDialog(
     const [showCondition, setShowCondition] = useState<ShowCondition>(question?.showCondition ?? {if: {}});
     const [questionCondition, setQuestionCondition] = useState<string | null>(null);
     const [conditionAnswer, setConditionAnswer] = useState<string | null>(null);
-    const [editingCondition, setEditingCondition] = useState<boolean>(false);
-    const [intendedAction, setIntendedAction] = useState<'remove' | 'return'>(null);
+    const [editingConditionKey, setEditingConditionKey] = useState<string | null>(null);
+    const [intendedAction, setIntendedAction] = useState<'remove' | 'return' | 'condition'>(null);
+    const [conditionToDelete, setConditionToDelete] = useState<string>(null);
     const [alert, setAlert] = useState<string | null>(null);
 
     useEffect(() => {
@@ -108,23 +111,37 @@ export function SubQuestionEditDialog(
             setError('A pergunta de ativação não existe');
             return;
         }
-        if (editingCondition) {
+        if (editingConditionKey) {
             setError('Termine de editar a condição de ativação');
             return;
         }
 
         if (intendedAction === 'remove') {
             onDeleteSubQuestion(question, false, null);
+            setIntendedAction(null);
+            setConditionToDelete(null)
+            setAlert(null);
             onClose();
         } else if (intendedAction === 'return') {
             onDeleteSubQuestion(question, true, questions?.find(q => q.id === questionCondition)?.id);
+            setIntendedAction(null);
+            setConditionToDelete(null)
+            setAlert(null);
             onClose();
-        } else {
+        } else if( intendedAction === 'condition') {
+            onRemoveCondition(conditionToDelete, question.id);
+            setIntendedAction(null);
+            setConditionToDelete(null)
+            setAlert(null);
+            onClose();
+        }
+
+        else {
             onAnswer(questionId, questionText, questionType, questionOptions, showCondition, questionCondition);
             onClose();
         }
 
-    }, [questionText, questionType, questionOptions, questionCondition, conditionAnswer, questions, editingCondition, onAnswer, questionId, showCondition, onClose, setError, intendedAction, onDeleteSubQuestion, question]);
+    }, [questionText, questionType, questionOptions, questionCondition, conditionAnswer, questions, editingConditionKey, intendedAction, setError, onDeleteSubQuestion, question, onClose, onRemoveCondition, conditionToDelete, onAnswer, questionId, showCondition]);
 
     function handleChangeCondition() {
         setShowCondition(oldShowCondition => {
@@ -293,7 +310,7 @@ export function SubQuestionEditDialog(
 
                     <Divider/>
                     {
-                        intendedAction === null && (
+                        (intendedAction === null || intendedAction === 'condition') && (
 
                             <FormControl fullWidth>
                                 <Typography variant="h6" sx={{mt: 1}}>
@@ -303,10 +320,11 @@ export function SubQuestionEditDialog(
                                     {Object.keys(showCondition?.if).map((fact, index) => (
                                         <ListItem key={index}>
                                             <ListItemText
-                                                sx={{width: "70%"}}
-                                                primary={`${questions?.find(q => q.id === fact)?.text} = ${translateResponse(showCondition.if[fact])}`}
+                                                sx={{ width: '70%', textDecoration: conditionToDelete === fact ? 'line-through' : 'none' }}
+                                                primary={`${questions?.find((q) => q.id === fact)?.text} = ${translateResponse(showCondition.if[fact])}`}
                                             />
-                                            {editingCondition && (
+
+                                            {editingConditionKey === fact ? (
                                                 <Box flexDirection="column" sx={{width: "25%"}}>
                                                     <FormControl fullWidth margin="normal" sx={{width: "100%"}}>
                                                         {createQuestionAnswersInput(questions?.find(q => q.id === questionCondition))}
@@ -315,34 +333,46 @@ export function SubQuestionEditDialog(
                                                         disabled={!questionCondition || !conditionAnswer}
                                                         onClick={() => {
                                                             handleChangeCondition();
-                                                            setEditingCondition(false);
+                                                            setEditingConditionKey(null);
                                                         }}
                                                     >
                                                         Guardar
                                                     </Button>
                                                 </Box>
-                                            )}
-                                            {!editingCondition && (
+                                            ) : (
                                                 <Box sx={{
                                                     width: "25%",
                                                     display: "flex",
                                                     flexDirection: "row",
                                                     justifyContent: "flex-end"
                                                 }}>
-                                                    <IconButton aria-label="edit" onClick={() => setEditingCondition(true)}>
+                                                    <IconButton aria-label="edit" disabled={conditionToDelete !== null} onClick={() => {
+                                                        setEditingConditionKey(fact);
+                                                        setQuestionCondition(fact);
+                                                        setConditionAnswer(showCondition.if[fact]);
+                                                    }}>
                                                         <Edit/>
+                                                    </IconButton>
+                                                    <IconButton aria-label="delete" onClick={() => {
+                                                        setIntendedAction('condition');
+                                                        setConditionToDelete(fact);
+                                                        setAlert(`Esta condição será apagada ao guardar: ${questions?.find(q => q.id === fact)?.text}`);
+                                                    }}>
+                                                        <Delete />
                                                     </IconButton>
                                                 </Box>
                                             )}
                                         </ListItem>
                                     ))}
                                 </List>
+
                             </FormControl>
                         )}
                     {error && <ErrorAlert error={error} clearError={() => setError(null)}/>}
                     {alert && <PendingActionAlert actionMessage={alert} clearActionMessage={() => {
                         setAlert(null);
-                        setIntendedAction(null)
+                        setIntendedAction(null);
+                        setConditionToDelete(null);
                     }}/>}
 
                     <Button

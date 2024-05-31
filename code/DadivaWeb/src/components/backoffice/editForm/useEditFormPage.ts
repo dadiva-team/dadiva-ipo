@@ -26,6 +26,7 @@ export function useEditFormPage() {
     const [creatingQuestionInGroup, setCreatingQuestionInGroup] = useState<GroupDomain>(null);
 
     const nav = useNavigate();
+    const [dropError, setDropError] = useState<{ id: string, msg: string }>(null);
     const [error, setError] = useState<string | null>(null);
     const [formFetchData, setFormFetchData] = useState<Form>();
 
@@ -189,20 +190,41 @@ export function useEditFormPage() {
 
     function updateQuestionOrder(groups: GroupDomain[]) {
         return groups.map(group => {
-            const newQuestions = [...group.questions];
-            const reorderedQuestions: Question[] = [];
+            const sequentialQuestions: Question[] = [];
+            const subordinateQuestions: Question[] = [];
 
-            newQuestions.forEach(question => {
-                if (!reorderedQuestions.some(q => q.id === question.id)) {
-                    reorderedQuestions.push(question);
-                    const subQuestions = newQuestions.filter(subQ => subQ.showCondition?.if?.[question.id]);
-                    reorderedQuestions.push(...subQuestions);
+            group.questions.forEach(question => {
+                if (question.showCondition) {
+                    subordinateQuestions.push(question);
+                } else {
+                    sequentialQuestions.push(question);
                 }
             });
 
             return {
                 ...group,
-                questions: reorderedQuestions,
+                questions: [...sequentialQuestions, ...subordinateQuestions],
+            };
+        });
+    }
+
+
+    function handleAddQuestion(question: Question, groupName: string) {
+        setFormFetchData(oldForm => {
+            const updatedGroups = oldForm.groups.map(group => {
+                if (group.name === groupName) {
+                    group.questions.push(question);
+                }
+                return group;
+            })
+
+            const reorderedGroups = updateQuestionOrder(updatedGroups);
+            const newRules = calculateRules(reorderedGroups);
+
+            return {
+                ...oldForm,
+                groups: reorderedGroups,
+                rules: newRules,
             };
         });
     }
@@ -215,31 +237,37 @@ export function useEditFormPage() {
         showCondition?: ShowCondition,
         parentQuestionId?: string | null
     ) {
-        console.log('handleUpdateQuestion:');
-
         setFormFetchData(oldForm => {
-            const newQuestion: Question = {id, text, type, options, showCondition};
-            console.log(newQuestion);
-            console.log(parentQuestionId);
+            const newQuestion: Question = { id, text, type, options, showCondition };
+            console.log('handleUpdateQuestion:', newQuestion);
 
             const updatedGroups = oldForm.groups.map(group => {
-                let newQuestions = [...group.questions];
+                const newQuestions = [...group.questions];
                 const questionIndex = newQuestions.findIndex(q => q.id === id);
 
                 if (questionIndex !== -1) {
-                    newQuestions[questionIndex] = newQuestion;
+                    const existingQuestion = newQuestions[questionIndex];
+                    const wasSubordinate = !!existingQuestion.showCondition;
+                    const isSubordinate = !!showCondition;
 
-                    if (parentQuestionId) {
-                        const parentIndex = newQuestions.findIndex(q => q.id === parentQuestionId);
-
-                        if (parentIndex !== -1) {
-                            newQuestions = newQuestions.filter(q => q.id !== id);
-                            newQuestions.splice(parentIndex + 1, 0, newQuestion);
-                        }
+                    if (wasSubordinate && isSubordinate) {
+                        newQuestions[questionIndex] = newQuestion;
+                    } else if (!wasSubordinate && !isSubordinate) {
+                        newQuestions[questionIndex] = newQuestion;
+                    } else if (!wasSubordinate && isSubordinate) {
+                        newQuestions.splice(questionIndex, 1);
+                        newQuestions.push(newQuestion);
+                    } else if (wasSubordinate && !isSubordinate) {
+                        newQuestions.splice(questionIndex, 1);
+                        newQuestions.unshift(newQuestion);
                     }
+                } else if (showCondition && parentQuestionId) {
+                    newQuestions.push(newQuestion);
+                } else {
+                    newQuestions.unshift(newQuestion);
                 }
 
-                return {...group, questions: newQuestions};
+                return { ...group, questions: newQuestions };
             });
 
             const reorderedGroups = updateQuestionOrder(updatedGroups);
@@ -254,9 +282,16 @@ export function useEditFormPage() {
     }
 
 
-
-
     function handleDrop(questionID: string, groupName: string, index: number) {
+        const subQuestions = formFetchData.groups.flatMap(group => group.questions).filter(q => q?.showCondition?.if?.[questionID]);
+        const currentGroup = formFetchData.groups.find(group => group.questions.some(q => q.id === questionID));
+        const targetGroup = formFetchData.groups.find(group => group.name === groupName);
+
+        if (subQuestions.length > 0  && currentGroup !== targetGroup) {
+            setDropError({id: questionID, msg: 'Não pode mover entre grupos uma questão que tem subquestões.' })
+            return
+        }
+
         setFormFetchData(oldForm => {
             console.log(questionID, groupName, index);
             let draggedQuestion: Question = null;
@@ -290,6 +325,34 @@ export function useEditFormPage() {
                 groups: reorderedGroups,
                 rules: newRules,
             };
+        });
+    }
+
+
+    function handleRemoveCondition(parentQuestionId: string, subQuestionId: string) {
+        setFormFetchData(oldForm => {
+            const updatedGroups = oldForm.groups.map(group => {
+                const newQuestions = [...group.questions];
+                const questionIndex = newQuestions.findIndex(q => q.id === subQuestionId);
+                if (questionIndex !== -1) {
+                    const updatedQuestion = {...newQuestions[questionIndex]};
+                    if (updatedQuestion.showCondition && updatedQuestion.showCondition.if) {
+                        const updatedShowCondition = {...updatedQuestion.showCondition};
+                        delete updatedShowCondition.if[parentQuestionId];
+                        if (Object.keys(updatedShowCondition.if).length === 0) {
+                            updatedQuestion.showCondition = undefined;
+                        } else {
+                            updatedQuestion.showCondition = updatedShowCondition;
+                        }
+                    }
+                    newQuestions[questionIndex] = updatedQuestion;
+                }
+                return {...group, questions: newQuestions};
+            });
+
+            const reorderedGroups = updateQuestionOrder(updatedGroups);
+            const newRules = calculateRules(reorderedGroups);
+            return {...oldForm, groups: reorderedGroups, rules: newRules};
         });
     }
 
@@ -379,6 +442,7 @@ export function useEditFormPage() {
         creatingGroup,
         creatingQuestionInGroup,
         error,
+        dropError,
         formFetchData,
         calculateRules,
         setFormFetchData,
@@ -391,9 +455,12 @@ export function useEditFormPage() {
         setCreatingGroup,
         setCreatingQuestionInGroup,
         setError,
+        setDropError,
         handleDrop,
+        handleRemoveCondition,
         handleDeleteQuestion,
         handleUpdateQuestion,
+        handleAddQuestion,
         moveGroup,
         deleteGroup,
         saveForm,

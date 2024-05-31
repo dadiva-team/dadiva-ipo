@@ -14,6 +14,8 @@ interface GroupProps {
     onDeleteRequest: (question: Question, isSubQuestion: boolean, parentQuestionId: string | null) => void;
     onMoveUp: () => void | null;
     onMoveDown: () => void;
+    onDropError: { id: string; msg: string } | null;
+    onDropErrorClear: () => void;
     onRename: () => void;
     onDelete: () => void;
 }
@@ -34,28 +36,39 @@ export function Group(props: GroupProps) {
         props.onDrop(questionID, props.group.name, questionIndex === -1 ? props.group.questions.length : questionIndex / 2);
     };
 
-    const renderQuestions = (questions: Question[], parentQuestionId: string | null = null) => {
+    const renderQuestions = (questions: Question[]) => {
         return questions
-            .filter(q => (parentQuestionId ? q.showCondition?.if?.[parentQuestionId] : !q.showCondition))
-            .map((question, index) => (
-                <React.Fragment key={question.id}>
-                    <DraggableQuestion
-                        question={question}
-                        subordinateQuestions={questions.filter(q => q.showCondition?.if?.[question.id])}
-                        groupName={props.group.name}
-                        index={index}
-                        onDragStart={event => {
-                            event.dataTransfer.setData('questionID', question.id);
-                            event.dataTransfer.setData('questionIndex', index.toString());
-                        }}
-                        onEditRequest={() => props.onEditRequest(question)}
-                        onDeleteRequest={props.onDeleteRequest}
-                        onSubEditRequest={props.onSubEditRequest}
-                    />
-                    <Divider/>
-                </React.Fragment>
-            ));
+            .map((question, index) => {
+                const parentQuestions = question.showCondition?.if ? Object.keys(question.showCondition.if) : [];
+                const parentQuestionObjects = parentQuestions.map(id => {
+                    return props.group.questions.find(question => question.id === id);
+                }).filter(Boolean);
+
+                return (
+                    <React.Fragment key={question.id}>
+                        <DraggableQuestion
+                            question={question}
+                            parentQuestions={parentQuestionObjects}
+                            groupName={props.group.name}
+                            index={index}
+                            onDragStart={event => {
+                                event.dataTransfer.setData('questionID', question.id);
+                                event.dataTransfer.setData('questionIndex', index.toString());
+                            }}
+                            onEditRequest={() => props.onEditRequest(question)}
+                            onDeleteRequest={props.onDeleteRequest}
+                            onSubEditRequest={props.onSubEditRequest}
+                            onDragError={props?.onDropError?.id === question.id ? props?.onDropError?.msg : null}
+                            onDragErrorClear={() => {
+                                props.onDropErrorClear();
+                            }}
+                        />
+                        <Divider/>
+                    </React.Fragment>
+                );
+            });
     };
+
 
     return (
         <Card
