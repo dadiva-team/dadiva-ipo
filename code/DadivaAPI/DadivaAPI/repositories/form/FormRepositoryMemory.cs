@@ -31,6 +31,11 @@ public class FormRepositoryMemory : IFormRepository
     {
         return _submissions;
     }
+    
+    public async Task<Submission> GetSubmission(int nic)
+    {
+        return _submissions[nic];
+    }
 
     public async Task<Inconsistencies> GetInconsistencies()
     {

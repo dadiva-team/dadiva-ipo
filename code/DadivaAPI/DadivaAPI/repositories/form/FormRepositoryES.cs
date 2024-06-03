@@ -46,8 +46,17 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
 
     public async Task<bool> SubmitForm(Submission submission, int nic)
     {
-        var response = await client.IndexAsync(submission, idx => idx.Index("submissions").Id(nic));
-        return response.IsValidResponse;
+        try
+        {
+            var response = await client.IndexAsync(submission, idx => idx.Index("submissions").Id(nic));
+            System.Console.WriteLine(response);
+            return response.IsValidResponse;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error submitting form: '{e}'");
+            return false; //TODO: better error handling
+        }
     }
 
     public async Task<Dictionary<int, Submission>> GetSubmissions()
@@ -60,6 +69,26 @@ public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
         }
         return response.Result.Hits.ToDictionary(h => int.Parse(h.Id), h => h.Source)!;
     }
+    
+    public async Task<Submission> GetSubmission(int nic)
+    {
+        try
+        {
+            var response = await client.GetAsync<Submission>(nic, idx => idx.Index("submissions"));
+            if (response.IsValidResponse)
+            {
+                return response.Source;
+            }
+
+            return null;
+        } catch (Exception e)
+        {
+            Console.WriteLine($"Error getting submission: '{e}'");
+            return null; //TODO: better error handling
+        }
+    }
+    
+    
     
     public async Task<Inconsistencies> GetInconsistencies()
     {

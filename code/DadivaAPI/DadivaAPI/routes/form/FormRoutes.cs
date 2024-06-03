@@ -15,9 +15,9 @@ public static class FormRoutes
         var group = app.MapGroup("/forms");
         group.MapGet("/structure", GetForm);
         group.MapGet("/submissions", GetSubmissions);
-        //group.MapGet("/submissions/{nic}", GetSubmission);
+        group.MapGet("/submissions/{nic}", GetSubmission);
         //group.MapDelete("/submissions/{nic}", DeleteSubmission);
-        group.MapPost("/submissions", SubmitForm);
+        group.MapPost("/submissions/{nic}", SubmitForm);
         group.MapPut("/structure", EditForm);
         group.MapGet("/inconsistencies", GetInconsistencies);
         group.MapPut("/inconsistencies", EditInconsistencies);
@@ -32,9 +32,26 @@ public static class FormRoutes
                 new GetSubmissionsOutputModel(
                     success.Value.Select(pair => new SubmissionModel(
                         pair.Key,
-                        pair.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList()
+                        pair.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
+                        pair.Value.SubmissionDate
                     )).ToList())),
             Result<Dictionary<int, Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+        };
+    }
+    
+    private static async Task<IResult> GetSubmission([FromRoute] int nic, IFormService service)
+    {
+        Result<Submission, Problem> result = await service.GetSubmission(nic);
+        return result switch
+        {
+            Result<Submission, Problem>.SuccessResult success => Results.Ok(
+                new SubmissionModel(
+                    nic,
+                    success.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
+                    success.Value.SubmissionDate
+                )),
+            Result<Submission, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
@@ -72,14 +89,17 @@ public static class FormRoutes
         };
     }
 
-    private static async Task<IResult> SubmitForm([FromBody] SubmitFormRequest input, IFormService service)
+    private static async Task<IResult> SubmitForm([FromRoute] int nic, [FromBody] SubmitFormRequest input, IFormService service)
     {
+        System.Console.WriteLine(input);
         Dictionary<string, IAnswer> answers = input.AnsweredQuestions.ToDictionary(
             question => question.QuestionId,
             question => question.Answer.ToAnswer()
         );
-        const int hardcodedNic = 123456789;
-        Result<bool, Problem> result = await service.SubmitForm(answers, hardcodedNic);
+        System.Console.WriteLine("input");
+        System.Console.WriteLine(answers);
+        
+        Result<bool, Problem> result = await service.SubmitForm(answers, nic);
         return result switch
         {
             Result<bool, Problem>.SuccessResult => Results.NoContent(),

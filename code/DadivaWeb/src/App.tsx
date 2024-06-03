@@ -21,6 +21,11 @@ import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
 import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
 import { EditFormPage } from './pages/backoffice/EditFormPage';
 import { Role, useCurrentSession } from './session/Session';
+import DOCTOR = Uris.DOCTOR;
+import { Doctor } from './pages/doctor/Doctor';
+import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
+import DOCTOR_SEARCH_NAME = Uris.DOCTOR_SEARCH_NAME;
+import { DoctorSearch } from './pages/doctor/search/DoctorSearch';
 
 export default function App() {
   const user = useCurrentSession();
@@ -50,6 +55,10 @@ export default function App() {
         <Routes>
           <Route path={HOME} element={<Home />} />
           <Route path={REGISTER} element={<Register />} />
+          <Route path={DOCTOR} element={<Doctor />}>
+            <Route path={DOCTOR_SEARCH_NIC} element={<DoctorSearch mode="nic" />} />
+            <Route path={DOCTOR_SEARCH_NAME} element={<DoctorSearch mode="name" />} />
+          </Route>
           <Route
             path={FORM_INFO}
             element={
@@ -69,9 +78,9 @@ export default function App() {
           <Route
             path={BACKOFFICE}
             element={
-              <ProtectedRoute roles={[Role.ADMIN]}>
+              //<ProtectedRoute roles={[Role.ADMIN]}>
                 <Backoffice />
-              </ProtectedRoute>
+              //</ProtectedRoute>
             }
           >
             <Route path="" element={<BackofficeMockChart />} />

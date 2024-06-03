@@ -1,3 +1,3 @@
 namespace DadivaAPI.domain;
 
-public record Submission(List<AnsweredQuestion> AnsweredQuestions);
+public record Submission(List<AnsweredQuestion> AnsweredQuestions, string SubmissionDate);

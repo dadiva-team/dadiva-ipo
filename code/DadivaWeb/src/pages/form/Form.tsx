@@ -22,6 +22,7 @@ export function Form() {
     onEditRequest,
     onNextQuestion,
     onPrevQuestion,
+    submitForm
   } = useNewForm();
 
   const [reviewMode, setReviewMode] = useState(true);
@@ -64,6 +65,7 @@ export function Form() {
         questionColors={questionColors}
         showQuestions={showQuestions}
         onEditRequest={(questionId, type, answer) => onChangeAnswer(questionId, type, answer)}
+        onSubmitRequest={() => submitForm()}
       />
       <Button onClick={() => setReviewMode(!reviewMode)}>Review</Button>
     </Box>

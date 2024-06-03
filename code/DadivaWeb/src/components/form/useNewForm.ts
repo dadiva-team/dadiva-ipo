@@ -7,8 +7,11 @@ import { FormServices } from '../../services/from/FormServices';
 import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { form } from './MockForm';
+import { useCurrentSession } from '../../session/Session';
 
 export function useNewForm() {
+  const session = useCurrentSession(); // Call the hook at the top level
+  const nic = session?.nic;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
@@ -35,6 +38,27 @@ export function useNewForm() {
     console.log('Form answers: ' + JSON.stringify(formAnswers));
     console.log('Current Group: ' + currentGroup);
   }, [formAnswers, showQuestions, currentGroup]);*/
+
+  async function submitForm() {
+    if (!nic) {
+      setError('No NIC found in session');
+      return;
+    }
+
+    const nicNumber = Number(nic);
+    if (isNaN(nicNumber)) {
+      setError('NIC is not a valid number');
+      return;
+    }
+
+    const [error, res] = await handleRequest(FormServices.submitForm(nic, formAnswers));
+    if (error) {
+      handleError(error, setError, nav);
+      return;
+    }
+    console.log('Form saved');
+    if (res) nav('/');
+  }
 
   useEffect(() => {
     const fetch = async () => {
@@ -106,7 +130,7 @@ export function useNewForm() {
         return group;
       })
     );
-    console.log(formAnswers[currentGroup]);
+
     engine.run(formAnswers[currentGroup]).then(result => {
       setCanGoNext(false);
       setCanGoReview(false);
@@ -123,8 +147,6 @@ export function useNewForm() {
         })
       );
 
-      console.log('||||||||||||');
-      console.log(result.results);
       result.results.forEach(result => {
         if (result.event.type === 'showQuestion') {
           setShowQuestions(prevShowQuestions =>
@@ -195,6 +217,7 @@ export function useNewForm() {
     isLoading,
     error,
     cleanError: () => setError(null),
+    submitForm,
     formRawFetchData,
     formAnswers,
     answeredQuestions,

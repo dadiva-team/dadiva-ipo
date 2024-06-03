@@ -1,5 +1,11 @@
-import { get, put } from '../utils/fetch';
-import { editFormUri, editInconsistenciesUri, getFormUri, getInconsistenciesUri } from '../utils/WebApiUris';
+import { get, post, put } from '../utils/fetch';
+import {
+  editFormUri,
+  editInconsistenciesUri,
+  getFormUri,
+  getInconsistenciesUri,
+  submitFormUri,
+} from '../utils/WebApiUris';
 import { DomainToModel, DomainToRules, FormOutputModel, ModelToDomain, RulesToDomain } from './models/FormOutputModel';
 import { Form } from '../../domain/Form/Form';
 import { RuleProperties } from 'json-rules-engine';
@@ -39,6 +45,25 @@ function convertKeysToCamelCase<T>(obj: T): ConvertKeysToCamelCase<T> {
   return newObj as ConvertKeysToCamelCase<T>;
 }
 
+function transformFormAnswers(formAnswers: Record<string, string>[]): {
+  answeredQuestions: Array<{ questionId: string; answer: string }>;
+} {
+  console.log(formAnswers);
+  console.log('TRANSFORM FORM ANSWERS |||||||||||||||');
+  const answeredQuestions: { questionId: string; answer: string }[] = [];
+
+  formAnswers.forEach(answer => {
+    Object.keys(answer).forEach(questionId => {
+      answeredQuestions.push({
+        questionId,
+        answer: answer[questionId],
+      });
+    });
+  });
+
+  return { answeredQuestions };
+}
+
 export namespace FormServices {
   export async function getForm(): Promise<Form> {
     console.log('GET FORM |||||||||||||||');
@@ -71,6 +96,17 @@ export namespace FormServices {
       return false;
     }
   }
-}
 
-//export async function submitForm(): Promise<FormSubmitModel> {}
+  export async function submitForm(nic: number, formAnswers: Record<string, string>[]): Promise<boolean> {
+    try {
+      const answeredQuestions = transformFormAnswers(formAnswers);
+      console.log(JSON.stringify(answeredQuestions));
+      console.log('SUBMIT FORM |||||||||||||||');
+      await post(submitFormUri(nic), JSON.stringify(answeredQuestions));
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
+}

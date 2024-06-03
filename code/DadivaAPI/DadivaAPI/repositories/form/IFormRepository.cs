@@ -12,6 +12,8 @@ public interface IFormRepository
     
     public Task<Dictionary<int, Submission>> GetSubmissions();
     
+    public Task<Submission> GetSubmission(int nic);
+    
     public Task<Inconsistencies> GetInconsistencies();
     public Task<bool> EditInconsistencies(Inconsistencies inconsistencies);
 }

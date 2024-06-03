@@ -13,4 +13,10 @@ export namespace Uris {
   export const MANAGE_USERS = '/backoffice/users';
 
   export const EDIT_INCONSISTENCIES = '/backoffice/inconsistencies';
+
+  export const DOCTOR = '/doctor';
+  export const DOCTOR_SEARCH_NAME = '/doctor/search-name';
+  export const DOCTOR_SEARCH_NIC = '/doctor/search-nic';
+  export const DONOR_HISTORY = (donorNIC: string) => `/donors/${donorNIC}/history`;
+  export const DONOR_FORM = (donorNIC: string, formId: string) => `/donors/${donorNIC}/forms/${formId}`;
 }

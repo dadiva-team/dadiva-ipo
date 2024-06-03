@@ -14,19 +14,27 @@ interface ReviewFormProps {
   questionColors: Record<string, string>;
   showQuestions: Record<string, boolean>[];
   onEditRequest: (questionId: string, type: string, answer: string) => void;
+  onSubmitRequest: () => void;
 }
 
 interface ItemProps {
-  questionId: string;
+  questionid: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function ReviewForm({ formData, formAnswers, questionColors, showQuestions, onEditRequest }: ReviewFormProps) {
+export function ReviewForm({
+  formData,
+  formAnswers,
+  questionColors,
+  showQuestions,
+  onEditRequest,
+  onSubmitRequest,
+}: ReviewFormProps) {
   const [open, setOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<Question>(null);
 
-  const Item = styled(Paper)<ItemProps>(({ theme, questionId }) => ({
-    backgroundColor: questionColors[questionId],
+  const Item = styled(Paper)<ItemProps>(({ theme, questionid }) => ({
+    backgroundColor: questionColors[questionid],
     ...theme.typography.h6,
     padding: theme.spacing(1),
     textAlign: 'center',
@@ -60,6 +68,16 @@ export function ReviewForm({ formData, formAnswers, questionColors, showQuestion
         borderRadius: 10,
       }}
     >
+      {formData && (
+        <Button
+          onClick={onSubmitRequest}
+          variant="contained"
+          color="primary"
+          sx={{ width: '50%', borderRadius: 5, justifyContent: 'bottom' }}
+        >
+          Submit form
+        </Button>
+      )}
       {formData &&
         formData.groups.map((group, groupIndex) => (
           <Box
@@ -89,7 +107,7 @@ export function ReviewForm({ formData, formAnswers, questionColors, showQuestion
                           borderRadius: 5,
                           border: 2,
                         }}
-                        questionId={question.id}
+                        questionid={question.id}
                       >
                         <Box
                           sx={{

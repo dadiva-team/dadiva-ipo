@@ -4,6 +4,7 @@ import { PreDadivaInfoCard } from '../../components/home/PreDadivaInfoCard';
 import { useNavigate } from 'react-router-dom';
 import { Uris } from '../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
+import DOCTOR = Uris.DOCTOR;
 import { Role, useCurrentSession } from '../../session/Session';
 
 export default function Home() {
@@ -37,6 +38,16 @@ export default function Home() {
           BACK OFFICE
         </button>
       )}
+      <button
+        type="button"
+        value="Go to Doctor page"
+        onClick={() => {
+          nav(DOCTOR);
+        }}
+        style={{ display: 'block', marginBottom: '10px' }}
+      >
+        DOCTOR PAGE
+      </button>
       <Box
         sx={{
           display: 'flex',

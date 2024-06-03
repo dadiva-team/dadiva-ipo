@@ -12,6 +12,8 @@ public interface IFormService
     public Task<Result<bool, Problem>> SubmitForm(Dictionary<string,IAnswer> answers, int nic);
     
     public Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions();
+    
+    public Task<Result<Submission, Problem>> GetSubmission(int nic);
     public Task<Result<Inconsistencies, Problem>> GetInconsistencies();
     
     public Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies);
