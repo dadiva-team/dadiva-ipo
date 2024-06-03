@@ -20,10 +20,20 @@ export async function fetchAPI<T>(
   });
 
   if (!res.ok) {
-    throw new Problem(await res.json());
+    const text = await res.text();
+    if (text) {
+      throw new Problem(JSON.parse(text));
+    } else {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
   }
 
-  return await res.json();
+  const text = await res.text();
+  if (text) {
+    return JSON.parse(text);
+  } else {
+    return null;
+  }
 }
 
 export function get<T>(input: RequestInfo | URL): Promise<T> {
@@ -60,7 +70,7 @@ export function handleError(
     navigate('/login');
   } else if (err instanceof Problem) {
     console.log('Problem title is: ' + err.title);
-    setError(err.title);
+    setError(err.detail);
   } else {
     console.log(err);
     setError(err.message);

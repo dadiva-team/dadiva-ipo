@@ -1,5 +1,5 @@
-import React, { ReactElement } from 'react';
-import { List, ListItem, ListItemIcon, ListItemText, Divider, Button, Box } from '@mui/material';
+import React from 'react';
+import { List, Divider, Box } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FormIcon from '@mui/icons-material/Description';
 import MedicationIcon from '@mui/icons-material/LocalPharmacy';
@@ -8,31 +8,14 @@ import DonorsIcon from '@mui/icons-material/People';
 import DoctorsIcon from '@mui/icons-material/MedicalServices';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useLocation, useNavigate, Location } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import { Uris } from '../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
 import EDIT_FORM = Uris.EDIT_FORM;
 import MANAGE_USERS = Uris.MANAGE_USERS;
 import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
-
-interface NavItem {
-  text: string;
-  icon: ReactElement;
-  path: string;
-  disabled: boolean;
-}
-
-function navBuilder(items: NavItem[], navigate: (path: string) => void, location: Location) {
-  return items.map(item => (
-    <ListItem key={item.text}>
-      <Button disabled={location.pathname === item.path || item.disabled} onClick={() => navigate(item.path)}>
-        <ListItemIcon>{item.icon}</ListItemIcon>
-        <ListItemText primary={item.text} />
-      </Button>
-    </ListItem>
-  ));
-}
+import { navBuilder, NavItem } from '../shared/NavBuilder';
 
 export function BackofficeNavBar() {
   const location = useLocation();
