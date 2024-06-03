@@ -1,8 +1,15 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
+export enum Role {
+  DONOR = 'DONOR',
+  DOCTOR = 'DOCTOR',
+  ADMIN = 'ADMIN',
+}
+
 export interface Session {
   readonly name: string;
-  readonly nic: string;
+  readonly nic: number;
+  readonly role: Role;
 }
 
 type SessionManager = {
@@ -48,7 +55,8 @@ export function useCurrentSession() {
   const contextUser = context.session;
   const userItem = sessionStorage.getItem('user');
 
-  const user = contextUser === null && userItem && userItem !== 'undefined' ? JSON.parse(userItem) : contextUser;
+  const user: Session =
+    contextUser === null && userItem && userItem !== 'undefined' ? JSON.parse(userItem) : contextUser;
 
   useEffect(() => {
     if (user !== null && contextUser === null) {

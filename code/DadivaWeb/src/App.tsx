@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/authentication/Login';
 import Register from './pages/authentication/Register';
 import { Uris } from './utils/navigation/Uris';
@@ -20,15 +20,26 @@ import { ManageUsersPage } from './components/backoffice/manageUsers/ManageUsers
 import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
 import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
 import { EditFormPage } from './pages/backoffice/EditFormPage';
-import { useLoggedIn } from './session/Session';
+import { Role, useCurrentSession } from './session/Session';
 
 export default function App() {
-  const loggedIn = useLoggedIn();
+  const user = useCurrentSession();
 
-  function ProtectedRoute({ children }: { children: React.ReactNode }) {
-    if (!loggedIn) {
+  interface ProtectedRouteProps {
+    roles: Role[];
+    children: React.ReactNode;
+  }
+
+  function ProtectedRoute({ roles, children }: ProtectedRouteProps) {
+    console.log(user, roles);
+    if (!user) {
       return <Login />;
     }
+
+    if (!roles.includes(user.role)) {
+      return <Navigate to={HOME} />;
+    }
+
     return children;
   }
 
@@ -42,7 +53,7 @@ export default function App() {
           <Route
             path={FORM_INFO}
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roles={[Role.DONOR]}>
                 <FormInfo />
               </ProtectedRoute>
             }
@@ -50,7 +61,7 @@ export default function App() {
           <Route
             path={FORM}
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roles={[Role.DONOR]}>
                 <Form />
               </ProtectedRoute>
             }
@@ -58,7 +69,7 @@ export default function App() {
           <Route
             path={BACKOFFICE}
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roles={[Role.ADMIN]}>
                 <Backoffice />
               </ProtectedRoute>
             }

@@ -1,7 +1,8 @@
 import { deleteRequest, get, post } from '../utils/fetch';
 import { createTokenUri, createUserUri, deleteUserUri, getUsersUri } from '../utils/WebApiUris';
+import { LoginOutputModel } from './models/LoginOutputModel';
 
-export async function loginNIC(nic: string, password: string) {
+export async function loginNIC(nic: string, password: string): Promise<LoginOutputModel> {
   return await post(createTokenUri, JSON.stringify({ nic: nic, password: password }));
 }
 

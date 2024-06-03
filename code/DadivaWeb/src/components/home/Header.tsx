@@ -21,7 +21,7 @@ export function Header() {
       }}
     >
       <LogoIPO />
-      {loggedIn ? <UserInfo name={session.session.name} nic={session.session.nic} /> : <> {} </>}
+      {loggedIn ? <UserInfo name={session.session.name} nic={`${session.session.nic}`} /> : <> {} </>}
     </Container>
   );
 }
