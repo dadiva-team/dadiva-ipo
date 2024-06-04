@@ -68,16 +68,6 @@ export function ReviewForm({
         borderRadius: 10,
       }}
     >
-      {formData && (
-        <Button
-          onClick={onSubmitRequest}
-          variant="contained"
-          color="primary"
-          sx={{ width: '50%', borderRadius: 5, justifyContent: 'bottom' }}
-        >
-          Submit form
-        </Button>
-      )}
       {formData &&
         formData.groups.map((group, groupIndex) => (
           <Box
@@ -94,11 +84,11 @@ export function ReviewForm({
               {group.name}
             </Typography>
 
-            <Grid container rowSpacing={5} columnSpacing={{ xs: 6, sm: 6, md: 6 }}>
+            <Grid container direction="column" spacing={1}>
               {group.questions.map(
                 (question, questionIndex) =>
                   showQuestions[groupIndex][question.id] && (
-                    <Grid item xs={12} sm={6} md={4} key={questionIndex}>
+                    <Grid item xs={12} key={questionIndex}>
                       <Item
                         sx={{
                           bgcolor: questionColors[question.id],
@@ -112,55 +102,66 @@ export function ReviewForm({
                         <Box
                           sx={{
                             display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
+                            flexDirection: 'row',
                             alignItems: 'center',
+                            justifyContent: 'space-between',
                             height: '100%',
                           }}
                         >
-                          <Box>
-                            <h3>{question.text}</h3>
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="h6" sx={{ textAlign: 'left' }}>
+                              {question.text}
+                            </Typography>
                           </Box>
-                          {question.type == 'boolean' && formAnswers[groupIndex][question.id] == 'yes' ? (
-                            <CheckCircleIcon sx={{ fontSize: 40 }} />
-                          ) : question.type == 'boolean' && formAnswers[groupIndex][question.id] == 'no' ? (
-                            <CancelIcon sx={{ fontSize: 40 }} />
-                          ) : (
-                            formAnswers[groupIndex][question.id] && (
-                              <Box
-                                sx={{
-                                  justifyContent: 'left',
-                                  border: 2,
-                                  borderColor: 'darkgreen',
-                                  borderRadius: 1,
-                                  bgcolor: 'grey.200',
-                                  p: 1,
-                                }}
-                              >
-                                <Typography
-                                  variant="body1"
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                            }}
+                          >
+                            {question.type === 'boolean' && formAnswers[groupIndex][question.id] === 'yes' ? (
+                              <CheckCircleIcon sx={{ fontSize: 40, marginRight: 1 }} />
+                            ) : question.type === 'boolean' && formAnswers[groupIndex][question.id] === 'no' ? (
+                              <CancelIcon sx={{ fontSize: 40, marginRight: 1 }} />
+                            ) : null}
+                            {formAnswers[groupIndex][question.id] &&
+                              !['yes', 'no'].includes(formAnswers[groupIndex][question.id]) && (
+                                <Box
                                   sx={{
-                                    textAlign: 'left',
-                                    maxWidth: '100%',
-                                    whiteSpace: 'pre-wrap',
-                                    overflowWrap: 'break-word',
-                                    wordBreak: 'break-all',
+                                    justifyContent: 'left',
+                                    border: 2,
+                                    borderColor: 'darkgreen',
+                                    borderRadius: 1,
+                                    bgcolor: 'grey.200',
+                                    p: 1,
                                   }}
                                 >
-                                  Resposta: {formAnswers[groupIndex][question.id]}
-                                </Typography>
-                              </Box>
-                            )
-                          )}
-                          <Button
-                            onClick={() => handleOpen(question)}
-                            startIcon={<EditIcon />}
-                            variant="contained"
-                            color="primary"
-                            sx={{ width: '50%', borderRadius: 5, justifyContent: 'bottom' }}
-                          >
-                            Editar
-                          </Button>
+                                  <Typography
+                                    variant="body1"
+                                    sx={{
+                                      textAlign: 'left',
+                                      maxWidth: '100%',
+                                      whiteSpace: 'pre-wrap',
+                                      overflowWrap: 'break-word',
+                                      wordBreak: 'break-all',
+                                    }}
+                                  >
+                                    Resposta: {formAnswers[groupIndex][question.id]}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                            <Button
+                              onClick={() => handleOpen(question)}
+                              startIcon={<EditIcon />}
+                              variant="contained"
+                              color="primary"
+                              sx={{ borderRadius: 5, marginRight: 1 }}
+                            >
+                              Editar
+                            </Button>
+                          </Box>
                         </Box>
                       </Item>
                     </Grid>
@@ -175,6 +176,16 @@ export function ReviewForm({
             </Grid>
           </Box>
         ))}
+      {formData && (
+        <Button
+          onClick={onSubmitRequest}
+          variant="contained"
+          color="primary"
+          sx={{ width: '50%', borderRadius: 5, justifyContent: 'bottom' }}
+        >
+          Submit form
+        </Button>
+      )}
     </Container>
   );
 }
