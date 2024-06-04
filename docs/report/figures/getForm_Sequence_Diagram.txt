@@ -1,0 +1,20 @@
+CLIENT->ROUTE: GET form/structure
+ROUTE->SERVICE:formService.\n getForm()
+SERVICE->REPOSITORY: formRepository.\n getForm()
+REPOSITORY->DATABASE:ElasticsearchClient.\n SearchAsync<Form>("form")\n
+
+//Success
+note over SERVICE,DATABASE:Success case
+REPOSITORY<--DATABASE: Resource
+SERVICE<--REPOSITORY: Resource
+
+note over SERVICE,DATABASE:Failure case
+REPOSITORY<--DATABASE: Exception/Null
+SERVICE<--REPOSITORY:  Exception/Null          
+note over ROUTE,SERVICE:Result can be **Success** with **OutputModel**\nor **Failure** with **Problem**
+ROUTE<-SERVICE:Result<OutputModel,Problem>
+
+//Failure
+
+CLIENT<--ROUTE:   Success \n -200 Ok
+CLIENT<--ROUTE:               Failure\n- 500 Internal Server Error \n- 404 Not Found

@@ -3,30 +3,34 @@
 %
 \chapter{Technologies} \label{cap:technologies}
 
- In this chapter we introduce the most relevant technologies that support the different
-components of the DADIVA IPO Platform, explaining what they are and why they are being used in the context of our project.
-We will start by introducing the technologies that are used in the backend, then
-we will introduce the technologies that are used in the frontend, and finally we will
-present the tools that enable version control.
-We obtained experience in some of these throughout the several courses of our
-bachelor’s degree in computer science, which highly influenced us in choosing them in
-our project:
+ In this chapter, we introduce the key technologies that underpin the various components of the DADIVA IPO Platform. We will explain each technology's purpose and relevance within the context of our project. The discussion is organized into three main sections: backend technologies, frontend technologies, and version control tools. Our choices were significantly influenced by the experience and knowledge gained during our bachelor's degree in computer science:
 \begin{itemize}
-	\item Introduction to Web Programming (Introdução á Programação na Web) - Express.js;
-	\item WebApplication Development (Desenvolvimento de Aplicações Web)- Docker, React, Material-UI, Webpack;
+	\item Introduction to Web Programming (Introdução à Programação na Web) - Express.js;
+	\item Web Application Development (Desenvolvimento de Aplicações Web)- Docker, React, Material-UI, Webpack, Spring;
 	\item Systems Virtualization Techniques (Técnicas de Virtualização de Sistema) - Docker;
 	\item Software Laboratory (Laboratório de Software) - Docker;
 	\item Informatic Security (Segurança Informática) - RBAC;
-	\item Git and Github where used during most of the course.
+	\item Git and Github were used during most of the course.
 \end{itemize}
 
 \section{Backend Technologies}
 
-The backend technologies used in the DADIVA IPO are similar, at least conceptually, to those used in Software Laboratory and Introduction to Web Programming. These technologies encompass the server-side components that handle data processing, database management, and API integrations. In this section, we will explore the key backend technologies employed in our project, providing a comprehensive overview of their functionalities, benefits, and relevance to our system. We will explore how these technologies work together to support the seamless operation and performance of the DADIVA IPO platform.
+The backend technologies used in the DADIVA IPO platform share conceptual similarities with those we encountered in courses such as Web Application Development and Introduction to Web Programming. These technologies form the server-side components responsible for data processing, database management, and API integrations. In this section, we will provide a comprehensive overview of the key backend technologies employed in our project, highlighting their functionalities, benefits, and relevance to our system. We will also explore how these technologies collaborate to ensure the seamless operation and performance of the DADIVA IPO platform.
 
-The programming language used in the backend was C\#, which is a general purpose, object-oriented programming language. C\# was chosen since it is part of the technology stack at Cofidis, the employer of João Pereira, and it presented a opportunity to use a new, industry prevalent, language in  a large project that would prepare us for possible development environments upon course conclusion.
+The programming language used for the backend is C\#. This general-purpose, object-oriented language was selected for several reasons:
+\begin{itemize}
+	\item Industry Relevance: C\# is part of the technology stack at Cofidis, aligning our project with industry standards;
+	\item Learning Opportunity: Using C\# in this project provided us with valuable experience in a new language, preparing us for diverse development environments post-graduation;
+	\item Robustness: C\# is well-suited for building scalable and maintainable backend systems, offering strong type safety and extensive libraries.
+\end{itemize}
 
-Other options where Kotlin, which was extensively used during our course and Java, which, much like C\#, is already a staple language for backend development. However C\# presented an interesting novelty challenge that wasn't as present in these alternatives.
+While C\# was our final choice, we considered other languages based on our coursework experience:
+\begin{itemize}
+	\item Kotlin: Extensively used during our course, Kotlin is known for its modern syntax and interoperability with Java;
+	\item Java: A staple language for backend development, Java shares many characteristics with C\#, making it another viable option.
+\end{itemize}
+
+However, C\# presented a unique and interesting challenge, offering a fresh perspective compared to the more familiar alternatives.
 
 \subsection{.NET}
 .NET is a comprehensive development framework created by Microsoft. It serves as the backbone for building a variety of applications, including web, mobile, desktop, gaming, and Internet of Things (IoT) applications.
@@ -51,11 +55,11 @@ such as:
 To easily configure the virtual environment that the container hosts, Docker provides Docker images. Images are snapshots of all the necessary tools and files to execute an application. 
 Containers can be started from images, the same way virtual machines run snapshots. To effortlessly distribute images, Docker provides registries. These are public or private stores where users may upload or download images. Docker provides a cloud-based registry service called DockerHub.
 
-In addition to the Docker platform, we use Docker Compose to orchestrate the containers. Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, we can define a multi-container application in a single file, then spin it up in a single command which does everything that needs to be done to get it running. Compose is especially useful in development environments, testing environments, and CI workflows. 
+In addition to the Docker platform, we use Docker Compose to orchestrate the containers. Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, we can define a multi-container application in a single file, then spin it up in a single command which does everything that needs to be done to get it running. Compose is especially useful in development environments, testing environments. 
 
 We use Docker as an alternative for software containerization because it is the most well known, actively developed and supported in the area. Many frameworks already support it or are starting to support it.
 
-\section{Frontend Technologies}
+\section{Frontend Technologies}\label{sec:frontend_tech}
 
 \subsection{React}
 
@@ -83,3 +87,21 @@ In DADIVA IPO, we use Webpack to bundle the JavaScript files of the application,
 
 \subsection{ Git and GitHub}
 Git and GitHub are widely used version control tools that play a critical role in modern DevOps practices. Git is a distributed version control system that allows teams to efficiently manage changes to source code, track them over time and streamlines developer collaboration. GitHub, on the other hand, is a web-based hosting service for Git repositories that provides additional collaboration and project management features. Both of these technologies where extensively used trough our course.
+
+\subsection{ Swagger }
+Swagger ~\cite{Swagger} is an open-source framework that simplifies the design, documentation, and consumption of RESTful web services. It is widely used in the software development industry to create, visualize, and interact with API specifications. Swagger's comprehensive suite of tools and features enhances the development workflow, making it easier for developers to build and maintain APIs.
+
+\subsection{ diagrams.net }
+In the development of this report, the majority of the diagrams were created using diagrams.net ~\cite{diagrams.net}, also known as draw.io. Diagrams.net is a highly popular online diagramming tool that offers users the ability to design a wide variety of diagrams with ease and precision.
+Some of diagrams.net's key features are:
+\begin{itemize}
+	\item \textbf{User-Friendly Interface}: Diagrams.net boasts an intuitive and user-friendly interface, making it accessible to both beginners and experienced users. The drag-and-drop functionality allows for quick creation and editing of diagrams.
+	\item \textbf{Wide Range of Diagram Types}: The platform supports a diverse array of diagram types, including flowcharts, organizational charts, mind maps, network diagrams, UML diagrams, ER diagrams, and more. This versatility makes it a one-stop solution for most diagramming needs.
+	\item \textbf{Customization Options}: Users can customize diagrams extensively with a variety of shapes, connectors, and styles. The tool offers a rich library of predefined shapes and templates that can be tailored to specific requirements.
+	\item \textbf{Collaboration Capabilities}: Diagrams.net supports real-time collaboration, allowing multiple users to work on the same diagram simultaneously. This feature is particularly useful for team projects and collaborative work environments.
+	\item \textbf{Integration and Compatibility}: The tool integrates seamlessly with popular cloud storage services like Google Drive, OneDrive, Dropbox, and GitHub. This ensures that diagrams can be easily saved, shared, and accessed from anywhere.
+\end{itemize}
+
+\subsection{ visily.ai }
+
+Visily.ai~\cite{Visily} is a powerful design tool that leverages artificial intelligence to facilitate the creation of wireframes and prototypes for web and mobile applications. It is designed to help both designers and non-designers quickly produce high-quality visual representations of their ideas, and was used to produce the mockups show in section ~\ref{architecture_frontend}.

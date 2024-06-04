@@ -13,6 +13,71 @@
 \usepackage[verbose]{placeins}
 \renewcommand{\algorithmicrequire}{\textbf{Dados: }}
 \renewcommand{\algorithmicensure}{\textbf{Resultado: }}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Define colors
+\definecolor{codeblue}{rgb}{0.13,0.13,1}
+\definecolor{codegreen}{rgb}{0,0.5,0}
+\definecolor{codered}{rgb}{0.9,0,0}
+\definecolor{codebackground}{rgb}{0.95,0.95,0.95}
+
+% Define C# listing style
+\lstdefinestyle{sharpc}{
+	language=[Sharp]C,
+	numbers=left,
+	numberstyle=\tiny\color{gray},
+	stepnumber=1,
+	numbersep=10pt,
+	showspaces=false,
+	showtabs=false,
+	showstringspaces=false,
+	breaklines=true,
+	breakatwhitespace=true,
+	escapeinside={(*@}{@*)},
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{codeblue}\bfseries,
+	stringstyle=\color{codered},
+	basicstyle=\ttfamily\footnotesize,
+	backgroundcolor=\color{codebackground},
+	frame=single,
+	captionpos=b,
+	tabsize=4,
+}
+
+%\colorlet{punct}{red!60!black}
+%\definecolor{delim}{RGB}{20,105,176}
+%\colorlet{numb}{magenta!60!black}
+
+%\lstdefinelanguage{json}{
+%	basicstyle=\normalfont\ttfamily,
+%	numbers=left,
+%	numberstyle=\scriptsize,
+%	stepnumber=1,
+%	numbersep=8pt,
+%	showstringspaces=false,
+%	breaklines=true,
+%	frame=lines,
+%	backgroundcolor=\color{background}, % Use the same defined background color
+%	literate=
+%	*{0}{{{\color{numb}0}}}{1}
+%	{1}{{{\color{numb}1}}}{1}
+%	{2}{{{\color{numb}2}}}{1}
+%	{3}{{{\color{numb}3}}}{1}
+%	{4}{{{\color{numb}4}}}{1}
+%	{5}{{{\color{numb}5}}}{1}
+%	{6}{{{\color{numb}6}}}{1}
+%	{7}{{{\color{numb}7}}}{1}
+%	{8}{{{\color{numb}8}}}{1}
+%	{9}{{{\color{numb}9}}}{1}
+%	{:}{{{\color{punct}{:}}}}{1}
+%	{,}{{{\color{punct}{,}}}}{1}
+%	{\{}{{{\color{delim}{\{}}}}{1}
+%	{\}}{{{\color{delim}{\}}}}}{1}
+%	{[}{{{\color{delim}{[}}}}{1}
+%	{]}{{{\color{delim}{]}}}}{1},
+%}
+
 
 % Definições das dimensões das páginas
 \setlength{\textheight}{24.00cm}
@@ -38,7 +103,7 @@
 % Nome dos autores (um por linha)
 \author{
 \begin{tabular}{cr}
-             & Francisco Medeiros  \\
+             & Francisco Medeiros \\
              & Luís Macário \\
              & Ricardo Pinto \\[50mm]
 \end{tabular}}
@@ -95,18 +160,19 @@ Licenciatura em Engenharia Informática e de Computadores\\[20mm]
 *Junho* de 2024\\
 \end{center}
 
-% Página de resumo em Português
+
 \cleardoublepage
 \chapter*{Resumo}
-Texto do resumo.
-Breve descrição do projeto, dos resultados importantes e das conclusões: o objetivo é dar ao leitor uma visão global do projeto (não deve exceder uma página).
+O Instituto Português de Oncologia (IPO) em Lisboa utiliza atualmente um sistema manual para a gestão de informações dos dadores de sangue. Este processo envolve os dadores preencherem um formulário pré-doação em papel, seguido por uma entrevista médica onde um médico avalia a elegibilidade para a doação, com base no formulário e questões verbais adicionais. Este processo manual de gestão e verificação de detalhes médicos e de medicação é altamente ineficiente e pode levar a imprecisões com consequências graves.
+
+O projeto proposto visa digitalizar o processo de doação de sangue no IPO. Isto inclui a criação de uma versão digital do formulário pré-doação e o desenvolvimento de um sistema para gerir e comparar automaticamente dados sobre interações medicamentosas e patológicas com a dádiva. O sistema digital permitirá a fácil atualização, personalização e recuperação de informações. Ao automatizar o formulário e a gestão de dados, o projeto procura reduzir os erros associados à gestão manual dos mesmos, uma vez que a informação sobre medicação e patologia pode ser atualizada regularmente, e diminuir o tempo total necessário para o processo de doação, agilizando assim os procedimentos de triagem, aumentando a ergonomia do processo para dadores e médicos, reduzindo a dependência de papel e tornando possível preencher o formulário fora das instalações do IPO, reduzindo assim a permanência dos dadores no IPO.
 
 % Página de resumo em Inglês
 \cleardoublepage
 \chapter*{Abstract}
-The Instituto Português de Oncologia (IPO) in Lisbon currently employs a manual system for managing blood donor information. This involves donors completing a pre-donation form on paper, followed by a medical interview where a doctor assesses eligibility based on the form and additional verbal questions. This manual process of handling and verifying medical and medication details is prone to errors and inefficiency.
+The Instituto Português de Oncologia (IPO) in Lisbon currently employs a manual system for managing blood donor information. This involves donors completing a pre-donation form on paper, followed by a medical interview where a doctor assesses eligibility based on the form and additional verbal questions. This manual process of handling and verifying pathology and medication details is highly inefficient, and may lead to imprecisions with severe consequences.
 
-The proposed project aims to digitalize the blood donation process at IPO. This includes creating a digital version of the pre-donation form and developing a system to manage and cross-reference medication and pathology data. The digital system will allow for easy updating, customization, and retrieval of information. By automating the form and data handling, the project seeks to reduce errors associated with manual data management and decrease the overall time required for the donation process, thereby streamlining both donor signup and triage procedures.
+The proposed project aims to digitalize the blood donation process at IPO. This includes creating a digital version of the pre-donation form and developing a system to manage and cross-reference medication and pathology data. The digital system will allow for easy updating, customization, and retrieval of information. By automating the form and data handling, the project seeks to reduce errors associated with manual data management, since medication and pathology information can be regularly updated,  and decrease the overall time required for the donation process, thereby streamlining triage procedures, increase process ergonomics for both donors and doctors, reduce paper reliance and make it possible to fill out the form outside IPO's installations, hence reducing donor's time commitment per donation.
 
 %{\bf Palavras-chave:} lista de palavras-chave separadas por ;.
 
@@ -116,12 +182,19 @@ The proposed project aims to digitalize the blood donation process at IPO. This 
 %Texto dos agradecimentos. É opcional.\\
 
 % Geração do índice de conteúdos
+\setcounter{tocdepth}{1}
 \cleardoublepage
 \tableofcontents \cleardoublepage
 
 % Geração do índice de figuras e de tabelas
-%\listoffigures \cleardoublepage
-%\listoftables \cleardoublepage
+\setcounter{tocdepth}{1}
+\listoffigures 
+\cleardoublepage
+
+\setcounter{tocdepth}{2}
+\listoftables 
+\cleardoublepage
+
 
 % Reiniciar a numeração de páginas
 \setcounter{page}{1}
@@ -134,16 +207,19 @@ The proposed project aims to digitalize the blood donation process at IPO. This 
 \include{capenquadramento}
 
 % Capitulo 3
-\include{technologies}
-
-% Capitulo 4
 \include{architecture}
 
 % Capitulo 4
-\include{capexemplos}
+\include{technologies}
 
 % Capitulo 5
-\include{captestes}
+\include{implementation}
+
+% Capitulo 6
+\include{state}
+
+%% Capitulo 5
+%\include{captestes}
 
 % Referências
 \bibliographystyle{unsrt}
@@ -152,6 +228,6 @@ The proposed project aims to digitalize the blood donation process at IPO. This 
 
 % Apêndices (opcional)
 \appendix
-\include{apendiceex}
+\include{domain}
 
 \end{document} 
