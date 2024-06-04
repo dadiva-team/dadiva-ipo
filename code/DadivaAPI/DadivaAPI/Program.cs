@@ -60,8 +60,8 @@ builder.Services.AddAuthentication(x =>
 // Adds authorization such that the jwt bearer token must contain a claim with the key "perms" and the value "admin"
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("donor", policy => policy.RequireClaim("perms", "donor"));
-    options.AddPolicy("doctor", policy => policy.RequireClaim("perms", "doctor"));
+    options.AddPolicy("donor", policy => policy.RequireClaim("perms", "donor", "doctor", "admin"));
+    options.AddPolicy("doctor", policy => policy.RequireClaim("perms", "doctor", "admin"));
     options.AddPolicy("admin", policy => policy.RequireClaim("perms", "admin"));
 });
 

@@ -9,9 +9,6 @@ import { DeleteConfirmDialog } from '../../shared/DeleteConfirmDialog';
 export function ManageUsersPage() {
   const { isLoading, error, setError, nics, isDeleting, setIsDeleting, handleDeleteUser } = useManageUsers();
 
-  // Log the nics array to ensure it contains unique numbers
-  console.log('NICs:', nics);
-
   return (
     <div>
       {isLoading ? (
@@ -22,7 +19,7 @@ export function ManageUsersPage() {
       ) : (
         <>
           {nics.map(nic => {
-            console.log('Rendering UserLayout for NIC:', nic); // Log each nic to ensure uniqueness
+            console.log('Rendering UserLayout for NIC:', nic);
             return <UserLayout key={nic} nic={nic} onDeleteRequest={() => setIsDeleting(nic)} />;
           })}
           <DeleteConfirmDialog

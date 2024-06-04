@@ -6,8 +6,6 @@ namespace DadivaAPI.repositories.form;
 
 public class FormRepositoryES(ElasticsearchClient client) : IFormRepository
 {
-    private readonly string index = "form";
-
     public async Task<Form?> GetForm()
     {
         try

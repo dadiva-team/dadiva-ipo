@@ -21,10 +21,10 @@ public static class FormRoutes
         group.MapPut("/structure", EditForm).RequireAuthorization("admin");
         group.MapPut("/inconsistencies", EditInconsistencies).RequireAuthorization("admin");
 
-        group.MapGet("/submissions", GetSubmissions).RequireAuthorization("doctor", "admin");
-        group.MapGet("/submissions/{nic:int}", GetSubmission).RequireAuthorization("doctor", "admin");
-        //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor","admin");
-        group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor", "admin");
+        group.MapGet("/submissions", GetSubmissions).RequireAuthorization("doctor");
+        group.MapGet("/submissions/{nic:int}", GetSubmission).RequireAuthorization("doctor");
+        //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor");
+        group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor");
     }
 
     private static async Task<IResult> GetSubmissions(IFormService service)
@@ -62,6 +62,7 @@ public static class FormRoutes
 
     private static async Task<IResult> GetForm(IFormService service, ClaimsPrincipal user)
     {
+        
         (user.Identity as ClaimsIdentity).Claims.ToList().ForEach(claim =>
         {
             Console.Out.WriteLine(claim.Type + ": " + claim.Value);

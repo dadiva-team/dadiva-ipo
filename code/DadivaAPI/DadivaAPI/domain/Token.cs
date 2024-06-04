@@ -19,8 +19,8 @@ public class Token
             audience,
             new []
             {
-                new Claim(ClaimTypes.Sid, user.Nic.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim("nic", user.Nic.ToString()),
+                new Claim("name", user.Name),
                 new Claim("perms", user.Role.ToString())
             },
             expires: DateTime.Now.AddMinutes(30),

@@ -15,5 +15,6 @@ public interface IFormRepository
     public Task<Submission> GetSubmission(int nic);
     
     public Task<Inconsistencies> GetInconsistencies();
+    
     public Task<bool> EditInconsistencies(Inconsistencies inconsistencies);
 }

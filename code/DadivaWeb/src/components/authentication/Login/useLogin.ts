@@ -4,7 +4,6 @@ import * as React from 'react';
 import reduce from '../utils/Reduce';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { loginNIC } from '../../../services/users/UserServices';
-import { TOKENS } from './MockTokens';
 
 export function useLogin() {
   const navigate = useNavigate();
@@ -63,8 +62,7 @@ export function useLogin() {
       throw new Error('Response is undefined');
     }
 
-    // const token = res.token;
-    const token = TOKENS[res.nic];
+    const token = res.token;
     if (!token) {
       dispatch({ type: 'error', message: 'Token não encontrado' });
       setError('Token não encontrado');
@@ -74,14 +72,14 @@ export function useLogin() {
     const payload: {
       name: string;
       nic: number;
-      role: string;
+      perms: string;
     } = JSON.parse(atob(token.split('.')[1]));
     console.log(atob(token.split('.')[1]));
     console.log(payload);
     const session: Session = {
       name: payload.name,
       nic: payload.nic,
-      role: Role[payload.role as keyof typeof Role],
+      perms: payload.perms as Role,
     };
 
     sessionManager.setSession(session);
