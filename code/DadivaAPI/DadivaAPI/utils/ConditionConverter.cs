@@ -18,8 +18,9 @@ public class ConditionConverter : JsonConverter<Condition>
             {
                 return JsonSerializer.Deserialize<EvaluationCondition>(rootElement.GetRawText(), options);
             }
-            else if (rootElement.TryGetProperty("all", out _) ||
-                     rootElement.TryGetProperty("any", out _))
+
+            if (rootElement.TryGetProperty("all", out _) ||
+                rootElement.TryGetProperty("any", out _))
             {
                 return JsonSerializer.Deserialize<LogicalCondition>(rootElement.GetRawText(), options);
             }

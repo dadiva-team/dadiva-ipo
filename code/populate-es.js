@@ -15,13 +15,13 @@ const users = [
 	{
 		"nic": 111111111,
 		"name": "Dr. Doe",
-		"hashedpassword": "MegaPassword123!hashed",
+		"hashedPassword": "MegaPassword123!hashed",
 		"role": "doctor"
 	},
 	{
 		"nic": 987654321,
 		"name": "Eng. Doe",
-		"hashedpassword": "MegaPassword123!hashed",
+		"hashedPassword": "MegaPassword123!hashed",
 		"role": "admin"
 	}
 ]

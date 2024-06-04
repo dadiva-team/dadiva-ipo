@@ -1,15 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
-using System.Text.Json.Serialization;
-using DadivaAPI.domain;
 using DadivaAPI.repositories.dnd;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.search;
 using DadivaAPI.routes.example;
 using DadivaAPI.routes.form;
-using DadivaAPI.routes.form.models;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.dnd;
 using DadivaAPI.services.example;
@@ -20,9 +15,7 @@ using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +43,6 @@ builder.Services.AddAuthentication(x =>
             return Task.CompletedTask;
         }
     };
-    options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -65,8 +57,13 @@ builder.Services.AddAuthentication(x =>
 });
 
 
-// Adds authorization such that the jwt bearer token must contain a claim with the key "role" and the value "admin"
-builder.Services.AddAuthorization();
+// Adds authorization such that the jwt bearer token must contain a claim with the key "perms" and the value "admin"
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("donor", policy => policy.RequireClaim("perms", "donor"));
+    options.AddPolicy("doctor", policy => policy.RequireClaim("perms", "doctor"));
+    options.AddPolicy("admin", policy => policy.RequireClaim("perms", "admin"));
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -108,9 +105,6 @@ builder.Services.AddCors(options =>
                 .AllowCredentials(); // Important if you are sending credentials (like cookies or basic auth)
         });
 });
-
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
 
 var app = builder.Build();
 

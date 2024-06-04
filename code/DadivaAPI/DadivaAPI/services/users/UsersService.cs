@@ -15,16 +15,15 @@ public class UsersService(IConfiguration config, IUsersRepository repository) : 
             string hashedPassword = User.HashPassword(password);
 
             User? user = await repository.GetUserByNic(nic);
-            if (user != null && user.HashedPassword == hashedPassword)
-            {
-                return Result<Token, Problem>.Success(new Token(config["Jwt:Key"], config["Jwt:Issuer"],
-                    config["Jwt:Audience"], user));
-            }
-            else
+
+            if (user == null || user.HashedPassword != hashedPassword)
             {
                 return Result<Token, Problem>.Failure(
                     UserServicesErrorExtensions.ToResponse(TokenCreationError.UserOrPasswordAreInvalid));
             }
+
+            return Result<Token, Problem>.Success(new Token(config["Jwt:Key"], config["Jwt:Issuer"],
+                config["Jwt:Audience"], user));
         }
         catch (Exception e)
         {

@@ -21,9 +21,9 @@ public class Token
             {
                 new Claim(ClaimTypes.Sid, user.Nic.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim("roles", [""])
+                new Claim("perms", user.Role.ToString())
             },
-            expires: DateTime.Now.AddMinutes(120),
+            expires: DateTime.Now.AddMinutes(30),
             signingCredentials: credentials);
 
         token =  new JwtSecurityTokenHandler().WriteToken(sectoken);

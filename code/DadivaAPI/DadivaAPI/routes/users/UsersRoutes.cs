@@ -29,7 +29,7 @@ public static class UsersRoutes
                 CookieOptions cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,   // Required if SameSite is None
+                    Secure = true,
                     SameSite = SameSiteMode.None,  // Necessary for cross-origin/cross-site requests
                     Expires = DateTime.UtcNow.AddDays(1)
                 };
