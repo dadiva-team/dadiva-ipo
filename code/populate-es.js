@@ -8,15 +8,21 @@ const submissionIndex = 'submissions';
 const users = [
 	{
 		"nic": 123456789,
-		"password": "MegaPassword123!hashed"
+		"name": "John Doe",
+		"hashedPassword": "MegaPassword123!hashed",
+		"role": "donor"
 	},
 	{
 		"nic": 111111111,
-		"password": "MegaPassword123!hashed"
+		"name": "Dr. Doe",
+		"hashedpassword": "MegaPassword123!hashed",
+		"role": "doctor"
 	},
 	{
 		"nic": 987654321,
-		"password": "MegaPassword123!hashed"
+		"name": "Eng. Doe",
+		"hashedpassword": "MegaPassword123!hashed",
+		"role": "admin"
 	}
 ]
 

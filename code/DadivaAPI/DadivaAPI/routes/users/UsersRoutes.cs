@@ -3,7 +3,6 @@ using DadivaAPI.routes.users.models;
 using DadivaAPI.services.users;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DadivaAPI.routes.users;
@@ -12,11 +11,12 @@ public static class UsersRoutes
 {
     public static void AddUsersRoutes(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/users");
-        group.MapPost("/login", CreateToken);
-        group.MapPost("", CreateUser);
-        group.MapGet("", GetUsers);
-        group.MapDelete("/{nic}", DeleteUser);
+        var usersGroup = app.MapGroup("/users");
+        usersGroup.MapPost("/login", CreateToken).AllowAnonymous();
+
+        usersGroup.MapPost("", CreateUser).RequireAuthorization("admin");
+        usersGroup.MapGet("", GetUsers).RequireAuthorization("admin");
+        usersGroup.MapDelete("/{nic}", DeleteUser).RequireAuthorization("admin");
     }
 
     private static async Task<IResult> CreateToken(HttpContext http, [FromBody] CreateTokenInputModel input,
@@ -46,7 +46,7 @@ public static class UsersRoutes
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)
     {
-        Result<UserExternalInfo, Problem> result = await service.CreateUser(input.Nic, input.Password);
+        Result<UserExternalInfo, Problem> result = await service.CreateUser(input.Nic, input.Name, input.Password, Enum.Parse<Role>(input.Role));
         return result switch
         {
             Result<UserExternalInfo, Problem>.SuccessResult success => Results.Created((string)null,

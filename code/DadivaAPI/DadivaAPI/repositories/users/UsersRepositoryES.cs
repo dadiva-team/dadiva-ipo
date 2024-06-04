@@ -11,25 +11,15 @@ public class UsersRepositoryES(ElasticsearchClient client) : IUsersRepository
 
     public async Task<bool> CheckUserByNicAndPassword(int nic, string hashedPassword)
     {
-        var request = new SearchRequest(_index)
-        {
-            Query = new TermQuery("nic") { Value = nic },
-        };
-        var searchResponse = await client.SearchAsync<User>(request);
-
-        if (searchResponse.IsValidResponse && searchResponse.Documents.First().password == hashedPassword)
-        {
-            return true;
-        }
-
-        return false;
+        var response = await client.GetAsync<User>(nic, idx => idx.Index(_index));
+        return response.IsValidResponse && response.Source?.HashedPassword == hashedPassword;
     }
 
     public async Task<bool> AddUser(User user)
     {
         var response = await client.IndexAsync(
             user,
-            idx => idx.Index(_index).Id(user.nic)
+            idx => idx.Index(_index).Id(user.Nic)
             );
         return response.IsValidResponse;
     }

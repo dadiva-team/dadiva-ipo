@@ -17,7 +17,7 @@ public class UsersRepositoryMemory : IUsersRepository
 
     public Task<bool> AddUser(User user)
     {
-        return Task.FromResult(users.TryAdd(user.nic, user.password));
+        return Task.FromResult(users.TryAdd(user.Nic, user.HashedPassword));
     }
 
     public Task<List<User>> GetUsers()

@@ -6,18 +6,18 @@ public class FormRepositoryMemory : IFormRepository
 {
     private readonly Dictionary<int, Submission> _submissions = new();
 
-    private Form _form = new([], []);
-    
+    private List<Form> _forms = [MockForm.Form];
+
     private List<Rule> _inconsistencies = [];
 
-    public async Task<Form> GetForm()
+    public async Task<Form?> GetForm()
     {
-        return _form;
+        return _forms.Last();
     }
 
     public async Task<Form> EditForm(Form form)
     {
-        _form = form;
+        _forms.Add(form);
         return form;
     }
 
@@ -31,7 +31,7 @@ public class FormRepositoryMemory : IFormRepository
     {
         return _submissions;
     }
-    
+
     public async Task<Submission> GetSubmission(int nic)
     {
         return _submissions[nic];
@@ -41,7 +41,7 @@ public class FormRepositoryMemory : IFormRepository
     {
         return new Inconsistencies(_inconsistencies);
     }
-    
+
     public async Task<bool> EditInconsistencies(Inconsistencies inconsistencies)
     {
         _inconsistencies = inconsistencies.InconsistencyList;

@@ -1,9 +1,11 @@
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DadivaAPI.domain;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.services.form;
 using DadivaAPI.utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DadivaAPI.routes.form;
@@ -13,14 +15,16 @@ public static class FormRoutes
     public static void AddFormRoutes(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/forms");
-        group.MapGet("/structure", GetForm);
-        group.MapGet("/submissions", GetSubmissions);
-        group.MapGet("/submissions/{nic}", GetSubmission);
-        //group.MapDelete("/submissions/{nic}", DeleteSubmission);
-        group.MapPost("/submissions/{nic}", SubmitForm);
-        group.MapPut("/structure", EditForm);
-        group.MapGet("/inconsistencies", GetInconsistencies);
-        group.MapPut("/inconsistencies", EditInconsistencies);
+        group.MapGet("/structure", GetForm).RequireAuthorization("donor");
+        group.MapPost("/submissions/{nic:int}", SubmitForm).RequireAuthorization("donor");
+
+        group.MapPut("/structure", EditForm).RequireAuthorization("admin");
+        group.MapPut("/inconsistencies", EditInconsistencies).RequireAuthorization("admin");
+
+        group.MapGet("/submissions", GetSubmissions).RequireAuthorization("doctor", "admin");
+        group.MapGet("/submissions/{nic:int}", GetSubmission).RequireAuthorization("doctor", "admin");
+        //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor","admin");
+        group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor", "admin");
     }
 
     private static async Task<IResult> GetSubmissions(IFormService service)
@@ -39,7 +43,7 @@ public static class FormRoutes
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
-    
+
     private static async Task<IResult> GetSubmission([FromRoute] int nic, IFormService service)
     {
         Result<Submission, Problem> result = await service.GetSubmission(nic);
@@ -56,8 +60,13 @@ public static class FormRoutes
         };
     }
 
-    private static async Task<IResult> GetForm(IFormService service)
+    private static async Task<IResult> GetForm(IFormService service, ClaimsPrincipal user)
     {
+        (user.Identity as ClaimsIdentity).Claims.ToList().ForEach(claim =>
+        {
+            Console.Out.WriteLine(claim.Type + ": " + claim.Value);
+        });
+        
         var options = new JsonSerializerOptions();
         options.Converters.Add(new JsonStringEnumConverter());
 
@@ -89,7 +98,8 @@ public static class FormRoutes
         };
     }
 
-    private static async Task<IResult> SubmitForm([FromRoute] int nic, [FromBody] SubmitFormRequest input, IFormService service)
+    private static async Task<IResult> SubmitForm([FromRoute] int nic, [FromBody] SubmitFormRequest input,
+        IFormService service)
     {
         System.Console.WriteLine(input);
         Dictionary<string, IAnswer> answers = input.AnsweredQuestions.ToDictionary(
@@ -98,7 +108,7 @@ public static class FormRoutes
         );
         System.Console.WriteLine("input");
         System.Console.WriteLine(answers);
-        
+
         Result<bool, Problem> result = await service.SubmitForm(answers, nic);
         return result switch
         {

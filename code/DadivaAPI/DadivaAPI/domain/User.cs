@@ -1,10 +1,7 @@
 namespace DadivaAPI.domain;
 
-public class User
+public record User(int Nic, string Name, string HashedPassword, Role Role)
 {
-    public int nic { get; set; }
-    public string password { get; set; }
-    
     public static bool IsValidPassword(string password)
     {
         return password.Length >= 8;
@@ -15,6 +12,10 @@ public class User
     {
         return nic.ToString().Length == 8;
     }
-    
-    //public static string HashPassword()
+
+    public static string HashPassword(string password)
+    {
+        //TODO: TEMPORARY FAKE HASHING
+        return $"{password}hashed";
+    }
 }

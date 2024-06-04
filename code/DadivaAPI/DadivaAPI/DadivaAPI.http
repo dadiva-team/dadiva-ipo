@@ -1,6 +1,6 @@
-@DadivaAPI_HostAddress = http://localhost:5231
+@DadivaAPI_HostAddress = https://localhost:7011
 
-GET {{DadivaAPI_HostAddress}}/weatherforecast/
+GET {{DadivaAPI_HostAddress}}/health/
 Accept: application/json
 
 ###

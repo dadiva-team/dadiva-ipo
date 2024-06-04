@@ -9,7 +9,7 @@ public interface IUsersService
 {
     public Task<Result<Token, Problem>> CreateToken(int nic, string password);
 
-    public Task<Result<UserExternalInfo, Problem>> CreateUser(int nic, string password);
+    public Task<Result<UserExternalInfo, Problem>> CreateUser(int nic, string name, string password, Role role);
 
     public Task<Result<List<UserExternalInfo>, Problem>> GetUsers(string token);
 
