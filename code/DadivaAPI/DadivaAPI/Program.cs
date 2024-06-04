@@ -16,6 +16,7 @@ using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,7 +91,9 @@ builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IFormService, FormService>();
 builder.Services.AddSingleton<ISearchService, SearchService>();
 
-builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
+builder.Services.AddSingleton(NpgsqlDataSource.Create("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres"));
+
+builder.Services.AddSingleton<IUsersRepository, UsersRepositoryPGSQL>();
 builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
 builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 
