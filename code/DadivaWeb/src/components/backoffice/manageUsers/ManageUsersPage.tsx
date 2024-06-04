@@ -5,10 +5,11 @@ import { Box } from '@mui/material';
 import { UserLayout } from './UserLayout';
 import { useManageUsers } from './useManageUsers';
 import { DeleteConfirmDialog } from '../../shared/DeleteConfirmDialog';
+import { useCurrentSession } from '../../../session/Session';
 
 export function ManageUsersPage() {
   const { isLoading, error, setError, nics, isDeleting, setIsDeleting, handleDeleteUser } = useManageUsers();
-
+  const currentUserNic = useCurrentSession().nic;
   return (
     <div>
       {isLoading ? (
@@ -19,7 +20,7 @@ export function ManageUsersPage() {
       ) : (
         <>
           {nics.map(nic => {
-            console.log('Rendering UserLayout for NIC:', nic);
+            if (nic == currentUserNic) return;
             return <UserLayout key={nic} nic={nic} onDeleteRequest={() => setIsDeleting(nic)} />;
           })}
           <DeleteConfirmDialog

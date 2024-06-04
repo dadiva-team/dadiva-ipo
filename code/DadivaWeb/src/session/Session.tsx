@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 export enum Role {
-  DONOR = 'DONOR',
-  DOCTOR = 'DOCTOR',
-  ADMIN = 'ADMIN',
+  DONOR = 'donor',
+  DOCTOR = 'doctor',
+  ADMIN = 'admin',
 }
 
 export interface Session {
   readonly name: string;
   readonly nic: number;
-  readonly role: Role;
+  readonly perms: Role;
 }
 
 type SessionManager = {

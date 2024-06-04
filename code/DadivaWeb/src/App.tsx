@@ -4,28 +4,28 @@ import Login from './pages/authentication/Login';
 import Register from './pages/authentication/Register';
 import { Uris } from './utils/navigation/Uris';
 import Home from './pages/home/Home';
+import { Header } from './components/home/Header';
+import { FormInfo } from './pages/form/FormInfo';
+import { Form } from './pages/form/Form';
+import { Backoffice } from './pages/backoffice/Backoffice';
+import { BackofficeMockChart } from './components/backoffice/BackofficeMockChart';
+import { ManageUsersPage } from './components/backoffice/manageUsers/ManageUsersPage';
+import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
+import { EditFormPage } from './pages/backoffice/EditFormPage';
+import { Role, useCurrentSession } from './session/Session';
+import { Doctor } from './pages/doctor/Doctor';
+import { DoctorSearch } from './pages/doctor/search/DoctorSearch';
 import HOME = Uris.HOME;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
 import EDIT_FORM = Uris.EDIT_FORM;
-import { Header } from './components/home/Header';
 import FORM_INFO = Uris.FORM_INFO;
-import { FormInfo } from './pages/form/FormInfo';
-import { Form } from './pages/form/Form';
 import BACKOFFICE = Uris.BACKOFFICE;
-import { Backoffice } from './pages/backoffice/Backoffice';
-import { BackofficeMockChart } from './components/backoffice/BackofficeMockChart';
 import MANAGE_USERS = Uris.MANAGE_USERS;
-import { ManageUsersPage } from './components/backoffice/manageUsers/ManageUsersPage';
 import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
-import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
-import { EditFormPage } from './pages/backoffice/EditFormPage';
-import { Role, useCurrentSession } from './session/Session';
 import DOCTOR = Uris.DOCTOR;
-import { Doctor } from './pages/doctor/Doctor';
 import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
 import DOCTOR_SEARCH_NAME = Uris.DOCTOR_SEARCH_NAME;
-import { DoctorSearch } from './pages/doctor/search/DoctorSearch';
 
 export default function App() {
   const user = useCurrentSession();
@@ -41,7 +41,7 @@ export default function App() {
       return <Login />;
     }
 
-    if (!roles.includes(user.role)) {
+    if (!roles.includes(user.perms)) {
       return <Navigate to={HOME} />;
     }
 
@@ -55,14 +55,21 @@ export default function App() {
         <Routes>
           <Route path={HOME} element={<Home />} />
           <Route path={REGISTER} element={<Register />} />
-          <Route path={DOCTOR} element={<Doctor />}>
+          <Route
+            path={DOCTOR}
+            element={
+              <ProtectedRoute roles={[Role.DOCTOR, Role.ADMIN]}>
+                <Doctor />
+              </ProtectedRoute>
+            }
+          >
             <Route path={DOCTOR_SEARCH_NIC} element={<DoctorSearch mode="nic" />} />
             <Route path={DOCTOR_SEARCH_NAME} element={<DoctorSearch mode="name" />} />
           </Route>
           <Route
             path={FORM_INFO}
             element={
-              <ProtectedRoute roles={[Role.DONOR]}>
+              <ProtectedRoute roles={[Role.DONOR, Role.DOCTOR, Role.ADMIN]}>
                 <FormInfo />
               </ProtectedRoute>
             }
@@ -70,7 +77,7 @@ export default function App() {
           <Route
             path={FORM}
             element={
-              <ProtectedRoute roles={[Role.DONOR]}>
+              <ProtectedRoute roles={[Role.DONOR, Role.DOCTOR, Role.ADMIN]}>
                 <Form />
               </ProtectedRoute>
             }
@@ -78,9 +85,9 @@ export default function App() {
           <Route
             path={BACKOFFICE}
             element={
-              //<ProtectedRoute roles={[Role.ADMIN]}>
+              <ProtectedRoute roles={[Role.ADMIN]}>
                 <Backoffice />
-              //</ProtectedRoute>
+              </ProtectedRoute>
             }
           >
             <Route path="" element={<BackofficeMockChart />} />

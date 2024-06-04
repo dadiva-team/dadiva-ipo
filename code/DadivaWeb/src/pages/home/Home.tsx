@@ -26,7 +26,7 @@ export default function Home() {
           Clear Session
         </button>
       )}
-      {(!user || user.role == Role.ADMIN) && (
+      {(!user || user.perms == Role.ADMIN) && (
         <button
           type="button"
           value="Go to Backoffice"
@@ -38,16 +38,18 @@ export default function Home() {
           BACK OFFICE
         </button>
       )}
-      <button
-        type="button"
-        value="Go to Doctor page"
-        onClick={() => {
-          nav(DOCTOR);
-        }}
-        style={{ display: 'block', marginBottom: '10px' }}
-      >
-        DOCTOR PAGE
-      </button>
+      {(!user || user.perms == Role.DOCTOR || user.perms == Role.ADMIN) && (
+        <button
+          type="button"
+          value="Go to Doctor page"
+          onClick={() => {
+            nav(DOCTOR);
+          }}
+          style={{ display: 'block', marginBottom: '10px' }}
+        >
+          DOCTOR PAGE
+        </button>
+      )}
       <Box
         sx={{
           display: 'flex',
