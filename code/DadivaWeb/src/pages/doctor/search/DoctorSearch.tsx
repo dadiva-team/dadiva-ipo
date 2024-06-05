@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Paper } from '@mui/material';
 import { DonorSearchName } from './DoctorSearchName';
 import { DonorSearchNic } from './DoctorSearchNic';
 import { DoctorSearchResult } from './DoctorSearchResult';
@@ -76,23 +76,23 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
           />
         </Box>
       )}
-      {submission && (
-        <DoctorSearchResult
-          submission={submission}
-          onCheckSubmission={() => {
-            console.log('Checking submission...');
-            setFormCheck(true);
-          }}
-        />
-      )}
-      {isLoading && <LoadingSpinner text={'A carregar...'} />}
       {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
-      {formCheck && submission && <FormCheck formGroups={formGroups} submission={submission} />}
+      {isLoading && <LoadingSpinner text={'A carregar...'} />}
       {submission && (
-        <Box>
-          <Button disabled={true}>Rejeitar formulário</Button>
-          <Button disabled={true}>Aprovar formulário</Button>
-        </Box>
+        <Paper elevation={2} sx={{ padding: 2, display: 'flex', alignItems: 'center' }}>
+          <DoctorSearchResult
+            submission={submission}
+            onCheckSubmission={() => {
+              console.log('Checking submission...');
+              setFormCheck(true);
+            }}
+          />
+          {formCheck && <FormCheck formGroups={formGroups} submission={submission} />}
+          <Box>
+            <Button disabled={true}>Rejeitar formulário</Button>
+            <Button disabled={true}>Aprovar formulário</Button>
+          </Box>
+        </Paper>
       )}
     </Box>
   );

@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS notes cascade;
+DROP TABLE IF EXISTS reviews cascade;
+DROP TABLE  IF EXISTS answers cascade;
+DROP TABLE IF EXISTS questions cascade;
+DROP TABLE IF EXISTS options cascade;
+DROP TABLE IF EXISTS question_groups cascade;
+DROP TABLE IF EXISTS submissions cascade;
+DROP TABLE IF EXISTS forms cascade;
+drop table if exists logical_conditions cascade;
+drop table if exists evaluation_conditions cascade;
+drop table if exists question_rules cascade;
+drop table if exists rules cascade;
+DROP TABLE IF EXISTS users cascade;

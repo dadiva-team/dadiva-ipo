@@ -1,13 +1,14 @@
-import { Group } from "../../../domain/Form/Form";
-import { Submission } from "../../../domain/Submission";
-import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { BuildFormWithAnswers, CheckFormValidity, Inconsistency, QuestionWithAnswer } from "./utils/DoctorSearchAux";
-import { Box, Button, Divider } from "@mui/material";
-import LoadingSpinner from "../../../components/shared/LoadingSpinner";
-import { ErrorAlert } from "../../../components/shared/ErrorAlert";
-import Typography from "@mui/material/Typography";
-import { FormDetails } from "./FormDetails";
+import { Group } from '../../../domain/Form/Form';
+import { Submission } from '../../../domain/Submission';
+import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BuildFormWithAnswers, CheckFormValidity, Inconsistency, QuestionWithAnswer } from './utils/DoctorSearchAux';
+import { Box, Button, Divider } from '@mui/material';
+import LoadingSpinner from '../../../components/shared/LoadingSpinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
+import Typography from '@mui/material/Typography';
+import { FormDetails } from './FormDetails';
+import { PendingActionAlert } from '../../../components/shared/PendingActionAlert';
 
 interface FormCheckProps {
   formGroups: Group[];
@@ -37,8 +38,8 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
 
     if (inconsistencies == null) {
       setInconsistencies([
-        { questionId: 'q1', invalidValue: 'yes' },
-        { questionId: 'q2', invalidValue: 'yes' },
+        { questionId: 'q3', invalidValue: 'no' },
+        { questionId: 'q2', invalidValue: 'no' },
       ]);
       setIsLoading(false);
     }
@@ -61,7 +62,7 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
       ) : (
         <Box>
           <Typography>Formulario submetido {submission.submissionDate}</Typography>
-          {invalidQuestions?.length > 0 && (
+          {invalidQuestions?.length > 0 ? (
             <Box>
               <ErrorAlert error={'Formulário inválido'} clearError={() => setError(null)} />
               <Typography>Existem inconsistências no formulário. Por favor, reveja as seguintes questões:</Typography>
@@ -73,6 +74,11 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
                 </Box>
               ))}
             </Box>
+          ) : (
+            <PendingActionAlert
+              actionMessage={'Formulario parcialmente validado'}
+              clearActionMessage={() => console.log(':D')}
+            />
           )}
           <Button onClick={() => setShowDetails(!showDetails)}>Ver respostas do dador</Button>
           {showDetails && formWithAnswers && <FormDetails formWithAnswers={formWithAnswers} />}

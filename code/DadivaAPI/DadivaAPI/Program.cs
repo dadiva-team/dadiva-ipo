@@ -93,8 +93,9 @@ builder.Services.AddSingleton<ISearchService, SearchService>();
 
 builder.Services.AddSingleton(NpgsqlDataSource.Create("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres"));
 
-builder.Services.AddSingleton<IUsersRepository, UsersRepositoryPGSQL>();
-builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
+//builder.Services.AddSingleton<IUsersRepository, UsersRepositoryPGSQL>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
+builder.Services.AddSingleton<IFormRepository, FormRepositoryPGSQL>();
 builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 
 builder.Services.AddCors(options =>

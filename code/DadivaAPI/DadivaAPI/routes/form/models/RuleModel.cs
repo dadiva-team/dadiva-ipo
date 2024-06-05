@@ -116,6 +116,8 @@ namespace DadivaAPI.routes.form.models
     public class EventModel
     {
         public string Type { get; set; }
+        
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public EventParamsModel? Params { get; set; }
 
         [JsonConstructor]

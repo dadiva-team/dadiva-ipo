@@ -37,7 +37,7 @@ export function CheckFormValidity(
     const inconsistency = inconsistencies?.find(inc => inc?.questionId === question.id);
     if (!inconsistency) return false;
 
-    return question.answer !== inconsistency.invalidValue;
+    return question.answer === inconsistency.invalidValue;
   });
 
   return { invalidQuestions };
