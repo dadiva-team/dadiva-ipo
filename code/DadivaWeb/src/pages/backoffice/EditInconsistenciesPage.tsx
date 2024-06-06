@@ -1,130 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Divider, IconButton, List, ListItem } from '@mui/material';
+import React from 'react';
+import { Box, Button, Card, Divider, List } from '@mui/material';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
 import { Group } from '../../components/backoffice/inconsistencies/Group';
-import { Form } from '../../domain/Form/Form';
-import { useNavigate } from 'react-router-dom';
-import { handleError, handleRequest } from '../../services/utils/fetch';
-import { FormServices } from '../../services/from/FormServices';
-import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { Inconsistency } from '../../components/backoffice/inconsistencies/Inconsistency';
 import Typography from '@mui/material/Typography';
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import { AddConditionDialog } from '../../components/backoffice/inconsistencies/AddConditionDialog';
+import { useEditInconsistenciesPage } from '../../components/backoffice/inconsistencies/useEditInconsistenciesPage';
 
 const SHOW_FORM = false;
 
 export function EditInconsistenciesPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [formFetchData, setFormFetchData] = useState<Form>();
-  const [inconsistencies, setInconsistencies] = useState<RuleProperties[]>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [addingCondition, setAddingCondition] = useState<number>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [addingInconsistency, setAddingInconsistency] = useState<boolean>(false);
-
-  const nav = useNavigate();
-
-  useEffect(() => {
-    const fetch = async () => {
-      const [formError, formRes] = await handleRequest(FormServices.getForm());
-      if (formError) {
-        handleError(formError, setError, nav);
-        return;
-      }
-      setFormFetchData(formRes);
-      const [incError, inconsistenciesRes] = await handleRequest(FormServices.getInconsistencies());
-
-      if (incError) {
-        handleError(incError, setError, nav);
-        return;
-      }
-
-      setInconsistencies(inconsistenciesRes);
-      setIsLoading(false);
-    };
-
-    if (isLoading) fetch();
-  }, [isLoading, nav]);
-
-  function onAddInconsistency() {
-    setInconsistencies(old => {
-      return [...old, { conditions: { all: [] }, event: { type: 'showInconsistency' } } as RuleProperties];
-    });
-  }
-
-  function onAddCondition(index: number) {
-    setAddingCondition(index);
-  }
-
-  function conditionAllIsEmpty(conditions?: TopLevelCondition) {
-    if (conditions && 'all' in conditions) return conditions.all.length == 0;
-    return false;
-  }
-
-  function saveInconsistencies() {
-    const filteredInconsistencies = inconsistencies.filter(
-      inc => 'all' in inc.conditions && inc.conditions.all.length !== 0
-    );
-    FormServices.saveInconsistencies(filteredInconsistencies).then(res => {
-      if (res) nav('/');
-    });
-  }
+  const {
+    isLoading,
+    error,
+    formFetchData,
+    inconsistencies,
+    setInconsistencies,
+    addingCondition,
+    setAddingCondition,
+    setError,
+    onAddInconsistency,
+    onAddCondition,
+    onDeletingInconsistency,
+    conditionAllIsEmpty,
+    saveInconsistencies,
+  } = useEditInconsistenciesPage();
 
   return (
     <div>
       <div>
         {isLoading ? (
           <Box sx={{ mt: 1 }}>
-            <LoadingSpinner text={'A carregar as perguntas...'} />
+            <LoadingSpinner text={'A carregar as incoerências...'} />
             <ErrorAlert error={error} clearError={() => setError(null)} />
           </Box>
         ) : (
           <>
+            <List sx={{ width: '100%' }}>
+              {inconsistencies.map((inc, index) => (
+                <Card
+                  key={index}
+                  sx={{
+                    margin: 2,
+                    border: 1.5,
+                    borderColor: 'black',
+                  }}
+                >
+                  <Inconsistency
+                    inconsistency={inc}
+                    groups={formFetchData.groups}
+                    onAddCondition={() => onAddCondition(index)}
+                    onDelete={() => onDeletingInconsistency(index, inc)}
+                  />
+                  {index !== inconsistencies.length - 1 && <Divider />}
+                </Card>
+              ))}
+            </List>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Button
+                color="primary"
+                disabled={conditionAllIsEmpty(inconsistencies[inconsistencies.length - 1]?.conditions)}
+                onClick={() => onAddInconsistency()}
+              >
+                Criar Grupo
+              </Button>
+            </Box>
             <Box>
               {SHOW_FORM && <Typography variant="h6">Formulário</Typography> &&
                 formFetchData.groups.map(group => <Group group={group} key={group.name} />)}
-            </Box>
-            <Box sx={{ width: '100%' }}>
-              <Typography variant="h6">Incoerências</Typography>
-              <List sx={{ width: '100%' }}>
-                {inconsistencies.map((inc, index) => (
-                  <ListItem key={index}>
-                    <Box
-                      sx={{
-                        width: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Inconsistency
-                        inconsistency={inc}
-                        groups={formFetchData.groups}
-                        onAddCondition={() => onAddCondition(index)}
-                      />
-                      {index !== inconsistencies.length - 1 && <Divider />}
-                    </Box>
-                  </ListItem>
-                ))}
-              </List>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <IconButton
-                  disabled={conditionAllIsEmpty(inconsistencies[inconsistencies.length - 1]?.conditions)}
-                  color="primary"
-                  onClick={() => onAddInconsistency()}
-                >
-                  <ControlPointIcon />
-                </IconButton>
-              </Box>
             </Box>
             <AddConditionDialog
               open={addingCondition !== null}
