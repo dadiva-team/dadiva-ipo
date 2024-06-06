@@ -39,7 +39,16 @@ export function FormEditDialog({ open, question, onAnswer, onClose }: SimpleDial
   };
 
   return (
-    <Dialog onClose={handleClose} open={open} aria-labelledby="edit-dialog-title">
+    <Dialog
+      onClose={handleClose}
+      open={open}
+      aria-labelledby="edit-dialog-title"
+      sx={{
+        '& .MuiPaper-root': {
+          backgroundColor: 'white', // Set the dialog background color
+        },
+      }}
+    >
       <DialogTitle id="edit-dialog-title">Edite a sua resposta</DialogTitle>
       <IconButton
         aria-label="close"
@@ -54,7 +63,12 @@ export function FormEditDialog({ open, question, onAnswer, onClose }: SimpleDial
       >
         <Close fontSize="inherit" />
       </IconButton>
-      <DialogContent dividers>
+      <DialogContent
+        dividers
+        sx={{
+          backgroundColor: 'white', // Set the content background color
+        }}
+      >
         <Box
           sx={{
             display: 'flex',

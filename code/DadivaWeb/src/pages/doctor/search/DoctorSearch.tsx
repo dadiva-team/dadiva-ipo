@@ -60,7 +60,7 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
   };
 
   return (
-    <Box>
+    <Box sx={{ pr: 1 }}>
       {mode === 'name' ? (
         <Box>
           <DonorSearchName />
@@ -79,19 +79,21 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
       {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
       {isLoading && <LoadingSpinner text={'A carregar...'} />}
       {submission && (
-        <Paper elevation={2} sx={{ padding: 2, display: 'flex', alignItems: 'center' }}>
+        <Paper elevation={2} sx={{ padding: 2, display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
           <DoctorSearchResult
             submission={submission}
             onCheckSubmission={() => {
               console.log('Checking submission...');
-              setFormCheck(true);
+              setFormCheck(!formCheck);
             }}
           />
-          {formCheck && <FormCheck formGroups={formGroups} submission={submission} />}
-          <Box>
-            <Button disabled={true}>Rejeitar formulário</Button>
-            <Button disabled={true}>Aprovar formulário</Button>
-          </Box>
+          {formCheck && (
+            <Box sx={{ marginLeft: 1, width: '80%' }}>
+              <FormCheck formGroups={formGroups} submission={submission} />
+              <Button disabled={true}>Rejeitar</Button>
+              <Button disabled={true}>Aprovar</Button>
+            </Box>
+          )}
         </Paper>
       )}
     </Box>

@@ -38,7 +38,8 @@ export function Inconsistency({ inconsistency, groups, onAddCondition, onDelete 
           >
             <Box
               sx={{
-                width: '100%',
+                pl: 0.5,
+                width: '50%',
                 border: 1,
               }}
             >
@@ -49,7 +50,8 @@ export function Inconsistency({ inconsistency, groups, onAddCondition, onDelete 
             </Box>
             <Box
               sx={{
-                width: '100%',
+                pl: 0.5,
+                width: '15%',
                 border: 1,
               }}
             >
@@ -59,7 +61,8 @@ export function Inconsistency({ inconsistency, groups, onAddCondition, onDelete 
             </Box>
             <Box
               sx={{
-                width: '100%',
+                pl: 0.5,
+                width: '25%',
                 border: 1,
               }}
             >

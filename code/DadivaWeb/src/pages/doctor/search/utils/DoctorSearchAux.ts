@@ -1,5 +1,6 @@
-import { Group } from "../../../../domain/Form/Form";
-import { Answers } from "../../../../domain/Submission";
+import { Group } from '../../../../domain/Form/Form';
+import { Answers } from '../../../../domain/Submission';
+import { RuleProperties } from 'json-rules-engine';
 
 export interface QuestionWithAnswer {
   id: string;
@@ -17,7 +18,7 @@ export interface DoctorViewProps {
   donorAnswers: Answers[];
 }
 
-export function BuildFormWithAnswers({ formGroups, donorAnswers }: DoctorViewProps): QuestionWithAnswer[] {
+export function buildFormWithAnswers({ formGroups, donorAnswers }: DoctorViewProps): QuestionWithAnswer[] {
   const answerMap = new Map(donorAnswers?.map(answer => [answer.questionId, answer.answer]));
 
   return formGroups.flatMap(group =>
@@ -29,10 +30,12 @@ export function BuildFormWithAnswers({ formGroups, donorAnswers }: DoctorViewPro
   );
 }
 
-export function CheckFormValidity(
+export function checkFormValidity(
   formWithAnswers: QuestionWithAnswer[],
   inconsistencies: Inconsistency[]
 ): { invalidQuestions: QuestionWithAnswer[] } {
+  console.log('Form with answers ', formWithAnswers);
+  console.log('Inconsistencies ', inconsistencies);
   const invalidQuestions = formWithAnswers?.filter(question => {
     const inconsistency = inconsistencies?.find(inc => inc?.questionId === question.id);
     if (!inconsistency) return false;
@@ -41,4 +44,24 @@ export function CheckFormValidity(
   });
 
   return { invalidQuestions };
+}
+
+export function extractInconsistencies(ruleProperty: RuleProperties): Inconsistency[] {
+  const inconsistencies: Inconsistency[] = [];
+
+  const condition = ruleProperty.conditions;
+
+  if ('all' in condition && condition.all) {
+    condition.all.forEach(subCondition => {
+      if ('fact' in subCondition && 'value' in subCondition) {
+        inconsistencies.push({
+          questionId: subCondition.fact,
+          invalidValue: subCondition.value,
+        });
+      }
+    });
+  }
+
+  console.log('Inconsistencies ', inconsistencies);
+  return inconsistencies;
 }

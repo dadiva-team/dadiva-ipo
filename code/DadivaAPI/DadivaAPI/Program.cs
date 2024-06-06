@@ -95,7 +95,7 @@ builder.Services.AddSingleton(NpgsqlDataSource.Create("Host=localhost;Port=5432;
 
 //builder.Services.AddSingleton<IUsersRepository, UsersRepositoryPGSQL>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
-builder.Services.AddSingleton<IFormRepository, FormRepositoryPGSQL>();
+builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
 builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 
 builder.Services.AddCors(options =>

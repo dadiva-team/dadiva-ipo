@@ -2,13 +2,21 @@ import { Group } from '../../../domain/Form/Form';
 import { Submission } from '../../../domain/Submission';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { BuildFormWithAnswers, CheckFormValidity, Inconsistency, QuestionWithAnswer } from './utils/DoctorSearchAux';
+import {
+  buildFormWithAnswers,
+  checkFormValidity,
+  extractInconsistencies,
+  Inconsistency,
+  QuestionWithAnswer,
+} from './utils/DoctorSearchAux';
 import { Box, Button, Divider } from '@mui/material';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 import Typography from '@mui/material/Typography';
 import { FormDetails } from './FormDetails';
 import { PendingActionAlert } from '../../../components/shared/PendingActionAlert';
+import { handleError, handleRequest } from '../../../services/utils/fetch';
+import { FormServices } from '../../../services/from/FormServices';
 
 interface FormCheckProps {
   formGroups: Group[];
@@ -25,32 +33,36 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
   useEffect(() => {
-    /*const fetch = async () => {
+    const fetch = async () => {
       const [error, res] = await handleRequest(FormServices.getInconsistencies());
       if (error) {
         handleError(error, setError, nav);
+        setIsLoading(false); // stop loading if there is an error
         return;
       }
-      return res as Inconsistency[];
-    };*/
 
-    // TODO ir buscar as inconsistencies
+      const inconsistencies = extractInconsistencies(res[0]);
+      setInconsistencies(inconsistencies.length == 0 ? null : inconsistencies);
+    };
 
     if (inconsistencies == null) {
-      setInconsistencies([
-        { questionId: 'q3', invalidValue: 'no' },
-        { questionId: 'q2', invalidValue: 'no' },
-      ]);
-      setIsLoading(false);
+      fetch().then(() => setIsLoading(false));
     }
-    if (formWithAnswers == null) {
-      setFormWithAnswers(BuildFormWithAnswers({ formGroups, donorAnswers: submission.answers }));
-    }
+  }, [inconsistencies, nav]);
 
-    if (invalidQuestions == null) {
-      setInvalidQuestions(CheckFormValidity(formWithAnswers, inconsistencies).invalidQuestions);
+// Process form
+  useEffect(() => {
+    if (formWithAnswers == null) {
+      setFormWithAnswers(buildFormWithAnswers({ formGroups, donorAnswers: submission.answers }));
     }
-  }, [inconsistencies, formWithAnswers, submission, formGroups, invalidQuestions, nav]);
+  }, [formWithAnswers, formGroups, submission]);
+
+// Check invalid questions
+  useEffect(() => {
+    if (formWithAnswers != null && inconsistencies != null) {
+      setInvalidQuestions(checkFormValidity(formWithAnswers, inconsistencies).invalidQuestions);
+    }
+  }, [formWithAnswers, inconsistencies]);
 
   return (
     <Box>
@@ -61,14 +73,14 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
         </Box>
       ) : (
         <Box>
-          <Typography>Formulario submetido {submission.submissionDate}</Typography>
+          <Typography>Formulario submetido: {submission.submissionDate}</Typography>
           {invalidQuestions?.length > 0 ? (
             <Box>
-              <ErrorAlert error={'Formulário inválido'} clearError={() => setError(null)} />
+              <ErrorAlert error={'Formulário parcialmente inválido'} clearError={() => setError(null)} />
               <Typography>Existem inconsistências no formulário. Por favor, reveja as seguintes questões:</Typography>
               <Divider />
               {invalidQuestions.map(question => (
-                <Box key={question.id}>
+                <Box key={question.id} sx={{ pl: 1.5, display: 'flex', justifyContent: 'space-between', width: '70%' }}>
                   <Typography>{question.question}</Typography>
                   <Typography>Resposta: {question.answer}</Typography>
                 </Box>
@@ -80,8 +92,12 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
               clearActionMessage={() => console.log(':D')}
             />
           )}
-          <Button onClick={() => setShowDetails(!showDetails)}>Ver respostas do dador</Button>
-          {showDetails && formWithAnswers && <FormDetails formWithAnswers={formWithAnswers} />}
+          <Button sx= {{pt: 1}} onClick={() => setShowDetails(!showDetails)}>Ver respostas do dador</Button>
+          {showDetails && formWithAnswers && (
+            <Box sx={{ pt: 2 }}>
+              <FormDetails formWithAnswers={formWithAnswers} invalidQuestions={invalidQuestions} />
+            </Box>
+          )}
         </Box>
       )}
     </Box>

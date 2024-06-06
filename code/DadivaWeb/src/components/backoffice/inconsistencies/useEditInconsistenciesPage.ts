@@ -32,6 +32,7 @@ export function useEditInconsistenciesPage() {
         return;
       }
 
+      console.log(inconsistenciesRes)
       setInconsistencies(inconsistenciesRes);
       setIsLoading(false);
     };
