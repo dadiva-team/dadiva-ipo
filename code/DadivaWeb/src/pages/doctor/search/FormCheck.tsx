@@ -17,6 +17,8 @@ import { FormDetails } from './FormDetails';
 import { PendingActionAlert } from '../../../components/shared/PendingActionAlert';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { FormServices } from '../../../services/from/FormServices';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface FormCheckProps {
   formGroups: Group[];
@@ -50,14 +52,12 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
     }
   }, [inconsistencies, nav]);
 
-// Process form
   useEffect(() => {
     if (formWithAnswers == null) {
       setFormWithAnswers(buildFormWithAnswers({ formGroups, donorAnswers: submission.answers }));
     }
   }, [formWithAnswers, formGroups, submission]);
 
-// Check invalid questions
   useEffect(() => {
     if (formWithAnswers != null && inconsistencies != null) {
       setInvalidQuestions(checkFormValidity(formWithAnswers, inconsistencies).invalidQuestions);
@@ -77,12 +77,17 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
           {invalidQuestions?.length > 0 ? (
             <Box>
               <ErrorAlert error={'Formulário parcialmente inválido'} clearError={() => setError(null)} />
-              <Typography>Existem inconsistências no formulário. Por favor, reveja as seguintes questões:</Typography>
-              <Divider />
+              <Typography variant="h6">
+                Existem inconsistências no formulário. Por favor, reveja as seguintes questões:
+              </Typography>
+              <Divider sx={{ p: 0.5 }} />
               {invalidQuestions.map(question => (
-                <Box key={question.id} sx={{ pl: 1.5, display: 'flex', justifyContent: 'space-between', width: '70%' }}>
-                  <Typography>{question.question}</Typography>
-                  <Typography>Resposta: {question.answer}</Typography>
+                <Box
+                  key={question.id}
+                  sx={{ pl: 1.5, pt: 1, display: 'flex', justifyContent: 'space-between', width: '70%' }}
+                >
+                  <Typography sx={{ width: '70%' }}>{question.question}</Typography>
+                  <Typography sx={{ width: '30%' }}>Resposta: {question.answer}</Typography>
                 </Box>
               ))}
             </Box>
@@ -92,7 +97,11 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
               clearActionMessage={() => console.log(':D')}
             />
           )}
-          <Button sx= {{pt: 1}} onClick={() => setShowDetails(!showDetails)}>Ver respostas do dador</Button>
+          <Box sx={{ pt: 2 }}>
+            <Button variant="outlined" endIcon={!showDetails ? <ManageSearchIcon /> : <CloseIcon/>} onClick={() => setShowDetails(!showDetails)}>
+              Respostas
+            </Button>
+          </Box>
           {showDetails && formWithAnswers && (
             <Box sx={{ pt: 2 }}>
               <FormDetails formWithAnswers={formWithAnswers} invalidQuestions={invalidQuestions} />
