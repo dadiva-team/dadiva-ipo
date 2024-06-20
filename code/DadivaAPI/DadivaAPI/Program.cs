@@ -1,10 +1,12 @@
 using System.Text;
+using System.Text.Json;
 using DadivaAPI.repositories.dnd;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.search;
 using DadivaAPI.routes.example;
 using DadivaAPI.routes.form;
+using DadivaAPI.routes.form.models;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.dnd;
 using DadivaAPI.services.example;
@@ -15,7 +17,10 @@ using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,14 +93,17 @@ builder.Services.AddSingleton(new ElasticsearchClient(settings));
 
 builder.Services.AddSingleton<IExampleService, ExampleService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
-builder.Services.AddSingleton<IFormService, FormService>();
+builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddSingleton<ISearchService, SearchService>();
 
-builder.Services.AddSingleton(NpgsqlDataSource.Create("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres"));
+builder.Services.AddDbContext<FormDbContext>(options =>
+    options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres")
+);
 
-//builder.Services.AddSingleton<IUsersRepository, UsersRepositoryPGSQL>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
-builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
+//builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
+builder.Services.AddScoped<IFormRepository, FormRepositoryPGSQL>();
+//builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
 builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
 
 builder.Services.AddCors(options =>
@@ -130,5 +138,8 @@ group.AddExampleRoutes();
 group.AddUsersRoutes();
 group.AddFormRoutes();
 group.AddSearchRoutes();
+
+await (app.Services.CreateScope().ServiceProvider.GetService(typeof(IFormRepository)) as FormRepositoryPGSQL)
+    .EditForm(MockForm.Form);
 
 app.Run();

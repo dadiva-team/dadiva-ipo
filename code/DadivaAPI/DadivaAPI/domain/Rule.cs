@@ -1,6 +1,9 @@
 namespace DadivaAPI.domain;
 
-public record Rule(LogicalCondition Conditions, Event Event);
+public record Rule(LogicalCondition Conditions, Event Event)
+{
+    public int Id { get; init; }
+};
 
 public abstract record Condition;
 

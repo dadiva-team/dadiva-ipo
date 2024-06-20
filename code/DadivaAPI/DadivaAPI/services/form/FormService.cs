@@ -1,12 +1,11 @@
 using DadivaAPI.domain;
 using DadivaAPI.repositories.form;
-using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.utils;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IFormRepository repository, IUsersRepository userRepository) : IFormService
+public class FormService(IFormRepository repository) : IFormService
 {
     public async Task<Result<GetFormOutputModel, Problem>> GetForm()
     {
@@ -27,13 +26,15 @@ public class FormService(IFormRepository repository, IUsersRepository userReposi
         );
     }
 
-    public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules)
+    public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules, User user)
     {
 
         Form form = new Form
         (
             groups.ConvertAll(QuestionGroupModel.ToDomain).ToList(),
-            rules.ConvertAll(RuleModel.ToDomain).ToList()
+            rules.ConvertAll(RuleModel.ToDomain).ToList(),
+            user,
+            DateTime.Now
         );
 
         return Result<Form, Problem>.Success(await repository.EditForm(form));
@@ -51,8 +52,7 @@ public class FormService(IFormRepository repository, IUsersRepository userReposi
 
     public async Task<Result<bool, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic)
     {
-        String currentDate = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
-        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), currentDate);
+        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), "now");
         bool isSubmitted = await repository.SubmitForm(submission, nic);
         if (isSubmitted) return Result<bool, Problem>.Success(true);
 
@@ -68,31 +68,6 @@ public class FormService(IFormRepository repository, IUsersRepository userReposi
     public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()
     {
         return Result<Dictionary<int, Submission>, Problem>.Success(await repository.GetSubmissions());
-    }
-    
-    public async Task<Result<Submission, Problem>> GetSubmission(int nic)
-    {
-        User? user = await userRepository.GetUserByNic(nic);
-        if (user is null)
-            return Result<Submission, Problem>.Failure(
-                new Problem(
-                    "errorGettingSubmission.com",
-                    "The user with that nic does not exist",
-                    404,
-                    "Não foi encontrado nenhum dador registado com esse NIC") //TODO Create Problems types for submission
-            );
-        Submission? submission = await repository.GetSubmission(nic);
-        System.Console.WriteLine(submission);
-        if (submission is null)
-            return Result<Submission, Problem>.Failure(
-                new Problem(
-                    "errorGettingSubmission.com",
-                    "No submissions found for that user",
-                    404,
-                    "No submission found for that user ") //TODO Create Problems types for submission
-            );
-
-        return Result<Submission, Problem>.Success(submission);
     }
     
     public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()

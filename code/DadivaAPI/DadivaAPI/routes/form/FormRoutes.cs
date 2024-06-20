@@ -46,7 +46,7 @@ public static class FormRoutes
 
     private static async Task<IResult> GetSubmission([FromRoute] int nic, IFormService service)
     {
-        Result<Submission, Problem> result = await service.GetSubmission(nic);
+        Result<Submission, Problem> result = Result<Submission, Problem>.Success(null); //await service.GetSubmission(nic);
         return result switch
         {
             Result<Submission, Problem>.SuccessResult success => Results.Ok(
@@ -119,9 +119,10 @@ public static class FormRoutes
         };
     }
 
-    private static async Task<IResult> EditForm([FromBody] EditFormRequest input, IFormService service)
+    private static async Task<IResult> EditForm(HttpContext context, [FromBody] EditFormRequest input, IFormService service)
     {
-        Result<Form, Problem> result = await service.EditForm(input.Groups, input.Rules);
+        var user = new User(int.Parse(context.User.Claims.First(claim => claim.Type == "nic").Value), context.User.Claims.First(claim => claim.Type == "name").Value, "", Enum.Parse<Role>(context.User.Claims.First(claim => claim.Type == "perms").Value));
+        Result<Form, Problem> result = await service.EditForm(input.Groups, input.Rules, user);
         return result switch
         {
             Result<Form, Problem>.SuccessResult success => Results.Json(

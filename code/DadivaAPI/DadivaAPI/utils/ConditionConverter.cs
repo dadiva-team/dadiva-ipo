@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DadivaAPI.domain;
-using DadivaAPI.routes.form.models;
 
 namespace DadivaAPI.utils;
 
@@ -14,13 +13,14 @@ public class ConditionConverter : JsonConverter<Condition>
             var rootElement = doc.RootElement;
 
             // Handle nested logical conditions and evaluation conditions
-            if (rootElement.TryGetProperty("fact", out _))
+            if (rootElement.TryGetProperty("fact", out _) || rootElement.TryGetProperty("Fact", out _))
             {
+                Console.Out.WriteLine("Root element: " + rootElement.ToString());
                 return JsonSerializer.Deserialize<EvaluationCondition>(rootElement.GetRawText(), options);
             }
 
-            if (rootElement.TryGetProperty("all", out _) ||
-                rootElement.TryGetProperty("any", out _))
+            if (rootElement.TryGetProperty("all", out _) || rootElement.TryGetProperty("All", out _) ||
+                rootElement.TryGetProperty("any", out _) || rootElement.TryGetProperty("Any", out _))
             {
                 return JsonSerializer.Deserialize<LogicalCondition>(rootElement.GetRawText(), options);
             }
