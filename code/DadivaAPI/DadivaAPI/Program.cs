@@ -1,22 +1,13 @@
 using System.Text;
-using DadivaAPI.repositories.dnd;
-using DadivaAPI.repositories.form;
-using DadivaAPI.repositories.users;
-using DadivaAPI.routes.search;
-using DadivaAPI.routes.example;
+using DadivaAPI.repositories;
 using DadivaAPI.routes.form;
 using DadivaAPI.routes.users;
-using DadivaAPI.services.dnd;
-using DadivaAPI.services.example;
 using DadivaAPI.services.form;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
-using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Serialization;
-using Elastic.Transport;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,32 +62,30 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var nodePool = new SingleNodePool(new Uri("http://localhost:9200"));
-var settings = new ElasticsearchClientSettings(
-    nodePool,
-    sourceSerializer: (_, settings) =>
-    {
-        return new DefaultSourceSerializer(settings, options =>
-        {
-            options.Converters.Add(new AnswerConverter());
-            options.Converters.Add(new ConditionConverter());
-        });
-    });
+string? databaseType = builder.Configuration.GetSection("DatabaseType").Get<string>();
 
-// Register the Elasticsearch client as a singleton
-builder.Services.AddSingleton(new ElasticsearchClient(settings));
+switch (databaseType)
+{
+    case "PGSQL":
+        builder.Services.AddDbContext<DadivaDbContext>(options =>
+            options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres")
+        );
+        break;
+    case "MEMORY":
+        builder.Services.AddDbContext<DadivaDbContext>(options =>
+            options.UseInMemoryDatabase("DadivaDbContext")
+        );
+        break;
+    default:
+        throw new Exception(
+            "DatabaseType must be provided in appsettings.json. Aceepted values are PGSQL or MEMORY.");
+}
 
-builder.Services.AddSingleton<IExampleService, ExampleService>();
-builder.Services.AddSingleton<IUsersService, UsersService>();
-builder.Services.AddSingleton<IFormService, FormService>();
-builder.Services.AddSingleton<ISearchService, SearchService>();
 
-builder.Services.AddSingleton(NpgsqlDataSource.Create("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres"));
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IFormService, FormService>();
 
-//builder.Services.AddSingleton<IUsersRepository, UsersRepositoryPGSQL>();
-builder.Services.AddSingleton<IUsersRepository, UsersRepositoryES>();
-builder.Services.AddSingleton<IFormRepository, FormRepositoryES>();
-builder.Services.AddSingleton<ISearchRepository, SearchRepositoryMemory>();
+builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddCors(options =>
 {
@@ -126,9 +115,15 @@ if (app.Environment.IsDevelopment())
 
 var group = app.MapGroup("/api");
 
-group.AddExampleRoutes();
 group.AddUsersRoutes();
 group.AddFormRoutes();
-group.AddSearchRoutes();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<DadivaDbContext>();
+    context.Database.Migrate();  // Apply pending migrations
+    PopulateDatabase.Initialize(context);
+}
 
 app.Run();

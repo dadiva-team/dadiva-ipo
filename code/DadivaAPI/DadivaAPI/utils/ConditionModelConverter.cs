@@ -13,7 +13,7 @@ public class ConditionModelConverter : JsonConverter<ConditionModel>
         var rootElement = doc.RootElement;
 
         // Handle nested logical conditions and evaluation conditions
-        if (rootElement.TryGetProperty("fact", out _))
+        if (rootElement.TryGetProperty("fact", out _) || rootElement.TryGetProperty("Fact", out _))
         {
             return JsonSerializer.Deserialize<EvaluationConditionModel>(rootElement.GetRawText(), options);
         }

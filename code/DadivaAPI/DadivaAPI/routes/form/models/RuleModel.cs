@@ -69,6 +69,9 @@ namespace DadivaAPI.routes.form.models
 
         public static LogicalConditionModel FromDomain(LogicalCondition conditions)
         {
+            Console.Out.WriteLine(conditions);
+            Console.Out.WriteLine(conditions.All);
+            Console.Out.WriteLine(conditions.Any);
             return new LogicalConditionModel(
                 ConditionModel.FromDomain(conditions.All),
                 ConditionModel.FromDomain(conditions.Any)

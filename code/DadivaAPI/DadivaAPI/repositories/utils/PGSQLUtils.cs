@@ -1,3 +1,4 @@
+using DadivaAPI.domain;
 using Npgsql;
 
 namespace DadivaAPI.repositories.utils;
@@ -8,11 +9,12 @@ public static class PGSQLUtils
 
     public static async Task<T> InTransaction<T>(NpgsqlDataSource dataSource, NpgsqlCommandToTFunction<T> action)
     {
-        var connection = await dataSource.OpenConnectionAsync();
-        var transaction = await connection.BeginTransactionAsync();
+        await using var connection = await dataSource.OpenConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
         try
         {
-            var result = await action(new NpgsqlCommand("", connection, transaction));
+            await using var command = new NpgsqlCommand("", connection, transaction);
+            var result = await action(command);
             await transaction.CommitAsync();
             return result;
         }

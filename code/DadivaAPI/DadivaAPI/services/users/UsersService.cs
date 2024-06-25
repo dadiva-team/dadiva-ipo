@@ -1,21 +1,20 @@
 using DadivaAPI.domain;
-using DadivaAPI.repositories.users;
+using DadivaAPI.repositories;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
-using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.users;
 
-public class UsersService(IConfiguration config, IUsersRepository repository) : IUsersService
+public class UsersService(IConfiguration config, IRepository repository) : IUsersService
 {
     public async Task<Result<Token, Problem>> CreateToken(int nic, string password)
     {
         try
         {
             string hashedPassword = User.HashPassword(password);
-
+            Console.Out.WriteLine("nic: " + nic + " password: " + password + " hashedPassword: " + hashedPassword);
             User? user = await repository.GetUserByNic(nic);
-
+            Console.Out.WriteLine("user: " + user + " user.HashedPassword: " + user?.HashedPassword);
             if (user == null || user.HashedPassword != hashedPassword)
             {
                 return Result<Token, Problem>.Failure(
