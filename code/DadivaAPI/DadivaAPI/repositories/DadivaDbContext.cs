@@ -3,14 +3,15 @@ using DadivaAPI.domain;
 using DadivaAPI.utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace DadivaAPI.repositories.form;
+namespace DadivaAPI.repositories;
 
-public class FormDbContext : DbContext
+public class DadivaDbContext : DbContext
 {
-    public FormDbContext(DbContextOptions<FormDbContext> options) : base(options)
+    public DadivaDbContext(DbContextOptions<DadivaDbContext> options) : base(options)
     {
     }
-
+    
+    public DbSet<User> Users { get; set; }
     public DbSet<Form> Forms { get; set; }
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
@@ -73,6 +74,8 @@ public class FormDbContext : DbContext
             
         modelBuilder.Entity<AnsweredQuestion>()
             .HasKey(aq => aq.Id);
+        modelBuilder.Entity<User>()
+            .HasKey(user => user.Nic);
         // Configure other entities as needed
     }
 }

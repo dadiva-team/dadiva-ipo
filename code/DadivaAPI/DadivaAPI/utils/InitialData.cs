@@ -1,9 +1,40 @@
 using DadivaAPI.domain;
 
-namespace DadivaAPI.repositories.form;
+namespace DadivaAPI.utils;
 
-public class MockForm
+public class InitialData
 {
+    static readonly User Admin = new User
+    (
+        987654321,
+        "Eng. Doe",
+        "MegaPassword123!hashed",
+        Role.admin
+    );
+
+    static readonly User Doctor = new User
+    (
+        111111111,
+        "Dr. Doe",
+        "MegaPassword123!hashed",
+        Role.doctor
+    );
+
+    static readonly User Donor = new User
+    (
+        123456789,
+        "John Doe",
+        "MegaPassword123!hashed",
+        Role.donor
+    );
+    
+    public static readonly List<User> Users =
+    [
+        Admin,
+        Doctor,
+        Donor
+    ];
+
     public static readonly Form Form = new Form
     (
         [
@@ -62,7 +93,7 @@ public class MockForm
             ])
         ],
         [],
-        new User(111111111, "Dr. Doe", "MegaPassword123!", Role.doctor),
-        DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc)
+        Admin,
+        DateTime.Now.ToUniversalTime()
     );
 }

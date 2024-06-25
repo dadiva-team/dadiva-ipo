@@ -9,7 +9,10 @@ public class AnswerConverter : JsonConverter<IAnswer>
     public override IAnswer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         using JsonDocument doc = JsonDocument.ParseValue(ref reader);
-        JsonElement element = doc.RootElement.GetProperty("content");
+        Console.Out.WriteLine(doc.RootElement);
+        JsonElement element = doc.RootElement.GetProperty("Content");
+
+
         Console.Out.WriteLine("Element: " + element);
         return element.ValueKind switch
         {

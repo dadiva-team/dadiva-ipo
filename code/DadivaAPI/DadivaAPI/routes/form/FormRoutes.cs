@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -37,7 +38,7 @@ public static class FormRoutes
                     success.Value.Select(pair => new SubmissionModel(
                         pair.Key,
                         pair.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                        pair.Value.SubmissionDate
+                        pair.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture)
                     )).ToList())),
             Result<Dictionary<int, Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
@@ -46,14 +47,14 @@ public static class FormRoutes
 
     private static async Task<IResult> GetSubmission([FromRoute] int nic, IFormService service)
     {
-        Result<Submission, Problem> result = Result<Submission, Problem>.Success(null); //await service.GetSubmission(nic);
+        var result = await service.GetSubmission(nic);
         return result switch
         {
             Result<Submission, Problem>.SuccessResult success => Results.Ok(
                 new SubmissionModel(
                     nic,
                     success.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                    success.Value.SubmissionDate
+                    success.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture)
                 )),
             Result<Submission, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")

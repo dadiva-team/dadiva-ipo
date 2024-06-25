@@ -15,20 +15,33 @@ public class EventConverter : JsonConverter<Event>
             Console.Out.WriteLine("Root element: " + rootElement.ToString());
             var typeString = rootElement.GetProperty("Type").GetString();
             var type = Enum.Parse<EventType>(typeString);
+
+            EventParams? eventParams = null;           
             
-            var id = rootElement.GetProperty("Params").GetProperty("Id").GetString();
+            if(rootElement.TryGetProperty("Params", out var paramsElement))
+             eventParams = new EventParams(paramsElement.GetProperty("Id").GetString());
             
             return new Event(
                 Type: type,
-                Params: new EventParams(
-                    Id: id
-                )
+                Params: eventParams
             );
         }
     }
 
     public override void Write(Utf8JsonWriter writer, Event value, JsonSerializerOptions options)
     {
-        JsonSerializer.Serialize(writer, (object)value, value.GetType(), options);
+        writer.WriteStartObject();
+        
+        writer.WriteString("Type", value.Type.ToString());
+        
+        if (value?.Params != null)
+        {
+            writer.WritePropertyName("Params");
+            writer.WriteStartObject();
+            writer.WriteString("Id", value.Params.Id);
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndObject();
     }
 }

@@ -1,11 +1,12 @@
 using DadivaAPI.domain;
-using DadivaAPI.repositories.form;
+using DadivaAPI.repositories;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.utils;
+using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IFormRepository repository) : IFormService
+public class FormService(IRepository repository) : IFormService
 {
     public async Task<Result<GetFormOutputModel, Problem>> GetForm()
     {
@@ -34,7 +35,7 @@ public class FormService(IFormRepository repository) : IFormService
             groups.ConvertAll(QuestionGroupModel.ToDomain).ToList(),
             rules.ConvertAll(RuleModel.ToDomain).ToList(),
             user,
-            DateTime.Now
+            DateTime.Now.ToUniversalTime()
         );
 
         return Result<Form, Problem>.Success(await repository.EditForm(form));
@@ -52,7 +53,7 @@ public class FormService(IFormRepository repository) : IFormService
 
     public async Task<Result<bool, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic)
     {
-        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), "now");
+        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic);
         bool isSubmitted = await repository.SubmitForm(submission, nic);
         if (isSubmitted) return Result<bool, Problem>.Success(true);
 
@@ -65,6 +66,20 @@ public class FormService(IFormRepository repository) : IFormService
             )); //TODO Create Problems types for form
     }
 
+    public async Task<Result<Submission, Problem>> GetSubmission(int id)
+    {
+        Submission? submission = await repository.GetSubmission(id);
+        if (submission == null)
+            return Result<Submission, Problem>.Failure(
+                new Problem(
+                    "errorGettingSubmission.com",
+                    "Error getting submission",
+                    404,
+                    "An error occurred while getting submission") //TODO Create Problems types for form
+            );
+        return Result<Submission, Problem>.Success(submission);
+    }
+
     public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()
     {
         return Result<Dictionary<int, Submission>, Problem>.Success(await repository.GetSubmissions());
@@ -72,7 +87,10 @@ public class FormService(IFormRepository repository) : IFormService
     
     public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()
     {
-        return Result<Inconsistencies, Problem>.Success(await repository.GetInconsistencies());
+        Inconsistencies? inconsistencies = await repository.GetInconsistencies();
+        if (inconsistencies == null)
+            inconsistencies = new Inconsistencies(new List<Rule>());
+        return Result<Inconsistencies, Problem>.Success(inconsistencies);
     }
     
     public async Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies)

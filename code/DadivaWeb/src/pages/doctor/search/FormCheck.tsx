@@ -42,8 +42,7 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
         setIsLoading(false); // stop loading if there is an error
         return;
       }
-
-      const inconsistencies = extractInconsistencies(res[0]);
+      const inconsistencies = res.length > 0 ? extractInconsistencies(res[0]) : [];
       setInconsistencies(inconsistencies.length == 0 ? null : inconsistencies);
     };
 
@@ -98,7 +97,11 @@ export function FormCheck({ formGroups, submission }: FormCheckProps) {
             />
           )}
           <Box sx={{ pt: 2 }}>
-            <Button variant="outlined" endIcon={!showDetails ? <ManageSearchIcon /> : <CloseIcon/>} onClick={() => setShowDetails(!showDetails)}>
+            <Button
+              variant="outlined"
+              endIcon={!showDetails ? <ManageSearchIcon /> : <CloseIcon />}
+              onClick={() => setShowDetails(!showDetails)}
+            >
               Respostas
             </Button>
           </Box>

@@ -7,24 +7,24 @@ using Rule = DadivaAPI.domain.Rule;
 
 namespace DadivaAPI.repositories.form
 {
-    public class FormRepositoryPGSQL : IFormRepository
+    public class FormRepository : IFormRepository
     {
         
-        private readonly FormDbContext _context;
+        private readonly DadivaDbContext _context;
         
-        public FormRepositoryPGSQL(FormDbContext context)
+        public FormRepository(DadivaDbContext context)
         {
             _context = context;
         }
         
-        public async Task<Form?> GetForm()
+        public async Task<Form> GetForm()
         {
-            return await _context.Forms.FirstOrDefaultAsync();
+            return await _context.Forms.OrderBy(form => form.AddedOn).LastOrDefaultAsync() ?? throw new Exception("Form not found");
         }
 
         public async Task<Form> EditForm(Form form)
         {
-            _context.Forms.Update(form);
+            await _context.Forms.AddAsync(form);
             await _context.SaveChangesAsync();
             return form;
         }
@@ -37,12 +37,12 @@ namespace DadivaAPI.repositories.form
 
         public async Task<Inconsistencies> GetInconsistencies()
         {
-            return await _context.Inconsistencies.FirstOrDefaultAsync();
+            return await _context.Inconsistencies.OrderBy(inconsistencies => inconsistencies.Id).LastOrDefaultAsync();
         }
 
-        public async Task<Submission> GetSubmission(int id)
+        public async Task<Submission> GetSubmission(int nic)
         {
-            throw new NotImplementedException();
+            return await _context.Submissions.FirstAsync(submission => submission.ByUserNic == nic);
         }
 
         public async Task<Dictionary<int, Submission>> GetSubmissions()
@@ -52,7 +52,7 @@ namespace DadivaAPI.repositories.form
 
         public async Task<bool> SubmitForm(Submission submission, int id)
         {
-            _context.Submissions.Add(submission);
+            await _context.Submissions.AddAsync(submission);
             return await _context.SaveChangesAsync() > 0;
         }
     }
