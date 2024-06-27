@@ -9,7 +9,7 @@ export function PreDadivaLoginCard() {
   return (
     <Paper
       sx={{
-        p: 4,
+        p: 3,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

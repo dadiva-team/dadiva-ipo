@@ -10,8 +10,7 @@ export const getDrugsAndDiseases = `${API_URL}/dnd`;
 export const editFormUri = `${API_URL}/forms/structure`;
 
 export const submitFormUri = (nic: number) => `${API_URL}/forms/submissions/${nic}`;
-
 export const getSubmissionsByUserUri = (nic: number) => `${API_URL}/forms/submissions/${nic}`;
-
+export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/forms/review/${submissionId}`;
 export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;

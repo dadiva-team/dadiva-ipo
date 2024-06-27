@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { DonorSearchName } from './DoctorSearchName';
 import { DonorSearchNic } from './DoctorSearchNic';
 import { DoctorSearchResult } from './DoctorSearchResult';
@@ -83,15 +83,12 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
           <DoctorSearchResult
             submission={submission}
             onCheckSubmission={() => {
-              console.log('Checking submission...');
               setFormCheck(!formCheck);
             }}
           />
           {formCheck && (
             <Box sx={{ marginLeft: 1, width: '80%' }}>
               <FormCheck formGroups={formGroups} submission={submission} />
-              <Button disabled={true}>Rejeitar</Button>
-              <Button disabled={true}>Aprovar</Button>
             </Box>
           )}
         </Paper>

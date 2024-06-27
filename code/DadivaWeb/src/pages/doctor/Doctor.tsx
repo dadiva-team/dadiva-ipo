@@ -7,7 +7,7 @@ export function Doctor() {
   return (
     <Box display="flex">
       <DoctorNavBar />
-      <Box component="main" sx={{ width: '100%' }}>
+      <Box component="main" sx={{ width: '80%', pr: 2 }}>
         <Outlet />
       </Box>
     </Box>

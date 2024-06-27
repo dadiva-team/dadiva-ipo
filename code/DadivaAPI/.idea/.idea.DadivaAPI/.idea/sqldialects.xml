@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/DadivaAPI/sql/createTables.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/DadivaAPI/sql/populateDb/createTables.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/DadivaAPI/sql/populateTables.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>

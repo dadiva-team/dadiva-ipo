@@ -6,7 +6,7 @@ export function LogoIPO() {
   return (
     <img
       className="logo"
-      src={'/IPO-logo.png'}
+      src={'/IPO-logo-transparent.png'}
       alt={'IPO logo'}
       onClick={() => navigate('/')}
       style={{ cursor: 'pointer' }}

@@ -1,7 +1,7 @@
 import { useLoggedIn, useSessionManager } from '../../session/Session';
 import { Container } from '@mui/material';
 import { LogoIPO } from './LogoIPO';
-import { UserInfo } from '../form/DadorInfo';
+import { UserInfo } from './DadorInfo';
 import React from 'react';
 
 export function Header() {
