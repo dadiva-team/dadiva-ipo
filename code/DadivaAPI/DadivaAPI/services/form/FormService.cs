@@ -79,6 +79,55 @@ public class FormService(IRepository repository) : IFormService
             );
         return Result<Submission, Problem>.Success(submission);
     }
+    
+    public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null)
+    {
+        // Probably not needed
+        
+        Console.WriteLine("ReviewForm");
+        Console.WriteLine(submissionId);
+        Console.WriteLine(doctorNic);
+        Console.WriteLine(status);
+        Console.WriteLine(finalNote);
+        Console.WriteLine(noteModels);
+        
+        Submission? submission = await repository.GetSubmissionById(submissionId);
+        /*
+        if (submission == null)
+            return Result<Review, Problem>.Failure(
+                new Problem(
+                    "errorGettingSubmission.com",
+                    "Error getting submission",
+                    404,
+                    "An error occurred while getting submission") //TODO Create Problems types for form
+            );*/
+        
+        var review = new Review(
+            submissionId,doctorNic,
+            status,
+            finalNote,
+            DateTime.UtcNow
+        );
+        
+        var addedReview = await repository.AddReview(review);
+        
+        if (noteModels != null && noteModels.Any())
+        {
+            foreach (var note in noteModels)
+            {
+                var newNote = new Note(
+                    addedReview.Id,
+                    note.QuestionId,
+                    note.NoteText
+                );
+
+                await repository.AddNote(newNote);
+            }
+        }
+
+
+        return Result<Review, Problem>.Success(addedReview);
+    }
 
     public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()
     {

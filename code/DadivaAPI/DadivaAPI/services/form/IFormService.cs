@@ -13,6 +13,8 @@ public interface IFormService
     
     public Task<Result<Submission, Problem>> GetSubmission(int id);
     
+    public Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null);
+    
     public Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions();
     public Task<Result<Inconsistencies, Problem>> GetInconsistencies();
     

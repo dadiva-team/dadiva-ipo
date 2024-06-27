@@ -1,7 +1,12 @@
 .logo {
     width: 100%;
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 175px;
+    max-height: 175px;
+}
+.App {
+    background-color: rgb(240, 240, 240);
+    min-height: 100vh;
+    overflow: auto;
 }
 /*
 @media (max-width: 768px) {

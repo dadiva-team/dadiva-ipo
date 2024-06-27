@@ -15,6 +15,10 @@ public class DadivaDbContext : DbContext
     public DbSet<Form> Forms { get; set; }
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
+    
+    public DbSet<Review> Reviews { get; set; }
+    
+    public DbSet<Note> Notes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -76,6 +80,21 @@ public class DadivaDbContext : DbContext
             .HasKey(aq => aq.Id);
         modelBuilder.Entity<User>()
             .HasKey(user => user.Nic);
+        modelBuilder.Entity<Review>()
+            .HasKey(r => r.Id);
+        modelBuilder.Entity<Note>()
+            .HasKey(n => n.Id);
+        // Configure relationships, if any
+        modelBuilder.Entity<Review>()
+            .HasOne<Submission>()
+            .WithMany()
+            .HasForeignKey(r => r.SubmissionId);
+
+        modelBuilder.Entity<Note>()
+            .HasOne<Review>()
+            .WithMany()
+            .HasForeignKey(n => n.ReviewId);
+        
         // Configure other entities as needed
     }
 }

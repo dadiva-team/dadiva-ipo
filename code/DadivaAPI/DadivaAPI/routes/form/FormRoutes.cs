@@ -26,6 +26,7 @@ public static class FormRoutes
         group.MapGet("/submissions/{nic:int}", GetSubmission).RequireAuthorization("doctor");
         //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor");
         group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor");
+        group.MapPost("/review/{submissionId:int}", ReviewForm).RequireAuthorization("doctor");
     }
 
     private static async Task<IResult> GetSubmissions(IFormService service)
@@ -36,6 +37,7 @@ public static class FormRoutes
             Result<Dictionary<int, Submission>, Problem>.SuccessResult success => Results.Ok(
                 new GetSubmissionsOutputModel(
                     success.Value.Select(pair => new SubmissionModel(
+                        pair.Value.Id,
                         pair.Key,
                         pair.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
                         pair.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture)
@@ -52,6 +54,7 @@ public static class FormRoutes
         {
             Result<Submission, Problem>.SuccessResult success => Results.Ok(
                 new SubmissionModel(
+                    success.Value.Id,
                     nic,
                     success.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
                     success.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture)
@@ -161,5 +164,23 @@ public static class FormRoutes
             Result<Inconsistencies, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
+    }
+    
+    private static async Task<IResult> ReviewForm(int submissionId, [FromBody] ReviewFormRequest input, IFormService service)
+    {
+        try
+        {
+            Result<Review, Problem> result = await service.ReviewForm(submissionId, input.DoctorNic, input.Status, input.FinalNote, input.Notes);
+            return result switch
+                {
+                    Result<Review, Problem>.SuccessResult success => Results.NoContent(),
+                    Result<Review, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+                    _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+                };
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
 }

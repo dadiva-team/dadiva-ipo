@@ -1,9 +1,5 @@
 using DadivaAPI.domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using static DadivaAPI.repositories.utils.PGSQLUtils;
-using Npgsql;
-using Rule = DadivaAPI.domain.Rule;
 
 namespace DadivaAPI.repositories.form
 {
@@ -42,7 +38,12 @@ namespace DadivaAPI.repositories.form
 
         public async Task<Submission> GetSubmission(int nic)
         {
-            return await _context.Submissions.FirstAsync(submission => submission.ByUserNic == nic);
+            return await _context.Submissions.FirstOrDefaultAsync(submission => submission.ByUserNic == nic);
+        }
+        
+        public async Task<Submission> GetSubmissionById(int id)
+        {
+            return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Id == id);
         }
 
         public async Task<Dictionary<int, Submission>> GetSubmissions()
@@ -53,6 +54,19 @@ namespace DadivaAPI.repositories.form
         public async Task<bool> SubmitForm(Submission submission, int id)
         {
             await _context.Submissions.AddAsync(submission);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        
+        public async Task<Review> AddReview(Review review)
+        {
+            await _context.Reviews.AddAsync(review);
+            await _context.SaveChangesAsync();
+            return review;
+        }
+
+        public async Task<bool> AddNote(Note note)
+        {
+            await _context.Notes.AddAsync(note);
             return await _context.SaveChangesAsync() > 0;
         }
     }

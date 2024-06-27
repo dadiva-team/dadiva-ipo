@@ -13,8 +13,13 @@ public interface IFormRepository
     public Task<Dictionary<int, Submission>> GetSubmissions();
     
     public Task<Submission> GetSubmission(int nic);
+    public Task<Submission> GetSubmissionById(int id);
     
     public Task<Inconsistencies> GetInconsistencies();
+    
+    public Task<Review> AddReview(Review review);
+    
+    public Task<bool> AddNote(Note note);
     
     public Task<bool> EditInconsistencies(Inconsistencies inconsistencies);
 }

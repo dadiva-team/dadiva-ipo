@@ -33,10 +33,25 @@ public interface IRepository
     {
         return FormRepository.GetSubmission(nic);
     }
+    
+    public Task<Submission> GetSubmissionById(int id)
+    {
+        return FormRepository.GetSubmission(id);
+    }
 
     public Task<Inconsistencies> GetInconsistencies()
     {
         return FormRepository.GetInconsistencies();
+    }
+    
+    public Task<Review> AddReview(Review review)
+    {
+        return FormRepository.AddReview(review);
+    }
+    
+    public Task<bool> AddNote(Note note)
+    {
+        return FormRepository.AddNote(note);
     }
 
     public Task<bool> EditInconsistencies(Inconsistencies inconsistencies)
