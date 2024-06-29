@@ -13,6 +13,8 @@ public static class UsersRoutes
     {
         var usersGroup = app.MapGroup("/users");
         usersGroup.MapPost("/login", CreateToken).AllowAnonymous();
+        usersGroup.MapGet("/status/{nic:int}", GetUserAccountStatus).RequireAuthorization();
+        usersGroup.MapPost("/update-status", UpdateUserAccountStatus).RequireAuthorization();
 
         usersGroup.MapPost("", CreateUser).RequireAuthorization("admin");
         usersGroup.MapGet("", GetUsers).RequireAuthorization("admin");
@@ -23,9 +25,11 @@ public static class UsersRoutes
         IUsersService service)
     {
         Result<Token, Problem> result = await service.CreateToken(input.Nic, input.Password);
-        switch (result)
+        var statusResult = await service.GetUserAccountStatus(input.Nic);
+        
+        switch (result, statusResult)
         {
-            case Result<Token, Problem>.SuccessResult success:
+            case (Result<Token, Problem>.SuccessResult tokenSuccess, Result<UserAccountStatus?, Problem>.SuccessResult statusSuccess):
                 CookieOptions cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
@@ -33,15 +37,15 @@ public static class UsersRoutes
                     SameSite = SameSiteMode.None,  // Necessary for cross-origin/cross-site requests
                     Expires = DateTime.UtcNow.AddDays(1)
                 };
-                http.Response.Cookies.Append("token", success.Value.token, cookieOptions);
-                return Results.Created((string?)null, new CreateTokenOutputModel(input.Nic, success.Value.token));
-            case Result<Token, Problem>.FailureResult failure:
-                return Results.NotFound(failure.Error);
+                http.Response.Cookies.Append("token", tokenSuccess.Value.token, cookieOptions);
+                return Results.Created((string?)null, new CreateTokenOutputModel(input.Nic, tokenSuccess.Value.token, statusSuccess.Value!));
+            case (Result<Token, Problem>.FailureResult tokenFailure, _):
+                return Results.NotFound(tokenFailure.Error);
+            case (_, Result<UserAccountStatus?, Problem>.FailureResult statusFailure):
+                return Results.BadRequest(statusFailure.Error);
             default:
                 throw new Exception("never gonna give you up, never gonna let you down");
         }
-
-        ;
     }
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)
@@ -75,6 +79,35 @@ public static class UsersRoutes
             Result<bool, Problem>.SuccessResult success => Results.Ok(success.Value),
             Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("never gonna give you up, never gonna let you down")
+        };
+    }
+    
+    private static async Task<IResult> GetUserAccountStatus([FromRoute] int nic, IUsersService service)
+    {
+        var result = await service.GetUserAccountStatus(nic);
+        return result switch
+        {
+            Result<UserAccountStatus?, Problem>.SuccessResult success => Results.Ok(new
+            {
+                success.Value.UserNic,
+                success.Value.Status,
+                success.Value.SuspendedUntil,
+                success.Value.LastSubmissionDate,
+                success.Value.LastSubmissionId
+            }),
+            Result<UserAccountStatus?, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Unexpected result")
+        };
+    }
+
+    private static async Task<IResult> UpdateUserAccountStatus([FromBody] UserAccountStatus userAccountStatus, IUsersService service)
+    {
+        var result = await service.UpdateUserAccountStatus(userAccountStatus);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult => Results.NoContent(),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Unexpected result")
         };
     }
 }

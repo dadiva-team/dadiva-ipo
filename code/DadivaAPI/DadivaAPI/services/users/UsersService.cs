@@ -115,4 +115,31 @@ public class UsersService(IConfiguration config, IRepository repository) : IUser
                     UserServicesErrorExtensions.ToResponse(UserServiceError.Unknown));
         }
     }
+    
+    public async Task<Result<UserAccountStatus?, Problem>> GetUserAccountStatus(int userNic)
+    {
+        var userStatus = await repository.GetUserAccountStatus(userNic);
+        if (userStatus == null)
+            return Result<UserAccountStatus?, Problem>.Failure(
+                new Problem(
+                    "userStatusNotFound.com",
+                    "User status not found",
+                    404,
+                    "The user account status was not found"));
+
+        return Result<UserAccountStatus?, Problem>.Success(userStatus);
+    }
+
+    public async Task<Result<bool, Problem>> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
+    {
+        bool updated = await repository.UpdateUserAccountStatus(userAccountStatus);
+        if (updated)
+            return Result<bool, Problem>.Success(true);
+        return Result<bool, Problem>.Failure(
+            new Problem(
+                "errorUpdatingUserStatus.com",
+                "Error updating user status",
+                400,
+                "An error occurred while updating the user account status"));
+    }
 }

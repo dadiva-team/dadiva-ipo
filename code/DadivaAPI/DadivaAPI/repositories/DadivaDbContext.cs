@@ -12,12 +12,12 @@ public class DadivaDbContext : DbContext
     }
     
     public DbSet<User> Users { get; set; }
+    public DbSet<UserAccountStatus> UserAccountStatuses { get; set; } 
     public DbSet<Form> Forms { get; set; }
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
     
     public DbSet<Review> Reviews { get; set; }
-    
     public DbSet<Note> Notes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -94,6 +94,14 @@ public class DadivaDbContext : DbContext
             .HasOne<Review>()
             .WithMany()
             .HasForeignKey(n => n.ReviewId);
+        
+        modelBuilder.Entity<UserAccountStatus>()
+            .HasKey(uas => uas.UserNic);
+
+        modelBuilder.Entity<UserAccountStatus>()
+            .HasOne<User>()
+            .WithOne()
+            .HasForeignKey<UserAccountStatus>(uas => uas.UserNic);
         
         // Configure other entities as needed
     }

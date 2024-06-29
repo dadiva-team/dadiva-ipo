@@ -14,6 +14,8 @@ public interface IFormRepository
     
     public Task<Submission> GetSubmission(int nic);
     public Task<Submission> GetSubmissionById(int id);
+
+    public Task<Submission?> GetLatestPendingSubmissionByUser(int userNic);
     
     public Task<Inconsistencies> GetInconsistencies();
     

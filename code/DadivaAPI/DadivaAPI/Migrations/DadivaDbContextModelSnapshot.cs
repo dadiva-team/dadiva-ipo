@@ -108,6 +108,8 @@ namespace DadivaAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ReviewId");
+
                     b.ToTable("Notes");
                 });
 
@@ -136,6 +138,8 @@ namespace DadivaAPI.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubmissionId");
 
                     b.ToTable("Reviews");
                 });
@@ -206,6 +210,55 @@ namespace DadivaAPI.Migrations
                     b.HasKey("Nic");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DadivaAPI.domain.UserAccountStatus", b =>
+                {
+                    b.Property<int>("UserNic")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("LastSubmissionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("LastSubmissionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SuspendedUntil")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserNic");
+
+                    b.ToTable("UserAccountStatuses");
+                });
+
+            modelBuilder.Entity("DadivaAPI.domain.Note", b =>
+                {
+                    b.HasOne("DadivaAPI.domain.Review", null)
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DadivaAPI.domain.Review", b =>
+                {
+                    b.HasOne("DadivaAPI.domain.Submission", null)
+                        .WithMany()
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DadivaAPI.domain.UserAccountStatus", b =>
+                {
+                    b.HasOne("DadivaAPI.domain.User", null)
+                        .WithOne()
+                        .HasForeignKey("DadivaAPI.domain.UserAccountStatus", "UserNic")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -14,4 +14,8 @@ public interface IUsersService
     public Task<Result<List<UserExternalInfo>, Problem>> GetUsers(string token);
 
     public Task<Result<Boolean, Problem>> DeleteUser(int nic);
+    
+    public Task<Result<UserAccountStatus?, Problem>> GetUserAccountStatus(int userNic);
+    
+    public Task<Result<Boolean, Problem>> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
 }

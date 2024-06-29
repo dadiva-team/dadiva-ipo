@@ -14,6 +14,7 @@ public class PopulateDatabase
         // Insert initial data
         context.Users.AddRange(InitialData.Users);
         context.Forms.Add(InitialData.Form);
+        context.UserAccountStatuses.AddRange(InitialData.UserAccountStatuses);
 
         context.SaveChanges();
     }

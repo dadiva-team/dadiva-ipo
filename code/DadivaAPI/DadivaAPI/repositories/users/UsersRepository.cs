@@ -40,4 +40,28 @@ public class UsersRepository : IUsersRepository
         _context.Users.Remove(await _context.Users.FindAsync(nic) ?? throw new Exception("User not found"));
         return await _context.SaveChangesAsync() > 0;
     }
+    
+    public async Task<UserAccountStatus?> GetUserAccountStatus(int userNic)
+    {
+        return await _context.UserAccountStatuses
+            .FirstOrDefaultAsync(status => status.UserNic == userNic);
+    }
+
+    public async Task<bool> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
+    {
+        var existingStatus = await _context.UserAccountStatuses.FindAsync(userAccountStatus.UserNic);
+        if (existingStatus == null)
+        {
+            await _context.UserAccountStatuses.AddAsync(userAccountStatus);
+        }
+        else
+        {
+            existingStatus.Status = userAccountStatus.Status;
+            existingStatus.SuspendedUntil = userAccountStatus.SuspendedUntil;
+            existingStatus.LastSubmissionDate = userAccountStatus.LastSubmissionDate;
+            existingStatus.LastSubmissionId = userAccountStatus.LastSubmissionId;
+            _context.UserAccountStatuses.Update(existingStatus);
+        }
+        return await _context.SaveChangesAsync() > 0;
+    }
 }

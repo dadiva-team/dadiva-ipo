@@ -11,4 +11,9 @@ public interface IUsersRepository
     public Task<User?> GetUserByNic(int nic);
 
     public Task<Boolean> DeleteUser(int nic);
+    
+    public Task<UserAccountStatus?> GetUserAccountStatus(int userNic);
+    
+    public Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
+    
 }

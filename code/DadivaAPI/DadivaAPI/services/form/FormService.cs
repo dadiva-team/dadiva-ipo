@@ -1,12 +1,13 @@
 using DadivaAPI.domain;
 using DadivaAPI.repositories;
+using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.utils;
 using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IRepository repository) : IFormService
+public class FormService(IRepository repository, IUsersRepository usersRepository) : IFormService
 {
     public async Task<Result<GetFormOutputModel, Problem>> GetForm()
     {
@@ -55,7 +56,19 @@ public class FormService(IRepository repository) : IFormService
     {
         var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic);
         bool isSubmitted = await repository.SubmitForm(submission, nic);
-        if (isSubmitted) return Result<bool, Problem>.Success(true);
+        if (isSubmitted)
+        {
+            var userAccountStatus = await usersRepository.GetUserAccountStatus(nic);
+            if (userAccountStatus != null)
+            {
+                userAccountStatus.Status = AccountStatus.PendingReview;
+                userAccountStatus.LastSubmissionDate = submission.SubmissionDate;
+                userAccountStatus.LastSubmissionId = submission.Id;
+                await usersRepository.UpdateUserAccountStatus(userAccountStatus);
+            }
+
+            return Result<bool, Problem>.Success(true);
+        }
 
         return Result<bool, Problem>.Failure(
             new Problem(
@@ -63,7 +76,7 @@ public class FormService(IRepository repository) : IFormService
                 "Error submitting form",
                 400,
                 "An error ocurred while submitting form"
-            )); //TODO Create Problems types for form
+            ));
     }
 
     public async Task<Result<Submission, Problem>> GetSubmission(int id)
@@ -124,6 +137,12 @@ public class FormService(IRepository repository) : IFormService
                 await repository.AddNote(newNote);
             }
         }
+        var userAccountStatus = await usersRepository.GetUserAccountStatus(submission.ByUserNic);
+        if (userAccountStatus != null)
+        {
+            userAccountStatus.Status = AccountStatus.Active;
+            await usersRepository.UpdateUserAccountStatus(userAccountStatus);
+        }
 
 
         return Result<Review, Problem>.Success(addedReview);
@@ -132,6 +151,22 @@ public class FormService(IRepository repository) : IFormService
     public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()
     {
         return Result<Dictionary<int, Submission>, Problem>.Success(await repository.GetSubmissions());
+    }
+    
+    public async Task<Result<Submission?, Problem>> HasPendingSubmissionsByUser(int userNic)
+    {
+        var pendingSubmission = await repository.GetLatestPendingSubmissionByUser(userNic);
+    
+        if (pendingSubmission == null)
+            return Result<Submission?, Problem>.Failure(
+                new Problem(
+                    "noPendingSubmission.com",
+                    "No pending submission",
+                    404,
+                    "The user has no pending submissions")
+            );
+
+        return Result<Submission?, Problem>.Success(pendingSubmission);
     }
     
     public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()

@@ -1,5 +1,6 @@
 using System.Text;
 using DadivaAPI.repositories;
+using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.form;
@@ -86,6 +87,8 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();
 
 builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+
 
 builder.Services.AddCors(options =>
 {

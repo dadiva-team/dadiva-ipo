@@ -34,6 +34,40 @@ public class InitialData
         Doctor,
         Donor
     ];
+    
+    public static readonly UserAccountStatus DonorStatus = new UserAccountStatus
+    (
+        Donor.Nic,
+        AccountStatus.Active,
+        null,
+        null,
+        null
+    );
+    
+    public static readonly UserAccountStatus AdminStatus = new UserAccountStatus
+    (
+        Admin.Nic,
+        AccountStatus.Active,
+        null,
+        null,
+        null
+    );
+    
+    public static readonly UserAccountStatus DoctorStatus = new UserAccountStatus
+    (
+        Doctor.Nic,
+        AccountStatus.Active,
+        null,
+        null,
+        null
+    );
+    
+    public static readonly List<UserAccountStatus> UserAccountStatuses =
+    [
+        DonorStatus,
+        AdminStatus,
+        DoctorStatus
+    ];
 
     public static readonly Form Form = new Form
     (

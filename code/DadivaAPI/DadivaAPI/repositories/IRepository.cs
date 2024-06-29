@@ -36,7 +36,12 @@ public interface IRepository
     
     public Task<Submission> GetSubmissionById(int id)
     {
-        return FormRepository.GetSubmission(id);
+        return FormRepository.GetSubmissionById(id);
+    }
+    
+    public Task<Submission?> GetLatestPendingSubmissionByUser(int userNic)
+    {
+        return FormRepository.GetLatestPendingSubmissionByUser(userNic);
     }
 
     public Task<Inconsistencies> GetInconsistencies()
@@ -77,5 +82,15 @@ public interface IRepository
     public Task<Boolean> DeleteUser(int nic)
     {
         return UserRepository.DeleteUser(nic);
+    }
+    
+    public Task<UserAccountStatus?> GetUserAccountStatus(int userNic)
+    {
+        return UserRepository.GetUserAccountStatus(userNic);
+    }
+    
+    public Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
+    {
+        return UserRepository.UpdateUserAccountStatus(userAccountStatus);
     }
 }

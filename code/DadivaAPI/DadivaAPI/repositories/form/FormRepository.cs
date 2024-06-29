@@ -41,6 +41,15 @@ namespace DadivaAPI.repositories.form
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.ByUserNic == nic);
         }
         
+        public async Task<Submission?> GetLatestPendingSubmissionByUser(int userNic)
+        {
+            return await _context.Submissions
+                .Where(submission => submission.ByUserNic == userNic && 
+                                     !_context.Reviews.Any(review => review.SubmissionId == submission.Id))
+                .OrderByDescending(submission => submission.SubmissionDate)
+                .FirstOrDefaultAsync();
+        }
+        
         public async Task<Submission> GetSubmissionById(int id)
         {
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Id == id);

@@ -17,6 +17,8 @@ public interface IFormService
     
     public Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions();
     public Task<Result<Inconsistencies, Problem>> GetInconsistencies();
+
+    public Task<Result<Submission?, Problem>> HasPendingSubmissionsByUser(int userNic);
     
     public Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies);
 }
