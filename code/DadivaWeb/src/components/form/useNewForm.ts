@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form } from '../../domain/Form/Form';
-import { Engine } from 'json-rules-engine';
-import { handleError, handleRequest } from '../../services/utils/fetch';
-import { FormServices } from '../../services/from/FormServices';
-import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
+import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Form} from '../../domain/Form/Form';
+import {Engine} from 'json-rules-engine';
+import {handleError, handleRequest} from '../../services/utils/fetch';
+import {FormServices} from '../../services/from/FormServices';
+import {updateFormAnswers, updateQuestionColors, updateShowQuestions} from './utils/FormUtils';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { form } from './MockForm';
-import { useCurrentSession } from '../../session/Session';
+import {useCurrentSession, useUpdateSessionStatus} from '../../session/Session';
+import {AccountStatus} from "../../services/users/models/LoginOutputModel";
 
 export function useNewForm() {
-  const session = useCurrentSession(); // Call the hook at the top level
+  const session = useCurrentSession();
+  const updateSessionStatus = useUpdateSessionStatus();
   const nic = session?.nic;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,13 +58,15 @@ export function useNewForm() {
       return;
     }
     console.log('Form saved');
-    if (res) nav('/');
+    if (res) {
+      updateSessionStatus(AccountStatus.PendingReview);
+      nav('/');
+    }
   }
 
   useEffect(() => {
     const fetch = async () => {
-      // eslint-disable-next-line prefer-const
-      let [error, res] = await handleRequest(FormServices.getForm());
+      const [error, res] = await handleRequest(FormServices.getForm());
       if (error) {
         handleError(error, setError, nav);
         return;

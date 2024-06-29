@@ -4,6 +4,7 @@ import * as React from 'react';
 import reduce from '../utils/Reduce';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { loginNIC } from '../../../services/users/UserServices';
+import {UserAccountStatus} from "../../../services/users/models/LoginOutputModel";
 
 export function useLogin() {
   const navigate = useNavigate();
@@ -61,8 +62,9 @@ export function useLogin() {
       setLoading(false);
       throw new Error('Response is undefined');
     }
+    console.log(res);
 
-    const token = res.token;
+    const { token, accountStatus } = res;
     if (!token) {
       dispatch({ type: 'error', message: 'Token não encontrado' });
       setError('Token não encontrado');
@@ -74,13 +76,19 @@ export function useLogin() {
       nic: number;
       perms: string;
     } = JSON.parse(atob(token.split('.')[1]));
+
     console.log(atob(token.split('.')[1]));
     console.log(payload);
+
     const session: Session = {
       name: payload.name,
       nic: payload.nic,
       perms: payload.perms as Role,
+      accountStatus: accountStatus as UserAccountStatus,
     };
+
+
+    console.log('-----------', session);
 
     sessionManager.setSession(session);
     dispatch({ type: 'success' });

@@ -75,7 +75,6 @@ export function ReviewForm({
             sx={{
               mb: 2,
               p: 2,
-              border: '1px solid lightblue',
               borderRadius: '8px',
               width: '100%',
             }}

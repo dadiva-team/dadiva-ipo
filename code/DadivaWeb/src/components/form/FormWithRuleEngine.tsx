@@ -68,6 +68,8 @@ export default function FormWithRuleEngine({
                 alignItems: 'center',
                 width: '70%',
                 borderRadius: 5,
+                //border: '1.5px solid black', // First border with black color
+                //boxShadow: '0 0 0 2px lightcoral', // Second border with light red color
               }}
             >
               <NavButtons

@@ -5,11 +5,15 @@ import {useNavigate} from 'react-router-dom';
 import {Uris} from '../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
 import DOCTOR = Uris.DOCTOR;
-import {Role, useCurrentSession} from '../../session/Session';
+import {Role, useCurrentSession, useHasPendingReview} from '../../session/Session';
+import {PreDadivaLoginCard} from "../../components/home/PreDadivaLoginCard";
+import {PendingReviewCard} from "../../components/home/PendingReviewCard";
 
 export default function Home() {
     const nav = useNavigate();
     const user = useCurrentSession();
+    const hasPendingReview = useHasPendingReview();
+
     return (
         <div>
             <h1>DEMO</h1>
@@ -61,7 +65,7 @@ export default function Home() {
                     width: '100%',
                 }}
             >
-                {/*loggedIn ? <PreDadivaInfoCard/> : <PreDadivaLoginCard/>*/ <PreDadivaInfoCard/>}
+                {user ? (hasPendingReview ? <PendingReviewCard submissionDate={user?.accountStatus?.lastSubmissionDate.toString()} /> : <PreDadivaInfoCard/>) : <PreDadivaLoginCard/>}
             </Box>
         </div>
     );
