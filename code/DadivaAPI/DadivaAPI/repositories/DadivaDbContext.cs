@@ -12,11 +12,10 @@ public class DadivaDbContext : DbContext
     }
     
     public DbSet<User> Users { get; set; }
-    public DbSet<UserAccountStatus> UserAccountStatuses { get; set; } 
+    public DbSet<UserAccountStatus> UserAccountStatus { get; set; } 
     public DbSet<Form> Forms { get; set; }
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
-    
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Note> Notes { get; set; }
 

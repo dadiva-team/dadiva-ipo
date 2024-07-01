@@ -43,16 +43,16 @@ public class UsersRepository : IUsersRepository
     
     public async Task<UserAccountStatus?> GetUserAccountStatus(int userNic)
     {
-        return await _context.UserAccountStatuses
+        return await _context.UserAccountStatus
             .FirstOrDefaultAsync(status => status.UserNic == userNic);
     }
 
     public async Task<bool> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
     {
-        var existingStatus = await _context.UserAccountStatuses.FindAsync(userAccountStatus.UserNic);
+        var existingStatus = await _context.UserAccountStatus.FindAsync(userAccountStatus.UserNic);
         if (existingStatus == null)
         {
-            await _context.UserAccountStatuses.AddAsync(userAccountStatus);
+            await _context.UserAccountStatus.AddAsync(userAccountStatus);
         }
         else
         {
@@ -60,7 +60,7 @@ public class UsersRepository : IUsersRepository
             existingStatus.SuspendedUntil = userAccountStatus.SuspendedUntil;
             existingStatus.LastSubmissionDate = userAccountStatus.LastSubmissionDate;
             existingStatus.LastSubmissionId = userAccountStatus.LastSubmissionId;
-            _context.UserAccountStatuses.Update(existingStatus);
+            _context.UserAccountStatus.Update(existingStatus);
         }
         return await _context.SaveChangesAsync() > 0;
     }
