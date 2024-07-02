@@ -114,11 +114,14 @@ public static class FormRoutes
         System.Console.WriteLine("input");
         System.Console.WriteLine(answers);
 
-        Result<bool, Problem> result = await service.SubmitForm(answers, nic);
+        Result<SubmitFormOutputModel, Problem> result = await service.SubmitForm(answers, nic);
         return result switch
         {
-            Result<bool, Problem>.SuccessResult => Results.NoContent(),
-            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<SubmitFormOutputModel, Problem>.SuccessResult success => Results.Ok(new SubmitFormOutputModel(
+                success.Value.SubmissionDate,
+                success.Value.SubmissionId
+            )),
+            Result<SubmitFormOutputModel, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }

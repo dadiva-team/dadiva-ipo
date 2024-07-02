@@ -52,7 +52,7 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
             */
     }
 
-    public async Task<Result<bool, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic)
+    public async Task<Result<SubmitFormOutputModel, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic)
     {
         var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic);
         bool isSubmitted = await repository.SubmitForm(submission, nic);
@@ -67,10 +67,11 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
                 await usersRepository.UpdateUserAccountStatus(userAccountStatus);
             }
 
-            return Result<bool, Problem>.Success(true);
+            return Result<SubmitFormOutputModel, Problem>.Success(new SubmitFormOutputModel(
+                submission.SubmissionDate, submission.Id));
         }
 
-        return Result<bool, Problem>.Failure(
+        return Result<SubmitFormOutputModel, Problem>.Failure(
             new Problem(
                 "errorSubmitingForm.com",
                 "Error submitting form",

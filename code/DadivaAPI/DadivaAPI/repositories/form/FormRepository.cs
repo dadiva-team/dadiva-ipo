@@ -59,6 +59,15 @@ namespace DadivaAPI.repositories.form
         {
             throw new NotImplementedException();
         }
+        
+        public async Task<List<Submission>> GetSubmissionHistoryByNic(int nic)
+        {
+            return await _context.Submissions
+                .Where(submission => submission.ByUserNic == nic &&
+                                     !_context.Reviews.Any(review => review.SubmissionId == submission.Id))
+                .OrderByDescending(submission => submission.SubmissionDate)
+                .ToListAsync();
+        }
 
         public async Task<bool> SubmitForm(Submission submission, int id)
         {

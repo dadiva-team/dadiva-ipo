@@ -43,6 +43,11 @@ public interface IRepository
     {
         return FormRepository.GetLatestPendingSubmissionByUser(userNic);
     }
+    
+    public Task<List<Submission>?> GetSubmissionHistoryByNic(int nic)
+    {
+        return FormRepository.GetSubmissionHistoryByNic(nic);
+    }
 
     public Task<Inconsistencies> GetInconsistencies()
     {
