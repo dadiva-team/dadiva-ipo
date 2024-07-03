@@ -4,12 +4,14 @@ import {
   editInconsistenciesUri,
   getFormUri,
   getInconsistenciesUri,
+  getTermsUri,
   submitFormUri,
 } from '../utils/WebApiUris';
 import { DomainToModel, DomainToRules, FormOutputModel, ModelToDomain, RulesToDomain } from './models/FormOutputModel';
 import { Form } from '../../domain/Form/Form';
 import { RuleProperties } from 'json-rules-engine';
 import { InconsistenciesOutputModel } from './models/InconsistenciesOutputModel';
+import { Terms } from './models/Terms';
 
 function toCamelCase(s: string): string {
   return s.replace(/([A-Z])/g, (c, first) => (first ? c.toLowerCase() : c));
@@ -103,6 +105,28 @@ export namespace FormServices {
       console.log(JSON.stringify(answeredQuestions));
       console.log('SUBMIT FORM |||||||||||||||');
       await post(submitFormUri(nic), JSON.stringify(answeredQuestions));
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
+
+  export async function getTerms(): Promise<string> {
+    try {
+      console.log('Getting terms|||||||||||||||');
+      const res = await get<Terms>(getTermsUri);
+      return res.terms;
+    } catch (e) {
+      console.error(e);
+      return e;
+    }
+  }
+
+  export async function submitTerms(terms: Terms): Promise<boolean> {
+    try {
+      console.log('Submitting terms|||||||||||||||');
+      await put<boolean>(getTermsUri, JSON.stringify(terms));
       return true;
     } catch (e) {
       console.error(e);

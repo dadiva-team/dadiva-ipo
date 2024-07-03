@@ -6,7 +6,6 @@ using DadivaAPI.domain;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.services.form;
 using DadivaAPI.utils;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DadivaAPI.routes.form;
@@ -63,7 +62,8 @@ public static class FormRoutes
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
-
+    
+    
     private static async Task<IResult> GetForm(IFormService service, ClaimsPrincipal user)
     {
         

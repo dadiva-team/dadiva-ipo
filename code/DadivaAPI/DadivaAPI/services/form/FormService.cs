@@ -3,7 +3,6 @@ using DadivaAPI.repositories;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.utils;
-using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.form;
 
@@ -182,5 +181,21 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
     {
 
         return Result<bool, Problem>.Success(await repository.EditInconsistencies(inconsistencies));
+    }
+
+    public async Task<Result<Terms?, Problem>> GetTerms()
+    {
+        Terms? terms = null;
+        if (terms is not null)
+            return Result<Terms, Problem>.Success(terms);
+
+        return Result<Terms, Problem>.Failure(
+            new Problem(
+                "IllegalTerms.com",
+                "These terms are illegal",
+                404,
+                "The terms are illegal you go to jail"
+            )
+        );
     }
 }

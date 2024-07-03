@@ -2,10 +2,15 @@ using System.Text;
 using DadivaAPI.repositories;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form;
+using DadivaAPI.routes.terms;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.form;
+using DadivaAPI.services.terms;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Serialization;
+using Elastic.Transport;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -69,7 +74,7 @@ switch (databaseType)
 {
     case "PGSQL":
         builder.Services.AddDbContext<DadivaDbContext>(options =>
-            options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres")
+            options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=isel;Database=postgres")
         );
         break;
     case "MEMORY":
@@ -82,9 +87,14 @@ switch (databaseType)
             "DatabaseType must be provided in appsettings.json. Aceepted values are PGSQL or MEMORY.");
 }
 
+var nodePool = new SingleNodePool(new Uri("http://localhost:9200"));
+var settings = new ElasticsearchClientSettings(nodePool);
+
+builder.Services.AddSingleton(new ElasticsearchClient(settings));
 
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();
+builder.Services.AddScoped<ITermsService, TermsService>();
 
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
@@ -120,6 +130,7 @@ var group = app.MapGroup("/api");
 
 group.AddUsersRoutes();
 group.AddFormRoutes();
+group.AddTermsRoutes();
 
 using (var scope = app.Services.CreateScope())
 {

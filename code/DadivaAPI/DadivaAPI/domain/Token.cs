@@ -14,7 +14,8 @@ public class Token
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var sectoken = new JwtSecurityToken(
+        var sectoken = new JwtSecurityToken
+        (
             issuer,
             audience,
             new []
@@ -24,7 +25,8 @@ public class Token
                 new Claim("perms", user.Role.ToString())
             },
             expires: DateTime.Now.AddMinutes(30),
-            signingCredentials: credentials);
+            signingCredentials: credentials
+        );
 
         token =  new JwtSecurityTokenHandler().WriteToken(sectoken);
     }

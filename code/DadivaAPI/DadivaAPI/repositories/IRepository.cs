@@ -1,5 +1,7 @@
+using System.Text.Json;
 using DadivaAPI.domain;
 using DadivaAPI.repositories.form;
+using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
 
 namespace DadivaAPI.repositories;
@@ -8,6 +10,7 @@ public interface IRepository
 {
     public IFormRepository FormRepository { get; }
     public IUsersRepository UserRepository { get; }
+    public ITermsRepository TermsRepository { get; }
 
     public Task<Form?> GetForm()
     {
@@ -63,7 +66,7 @@ public interface IRepository
     {
         return FormRepository.AddNote(note);
     }
-
+    
     public Task<bool> EditInconsistencies(Inconsistencies inconsistencies)
     {
         return FormRepository.EditInconsistencies(inconsistencies);
@@ -97,5 +100,15 @@ public interface IRepository
     public Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
     {
         return UserRepository.UpdateUserAccountStatus(userAccountStatus);
+    }
+    
+    public Task<Terms?> GetTerms()
+    {
+        return TermsRepository.GetTerms();
+    }
+    
+    public Task<Boolean> SubmitTerms(JsonElement terms)
+    {
+        return TermsRepository.SubmitTerms(terms);
     }
 }

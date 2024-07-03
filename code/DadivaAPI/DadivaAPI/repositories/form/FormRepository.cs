@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DadivaAPI.domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,16 @@ namespace DadivaAPI.repositories.form
         {
             _context.Inconsistencies.Update(inconsistencies);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public Task<Terms?> GetTerms()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> EditTerms(JsonElement terms)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<Inconsistencies> GetInconsistencies()

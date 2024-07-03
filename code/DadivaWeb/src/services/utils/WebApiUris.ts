@@ -14,3 +14,5 @@ export const getSubmissionsByUserUri = (nic: number) => `${API_URL}/forms/submis
 export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/forms/review/${submissionId}`;
 export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
+
+export const getTermsUri = `${API_URL}/terms`;
