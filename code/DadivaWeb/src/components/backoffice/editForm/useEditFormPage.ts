@@ -267,6 +267,7 @@ export function useEditFormPage() {
       return {
         groups: updatedGroups,
         rules: newRules,
+        formVersion: oldForm.formVersion
       };
     });
   }
@@ -344,6 +345,7 @@ export function useEditFormPage() {
       return {
         groups: newGroups,
         rules: calculateRules(newGroups),
+        formVersion: oldForm.formVersion
       };
     });
   }
@@ -394,6 +396,7 @@ export function useEditFormPage() {
         return {
           groups: reorderedGroups,
           rules: calculateRules(reorderedGroups),
+          formVersion: oldForm.formVersion
         };
       });
     }
@@ -419,6 +422,7 @@ export function useEditFormPage() {
         ...oldForm,
         groups: reorderedGroups,
         rules: newRules,
+        formVersion: oldForm.formVersion
       };
     });
   }
@@ -443,7 +447,7 @@ export function useEditFormPage() {
 
       if (groups.length !== 0) groups[insertIndex].questions.push(...oldForm.groups[index].questions);
       const reorderedGroups = updateQuestionOrder(groups);
-      return { groups: reorderedGroups, rules: calculateRules(reorderedGroups) };
+      return { groups: reorderedGroups, rules: calculateRules(reorderedGroups), formVersion: oldForm.formVersion };
     });
   }
 

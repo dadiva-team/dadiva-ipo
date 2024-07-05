@@ -74,6 +74,11 @@ public class DadivaDbContext : DbContext
             .HasConversion(
                 v => JsonSerializer.Serialize(v, options),
                 v => JsonSerializer.Deserialize<List<AnsweredQuestion>>(v, options));
+        
+        modelBuilder.Entity<Submission>()
+            .HasOne<Form>()
+            .WithOne()
+            .HasForeignKey<Submission>(sub => sub.FormVersion);
             
         modelBuilder.Entity<AnsweredQuestion>()
             .HasKey(aq => aq.Id);

@@ -52,14 +52,15 @@ export function useNewForm() {
       return;
     }
 
-    const [error, res] = await handleRequest(FormServices.submitForm(nic, formAnswers));
+    const [error, res] = await handleRequest(FormServices.submitForm(nic, formAnswers, formRawFetchData.formVersion));
     if (error) {
       handleError(error, setError, nav);
       return;
     }
     console.log('Form saved');
     if (res) {
-      updateSessionStatus(AccountStatus.PendingReview);
+      console.log('res ',res)
+      updateSessionStatus(AccountStatus.PendingReview, res);
       nav('/');
     }
   }

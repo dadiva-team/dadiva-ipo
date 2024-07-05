@@ -15,6 +15,8 @@ public static class UsersRoutes
         usersGroup.MapPost("/login", CreateToken).AllowAnonymous();
         usersGroup.MapGet("/status/{nic:int}", GetUserAccountStatus).RequireAuthorization();
         usersGroup.MapPost("/update-status", UpdateUserAccountStatus).RequireAuthorization();
+        
+        usersGroup.MapGet("/{nic:int}", CheckNicExistence).AllowAnonymous();//RequireAuthorization("doctor");
 
         usersGroup.MapPost("", CreateUser).RequireAuthorization("admin");
         usersGroup.MapGet("", GetUsers).RequireAuthorization("admin");
@@ -107,6 +109,17 @@ public static class UsersRoutes
         {
             Result<bool, Problem>.SuccessResult => Results.NoContent(),
             Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Unexpected result")
+        };
+    }
+    
+    private static async Task<IResult> CheckNicExistence([FromRoute] int nic, IUsersService service)
+    {
+        var result = await service.CheckNicExistence(nic);
+        return result switch
+        {
+            Result<UserWithNameExternalInfo, Problem>.SuccessResult success => Results.Ok(success.Value),
+            Result<UserWithNameExternalInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Unexpected result")
         };
     }

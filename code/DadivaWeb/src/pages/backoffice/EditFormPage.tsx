@@ -164,6 +164,7 @@ export function EditFormPage() {
                                     return {
                                         groups: newGroups,
                                         rules: calculateRules(newGroups),
+                                        formVersion: oldForm.formVersion
                                     };
                                 });
                             }}
@@ -177,6 +178,7 @@ export function EditFormPage() {
                                     return {
                                         groups: newGroups,
                                         rules: calculateRules(newGroups),
+                                        formVersion: oldForm.formVersion
                                     };
                                 });
                             }}

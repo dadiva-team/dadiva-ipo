@@ -2,6 +2,7 @@ using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
+using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.users;
 
@@ -141,5 +142,19 @@ public class UsersService(IConfiguration config, IRepository repository) : IUser
                 "Error updating user status",
                 400,
                 "An error occurred while updating the user account status"));
+    }
+    
+    public async Task<Result<UserWithNameExternalInfo?, Problem>> CheckNicExistence(int nic)
+    {
+        var user = await repository.GetUserByNic(nic);
+        if (user == null)
+            return Result<UserWithNameExternalInfo?, Problem>.Failure(
+                new Problem(
+                    "userNICNotFound.com",
+                    "User with that NIC not found",
+                    404,
+                    "The user account was not found"));
+        return Result<UserWithNameExternalInfo?, Problem>.Success(new UserWithNameExternalInfo(user.Name, user.Nic));
+        
     }
 }

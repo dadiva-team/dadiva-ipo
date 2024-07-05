@@ -4,6 +4,7 @@ import { RuleProperties, TopLevelCondition, Event } from 'json-rules-engine';
 export interface FormOutputModel {
   groups: { name: string; questions: QuestionModel[] }[];
   rules: Rule[];
+  formVersion: number;
 }
 
 export class QuestionModel {
@@ -77,6 +78,7 @@ export function DomainToModel(form: Form): FormOutputModel {
   return {
     groups: form.groups,
     rules: DomainToRules(form.rules),
+    formVersion: form.formVersion,
   };
 }
 
@@ -148,5 +150,6 @@ export function ModelToDomain(model: FormOutputModel): Form {
   return {
     groups: groups,
     rules: RulesToDomain(model.rules),
+    formVersion: model.formVersion,
   };
 }

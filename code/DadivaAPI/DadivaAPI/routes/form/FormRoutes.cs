@@ -82,7 +82,8 @@ public static class FormRoutes
             Result<GetFormOutputModel, Problem>.SuccessResult success =>
                 Results.Json(new GetFormOutputModel(
                         success.Value.Groups,
-                        success.Value.Rules
+                        success.Value.Rules,
+                        success.Value.FormVersion
                     ),
                     options,
                     statusCode: 200),
@@ -114,7 +115,7 @@ public static class FormRoutes
         System.Console.WriteLine("input");
         System.Console.WriteLine(answers);
 
-        Result<SubmitFormOutputModel, Problem> result = await service.SubmitForm(answers, nic);
+        Result<SubmitFormOutputModel, Problem> result = await service.SubmitForm(answers, nic, input.FormVersion);
         return result switch
         {
             Result<SubmitFormOutputModel, Problem>.SuccessResult success => Results.Ok(new SubmitFormOutputModel(
@@ -135,7 +136,8 @@ public static class FormRoutes
             Result<Form, Problem>.SuccessResult success => Results.Json(
                 new GetFormOutputModel(
                     success.Value.Groups.Select(QuestionGroupModel.FromDomain).ToList(),
-                    success.Value.Rules.Select(RuleModel.FromDomain).ToList()
+                    success.Value.Rules.Select(RuleModel.FromDomain).ToList(),
+                    success.Value.Id
                 ), statusCode: 200),
             Result<Form, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")

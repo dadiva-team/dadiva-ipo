@@ -143,4 +143,5 @@ export const form: Form = {
       },
     },
   ],
+    formVersion: 1,
 };

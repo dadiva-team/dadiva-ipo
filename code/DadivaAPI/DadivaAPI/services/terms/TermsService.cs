@@ -11,7 +11,7 @@ public class TermsService(IRepository repository) : ITermsService
     {
         
         Terms? terms = await repository.GetTerms();
-        
+
         if (terms is null)
             return Result<Terms?, Problem>.Failure(
                 new Problem(

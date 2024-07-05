@@ -22,7 +22,8 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
 
         return Result<GetFormOutputModel, Problem>.Success(new GetFormOutputModel(
                 form.Groups.Select(QuestionGroupModel.FromDomain).ToList(),
-                form.Rules.Select(RuleModel.FromDomain).ToList()
+                form.Rules.Select(RuleModel.FromDomain).ToList(),
+                form.Id
             )
         );
     }
@@ -51,9 +52,9 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
             */
     }
 
-    public async Task<Result<SubmitFormOutputModel, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic)
+    public async Task<Result<SubmitFormOutputModel, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic, int formVersion)
     {
-        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic);
+        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion);
         bool isSubmitted = await repository.SubmitForm(submission, nic);
         if (isSubmitted)
         {

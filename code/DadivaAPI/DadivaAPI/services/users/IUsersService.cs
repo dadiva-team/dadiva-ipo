@@ -18,4 +18,6 @@ public interface IUsersService
     public Task<Result<UserAccountStatus?, Problem>> GetUserAccountStatus(int userNic);
     
     public Task<Result<Boolean, Problem>> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
+
+    public Task<Result<UserWithNameExternalInfo?, Problem>> CheckNicExistence(int nic);
 }

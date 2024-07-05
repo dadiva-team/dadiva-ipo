@@ -1,11 +1,16 @@
 import {get, post} from '../utils/fetch';
-import {getSubmissionsByUserUri, getUsersUri, reviewSubmissionUri} from "../utils/WebApiUris";
+import {getSubmissionsByUserUri, getUserByNicUri, getUsersUri, reviewSubmissionUri} from "../utils/WebApiUris";
 import {SubmissionOutputModel} from "./models/GetSubmissionsOutputModel";
 import {ReviewFormOutputModel} from "./models/ReviewFormOutputModel";
+import {GetUserByNicOutputModel} from "./models/GetUserByNicOutputModel";
 
 export namespace DoctorServices {
     export async function getUsers(): Promise<{ nic: number }[]> {
         return await get(getUsersUri);
+    }
+
+    export async function getUserByNic(nic: number): Promise<GetUserByNicOutputModel> {
+        return await get(getUserByNicUri(nic));
     }
 
     export async function getSubmissionByNic(nic: number): Promise<SubmissionOutputModel> {
