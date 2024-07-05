@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import {AccountStatus, UserAccountStatus} from "../services/users/models/LoginOutputModel";
+import {SubmitFormOutputModel} from "../services/from/models/SubmitFormOutputModel";
 
 export enum Role {
     DONOR = 'donor',
@@ -78,7 +79,7 @@ export function useSessionManager() {
 export function useUpdateSessionStatus() {
     const sessionManager = useSessionManager();
 
-    return function (newStatus: AccountStatus) {
+    return function (newStatus: AccountStatus, res: SubmitFormOutputModel) {
         const currentUser = sessionManager.session;
 
         if (currentUser) {
@@ -86,6 +87,8 @@ export function useUpdateSessionStatus() {
                 ...currentUser,
                 accountStatus: {
                     ...currentUser.accountStatus,
+                    submissionDate: res.submissionDate,
+                    submissionId: res.submissionId,
                     status: newStatus,
                 },
             };

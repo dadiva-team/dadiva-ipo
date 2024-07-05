@@ -74,7 +74,7 @@ switch (databaseType)
 {
     case "PGSQL":
         builder.Services.AddDbContext<DadivaDbContext>(options =>
-            options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=isel;Database=postgres")
+            options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres")
         );
         break;
     case "MEMORY":

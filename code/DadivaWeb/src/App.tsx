@@ -1,21 +1,22 @@
 import * as React from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import {Navigate, Route, Routes} from 'react-router-dom';
 import Login from './pages/authentication/Login';
 import Register from './pages/authentication/Register';
-import { Uris } from './utils/navigation/Uris';
+import {Uris} from './utils/navigation/Uris';
 import Home from './pages/home/Home';
-import { Header } from './components/home/Header';
-import { Form } from './pages/form/Form';
-import { Backoffice } from './pages/backoffice/Backoffice';
-import { BackofficeMockChart } from './components/backoffice/BackofficeMockChart';
-import { EditTermsPage } from './pages/backoffice/EditTermsPage';
-import { ManageUsersPage } from './components/backoffice/manageUsers/ManageUsersPage';
-import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
-import { EditFormPage } from './pages/backoffice/EditFormPage';
-import { Role, useCurrentSession } from './session/Session';
-import { Doctor } from './pages/doctor/Doctor';
-import { DoctorSearch } from './pages/doctor/search/DoctorSearch';
-import { Terms } from './pages/form/Terms';
+import {Header} from './components/home/Header';
+import {Form} from './pages/form/Form';
+import {Backoffice} from './pages/backoffice/Backoffice';
+import {BackofficeMockChart} from './components/backoffice/BackofficeMockChart';
+import {EditTermsPage} from './pages/backoffice/EditTermsPage';
+import {ManageUsersPage} from './components/backoffice/manageUsers/ManageUsersPage';
+import {EditInconsistenciesPage} from './pages/backoffice/EditInconsistenciesPage';
+import {EditFormPage} from './pages/backoffice/EditFormPage';
+import {Role, useCurrentSession} from './session/Session';
+import {Doctor} from './pages/doctor/Doctor';
+import {DoctorSearch} from './pages/doctor/search/DoctorSearch';
+import {Terms} from './pages/form/Terms';
+import {AccountStatus} from "./services/users/models/LoginOutputModel";
 import HOME = Uris.HOME;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
@@ -46,6 +47,10 @@ export default function App() {
 
     if (!roles.includes(user.perms)) {
       return <Navigate to={HOME} />;
+    }
+
+    if(user?.accountStatus?.status === AccountStatus.PendingReview) {
+        return <Navigate to={HOME} />;
     }
 
     return children;

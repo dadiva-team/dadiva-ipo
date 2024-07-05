@@ -2,6 +2,7 @@
 const elasticsearchUrl = 'http://localhost:9200';
 const formIndex = 'form';
 const userIndex = 'users';
+const termsIndex = 'terms';
 const inconsistenciesIndex = 'inconsistencies';
 const submissionIndex = 'submissions';
 
@@ -31,6 +32,7 @@ const form = {"groups":[{"name":"Dádivas Anteriores","questions":[{"id":"q3","t
 
 const inconsistencies = {"inconsistencies":[]};
 const submissions = {"submissions":[]};
+const terms = {"terms":""};
 
 // Function to index the document to Elasticsearch
 async function indexDocument(index, document) {
@@ -102,6 +104,11 @@ async function deleteIndex(index) {
 deleteIndex(formIndex).then(() => {
 	// Index the form
 	indexDocument(formIndex, form);
+});
+
+deleteIndex(termsIndex).then(() => {
+    // Index the terms
+    indexDocument(termsIndex, terms);
 });
 // Delete the current users
 deleteIndex(userIndex).then(() => {
