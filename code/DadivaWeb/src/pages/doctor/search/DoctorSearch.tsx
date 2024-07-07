@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Box, Paper} from '@mui/material';
 import {DonorSearchName} from './DoctorSearchName';
 import {DonorSearchNic} from './DoctorSearchNic';
@@ -11,7 +11,7 @@ import {ErrorAlert} from '../../../components/shared/ErrorAlert';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import {FormServices} from '../../../services/from/FormServices';
 import {Group} from '../../../domain/Form/Form';
-import {FormCheck} from './FormCheck';
+import {PendingSubmissionCheck} from './PendingSubmissionCheck';
 import {User} from "../../../domain/User/User";
 
 export interface DoctorSearchProps {
@@ -19,47 +19,80 @@ export interface DoctorSearchProps {
 }
 
 export function DoctorSearch({mode}: DoctorSearchProps) {
-    const [errorForm, setErrorForm] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const nav = useNavigate();
+    const [error, setError] = useState<string | null>(null);
+    const [errorForm, setErrorForm] = useState<string | null>(null);
+    const [errorSubmission, setErrorSubmission] = useState<string | null>(null);
+
     const [isLoading, setIsLoading] = useState(false);
     const [nic, setNic] = useState<string>('');
-    const [submission, setSubmissions] = useState<Submission>(null);
+    const [pendingSubmission, setPendingSubmission] = useState<Submission | null>(null);
+
+    const [oldSubmissions, setOldSubmissions] = useState<Submission[]>(null);
     const [user, setUser] = useState<User>(null);
-    const [formGroups, setFormGroups] = useState<Group[]>(null);
+
+    const [formGroupsCache, setFormGroupsCache] = useState<Map<number, Group[]>>(new Map());
     const [formCheck, setFormCheck] = useState<boolean>(null);
 
-    useEffect(() => {
-        const fetch = async () => {
-            const [error, res] = await handleRequest(FormServices.getForm());
+    const fetchFormGroups = async (formVersion: number): Promise<Group[]> => {
+        if (formGroupsCache.has(formVersion)) {
+            return formGroupsCache.get(formVersion)!;
+        } else {
+            const [error, res] = await handleRequest(FormServices.getFormByVersion(formVersion));
             if (error) {
                 handleError(error, setErrorForm, nav);
-                return;
+                return [];
             }
-            return res.groups as Group[];
-        };
-
-        if (formGroups == null) {
-            fetch().then(res => {
-                console.log(res);
-                setFormGroups(res);
-            });
+            const formGroups = res.groups as Group[];
+            setFormGroupsCache(new Map(formGroupsCache.set(formVersion, formGroups)));
+            return formGroups;
         }
-    }, [formGroups, nav]);
+    };
 
-    const fetch = async () => {
+    const fetchUser = async () => {
         setError(null);
         setIsLoading(true);
         const [error, res] = await handleRequest(DoctorServices.getUserByNic(Number(nic)));
 
         if (error) {
             handleError(error, setError, nav);
-            setSubmissions(null);
+            setPendingSubmission(null);
             setUser(null);
+            setIsLoading(false);
             return;
         }
 
         setUser({name: res.name, nic: res.nic.toString()});
+        setIsLoading(false);
+    };
+
+    const fetchPendingSubmission = async () => {
+        if (!user) return;
+        const [error, res] = await handleRequest(DoctorServices.getPendingSubmissionByNic(Number(user.nic)));
+        if (error) {
+            handleError(error, setErrorSubmission, nav);
+            setPendingSubmission(null);
+            return;
+        }
+        await fetchFormGroups(res.formVersion);
+        setPendingSubmission(res as Submission);
+        setFormCheck(true);
+    };
+
+    const fetchSubmissionHistory = async (limit: number, skip: number) => {
+        if (!user) return;
+        const [error, res] = await handleRequest(DoctorServices.getSubmissionHistoryByNic(Number(user.nic), limit, skip));
+        if (error) {
+            handleError(error, setErrorSubmission, nav);
+            setOldSubmissions([]);
+            return;
+        }
+        console.log(res);
+        /*const submissions = await Promise.all(res.map(async (submission: Submission) => {
+            const formGroups = await fetchFormGroups(submission.formVersion);
+            return {...submission, formGroups};
+        }));*/
+        setOldSubmissions(res as Submission[]);
     };
 
     return (
@@ -74,7 +107,7 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                     <DonorSearchNic
                         nic={nic}
                         setNic={nic => setNic(nic)}
-                        handleSearch={() => fetch().then(() => setIsLoading(false))}
+                        handleSearch={() => fetchUser()}
                         isSearching={isLoading}
                     />
                 </Box>
@@ -85,18 +118,32 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                 <Paper elevation={2} sx={{padding: 2, display: 'flex', flexDirection: 'row', alignItems: 'flex-start'}}>
                     <DoctorSearchResult
                         user={user}
-                        onCheckPendingSubmission={() => {
-                            setFormCheck(!formCheck);
-                        }}
-                        onCheckOldSubmissions={() => {
-                            console.log('old');
-                        }}
+                        onCheckPendingSubmission={fetchPendingSubmission}
+                        onCheckOldSubmissions={() => fetchSubmissionHistory(10, 0)}  //TODO: Tirar o hardcode do limit e skip
+
+                        //TODO: Alterar os botões para fazer mais um pedido à API ou simplesmente mostrar os resultados entre os 2 modos
+
                     />
-                    {formCheck && (
+                    {errorSubmission &&
+                        <ErrorAlert error={errorSubmission} clearError={() => setErrorSubmission(null)}/>
+                    }
+                    {formCheck && pendingSubmission && (
                         <Box sx={{marginLeft: 1, width: '80%'}}>
-                            <FormCheck formGroups={formGroups} submission={submission}/>
+
+                            <PendingSubmissionCheck
+                                formGroups={formGroupsCache.get(pendingSubmission.formVersion) || []}
+                                submission={pendingSubmission}
+                            />
                         </Box>
                     )}
+                    {oldSubmissions && (
+                        <Box sx={{marginLeft: 1, width: '80%'}}>
+
+                        </Box>
+                        //TODO: Adicionar componente para mostrar submissões antigas
+                        //TODO: Adicionar botão para carregar mais submissões antigas (skip + limit)
+                    )}
+
                 </Paper>
             )}
         </Box>

@@ -1,5 +1,11 @@
 import {get, post} from '../utils/fetch';
-import {getSubmissionsByUserUri, getUserByNicUri, getUsersUri, reviewSubmissionUri} from "../utils/WebApiUris";
+import {
+    getSubmissionByUserUri,
+    getSubmissionsHistoryByUserUri,
+    getUserByNicUri,
+    getUsersUri,
+    reviewSubmissionUri
+} from "../utils/WebApiUris";
 import {SubmissionOutputModel} from "./models/GetSubmissionsOutputModel";
 import {ReviewFormOutputModel} from "./models/ReviewFormOutputModel";
 import {GetUserByNicOutputModel} from "./models/GetUserByNicOutputModel";
@@ -13,12 +19,14 @@ export namespace DoctorServices {
         return await get(getUserByNicUri(nic));
     }
 
-    export async function getSubmissionByNic(nic: number): Promise<SubmissionOutputModel> {
-        return await get(getSubmissionsByUserUri(nic));
+    export async function getPendingSubmissionByNic(nic: number): Promise<SubmissionOutputModel> {
+        return await get(getSubmissionByUserUri(nic));
     }
 
-    export async function getSubmissionsByNic(nic: number): Promise<SubmissionOutputModel[]> {
-        return await get(getSubmissionsByUserUri(nic));
+    export async function getSubmissionHistoryByNic(nic: number, skip: number, limit: number): Promise<SubmissionOutputModel[]> {
+        console.log(getSubmissionsHistoryByUserUri(nic, skip, limit));
+        console.log("Requested getSubmissionHistoryByNic")
+        return await get(getSubmissionsHistoryByUserUri(nic, skip, limit));
     }
 
     export async function reviewSubmission(sumbission: number, outputModel: ReviewFormOutputModel): Promise<boolean> {

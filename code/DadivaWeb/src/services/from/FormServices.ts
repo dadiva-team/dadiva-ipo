@@ -15,6 +15,11 @@ import {Terms} from './models/Terms';
 import {SubmitFormOutputModel} from "./models/SubmitFormOutputModel";
 import {AnsweredQuestionModel} from "./models/AnsweredQuestionModel";
 import {SubmitFormRequest} from "./models/SubmitFormRequest";
+import {
+    FormWithVersionDomainModel,
+    FormWithVersionModelToDomain,
+    FormWithVersionOutputModel
+} from "./models/FormWithVersionOutputModel";
 
 function toCamelCase(s: string): string {
     return s.replace(/([A-Z])/g, (c, first) => (first ? c.toLowerCase() : c));
@@ -78,6 +83,14 @@ export namespace FormServices {
         };
         console.log(ModelToDomain(formOutput));
         return ModelToDomain(formOutput);
+    }
+
+    export async function getFormByVersion(formVersion: number): Promise<FormWithVersionDomainModel> {
+        console.log('GET FORM BY VERSION |||||||||||||||');
+        const res = await get<FormWithVersionOutputModel>(getFormUri + `/${formVersion}`);
+
+        console.log(FormWithVersionModelToDomain(res));
+        return FormWithVersionModelToDomain(res);
     }
 
     export async function saveForm(form: Form): Promise<boolean> {

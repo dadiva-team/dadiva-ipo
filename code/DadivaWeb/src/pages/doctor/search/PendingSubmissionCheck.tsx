@@ -11,15 +11,15 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import CloseIcon from '@mui/icons-material/Close';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import {useFormCheck} from "./useFormCheck";
+import {usePendingSubmissionCheck} from "./usePendingSubmissionCheck";
 import {ReviewDialog} from "./ReviewDialog";
 
-interface FormCheckProps {
+interface PendingSubmissionCheckProps {
     formGroups: Group[];
     submission: Submission;
 }
 
-export function FormCheck({formGroups, submission}: FormCheckProps) {
+export function PendingSubmissionCheck({formGroups, submission}: PendingSubmissionCheckProps) {
     const {
         error,
         isLoading,
@@ -38,7 +38,7 @@ export function FormCheck({formGroups, submission}: FormCheckProps) {
         handleDialogClose,
         handleDialogSubmit,
         setFinalNote,
-    } = useFormCheck({ formGroups, submission });
+    } = usePendingSubmissionCheck({ formGroups, submission });
 
     return (
         <Box>

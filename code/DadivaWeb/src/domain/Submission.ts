@@ -4,6 +4,7 @@ export interface Submission{
     nic: number;
     answers: Answers[];
     submissionDate: string;
+    formVersion: number;
 }
 
 export interface Answers{

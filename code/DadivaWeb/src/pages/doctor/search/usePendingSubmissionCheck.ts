@@ -15,12 +15,12 @@ import {useCurrentSession} from "../../../session/Session";
 import {ReviewFormOutputModel} from "../../../services/doctors/models/ReviewFormOutputModel";
 import {DoctorServices} from "../../../services/doctors/DoctorServices";
 
-interface UseFormCheckProps {
+interface UsePendingSubmissionCheckProps {
     formGroups: Group[];
     submission: Submission;
 }
 
-export function useFormCheck({ formGroups, submission }: UseFormCheckProps) {
+export function usePendingSubmissionCheck({ formGroups, submission }: UsePendingSubmissionCheckProps) {
     const nav = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [inconsistencies, setInconsistencies] = useState<Inconsistency[]>(null);

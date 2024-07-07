@@ -10,7 +10,7 @@ interface DoctorSearchResultProps {
   onCheckOldSubmissions: () => void;
 }
 
-export function DoctorSearchResult({ user, onCheckPendingSubmission }: DoctorSearchResultProps) {
+export function DoctorSearchResult({ user, onCheckPendingSubmission, onCheckOldSubmissions }: DoctorSearchResultProps) {
   return (
     <Box sx={{ marginLeft: 1, width: '20%', justifyContent: 'flex-start' }}>
       <Typography variant="h6" component="div">
@@ -21,7 +21,7 @@ export function DoctorSearchResult({ user, onCheckPendingSubmission }: DoctorSea
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <Button onClick={() => onCheckPendingSubmission()}> {'Form. pendente'}</Button>
-        <Button endIcon={<HistoryIcon />}>{'Form. antigos'}</Button>
+        <Button onClick={() => onCheckOldSubmissions()} endIcon={<HistoryIcon />}>{'Form. antigos'}</Button>
       </Box>
     </Box>
   );
