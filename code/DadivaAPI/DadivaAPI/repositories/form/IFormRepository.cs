@@ -6,6 +6,8 @@ public interface IFormRepository
 {
     public Task<Form> GetForm();
     
+    public Task<Form?> GetFormWithVersion(int version);
+    
     public Task<Form> EditForm(Form form);
     
     public Task<bool> SubmitForm(Submission submission, int nic);
@@ -17,7 +19,7 @@ public interface IFormRepository
 
     public Task<Submission?> GetLatestPendingSubmissionByUser(int userNic);
 
-    public Task<List<Submission>?> GetSubmissionHistoryByNic(int nic);
+    public Task<List<Submission>?> GetSubmissionHistoryByNic(int nic, int limit, int skip);
     
     public Task<Inconsistencies> GetInconsistencies();
     

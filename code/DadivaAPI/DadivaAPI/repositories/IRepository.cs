@@ -16,6 +16,11 @@ public interface IRepository
     {
         return FormRepository.GetForm();
     }
+    
+    public Task<Form?> GetFormWithVersion(int version)
+    {
+        return FormRepository.GetFormWithVersion(version);
+    }
 
     public Task<Form> EditForm(Form form)
     {
@@ -47,9 +52,9 @@ public interface IRepository
         return FormRepository.GetLatestPendingSubmissionByUser(userNic);
     }
     
-    public Task<List<Submission>?> GetSubmissionHistoryByNic(int nic)
+    public Task<List<Submission>?> GetSubmissionHistoryByNic(int nic, int limit, int skip)
     {
-        return FormRepository.GetSubmissionHistoryByNic(nic);
+        return FormRepository.GetSubmissionHistoryByNic(nic, limit, skip);
     }
 
     public Task<Inconsistencies> GetInconsistencies()

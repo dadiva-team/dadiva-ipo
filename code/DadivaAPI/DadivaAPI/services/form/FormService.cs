@@ -3,6 +3,7 @@ using DadivaAPI.repositories;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.utils;
+using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.form;
 
@@ -26,6 +27,24 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
                 form.Id
             )
         );
+    }
+    
+    public async Task<Result<GetFormWithVersionOutputModel, Problem>> GetFormWithVersion(int version)
+    {
+        Form? form = await repository.GetFormWithVersion(version);
+        if (form is null)
+            return Result<GetFormWithVersionOutputModel, Problem>.Failure(
+                new Problem(
+                    "errorGettingFormWithVersion.com",
+                    "Error getting form with version $version",
+                    400,
+                    "An error occurred while getting form") //TODO Create Problems types for form
+            );
+
+        return Result<GetFormWithVersionOutputModel, Problem>.Success(new GetFormWithVersionOutputModel(
+            form.Groups.Select(QuestionGroupModel.FromDomain).ToList(),
+            form.Id
+        ));
     }
 
     public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules, User user)
@@ -154,7 +173,7 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
         return Result<Dictionary<int, Submission>, Problem>.Success(await repository.GetSubmissions());
     }
     
-    public async Task<Result<Submission?, Problem>> HasPendingSubmissionsByUser(int userNic)
+    public async Task<Result<Submission?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
     {
         var pendingSubmission = await repository.GetLatestPendingSubmissionByUser(userNic);
     
@@ -168,6 +187,23 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
             );
 
         return Result<Submission?, Problem>.Success(pendingSubmission);
+    }
+    
+    public async Task<Result<List<Submission>, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip)
+    {
+        var submissionHistory = await repository.GetSubmissionHistoryByNic(nic, limit, skip);
+        //TODO: Adicionar a data da review e o nome do medico que fez a review
+        
+        if (submissionHistory == null || !submissionHistory.Any())
+            return Result<List<Submission>, Problem>.Failure(
+                new Problem(
+                    "noSubmissionHistory.com",
+                    "No submission history",
+                    404,
+                    "The user has no submission history")
+            );
+
+        return Result<List<Submission>, Problem>.Success(submissionHistory);
     }
     
     public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()

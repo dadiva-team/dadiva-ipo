@@ -16,13 +16,15 @@ public static class FormRoutes
     {
         var group = app.MapGroup("/forms");
         group.MapGet("/structure", GetForm).RequireAuthorization("donor");
+        group.MapGet("/structure/{version:int}", GetFormWithVersion).AllowAnonymous();//.RequireAuthorization("doctor");
         group.MapPost("/submissions/{nic:int}", SubmitForm).RequireAuthorization("donor");
 
         group.MapPut("/structure", EditForm).RequireAuthorization("admin");
         group.MapPut("/inconsistencies", EditInconsistencies).RequireAuthorization("admin");
 
         group.MapGet("/submissions", GetSubmissions).RequireAuthorization("doctor");
-        group.MapGet("/submissions/{nic:int}", GetSubmission).RequireAuthorization("doctor");
+        group.MapGet("/submissions/{nic:int}", GetPendingSubmission).AllowAnonymous();//.RequireAuthorization("doctor");
+        group.MapGet("/submissions/history/{nic:int}", GetSubmissionHistory).AllowAnonymous();//.RequireAuthorization("doctor");
         //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor");
         group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor");
         group.MapPost("/review/{submissionId:int}", ReviewForm).RequireAuthorization("doctor");
@@ -39,16 +41,17 @@ public static class FormRoutes
                         pair.Value.Id,
                         pair.Key,
                         pair.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                        pair.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture)
+                        pair.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture),
+                        pair.Value.FormVersion
                     )).ToList())),
             Result<Dictionary<int, Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
 
-    private static async Task<IResult> GetSubmission([FromRoute] int nic, IFormService service)
+    private static async Task<IResult> GetPendingSubmission([FromRoute] int nic, IFormService service)
     {
-        var result = await service.GetSubmission(nic);
+        var result = await service.GetPendingSubmissionsByUserNic(nic);
         return result switch
         {
             Result<Submission, Problem>.SuccessResult success => Results.Ok(
@@ -56,13 +59,32 @@ public static class FormRoutes
                     success.Value.Id,
                     nic,
                     success.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                    success.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture)
+                    success.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture),
+                    success.Value.FormVersion
                 )),
             Result<Submission, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
     
+    private static async Task<IResult> GetSubmissionHistory([FromRoute] int nic, [FromQuery] int limit, [FromQuery] int skip, IFormService service)
+    {
+        var result = await service.GetSubmissionHistoryByNic(nic, limit, skip);
+        Console.WriteLine(result.ToString());
+        return result switch
+        {
+            Result<List<Submission>, Problem>.SuccessResult success => Results.Ok(
+                success.Value.Select(submission => new SubmissionModel(
+                    submission.Id,
+                    nic,
+                    submission.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
+                    submission.SubmissionDate.ToString(CultureInfo.CurrentCulture),
+                    success.Value.First().FormVersion
+                )).ToList()),
+            Result<List<Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+        };
+    }
     
     private static async Task<IResult> GetForm(IFormService service, ClaimsPrincipal user)
     {
@@ -89,6 +111,21 @@ public static class FormRoutes
                     statusCode: 200),
             Result<GetFormOutputModel, Problem>.FailureResult failure =>
                 Results.BadRequest(failure.Error),
+            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+        };
+    }
+    
+    private static async Task<IResult> GetFormWithVersion([FromRoute] int version, IFormService service)
+    {
+        Result<GetFormWithVersionOutputModel, Problem> result = await service.GetFormWithVersion(version);
+        return result switch
+        {
+            Result<GetFormWithVersionOutputModel, Problem>.SuccessResult success => Results.Ok(
+                new GetFormWithVersionOutputModel(
+                    success.Value.Groups,
+                    success.Value.FormVersion
+                )),
+            Result<GetFormWithVersionOutputModel, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }

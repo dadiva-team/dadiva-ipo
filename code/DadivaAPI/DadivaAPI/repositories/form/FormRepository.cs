@@ -18,6 +18,11 @@ namespace DadivaAPI.repositories.form
         {
             return await _context.Forms.OrderBy(form => form.AddedOn).LastOrDefaultAsync() ?? throw new Exception("Form not found");
         }
+        
+        public async Task<Form?> GetFormWithVersion(int version)
+        {
+            return await _context.Forms.FirstOrDefaultAsync(form => form.Id == version);
+        }
 
         public async Task<Form> EditForm(Form form)
         {
@@ -71,12 +76,13 @@ namespace DadivaAPI.repositories.form
             throw new NotImplementedException();
         }
         
-        public async Task<List<Submission>> GetSubmissionHistoryByNic(int nic)
+        public async Task<List<Submission>> GetSubmissionHistoryByNic(int nic, int limit, int skip)
         {
             return await _context.Submissions
-                .Where(submission => submission.ByUserNic == nic &&
-                                     !_context.Reviews.Any(review => review.SubmissionId == submission.Id))
+                .Where(submission => submission.ByUserNic == nic && _context.Reviews.Any(review => review.SubmissionId == submission.Id))
                 .OrderByDescending(submission => submission.SubmissionDate)
+                .Skip(skip)
+                .Take(limit)
                 .ToListAsync();
         }
 
