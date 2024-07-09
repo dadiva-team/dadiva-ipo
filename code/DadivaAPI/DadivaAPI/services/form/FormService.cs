@@ -7,7 +7,7 @@ using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IRepository repository, IUsersRepository usersRepository) : IFormService
+public class FormService(IRepository repository) : IFormService
 {
     public async Task<Result<GetFormOutputModel, Problem>> GetForm()
     {
@@ -77,13 +77,13 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
         bool isSubmitted = await repository.SubmitForm(submission, nic);
         if (isSubmitted)
         {
-            var userAccountStatus = await usersRepository.GetUserAccountStatus(nic);
+            var userAccountStatus = await repository.GetUserAccountStatus(nic);
             if (userAccountStatus != null)
             {
                 userAccountStatus.Status = AccountStatus.PendingReview;
                 userAccountStatus.LastSubmissionDate = submission.SubmissionDate;
                 userAccountStatus.LastSubmissionId = submission.Id;
-                await usersRepository.UpdateUserAccountStatus(userAccountStatus);
+                await repository.UpdateUserAccountStatus(userAccountStatus);
             }
 
             return Result<SubmitFormOutputModel, Problem>.Success(new SubmitFormOutputModel(
@@ -157,11 +157,11 @@ public class FormService(IRepository repository, IUsersRepository usersRepositor
                 await repository.AddNote(newNote);
             }
         }
-        var userAccountStatus = await usersRepository.GetUserAccountStatus(submission.ByUserNic);
+        var userAccountStatus = await repository.GetUserAccountStatus(submission.ByUserNic);
         if (userAccountStatus != null)
         {
             userAccountStatus.Status = AccountStatus.Active;
-            await usersRepository.UpdateUserAccountStatus(userAccountStatus);
+            await repository.UpdateUserAccountStatus(userAccountStatus);
         }
 
 

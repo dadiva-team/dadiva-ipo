@@ -12,9 +12,12 @@ export const editFormUri = `${API_URL}/forms/structure`;
 
 export const submitFormUri = (nic: number) => `${API_URL}/forms/submissions/${nic}`;
 export const getSubmissionByUserUri = (nic: number) => `${API_URL}/forms/submissions/${nic}`;
-export const getSubmissionsHistoryByUserUri = (nic: number, skip: number, limit: number) => `${API_URL}/forms/submissions/history/${nic}?skip=${skip}&limit=${limit}`;
+export const getSubmissionsHistoryByUserUri = (nic: number, skip: number, limit: number) =>
+  `${API_URL}/forms/submissions/history/${nic}?skip=${skip}&limit=${limit}`;
 export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/forms/review/${submissionId}`;
 export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
 export const getTermsUri = `${API_URL}/terms`;
+
+export const searchMedicationsUri = `${API_URL}/medications/search?q=`;
