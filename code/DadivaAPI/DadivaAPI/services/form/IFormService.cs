@@ -22,7 +22,7 @@ public interface IFormService
 
     public Task<Result<Submission?, Problem>> GetPendingSubmissionsByUserNic(int userNic);
     
-    public Task<Result<List<Submission>, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip);
+    public Task<Result<SubmissionHistoryOutputModel, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip);
     
     public Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies);
 }

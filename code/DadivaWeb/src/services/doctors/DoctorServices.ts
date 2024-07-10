@@ -9,6 +9,7 @@ import {
 import {SubmissionOutputModel} from "./models/GetSubmissionsOutputModel";
 import {ReviewFormOutputModel} from "./models/ReviewFormOutputModel";
 import {GetUserByNicOutputModel} from "./models/GetUserByNicOutputModel";
+import {SubmissionHistoryOutputModel} from "./models/SubmissionHistoryOutputModel";
 
 export namespace DoctorServices {
     export async function getUsers(): Promise<{ nic: number }[]> {
@@ -23,7 +24,7 @@ export namespace DoctorServices {
         return await get(getSubmissionByUserUri(nic));
     }
 
-    export async function getSubmissionHistoryByNic(nic: number, skip: number, limit: number): Promise<SubmissionOutputModel[]> {
+    export async function getSubmissionHistoryByNic(nic: number, limit: number, skip: number): Promise<SubmissionHistoryOutputModel> {
         console.log(getSubmissionsHistoryByUserUri(nic, skip, limit));
         console.log("Requested getSubmissionHistoryByNic")
         return await get(getSubmissionsHistoryByUserUri(nic, skip, limit));

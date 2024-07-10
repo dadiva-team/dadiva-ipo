@@ -87,8 +87,8 @@ export function useUpdateSessionStatus() {
                 ...currentUser,
                 accountStatus: {
                     ...currentUser.accountStatus,
-                    submissionDate: res.submissionDate,
-                    submissionId: res.submissionId,
+                    lastSubmissionDate: res.submissionDate,
+                    lastSubmissionId: res.submissionId,
                     status: newStatus,
                 },
             };

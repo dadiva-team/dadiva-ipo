@@ -79,8 +79,8 @@ public class DadivaDbContext : DbContext
         
         modelBuilder.Entity<Submission>()
             .HasOne<Form>()
-            .WithOne()
-            .HasForeignKey<Submission>(sub => sub.FormVersion);
+            .WithMany()
+            .HasForeignKey(sub => sub.FormVersion);
             
         modelBuilder.Entity<AnsweredQuestion>()
             .HasKey(aq => aq.Id);

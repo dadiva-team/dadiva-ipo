@@ -6,6 +6,7 @@ using DadivaAPI.repositories.manual;
 using DadivaAPI.repositories.medications;
 using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
+using DadivaAPI.services.form.dtos;
 
 namespace DadivaAPI.repositories;
 
@@ -61,7 +62,7 @@ public interface IRepository
         return await FormRepository.GetLatestPendingSubmissionByUser(userNic);
     }
     
-    public async Task<List<Submission>?> GetSubmissionHistoryByNic(int nic, int limit, int skip)
+    public async Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip)
     {
         return await FormRepository.GetSubmissionHistoryByNic(nic, limit, skip);
     }

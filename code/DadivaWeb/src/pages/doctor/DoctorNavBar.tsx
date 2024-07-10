@@ -18,7 +18,7 @@ export function DoctorNavBar() {
   ];
 
   return (
-    <Box sx={{ width: '25%' }}>
+    <Box sx={{ width: '15%' }}>
       <Typography variant="h6" sx={{ margin: 2, textAlign: 'center' }}>
         Pesquisa de Dadores
       </Typography>

@@ -67,7 +67,7 @@ export default function Home() {
       >
         {user ? (
           hasPendingReview ? (
-            <PendingReviewCard submissionDate={user?.accountStatus?.lastSubmissionDate?.toString()} />
+            <PendingReviewCard submissionDate={ new Date(user?.accountStatus?.lastSubmissionDate).toLocaleDateString()} />
           ) : (
             <PreDadivaInfoCard />
           )

@@ -1,25 +1,25 @@
-import {Group} from '../../../domain/Form/Form';
-import {Submission} from '../../../domain/Submission';
+import {Group} from '../../../../domain/Form/Form';
+import {Submission} from '../../../../domain/Submission/Submission';
 import React from 'react';
 import {Box, Button,Divider} from '@mui/material';
-import LoadingSpinner from '../../../components/shared/LoadingSpinner';
-import {ErrorAlert} from '../../../components/shared/ErrorAlert';
+import LoadingSpinner from '../../../../components/shared/LoadingSpinner';
+import {ErrorAlert} from '../../../../components/shared/ErrorAlert';
 import Typography from '@mui/material/Typography';
 import {FormDetails} from './FormDetails';
-import {PendingActionAlert} from '../../../components/shared/PendingActionAlert';
+import {PendingActionAlert} from '../../../../components/shared/PendingActionAlert';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import CloseIcon from '@mui/icons-material/Close';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import {usePendingSubmissionCheck} from "./usePendingSubmissionCheck";
+import {usePendingSubmissionResults} from "./usePendingSubmissionResults";
 import {ReviewDialog} from "./ReviewDialog";
 
-interface PendingSubmissionCheckProps {
+interface PendingSubmissionPendingProps {
     formGroups: Group[];
     submission: Submission;
 }
 
-export function PendingSubmissionCheck({formGroups, submission}: PendingSubmissionCheckProps) {
+export function PendingSubmissionResults({formGroups, submission}: PendingSubmissionPendingProps) {
     const {
         error,
         isLoading,
@@ -38,7 +38,7 @@ export function PendingSubmissionCheck({formGroups, submission}: PendingSubmissi
         handleDialogClose,
         handleDialogSubmit,
         setFinalNote,
-    } = usePendingSubmissionCheck({ formGroups, submission });
+    } = usePendingSubmissionResults({ formGroups, submission });
 
     return (
         <Box>

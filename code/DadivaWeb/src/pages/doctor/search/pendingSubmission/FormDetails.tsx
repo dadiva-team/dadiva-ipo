@@ -5,9 +5,9 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { NoteDialog } from './NoteDialog';
-import { useFormDetails } from './useFormDetails';
-import { QuestionWithAnswer } from './utils/DoctorSearchAux';
-import { Note } from '../../../domain/Submission';
+import { useFormDetails } from '../useFormDetails';
+import { QuestionWithAnswer } from '../utils/DoctorSearchAux';
+import { Note } from '../../../../domain/Submission/Submission';
 import React from 'react';
 
 interface FormDetailsProps {

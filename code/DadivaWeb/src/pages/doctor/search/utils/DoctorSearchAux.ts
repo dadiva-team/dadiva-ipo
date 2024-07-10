@@ -1,5 +1,5 @@
 import { Group } from '../../../../domain/Form/Form';
-import { Answers } from '../../../../domain/Submission';
+import { Answers } from '../../../../domain/Submission/Submission';
 import { RuleProperties } from 'json-rules-engine';
 
 export interface QuestionWithAnswer {

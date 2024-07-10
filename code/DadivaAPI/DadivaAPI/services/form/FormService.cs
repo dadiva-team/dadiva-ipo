@@ -2,6 +2,7 @@ using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form.models;
+using DadivaAPI.services.form.dtos;
 using DadivaAPI.utils;
 using Elastic.Clients.Elasticsearch;
 
@@ -189,21 +190,48 @@ public class FormService(IRepository repository) : IFormService
         return Result<Submission?, Problem>.Success(pendingSubmission);
     }
     
-    public async Task<Result<List<Submission>, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip)
+    private SubmissionHistoryModel ConvertToOutputModel(SubmissionHistoryDto dto)
     {
-        var submissionHistory = await repository.GetSubmissionHistoryByNic(nic, limit, skip);
-        //TODO: Adicionar a data da review e o nome do medico que fez a review
-        
-        if (submissionHistory == null || !submissionHistory.Any())
-            return Result<List<Submission>, Problem>.Failure(
+        return new SubmissionHistoryModel
+        {
+            SubmissionId = dto.SubmissionId,
+            SubmissionDate = dto.SubmissionDate,
+            ByUserNic = dto.ByUserNic,
+            Answers = dto.Answers.Select(AnsweredQuestionModel.FromDomain).ToList(),
+            FormVersion = dto.FormVersion,
+            ReviewDate = dto.ReviewDate,
+            ReviewStatus = dto.ReviewStatus,
+            DoctorNic = dto.DoctorNic
+        };
+    }
+
+    public async Task<Result<SubmissionHistoryOutputModel, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip)
+    {
+        var (submissionHistoryDtos, hasMoreSubmissions) = await repository.GetSubmissionHistoryByNic(nic, limit, skip);
+
+        if (submissionHistoryDtos == null || !submissionHistoryDtos.Any())
+        {
+            return Result<SubmissionHistoryOutputModel, Problem>.Failure(
                 new Problem(
                     "noSubmissionHistory.com",
                     "No submission history",
                     404,
                     "The user has no submission history")
             );
+        }
 
-        return Result<List<Submission>, Problem>.Success(submissionHistory);
+        var submissionHistoryModels = submissionHistoryDtos.Select(dto => 
+        {
+            var outputModel = ConvertToOutputModel(dto);
+            return outputModel;
+        }).ToList();
+
+        return Result<SubmissionHistoryOutputModel, Problem>.Success(
+            new SubmissionHistoryOutputModel
+            {
+                SubmissionHistory = submissionHistoryModels,
+                HasMoreSubmissions = hasMoreSubmissions
+            } );
     }
     
     public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()
