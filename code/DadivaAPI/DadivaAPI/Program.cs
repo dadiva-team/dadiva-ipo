@@ -1,21 +1,35 @@
 using System.Text;
 using DadivaAPI.repositories;
+using DadivaAPI.repositories.cftToManual;
+using DadivaAPI.repositories.manual;
 using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form;
+using DadivaAPI.routes.manual;
 using DadivaAPI.routes.terms;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.form;
+using DadivaAPI.services.interactions;
+using DadivaAPI.services.manual;
 using DadivaAPI.services.terms;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
 using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Ensure environment variables are included
+builder.Configuration.AddEnvironmentVariables();
+
+// Load configuration from appsettings.json and override with environment variables
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
 
 //Jwt configuration starts here
 var jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
@@ -73,8 +87,15 @@ string? databaseType = builder.Configuration.GetSection("DatabaseType").Get<stri
 switch (databaseType)
 {
     case "PGSQL":
+        //string? connectionString = "Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres";//Environment.GetEnvironmentVariable("DADIVA_CONNECTION_STRING");
+        string? connectionString = Environment.GetEnvironmentVariable("DADIVA_CONNECTION_STRING");
+        if (connectionString == null)
+        {
+            throw new Exception("DADIVA_CONNECTION_STRING must be provided in the environment variables.");
+        }
+
         builder.Services.AddDbContext<DadivaDbContext>(options =>
-            options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres")
+            options.UseNpgsql(connectionString)
         );
         break;
     case "MEMORY":
@@ -95,9 +116,12 @@ builder.Services.AddSingleton(new ElasticsearchClient(settings));
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<ITermsService, TermsService>();
+builder.Services.AddScoped<IMedicationsService, MedicationsService>();
+builder.Services.AddScoped<IManualService, ManualService>();
 
 builder.Services.AddScoped<IRepository, Repository>();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+
+
 
 
 builder.Services.AddCors(options =>
@@ -131,12 +155,14 @@ var group = app.MapGroup("/api");
 group.AddUsersRoutes();
 group.AddFormRoutes();
 group.AddTermsRoutes();
+group.AddMedicationsRoutes();
+group.AddManualRoutes();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<DadivaDbContext>();
-    context.Database.Migrate();  // Apply pending migrations
+    context.Database.Migrate(); // Apply pending migrations
     PopulateDatabase.Initialize(context);
 }
 

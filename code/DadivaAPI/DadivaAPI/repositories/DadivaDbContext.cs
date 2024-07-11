@@ -18,6 +18,8 @@ public class DadivaDbContext : DbContext
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Note> Notes { get; set; }
+    
+    public DbSet<CftToManualEntry> CftToManual { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -77,8 +79,8 @@ public class DadivaDbContext : DbContext
         
         modelBuilder.Entity<Submission>()
             .HasOne<Form>()
-            .WithOne()
-            .HasForeignKey<Submission>(sub => sub.FormVersion);
+            .WithMany()
+            .HasForeignKey(sub => sub.FormVersion);
             
         modelBuilder.Entity<AnsweredQuestion>()
             .HasKey(aq => aq.Id);
@@ -107,6 +109,12 @@ public class DadivaDbContext : DbContext
             .WithOne()
             .HasForeignKey<UserAccountStatus>(uas => uas.UserNic);
         
-        // Configure other entities as needed
+        modelBuilder.Entity<CftToManualEntry>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Cft).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ManualEntry).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => e.Cft).IsUnique();
+        });
     }
 }

@@ -1,9 +1,9 @@
-import { BooleanButtons, CheckboxesTags, TextInput, WrongQuestionType } from '../Inputs';
+import { BooleanButtons, CheckboxesTags, MedicationsInput, TextInput, WrongQuestionType } from '../Inputs';
 import React from 'react';
 
 export function getInputComponent(
   question: { id: string; type: string; options: string[] },
-  onChangeAnswer: (id: string, type: string, answer: string) => void
+  onChangeAnswer: (id: string, type: string, answer: string | string[]) => void
 ) {
   let input;
   switch (question.type) {
@@ -23,6 +23,15 @@ export function getInputComponent(
       input = (
         <CheckboxesTags
           options={question.options}
+          onChangeAnswer={answer => {
+            onChangeAnswer(question.id, question.type, answer);
+          }}
+        />
+      );
+      break;
+    case 'medications':
+      input = (
+        <MedicationsInput
           onChangeAnswer={answer => {
             onChangeAnswer(question.id, question.type, answer);
           }}

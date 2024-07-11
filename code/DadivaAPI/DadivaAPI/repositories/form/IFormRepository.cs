@@ -1,4 +1,5 @@
 using DadivaAPI.domain;
+using DadivaAPI.services.form.dtos;
 
 namespace DadivaAPI.repositories.form;
 
@@ -19,7 +20,7 @@ public interface IFormRepository
 
     public Task<Submission?> GetLatestPendingSubmissionByUser(int userNic);
 
-    public Task<List<Submission>?> GetSubmissionHistoryByNic(int nic, int limit, int skip);
+    public Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip);
     
     public Task<Inconsistencies> GetInconsistencies();
     

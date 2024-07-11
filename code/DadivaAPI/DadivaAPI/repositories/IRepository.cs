@@ -1,8 +1,12 @@
 using System.Text.Json;
 using DadivaAPI.domain;
+using DadivaAPI.repositories.cftToManual;
 using DadivaAPI.repositories.form;
+using DadivaAPI.repositories.manual;
+using DadivaAPI.repositories.medications;
 using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
+using DadivaAPI.services.form.dtos;
 
 namespace DadivaAPI.repositories;
 
@@ -11,109 +15,145 @@ public interface IRepository
     public IFormRepository FormRepository { get; }
     public IUsersRepository UserRepository { get; }
     public ITermsRepository TermsRepository { get; }
-
-    public Task<Form?> GetForm()
+    
+    public IMedicationsRepository MedicationRepository { get; }
+    
+    public ICftToManualRepository CftToManualRepository { get; }
+    
+    public IManualRepository ManualRepository { get; }
+    
+    public async Task<Form?> GetForm()
     {
-        return FormRepository.GetForm();
+        return await FormRepository.GetForm();
     }
     
-    public Task<Form?> GetFormWithVersion(int version)
+    public async Task<Form?> GetFormWithVersion(int version)
     {
-        return FormRepository.GetFormWithVersion(version);
-    }
-
-    public Task<Form> EditForm(Form form)
-    {
-        return FormRepository.EditForm(form);
-    }
-    
-    public Task<bool> SubmitForm(Submission submission, int nic)
-    {
-        return FormRepository.SubmitForm(submission, nic);
-    }
-    
-    public Task<Dictionary<int, Submission>> GetSubmissions()
-    {
-        return FormRepository.GetSubmissions();
+        return await FormRepository.GetFormWithVersion(version);
     }
 
-    public Task<Submission> GetSubmission(int nic)
+    public async Task<Form> EditForm(Form form)
     {
-        return FormRepository.GetSubmission(nic);
+        return await FormRepository.EditForm(form);
     }
     
-    public Task<Submission> GetSubmissionById(int id)
+    public async Task<bool> SubmitForm(Submission submission, int nic)
     {
-        return FormRepository.GetSubmissionById(id);
+        return await FormRepository.SubmitForm(submission, nic);
     }
     
-    public Task<Submission?> GetLatestPendingSubmissionByUser(int userNic)
+    public async Task<Dictionary<int, Submission>> GetSubmissions()
     {
-        return FormRepository.GetLatestPendingSubmissionByUser(userNic);
-    }
-    
-    public Task<List<Submission>?> GetSubmissionHistoryByNic(int nic, int limit, int skip)
-    {
-        return FormRepository.GetSubmissionHistoryByNic(nic, limit, skip);
+        return await FormRepository.GetSubmissions();
     }
 
-    public Task<Inconsistencies> GetInconsistencies()
+    public async Task<Submission> GetSubmission(int nic)
     {
-        return FormRepository.GetInconsistencies();
+        return await FormRepository.GetSubmission(nic);
     }
     
-    public Task<Review> AddReview(Review review)
+    public async Task<Submission> GetSubmissionById(int id)
     {
-        return FormRepository.AddReview(review);
+        return await FormRepository.GetSubmissionById(id);
     }
     
-    public Task<bool> AddNote(Note note)
+    public async Task<Submission?> GetLatestPendingSubmissionByUser(int userNic)
     {
-        return FormRepository.AddNote(note);
+        return await FormRepository.GetLatestPendingSubmissionByUser(userNic);
     }
     
-    public Task<bool> EditInconsistencies(Inconsistencies inconsistencies)
+    public async Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip)
     {
-        return FormRepository.EditInconsistencies(inconsistencies);
+        return await FormRepository.GetSubmissionHistoryByNic(nic, limit, skip);
     }
 
-    public Task<bool> AddUser(User user)
+    public async Task<Inconsistencies> GetInconsistencies()
     {
-        return UserRepository.AddUser(user);
+        return await FormRepository.GetInconsistencies();
+    }
+    
+    public async Task<Review> AddReview(Review review)
+    {
+        return await FormRepository.AddReview(review);
+    }
+    
+    public async Task<bool> AddNote(Note note)
+    {
+        return await FormRepository.AddNote(note);
+    }
+    
+    public async Task<bool> EditInconsistencies(Inconsistencies inconsistencies)
+    {
+        return await FormRepository.EditInconsistencies(inconsistencies);
     }
 
-    public Task<List<User>?> GetUsers()
+    public async Task<bool> AddUser(User user)
     {
-        return UserRepository.GetUsers();
+        return await UserRepository.AddUser(user);
     }
 
-    public Task<User?> GetUserByNic(int nic)
+    public async Task<List<User>?> GetUsers()
     {
-        return UserRepository.GetUserByNic(nic);
+        return await UserRepository.GetUsers();
     }
 
-    public Task<Boolean> DeleteUser(int nic)
+    public async Task<User?> GetUserByNic(int nic)
     {
-        return UserRepository.DeleteUser(nic);
+        return await UserRepository.GetUserByNic(nic);
+    }
+
+    public async Task<Boolean> DeleteUser(int nic)
+    {
+        return await UserRepository.DeleteUser(nic);
     }
     
-    public Task<UserAccountStatus?> GetUserAccountStatus(int userNic)
+    public async Task<UserAccountStatus?> GetUserAccountStatus(int userNic)
     {
-        return UserRepository.GetUserAccountStatus(userNic);
+        return await UserRepository.GetUserAccountStatus(userNic);
     }
     
-    public Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
+    public async Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
     {
-        return UserRepository.UpdateUserAccountStatus(userAccountStatus);
+        return await UserRepository.UpdateUserAccountStatus(userAccountStatus);
     }
     
-    public Task<Terms?> GetTerms()
+    public async Task<Terms?> GetTerms()
     {
-        return TermsRepository.GetTerms();
+        return await TermsRepository.GetTerms();
     }
     
-    public Task<Boolean> SubmitTerms(JsonElement terms)
+    public async Task<Boolean> SubmitTerms(JsonElement terms)
     {
-        return TermsRepository.SubmitTerms(terms);
+        return await TermsRepository.SubmitTerms(terms);
+    }
+    
+    public async Task<List<string>> SearchMedications(string query)
+    {
+        return await MedicationRepository.SearchMedications(query);
+    }
+    
+    public Task<List<string>> GetCfts(string productName)
+    {
+        return MedicationRepository.GetCfts(productName);
+    }
+    
+    public async Task<string> GetManualEntryFromCft(string cft)
+    {
+        return await CftToManualRepository.GetManualEntryFromCft(cft);
+    }
+    
+    public async Task<bool> AddCftToManualEntry(string cft, string manualEntry)
+    {
+        return await CftToManualRepository.AddCftToManualEntry(cft, manualEntry);
+    }
+    
+    public async Task<List<string>> GetManualEntriesFromCfts(List<string> cfts)
+    {
+        return await CftToManualRepository.GetManualEntriesFromCfts(cfts);
+    }
+    
+    public async Task<List<ManualInformation>> GetManualInformations(List<string> manualEntries)
+    {
+        return await ManualRepository.GetManualInformations(manualEntries);
     }
 }

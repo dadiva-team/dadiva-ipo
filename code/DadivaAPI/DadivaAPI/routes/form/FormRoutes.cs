@@ -73,15 +73,8 @@ public static class FormRoutes
         Console.WriteLine(result.ToString());
         return result switch
         {
-            Result<List<Submission>, Problem>.SuccessResult success => Results.Ok(
-                success.Value.Select(submission => new SubmissionModel(
-                    submission.Id,
-                    nic,
-                    submission.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                    submission.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                    success.Value.First().FormVersion
-                )).ToList()),
-            Result<List<Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<SubmissionHistoryOutputModel, Problem>.SuccessResult success => Results.Ok(success.Value),
+            Result<SubmissionHistoryOutputModel, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }

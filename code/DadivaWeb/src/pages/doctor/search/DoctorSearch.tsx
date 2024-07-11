@@ -6,13 +6,15 @@ import {DoctorSearchResult} from './DoctorSearchResult';
 import {handleError, handleRequest} from '../../../services/utils/fetch';
 import {useNavigate} from 'react-router-dom';
 import {DoctorServices} from '../../../services/doctors/DoctorServices';
-import {Submission} from '../../../domain/Submission';
+import {Submission} from '../../../domain/Submission/Submission';
 import {ErrorAlert} from '../../../components/shared/ErrorAlert';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import {FormServices} from '../../../services/from/FormServices';
 import {Group} from '../../../domain/Form/Form';
-import {PendingSubmissionCheck} from './PendingSubmissionCheck';
+import {PendingSubmissionResults} from './pendingSubmission/PendingSubmissionResults';
 import {User} from "../../../domain/User/User";
+import {SubmissionHistory} from "../../../domain/Submission/SubmissionHistory";
+import {OldSubmissionsResults} from "./oldSubmissions/OldSubmissionsResults";
 
 export interface DoctorSearchProps {
     mode: string;
@@ -28,11 +30,17 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
     const [nic, setNic] = useState<string>('');
     const [pendingSubmission, setPendingSubmission] = useState<Submission | null>(null);
 
-    const [oldSubmissions, setOldSubmissions] = useState<Submission[]>(null);
+    const [oldSubmissions, setOldSubmissions] = useState<SubmissionHistory[]>([]);
     const [user, setUser] = useState<User>(null);
 
     const [formGroupsCache, setFormGroupsCache] = useState<Map<number, Group[]>>(new Map());
-    const [formCheck, setFormCheck] = useState<boolean>(null);
+    const [pendingView, setPendingView] = useState<boolean>(null);
+    const [oldView, setOldView] = useState<boolean>(null);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [submissionLimit, setSubmissionLimit] = useState(2);
+    const [submissionSkip, setSubmissionSkip] = useState(0);
+    const [hasMoreSubmissions, setHasMoreSubmissions] = useState(true);
 
     const fetchFormGroups = async (formVersion: number): Promise<Group[]> => {
         if (formGroupsCache.has(formVersion)) {
@@ -68,6 +76,8 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
 
     const fetchPendingSubmission = async () => {
         if (!user) return;
+        if (errorSubmission) setErrorSubmission(null);
+
         const [error, res] = await handleRequest(DoctorServices.getPendingSubmissionByNic(Number(user.nic)));
         if (error) {
             handleError(error, setErrorSubmission, nav);
@@ -76,23 +86,48 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
         }
         await fetchFormGroups(res.formVersion);
         setPendingSubmission(res as Submission);
-        setFormCheck(true);
+        setPendingView(true);
+        setOldView(false)
     };
 
-    const fetchSubmissionHistory = async (limit: number, skip: number) => {
+    const fetchSubmissionHistory = async (limit: number, skip: number, reset: boolean) => {
         if (!user) return;
+        if (errorSubmission) setErrorSubmission(null);
+        if (reset) {
+            setOldSubmissions([]);
+            setSubmissionSkip(0)
+        }
+
         const [error, res] = await handleRequest(DoctorServices.getSubmissionHistoryByNic(Number(user.nic), limit, skip));
         if (error) {
             handleError(error, setErrorSubmission, nav);
             setOldSubmissions([]);
             return;
         }
-        console.log(res);
-        /*const submissions = await Promise.all(res.map(async (submission: Submission) => {
-            const formGroups = await fetchFormGroups(submission.formVersion);
-            return {...submission, formGroups};
-        }));*/
-        setOldSubmissions(res as Submission[]);
+
+        const {submissionHistory, hasMoreSubmissions} = res
+
+        setHasMoreSubmissions(hasMoreSubmissions);
+        setOldSubmissions(prevSubmissions => [...prevSubmissions, ...(submissionHistory)]);
+        setOldView(true);
+        setPendingView(false);
+    };
+
+    const loadMoreSubmissions = () => {
+        const newSkip = submissionSkip + submissionLimit;
+        console.log('Loading more submissions');
+        console.log("Skip: " + newSkip);
+        setSubmissionSkip(newSkip);
+        fetchSubmissionHistory(submissionLimit, newSkip, false);
+    };
+    const togglePendingView = () => {
+        setPendingView(true);
+        setOldView(false);
+    };
+
+    const toggleOldView = () => {
+        setPendingView(false);
+        setOldView(true);
     };
 
     return (
@@ -118,31 +153,33 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                 <Paper elevation={2} sx={{padding: 2, display: 'flex', flexDirection: 'row', alignItems: 'flex-start'}}>
                     <DoctorSearchResult
                         user={user}
+                        pendingView={pendingView}
+                        historyView={oldView}
                         onCheckPendingSubmission={fetchPendingSubmission}
-                        onCheckOldSubmissions={() => fetchSubmissionHistory(10, 0)}  //TODO: Tirar o hardcode do limit e skip
-
-                        //TODO: Alterar os botões para fazer mais um pedido à API ou simplesmente mostrar os resultados entre os 2 modos
+                        onCheckOldSubmissions={(reset) => fetchSubmissionHistory(2, 0, reset)}  //TODO: Tirar o hardcode do limit e skip
+                        pendingAndOldView={pendingSubmission && oldSubmissions?.length > 0}
+                        onTogglePendingView={togglePendingView}
+                        onToggleHistoryView={toggleOldView}
 
                     />
-                    {errorSubmission &&
-                        <ErrorAlert error={errorSubmission} clearError={() => setErrorSubmission(null)}/>
-                    }
-                    {formCheck && pendingSubmission && (
-                        <Box sx={{marginLeft: 1, width: '80%'}}>
-
-                            <PendingSubmissionCheck
+                    <Box sx={{marginLeft: 2, width: '80%', borderLeft: '6px solid #1976d2', pl: 2}}>
+                        {errorSubmission &&
+                            <ErrorAlert error={errorSubmission} clearError={() => setErrorSubmission(null)}/>
+                        }
+                        {pendingView && pendingSubmission && (
+                            <PendingSubmissionResults
                                 formGroups={formGroupsCache.get(pendingSubmission.formVersion) || []}
                                 submission={pendingSubmission}
                             />
-                        </Box>
-                    )}
-                    {oldSubmissions && (
-                        <Box sx={{marginLeft: 1, width: '80%'}}>
-
-                        </Box>
-                        //TODO: Adicionar componente para mostrar submissões antigas
-                        //TODO: Adicionar botão para carregar mais submissões antigas (skip + limit)
-                    )}
+                        )}
+                        {oldView && oldSubmissions && (
+                            <OldSubmissionsResults
+                                submissions={oldSubmissions}
+                                loadMoreSubmissions={loadMoreSubmissions}
+                                hasMoreSubmissions={hasMoreSubmissions}
+                            />
+                        )}
+                    </Box>
 
                 </Paper>
             )}

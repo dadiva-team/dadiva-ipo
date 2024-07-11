@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {QuestionWithAnswer} from './utils/DoctorSearchAux';
-import {Note} from "../../../domain/Submission";
+import {Note} from "../../../domain/Submission/Submission";
 
 interface UseFormDetailsProps {
     notes: Note[];

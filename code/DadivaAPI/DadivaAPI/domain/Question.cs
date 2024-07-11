@@ -6,7 +6,8 @@ public enum ResponseType
 {
     boolean,
     text,
-    dropdown
+    dropdown,
+    medications
 }
 
 public record Question(string Id, string Text, ResponseType Type, List<string>? Options);

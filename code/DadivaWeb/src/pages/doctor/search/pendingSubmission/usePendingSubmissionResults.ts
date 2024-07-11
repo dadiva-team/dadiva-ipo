@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Group } from '../../../domain/Form/Form';
-import { Note, Submission } from '../../../domain/Submission';
+import { Group } from '../../../../domain/Form/Form';
+import { Note, Submission } from '../../../../domain/Submission/Submission';
 import { useNavigate } from 'react-router-dom';
 import {
     buildFormWithAnswers,
@@ -8,19 +8,19 @@ import {
     extractInconsistencies,
     Inconsistency,
     QuestionWithAnswer,
-} from './utils/DoctorSearchAux';
-import { handleRequest, handleError } from '../../../services/utils/fetch';
-import { FormServices } from '../../../services/from/FormServices';
-import {useCurrentSession} from "../../../session/Session";
-import {ReviewFormOutputModel} from "../../../services/doctors/models/ReviewFormOutputModel";
-import {DoctorServices} from "../../../services/doctors/DoctorServices";
+} from '../utils/DoctorSearchAux';
+import { handleRequest, handleError } from '../../../../services/utils/fetch';
+import { FormServices } from '../../../../services/from/FormServices';
+import {useCurrentSession} from "../../../../session/Session";
+import {ReviewFormOutputModel} from "../../../../services/doctors/models/ReviewFormOutputModel";
+import {DoctorServices} from "../../../../services/doctors/DoctorServices";
 
 interface UsePendingSubmissionCheckProps {
     formGroups: Group[];
     submission: Submission;
 }
 
-export function usePendingSubmissionCheck({ formGroups, submission }: UsePendingSubmissionCheckProps) {
+export function usePendingSubmissionResults({ formGroups, submission }: UsePendingSubmissionCheckProps) {
     const nav = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [inconsistencies, setInconsistencies] = useState<Inconsistency[]>(null);

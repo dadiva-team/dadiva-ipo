@@ -1,28 +1,11 @@
 const ESLintPlugin = require('eslint-webpack-plugin');
 
-function delay(ms) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  });
-}
-
 module.exports = {
   mode: 'development',
   devServer: {
     port: 8000,
     historyApiFallback: true,
     compress: false,
-    proxy: [
-      {
-        context: ['/api'],
-        target: 'https://localhost:7011',
-        // introducing an API delay to make testing easier
-        pathRewrite: async function (path) {
-          await delay(1000);
-          return path;
-        },
-      },
-    ],
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],

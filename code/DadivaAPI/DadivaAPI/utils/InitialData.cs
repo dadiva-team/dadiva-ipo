@@ -27,14 +27,14 @@ public class InitialData
         "MegaPassword123!hashed",
         Role.donor
     );
-    
+
     public static readonly List<User> Users =
     [
         Admin,
         Doctor,
         Donor
     ];
-    
+
     public static readonly UserAccountStatus DonorStatus = new UserAccountStatus
     (
         Donor.Nic,
@@ -43,7 +43,7 @@ public class InitialData
         null,
         null
     );
-    
+
     public static readonly UserAccountStatus AdminStatus = new UserAccountStatus
     (
         Admin.Nic,
@@ -52,7 +52,7 @@ public class InitialData
         null,
         null
     );
-    
+
     public static readonly UserAccountStatus DoctorStatus = new UserAccountStatus
     (
         Doctor.Nic,
@@ -61,7 +61,7 @@ public class InitialData
         null,
         null
     );
-    
+
     public static readonly List<UserAccountStatus> UserAccountStatuses =
     [
         DonorStatus,
@@ -76,58 +76,47 @@ public class InitialData
                 new Question
                 (
                     "q2",
-                    "Sente-se bem de saúde e em condições de dar sangue?",
-                    ResponseType.boolean,
-                    null
-                ),
-                new Question
-                (
-                    "q3",
-                    "Alguma vez deu sangue ou componentes sanguíneos?",
-                    ResponseType.boolean,
-                    null
-                ),
-                new Question
-                (
-                    "q4",
-                    "Deu sangue há menos de 2 meses?",
-                    ResponseType.boolean,
-                    null
-                ),
-                new Question
-                (
-                    "q5",
-                    "Alguma vez lhe foi aplicada uma suspensão para a dádiva de sangue?",
-                    ResponseType.boolean,
-                    null
-                ),
-                new Question
-                (
-                    "q6",
-                    "Ocorreu alguma reação ou incidente nas dádivas anteriores?",
-                    ResponseType.boolean,
+                    "Quais os medicamentos que toma?",
+                    ResponseType.medications,
                     null
                 )
             ]),
-            new QuestionGroup("Viagens", [
-                new Question
-                (
-                    "Q7",
-                    "Os seus pais biológicos nasceram e viveram sempre em Portugal?",
-                    ResponseType.boolean,
-                    null
-                ),
-                new Question
-                (
-                    "Q8",
-                    "Nasceu e viveu sempre em Portugal?",
+            new QuestionGroup("Dádivas Anteriores 2", [
+                new Question(
+                    "q3",
+                    "Alguma vez deu sangue ou componentes sanguíneos?",
                     ResponseType.boolean,
                     null
                 )
             ])
         ],
-        [],
+        [
+            new Rule(new LogicalCondition([], []), new Event(EventType.showQuestion, new EventParams("q2"))),
+            new Rule(new LogicalCondition([new EvaluationCondition("q2", Operator.notEqual, "")], []), new Event(EventType.nextGroup, null)),
+            new Rule(new LogicalCondition([], []), new Event(EventType.showQuestion, new EventParams("q3"))),
+            new Rule(new LogicalCondition([new EvaluationCondition("q3", Operator.notEqual, "")], []), new Event(EventType.showReview, null))
+        ],
         Admin,
         DateTime.Now.ToUniversalTime()
     );
+    
+    public static readonly List<KeyValuePair<string, string>> CftToManualEntries =
+    [
+        new KeyValuePair<string, string>(
+            "Derivados do ácido propiónico", 
+            "Anti-Inflamatórios não esteroides (AINES)"
+            ),
+        new KeyValuePair<string, string>(
+            "Outros anticoagulantes", 
+            "Anticoagulantes"
+        ),
+        new KeyValuePair<string, string>(
+            "Inibidores da bomba de protões", 
+            "Antiácidos, incluindo agonistas dos recetores H2 e inibidores da bomba de protões"
+        ),
+        new KeyValuePair<string, string>(
+            "Analgésicos e antipiréticos",
+            "Analgésicos"
+        )
+    ];
 }

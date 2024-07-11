@@ -1,20 +1,27 @@
+using DadivaAPI.domain;
 using DadivaAPI.repositories;
-using DadivaAPI.repositories.form;
-using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.utils;
 
-public class PopulateDatabase
+public static class PopulateDatabase
 {
     public static void Initialize(DadivaDbContext context)
     {
         // Check if the table is not empty
         if (context.Forms.Any()) return;
-        
+
         // Insert initial data
         context.Users.AddRange(InitialData.Users);
         context.Forms.Add(InitialData.Form);
         context.UserAccountStatus.AddRange(InitialData.UserAccountStatuses);
+
+
+        context.CftToManual.AddRange(InitialData.CftToManualEntries.Select(entry => new CftToManualEntry
+        {
+            Cft = entry.Key,
+            ManualEntry = entry.Value
+        }));
+
 
         context.SaveChanges();
     }

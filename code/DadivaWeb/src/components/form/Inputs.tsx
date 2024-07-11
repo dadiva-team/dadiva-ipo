@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Autocomplete, Box, Button, Checkbox, Chip, TextField } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -9,7 +9,8 @@ import PublishIcon from '@mui/icons-material/Publish';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Save } from '@mui/icons-material';
-
+import { MedicationsServices } from '../../services/medications/MedicationsServices';
+import { handleRequest } from '../../services/utils/fetch';
 interface BooleanButtonsProps {
   onChangeAnswer: (answer: boolean) => void;
 }
@@ -163,6 +164,67 @@ type DropdownProps = {
   options: string[];
   onChangeAnswer: (answer: string) => void;
 };
+
+type MedicationsInput = {
+  onChangeAnswer: (answer: string[]) => void;
+};
+
+export function MedicationsInput({ onChangeAnswer }: MedicationsInput) {
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [possibleOptions, setPossibleOptions] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const [error, res] = await handleRequest(MedicationsServices.searchMedications(inputValue));
+      if (error) {
+        console.log(error);
+        //handleError(error, setError, nav);
+        return;
+      }
+      setPossibleOptions(res);
+      setLoading(false);
+    };
+
+    if (inputValue.length >= 3) {
+      setLoading(true);
+      fetch();
+    } else {
+      setPossibleOptions([]);
+    }
+  }, [inputValue]);
+
+  return (
+    <div>
+      <Autocomplete
+        loading={loading}
+        loadingText={'A carregar opções...'}
+        value={selectedOptions}
+        inputValue={inputValue}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+        }}
+        onChange={(event, newValue) => {
+          setSelectedOptions(newValue);
+        }}
+        renderInput={params => <TextField {...params} label="Medicamentos" />}
+        multiple={true}
+        options={possibleOptions}
+      />
+      <Button
+        variant="outlined"
+        onClick={() => onChangeAnswer(selectedOptions)}
+        startIcon={<Save />}
+        sx={{ borderRadius: 50 }}
+        disabled={selectedOptions.length === 0}
+      >
+        Guardar
+      </Button>
+    </div>
+  );
+}
 
 export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
   const [selectedOptions, setSelectedOptions] = useState<string>('');
