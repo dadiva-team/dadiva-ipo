@@ -29,7 +29,7 @@ public static class TermsRoutes
         };
     }
     
-    private static async Task<IResult> EditTerms([FromBody] JsonElement terms, ITermsService service)
+    private static async Task<IResult> EditTerms([FromBody] Terms terms, ITermsService service)
     {
         Console.WriteLine(terms);
         Result<bool, Problem> result = await service.SubmitTerms(terms);

@@ -25,7 +25,7 @@ public class TermsService(IRepository repository) : ITermsService
         return Result<Terms?, Problem>.Success(terms);
     }
 
-    public async Task<Result<bool, Problem>> SubmitTerms(JsonElement terms)
+    public async Task<Result<bool, Problem>> SubmitTerms(Terms terms)
     {
         bool isSubmited = await repository.SubmitTerms(terms);
         

@@ -37,16 +37,6 @@ namespace DadivaAPI.repositories.form
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public Task<Terms?> GetTerms()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> EditTerms(JsonElement terms)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Inconsistencies> GetInconsistencies()
         {
             return await _context.Inconsistencies.OrderBy(inconsistencies => inconsistencies.Id).LastOrDefaultAsync();

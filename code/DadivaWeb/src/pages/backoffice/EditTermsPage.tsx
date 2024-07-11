@@ -3,30 +3,14 @@ import { useEditTermsPage } from '../../components/backoffice/editTerms/useEditT
 import { Box, Button } from '@mui/material';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
-import JoditEditor from 'jodit-react';
-import { FormServices } from '../../services/from/FormServices';
-import submitTerms = FormServices.submitTerms;
-import { Terms } from '../../domain/Terms/Terms';
+import Editor from '../../components/backoffice/editTerms/Editor';
+import Typography from '@mui/material/Typography';
+import { Jodit } from 'jodit-react';
 
 export function EditTermsPage() {
-  const { isLoading, error, setError, termsFetchData } = useEditTermsPage();
-
-  const editor = useRef(null);
+  const { isLoading, error, setError, termsFetchData, isSubmitted, setIsSubmitted, submitTerms } = useEditTermsPage();
   const [content, setContent] = useState('');
-
-  const config = {
-    readonly: false,
-    height: 500,
-    showCharsCounter: false,
-    showWordsCounter: false,
-    showXPathInStatusbar: false,
-    buttons:
-      'bold,italic,underline,strikethrough,eraser,ul,ol,font,fontsize,paragraph,lineHeight,superscript,subscript,file,image,cut,copy,paste,selectall,link, brush, align',
-  };
-
-  const handleSubmit = () => {
-    submitTerms(new Terms(content));
-  };
+  const editorRef = useRef<Jodit>();
 
   return (
     <div>
@@ -37,16 +21,25 @@ export function EditTermsPage() {
         </Box>
       ) : (
         <>
-          <JoditEditor
-            ref={editor}
-            value={termsFetchData ?? ''}
-            config={config}
-            onBlur={newContent => setContent(newContent)}
-            onChange={() => {}}
+          <Editor
+            ref={editorRef}
+            initialState={termsFetchData ? termsFetchData.terms : ' '}
+            setContent={setContent}
+            setIsSubmitted={setIsSubmitted}
           />
-          <div className="Btns">
-            <Button onClick={handleSubmit}>Submit Terms</Button>
-          </div>
+          <Button
+            disabled={isSubmitted}
+            onClick={() => {
+              submitTerms(content, termsFetchData.authors);
+              editorRef.current && editorRef.current.focus(); // Ensure focus after submit
+            }}
+          >
+            {isSubmitted ? 'Submitted' : 'Submit Terms'}
+          </Button>
+          <Typography>
+            Authors:
+            {termsFetchData?.authors.map(author => ` ${author}`)}
+          </Typography>
         </>
       )}
     </div>

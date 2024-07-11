@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Container } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useTerms } from '../../components/form/useTerms';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -15,8 +15,9 @@ export function Terms() {
           <ErrorAlert error={error} clearError={() => setError(null)} />
         </Box>
       ) : (
-        <div>
+        <Container maxWidth="lg">
           <div dangerouslySetInnerHTML={{ __html: terms }} /*TODO: just a proof of concept, sanitize the HTML*/ />
+
           <Button
             variant="contained"
             onClick={() => {
@@ -27,7 +28,7 @@ export function Terms() {
           >
             Aceito os termos e condições
           </Button>
-        </div>
+        </Container>
       )}
     </div>
   );

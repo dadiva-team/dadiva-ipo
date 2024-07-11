@@ -1,4 +1,3 @@
-using System.Text.Json;
 using DadivaAPI.domain;
 using Elastic.Clients.Elasticsearch;
 
@@ -14,10 +13,11 @@ public class TermsRepository(ElasticsearchClient client) : ITermsRepository
         Console.WriteLine("GetTerms");
         var response = await client.SearchAsync<Terms>(idx => idx.Index(TermsIndex));
         Console.WriteLine("response" + response.IsValidResponse);
+        Console.WriteLine("response" + response.Documents.Last());
         return response.IsValidResponse ? response.Documents.Last() : null;
     }
 
-    public async Task<bool> SubmitTerms(JsonElement terms)
+    public async Task<bool> SubmitTerms(Terms terms)
     {
         Console.WriteLine(client.ElasticsearchClientSettings);
         Console.WriteLine("SubmitTerms");

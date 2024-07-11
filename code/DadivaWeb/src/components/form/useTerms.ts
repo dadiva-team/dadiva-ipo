@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../services/utils/fetch';
-import { FormServices } from '../../services/from/FormServices';
+import { TermsServices } from '../../services/terms/TermsServices';
 
 export function useTerms() {
   const [isLoading, setIsLoading] = useState(true);
@@ -11,14 +11,14 @@ export function useTerms() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [termsError, termsRes] = await handleRequest(FormServices.getTerms());
+      const [termsError, termsRes] = await handleRequest(TermsServices.getTerms());
       if (termsError) {
         handleError(termsError, setError, nav);
         return;
       }
-      setTerms(termsRes);
+      setTerms(termsRes.terms);
 
-      console.log(termsRes);
+      console.log('Terms in useTerms : ' + termsRes);
       setIsLoading(false);
     };
 
