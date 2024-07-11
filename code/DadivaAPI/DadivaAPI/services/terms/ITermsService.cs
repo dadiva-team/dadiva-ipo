@@ -8,5 +8,5 @@ public interface ITermsService
 {
     public Task<Result<Terms?, Problem>> GetTerms();
 
-    public Task<Result<bool, Problem>> SubmitTerms(JsonElement terms);
+    public Task<Result<bool, Problem>> SubmitTerms(Terms terms);
 }

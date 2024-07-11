@@ -15,13 +15,13 @@ public interface IRepository
     public IFormRepository FormRepository { get; }
     public IUsersRepository UserRepository { get; }
     public ITermsRepository TermsRepository { get; }
-    
+
     public IMedicationsRepository MedicationRepository { get; }
-    
+
     public ICftToManualRepository CftToManualRepository { get; }
-    
+
     public IManualRepository ManualRepository { get; }
-    
+
     public async Task<Form?> GetForm()
     {
         return await FormRepository.GetForm();
@@ -122,36 +122,36 @@ public interface IRepository
         return await TermsRepository.GetTerms();
     }
     
-    public async Task<Boolean> SubmitTerms(JsonElement terms)
+    public async Task<Boolean> SubmitTerms(Terms terms)
     {
         return await TermsRepository.SubmitTerms(terms);
     }
-    
+
     public async Task<List<string>> SearchMedications(string query)
     {
         return await MedicationRepository.SearchMedications(query);
     }
-    
+
     public Task<List<string>> GetCfts(string productName)
     {
         return MedicationRepository.GetCfts(productName);
     }
-    
+
     public async Task<string> GetManualEntryFromCft(string cft)
     {
         return await CftToManualRepository.GetManualEntryFromCft(cft);
     }
-    
+
     public async Task<bool> AddCftToManualEntry(string cft, string manualEntry)
     {
         return await CftToManualRepository.AddCftToManualEntry(cft, manualEntry);
     }
-    
+
     public async Task<List<string>> GetManualEntriesFromCfts(List<string> cfts)
     {
         return await CftToManualRepository.GetManualEntriesFromCfts(cfts);
     }
-    
+
     public async Task<List<ManualInformation>> GetManualInformations(List<string> manualEntries)
     {
         return await ManualRepository.GetManualInformations(manualEntries);
