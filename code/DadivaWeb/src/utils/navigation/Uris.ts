@@ -18,6 +18,12 @@ export namespace Uris {
   export const DOCTOR = '/doctor';
   export const DOCTOR_SEARCH_NAME = '/doctor/search-name';
   export const DOCTOR_SEARCH_NIC = '/doctor/search-nic';
+
+  export const DOCTOR_MEDICATION_SEARCH = '/doctor/medications/search';
+  export const DOCTOR_MEDICATION_INFORMATION = `/doctor/medications/information/:product`;
+  export const DOCTOR_MEDICATION_INFORMATION_COMPLETE = (product: string) =>
+    `/doctor/medications/information/${product}`;
+
   export const DONOR_HISTORY = (donorNIC: string) => `/donors/${donorNIC}/history`;
   export const DONOR_FORM = (donorNIC: string, formId: string) => `/donors/${donorNIC}/forms/${formId}`;
 }

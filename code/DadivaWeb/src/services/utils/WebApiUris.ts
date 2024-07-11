@@ -21,3 +21,5 @@ export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const getTermsUri = `${API_URL}/terms`;
 
 export const searchMedicationsUri = `${API_URL}/medications/search?q=`;
+
+export const getManualInformationUri = (product: string) => `${API_URL}/manual/${product}`;

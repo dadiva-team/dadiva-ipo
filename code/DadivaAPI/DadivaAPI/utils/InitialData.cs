@@ -112,7 +112,7 @@ public class InitialData
         ),
         new KeyValuePair<string, string>(
             "Inibidores da bomba de protões", 
-            "Antiácidos, incluindo agonistas dos recetores H2 e inibidores da bomba de protões"
+            "Antiácidos, incluindo agonistas de recetores H2 e inibidores da bomba de protões"
         ),
         new KeyValuePair<string, string>(
             "Analgésicos e antipiréticos",
