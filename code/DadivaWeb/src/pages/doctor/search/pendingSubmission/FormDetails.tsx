@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, IconButton, Tooltip, Divider } from '@mui/material';
+import { Box, Grid, Typography, IconButton, Tooltip, Divider, Link } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import EditNoteIcon from '@mui/icons-material/EditNote';
@@ -9,6 +9,8 @@ import { useFormDetails } from '../useFormDetails';
 import { QuestionWithAnswer } from '../utils/DoctorSearchAux';
 import { Note } from '../../../../domain/Submission/Submission';
 import React from 'react';
+import { Uris } from '../../../../utils/navigation/Uris';
+import DOCTOR_MEDICATION_INFORMATION_COMPLETE = Uris.DOCTOR_MEDICATION_INFORMATION_COMPLETE;
 
 interface FormDetailsProps {
   formWithAnswers: QuestionWithAnswer[];
@@ -24,7 +26,8 @@ export function FormDetails({ formWithAnswers, invalidQuestions, notes, handleSa
   });
 
   // Temporary function to render the answer
-  const renderAnswer = (answer: string | boolean | string[]) => {
+  const renderAnswer = (qwa: QuestionWithAnswer) => {
+    const answer = qwa.answer;
     if (typeof answer === 'boolean') {
       return answer ? <CheckIcon color="success" /> : <CloseIcon color="error" />;
     } else if (typeof answer === 'string') {
@@ -35,6 +38,16 @@ export function FormDetails({ formWithAnswers, invalidQuestions, notes, handleSa
       } else {
         return <Typography variant="body1">{answer}</Typography>;
       }
+    } else if (typeof answer === 'object') {
+      return (
+        <Grid container direction="column">
+          {answer.map(ans => (
+            <Link target="_blank" key={ans} href={DOCTOR_MEDICATION_INFORMATION_COMPLETE(ans)}>
+              {ans}
+            </Link>
+          ))}
+        </Grid>
+      );
     } else {
       return <Typography variant="body1">{answer}</Typography>;
     }
@@ -77,7 +90,7 @@ export function FormDetails({ formWithAnswers, invalidQuestions, notes, handleSa
                 </Grid>
               )}
               <Grid item xs={2}>
-                {renderAnswer(item.answer)}
+                {renderAnswer(item)}
               </Grid>
             </Grid>
             {index < formWithAnswers.length - 1 && <Divider />}

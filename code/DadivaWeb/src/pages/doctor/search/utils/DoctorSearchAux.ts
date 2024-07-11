@@ -4,8 +4,9 @@ import { RuleProperties } from 'json-rules-engine';
 
 export interface QuestionWithAnswer {
   id: string;
+  type: string;
   question: string;
-  answer: string | boolean;
+  answer: string | boolean | string[];
 }
 
 export interface Inconsistency {
@@ -24,6 +25,7 @@ export function buildFormWithAnswers({ formGroups, donorAnswers }: DoctorViewPro
   return formGroups.flatMap(group =>
     group.questions.map(question => ({
       id: question.id,
+      type: question.type,
       question: question.text,
       answer: answerMap.get(question.id) || 'NO ANSWER GIVEN',
     }))

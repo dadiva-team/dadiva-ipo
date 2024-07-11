@@ -30,10 +30,10 @@ import DOCTOR = Uris.DOCTOR;
 import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
 import DOCTOR_SEARCH_NAME = Uris.DOCTOR_SEARCH_NAME;
 import LOGIN = Uris.LOGIN;
-import { MedicationInformation } from './pages/doctor/medications/MedicationInformation';
 import DOCTOR_MEDICATION_INFORMATION = Uris.DOCTOR_MEDICATION_INFORMATION;
 import DOCTOR_MEDICATION_SEARCH = Uris.DOCTOR_MEDICATION_SEARCH;
 import { MedicationSearch } from './pages/doctor/medications/MedicationSearch';
+import { MedicationInformation } from './pages/doctor/medications/MedicationInformation';
 
 export default function App() {
   const user = useCurrentSession();
