@@ -108,7 +108,13 @@ switch (databaseType)
             "DatabaseType must be provided in appsettings.json. Aceepted values are PGSQL or MEMORY.");
 }
 
-var nodePool = new SingleNodePool(new Uri("http://localhost:9200"));
+string? elasticString = Environment.GetEnvironmentVariable("DADIVA_ES_STRING");
+if (elasticString == null)
+{
+    throw new Exception("DADIVA_ES_STRING must be provided in the environment variables.");
+}
+
+var nodePool = new SingleNodePool(new Uri(elasticString));
 var settings = new ElasticsearchClientSettings(nodePool);
 
 builder.Services.AddSingleton(new ElasticsearchClient(settings));

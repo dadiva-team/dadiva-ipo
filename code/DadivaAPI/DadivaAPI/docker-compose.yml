@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    image: dadiva-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7011:7011"
+      - "5231:5231"
+    environment:
+      - ASPNETCORE_URLS=https://+:7011;http://+:5231
+      - DADIVA_ES_STRING=http://host.docker.internal:9200
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+    volumes:
+      - "${USERPROFILE}/.aspnet/https:/root/.aspnet/https:ro"
