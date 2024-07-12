@@ -52,7 +52,7 @@ public static class UsersRoutes
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)
     {
-        Result<UserExternalInfo, Problem> result = await service.CreateUser(input.Nic, input.Name, input.Password, Enum.Parse<Role>(input.Role));
+        Result<UserExternalInfo, Problem> result = await service.CreateUser(input.Nic, input.Name, input.Password, Enum.Parse<Role>(input.Role.ToLower()));
         return result switch
         {
             Result<UserExternalInfo, Problem>.SuccessResult success => Results.Created((string)null,

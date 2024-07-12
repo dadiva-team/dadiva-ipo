@@ -1,7 +1,5 @@
 using DadivaAPI.domain;
 using Microsoft.EntityFrameworkCore;
-using static DadivaAPI.repositories.utils.PGSQLUtils;
-using Npgsql;
 
 namespace DadivaAPI.repositories.users;
 
@@ -17,7 +15,8 @@ public class UsersRepository : IUsersRepository
 
     public async Task<bool> AddUser(User user)
     {
-        return (await _context.Users.AddAsync(user)).State == EntityState.Added;
+        await _context.Users.AddAsync(user);
+        return await _context.SaveChangesAsync() > 0;
     }
 
     public async Task<List<User>?> GetUsers()

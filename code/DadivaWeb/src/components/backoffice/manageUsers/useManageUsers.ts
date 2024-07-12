@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
-import { getUsers } from '../../../services/users/UserServices';
+import { getUsers, register } from '../../../services/users/UserServices';
 
 export function useManageUsers() {
   const [isLoading, setIsLoading] = useState(true);
@@ -9,6 +9,7 @@ export function useManageUsers() {
   const [error, setError] = useState<string | null>(null);
   const [nics, setNics] = useState<number[]>([]);
   const [isDeleting, setIsDeleting] = useState<number>(null);
+  const [isCreating, setIsCreating] = useState<boolean>(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -33,6 +34,16 @@ export function useManageUsers() {
     return;
   }
 
+  function handleCreateUser(nic: string, password: string, name: string, role: string) {
+    register(nic, password, name, role).then(res => {
+      if (res) {
+        setIsCreating(false);
+        setIsLoading(true);
+      }
+    });
+    return;
+  }
+
   return {
     isLoading,
     error,
@@ -41,5 +52,8 @@ export function useManageUsers() {
     isDeleting,
     setIsDeleting,
     handleDeleteUser,
+    handleCreateUser,
+    isCreating,
+    setIsCreating,
   };
 }

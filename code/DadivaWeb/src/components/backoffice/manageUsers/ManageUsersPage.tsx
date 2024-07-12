@@ -1,14 +1,26 @@
 import React from 'react';
 import LoadingSpinner from '../../shared/LoadingSpinner';
 import { ErrorAlert } from '../../shared/ErrorAlert';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { UserLayout } from './UserLayout';
 import { useManageUsers } from './useManageUsers';
 import { DeleteConfirmDialog } from '../../shared/DeleteConfirmDialog';
 import { useCurrentSession } from '../../../session/Session';
+import { CreateUserDialog } from './dialogs/CreateUserDialog';
 
 export function ManageUsersPage() {
-  const { isLoading, error, setError, nics, isDeleting, setIsDeleting, handleDeleteUser } = useManageUsers();
+  const {
+    isLoading,
+    error,
+    setError,
+    nics,
+    isDeleting,
+    setIsDeleting,
+    handleDeleteUser,
+    handleCreateUser,
+    isCreating,
+    setIsCreating,
+  } = useManageUsers();
   const currentUserNic = useCurrentSession().nic;
   return (
     <div>
@@ -19,9 +31,30 @@ export function ManageUsersPage() {
         </Box>
       ) : (
         <>
+          <Button
+            onClick={() => {
+              setIsCreating(true);
+            }}
+          >
+            {' '}
+            Create User{' '}
+          </Button>
+          <CreateUserDialog
+            open={isCreating}
+            onAnswer={handleCreateUser}
+            onClose={() => {
+              setIsCreating(false);
+            }}
+          />
           {nics.map(nic => {
-            if (nic == currentUserNic) return;
-            return <UserLayout key={nic} nic={nic} onDeleteRequest={() => setIsDeleting(nic)} />;
+            return (
+              <UserLayout
+                key={nic}
+                isDisabled={nic.toString() === currentUserNic.toString()}
+                nic={nic}
+                onDeleteRequest={() => setIsDeleting(nic)}
+              />
+            );
           })}
           <DeleteConfirmDialog
             title="Apagar Utilizador"

@@ -2,5 +2,8 @@
   "Start Session": "Start Session",
   "Doctor Page": "Doctor Page",
   "Backoffice": "Backoffice",
-  "Login Card Text": "Start session with you NIC and password to fill out the pre-donation form."
+  "Login Card Text": "Start session with you NIC and password to fill out the pre-donation form.",
+  "Pre Donation Card Title": "Read and accept the pre-donation terms",
+  "Pre Donation Card Text" : "It's necessary to read and accept the donation conditions before filling out the pre-donation form.",
+  "Pre Donation Card Button" : "Begin"
 }

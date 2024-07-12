@@ -6,13 +6,14 @@ import Typography from '@mui/material/Typography';
 
 interface UserLayoutProps {
   nic: number;
+  isDisabled: boolean;
   onDeleteRequest: (nic: number) => void;
   //onRoleChange: (role: string) => void | null;
   //onPasswordChange: (password: string) => void | null;
   //onUserCreation: (nic: number, password: string) => void | null;
 }
 
-export function UserLayout({ nic, onDeleteRequest }: UserLayoutProps) {
+export function UserLayout({ nic, isDisabled, onDeleteRequest }: UserLayoutProps) {
   return (
     <ListItem>
       <ListItemIcon>
@@ -26,6 +27,7 @@ export function UserLayout({ nic, onDeleteRequest }: UserLayoutProps) {
       <Button
         color="warning"
         variant="outlined"
+        disabled={isDisabled}
         onClick={() => onDeleteRequest(nic)}
         startIcon={<DeleteIcon />}
         sx={{ borderRadius: 50, height: 40 }}
