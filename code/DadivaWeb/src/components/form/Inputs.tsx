@@ -11,6 +11,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Save } from '@mui/icons-material';
 import { MedicationsServices } from '../../services/medications/MedicationsServices';
 import { handleRequest } from '../../services/utils/fetch';
+
 interface BooleanButtonsProps {
   onChangeAnswer: (answer: boolean) => void;
 }
@@ -210,6 +211,81 @@ export function MedicationsInput({ onChangeAnswer }: MedicationsInput) {
           setSelectedOptions(newValue);
         }}
         renderInput={params => <TextField {...params} label="Medicamentos" />}
+        multiple={true}
+        options={possibleOptions}
+      />
+      <Button
+        variant="outlined"
+        onClick={() => onChangeAnswer(selectedOptions)}
+        startIcon={<Save />}
+        sx={{ borderRadius: 50 }}
+        disabled={selectedOptions.length === 0}
+      >
+        Guardar
+      </Button>
+    </div>
+  );
+}
+
+type CountriesInput = {
+  onChangeAnswer: (answer: string[]) => void;
+};
+
+interface CountryList {
+  [key: string]: string[];
+}
+
+const mockContinents: CountryList = {
+  Europa: ['Portugal', 'Espanha', 'França'],
+  África: ['Angola', 'Moçambique', 'Cabo Verde'],
+  'América do Sul': ['Brasil', 'Argentina', 'Venezuela'],
+  'América do Norte': ['Estados Unidos', 'Canadá', 'México'],
+  Ásia: ['China', 'Japão', 'Coreia do Sul'],
+  Oceania: ['Austrália', 'Nova Zelândia', 'Fiji'],
+};
+
+const mockCountries: string[] = Object.keys(mockContinents)
+  .map(continent => {
+    return mockContinents[continent];
+  })
+  .reduce((acc, val) => acc.concat(val), []);
+
+export function CountriesInput({ onChangeAnswer }: CountriesInput) {
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [possibleOptions, setPossibleOptions] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const [error, res]: [Error | null, string[]] = [null, mockCountries];
+      if (error) {
+        console.log(error);
+        //handleError(error, setError, nav);
+        return;
+      }
+      setPossibleOptions(res);
+      setLoading(false);
+    };
+    setLoading(true);
+    fetch();
+  }, []);
+
+  return (
+    <div>
+      <Autocomplete
+        loading={loading}
+        loadingText={'A carregar opções...'}
+        value={selectedOptions}
+        inputValue={inputValue}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+        }}
+        onChange={(event, newValue) => {
+          setSelectedOptions(newValue);
+        }}
+        renderInput={params => <TextField {...params} label="Paises" />}
         multiple={true}
         options={possibleOptions}
       />

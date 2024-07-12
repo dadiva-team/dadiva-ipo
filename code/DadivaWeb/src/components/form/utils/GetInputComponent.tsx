@@ -1,4 +1,11 @@
-import { BooleanButtons, CheckboxesTags, MedicationsInput, TextInput, WrongQuestionType } from '../Inputs';
+import {
+  BooleanButtons,
+  CheckboxesTags,
+  CountriesInput,
+  MedicationsInput,
+  TextInput,
+  WrongQuestionType,
+} from '../Inputs';
 import React from 'react';
 
 export function getInputComponent(
@@ -32,6 +39,15 @@ export function getInputComponent(
     case 'medications':
       input = (
         <MedicationsInput
+          onChangeAnswer={answer => {
+            onChangeAnswer(question.id, question.type, answer);
+          }}
+        />
+      );
+      break;
+    case 'countries':
+      input = (
+        <CountriesInput
           onChangeAnswer={answer => {
             onChangeAnswer(question.id, question.type, answer);
           }}

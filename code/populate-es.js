@@ -52,16 +52,16 @@ const manualEntries = [
     'groupName': 'Antiácidos, incluindo agonistas de recetores H2 e inibidores da bomba de protões',
     'examples': [
       {
-        'examples': 'Ulcermin,\nKompensan,\nOmeprazole,\nPantoprazole',
+        'examples': 'Ulcermin,Kompensan,Omeprazole,Pantoprazole',
         'criteria': [
-          'Se assintomático - Apto',
-          'Se sob estudo e até à conclusão do mesmo - Suspensão Temporária de 30 dias',
+          '<p>Se assintomático - <strong><span style="color: green;">Apto</span></strong></p>',
+          '<p>Se sob estudo e até à conclusão do mesmo - <strong><span style="color: orange;">Suspensão Temporária de 30 dias</span></strong></p>',
         ],
       },
       {
         'examples': 'Misoprostol, Cytotec (potencialmente abortivo)',
         'criteria': [
-          'Suspensão Temporária de 30 dias',
+          '<p><strong><span style="color: orange;">Suspensão Temporária de 30 dias</span></strong></p>',
         ],
       },
     ],
@@ -72,8 +72,8 @@ const manualEntries = [
       {
         'examples': 'Clonixina, Ibuprofeno, Nimesulide, Diclofenac, Naproxeno, Etoricoxib',
         'criteria': [
-          'Avaliar doença de base.\nColheita de Sangue Total dar indicação para não separar para plaquetas - APTO\nColheita para CEA e PFA - APTO',
-          'Colheita CPA - Suspensão Temporária de 5 dias após a última toma',
+          '<p>Avaliar doença de base.<br>Colheita de Sangue Total dar indicação para não separar para plaquetas - <strong><span style="color: green;">APTO</span></strong><br>Colheita para CEA e PFA - <strong><span style="color: green;">APTO</span></strong></p>',
+          '<p>Colheita CPA - <strong><span style="color: orange;">Suspensão Temporária de 5 dias após a última toma</span></strong></p>',
         ],
       },
     ],
@@ -85,13 +85,13 @@ const manualEntries = [
       {
         'examples': 'Heparina',
         'criteria': [
-          'Avaliar causa da prescrição.\nSuspensão Temporária de 3 dias após a última administração',
+          '<p>Avaliar causa da prescrição.<br><strong><span style="color: orange;">Suspensão Temporária de 3 dias após a última administração</span></strong></p>',
         ],
       },
       {
-        'examples': 'Antagonistas da Vitamina K - Varfarina Varfine, Acenocumarol, Sintrom;\nInibidores da Trombina - Dabigatrano;\nPradaxa;\nInibidor direto do fator Xa - Rivaroxabano;\nXarelto Apixabano;\nEliquis Edoxabano;\nLixiana;',
+        'examples': 'Antagonistas da Vitamina K - Varfarina Varfine, Acenocumarol, Sintrom; Inibidores da Trombina - Dabigatrano; Pradaxa; Inibidor direto do fator Xa - Rivaroxabano; Xarelto Apixabano; Eliquis Edoxabano; Lixiana;',
         'criteria': [
-          'Avaliar a doença de base que poderá ser motivo de Suspensão Definitiva',
+          '<p>Avaliar a doença de base que poderá ser motivo de <strong><span style="color: red;">Suspensão Definitiva</span></strong></p>',
         ],
       },
     ],
@@ -103,13 +103,13 @@ const manualEntries = [
       {
         'examples': 'Paracetamol, Ben U Ron, Tramadol, Tramal, Zaldiar',
         'criteria': [
-          'Avaliar doença de base, pois não contraindicam a dádiva - Apto',
+          '<p>Avaliar doença de base, pois não contraindicam a dádiva - <strong><span style="color: green;">Apto</span></strong></p>',
         ],
       },
       {
         'examples': 'Analgésicos Opioides',
         'criteria': [
-          'Critério Clínico - Suspensão Temporária',
+          '<p>Critério Clínico - <strong><span style="color: orange;">Suspensão Temporária</span></strong></p>',
         ],
       },
     ],

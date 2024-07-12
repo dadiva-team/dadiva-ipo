@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Uris } from '../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
 import DOCTOR = Uris.DOCTOR;
-import { Role, useCurrentSession, useHasPendingReview } from '../../session/Session';
+import { Role, useCurrentSession, useHasPendingReview, useSessionManager } from '../../session/Session';
 import { PreDadivaLoginCard } from '../../components/home/PreDadivaLoginCard';
 import { PendingReviewCard } from '../../components/home/PendingReviewCard';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 export default function Home() {
   const nav = useNavigate();
   const user = useCurrentSession();
+  const sessionManager = useSessionManager();
   const hasPendingReview = useHasPendingReview();
   const { t } = useTranslation();
 
@@ -24,8 +25,7 @@ export default function Home() {
           type="button"
           value="Clear Session"
           onClick={() => {
-            sessionStorage.clear();
-            window.location.reload();
+            sessionManager.clearSession();
           }}
           style={{ display: 'block', marginBottom: '10px' }}
         >

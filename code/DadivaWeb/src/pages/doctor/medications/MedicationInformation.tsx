@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { MedicationsServices } from '../../../services/medications/MedicationsServices';
 import { handleRequest } from '../../../services/utils/fetch';
+import { Divider } from '@mui/material';
 
 export interface Example {
   examples: string;
@@ -52,13 +53,12 @@ export function MedicationInformation() {
               {information.examples.map(example => (
                 <>
                   <h2 key={example.examples}>{example.examples}</h2>
-                  {example.criteria.map(criterion => (
-                    <>
-                      <p key={criterion}>{criterion}</p>
-                    </>
+                  {example.criteria.map(criteria => (
+                    <div dangerouslySetInnerHTML={{ __html: criteria }} key={criteria} />
                   ))}
                 </>
               ))}
+              <Divider />
             </>
           ))}
         </>
