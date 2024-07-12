@@ -8,11 +8,13 @@ import DOCTOR = Uris.DOCTOR;
 import { Role, useCurrentSession, useHasPendingReview } from '../../session/Session';
 import { PreDadivaLoginCard } from '../../components/home/PreDadivaLoginCard';
 import { PendingReviewCard } from '../../components/home/PendingReviewCard';
+import { useTranslation } from 'react-i18next';
 
 export default function Home() {
   const nav = useNavigate();
   const user = useCurrentSession();
   const hasPendingReview = useHasPendingReview();
+  const { t } = useTranslation();
 
   return (
     <div>
@@ -39,7 +41,7 @@ export default function Home() {
           }}
           style={{ display: 'block', marginBottom: '10px' }}
         >
-          BACK OFFICE
+          {t('Backoffice')}
         </button>
       )}
       {(!user || user.perms == Role.DOCTOR || user.perms == Role.ADMIN) && (
@@ -51,7 +53,7 @@ export default function Home() {
           }}
           style={{ display: 'block', marginBottom: '10px' }}
         >
-          DOCTOR PAGE
+          {t('Doctor Page')}
         </button>
       )}
       <Box
@@ -67,7 +69,9 @@ export default function Home() {
       >
         {user ? (
           hasPendingReview ? (
-            <PendingReviewCard submissionDate={ new Date(user?.accountStatus?.lastSubmissionDate).toLocaleDateString()} />
+            <PendingReviewCard
+              submissionDate={new Date(user?.accountStatus?.lastSubmissionDate).toLocaleDateString()}
+            />
           ) : (
             <PreDadivaInfoCard />
           )

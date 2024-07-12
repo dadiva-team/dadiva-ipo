@@ -3,6 +3,7 @@ import { Container } from '@mui/material';
 import { LogoIPO } from './LogoIPO';
 import { UserInfo } from './DadorInfo';
 import React from 'react';
+import LanguageSwitcher from '../language/LanguageSwitcher';
 
 export function Header() {
   const session = useSessionManager();
@@ -21,6 +22,7 @@ export function Header() {
       }}
     >
       <LogoIPO />
+      <LanguageSwitcher />
       {loggedIn ? <UserInfo name={session.session.name} nic={`${session.session.nic}`} /> : <> {} </>}
     </Container>
   );

@@ -3,8 +3,10 @@ import { Button, Paper } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { Login } from '@mui/icons-material';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function PreDadivaLoginCard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <Paper
@@ -18,13 +20,13 @@ export function PreDadivaLoginCard() {
       }}
     >
       <Typography component="h1" variant="h5">
-        <strong> Iniciar sessão </strong>
+        <strong> {t('Start Session')} </strong>
       </Typography>
       <Typography component="h1" variant="body1">
-        Inicie sessão com o seu NIC e password para poder preencher o questionario pre-dádiva.
+        {t('Login Card Text')}
       </Typography>
       <Button variant="contained" startIcon={<Login />} onClick={() => navigate('login')} sx={{ mt: 4, width: '50%' }}>
-        Iniciar sessão
+        {t('Start Session')}
       </Button>
     </Paper>
   );
