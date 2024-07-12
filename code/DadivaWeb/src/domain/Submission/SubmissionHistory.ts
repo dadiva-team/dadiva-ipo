@@ -5,6 +5,7 @@ export interface SubmissionHistory {
     submissionDate: Date;
     byUserNic: number;
     answers: Answers[];
+    finalNote: string;
     formVersion: number;
     reviewDate: Date;
     reviewStatus: string;

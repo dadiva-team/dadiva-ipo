@@ -1,17 +1,21 @@
 import {
+    Box,
     Card,
     CardActions,
     CardContent,
     CardHeader,
-    Collapse,
+    Collapse, FormControlLabel,
     IconButton,
     IconButtonProps,
-    styled,
+    styled, Switch,
     Typography
 } from "@mui/material";
-import {SubmissionHistory} from "../../../../domain/Submission/SubmissionHistory";
 import React from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {SubmissionHistoryModel} from "../../../../services/doctors/models/SubmissionHistoryOutputModel";
+import {buildFormWithAnswers, checkFormValidity, Inconsistency} from "../utils/DoctorSearchAux";
+import {OldSubmissionsAnswers} from "./OldSubmissionAnswers";
+import {Group} from "../../../../domain/Form/Form";
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -31,23 +35,40 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 
 
 interface OldSubmissionCardProps {
-    submission: SubmissionHistory;
+    submission: SubmissionHistoryModel;
+    group: Group[];
+    inconsistencies: Inconsistency[];
+
 }
 
-export function OldSubmissionCard({submission}: OldSubmissionCardProps) {
+export function OldSubmissionCard({submission, group, inconsistencies}: OldSubmissionCardProps) {
     const [expanded, setExpanded] = React.useState(false);
+    const [notesVisible, setNotesVisible] = React.useState(true);
+    const cardBorder = submission.reviewStatus === 'approved' ? 'green' : 'red';
 
+    const formWithAnswers = buildFormWithAnswers({
+        formGroups: group,
+        donorAnswers: submission.answers
+    });
+
+    const invalidQuestions = checkFormValidity(formWithAnswers, inconsistencies)
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
     return (
-        <Card sx={{margin: 2}}>
+        <Card sx={{margin: 1, border: 2, borderColor: cardBorder}}>
             <CardHeader
                 title={`Data da Submissão: ${new Date(submission.submissionDate).toLocaleDateString()}`}
                 subheader={`Estado: ${submission.reviewStatus}`}
             />
             <CardActions disableSpacing>
+                <Box sx={{flexDirection: 'row'}}>
+                    <Typography sx={{pl: 1}}><strong>Medico:</strong> {submission.doctorNic}</Typography>
+                    {submission.finalNote.length != 0 &&
+                        <Typography paragraph sx={{pl: 1}}><strong> Nota Final:</strong> {submission.finalNote}
+                        </Typography>}
+                </Box>
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
@@ -59,19 +80,27 @@ export function OldSubmissionCard({submission}: OldSubmissionCardProps) {
             </CardActions>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
-                    <Typography paragraph><strong>Submission ID:</strong> {submission.submissionId}</Typography>
-                    <Typography paragraph><strong>Form Version:</strong> {submission.formVersion}</Typography>
-                    <Typography paragraph><strong>Review
-                        Date:</strong> {new Date(submission.reviewDate).toLocaleDateString()}</Typography>
-                    <Typography paragraph><strong>NIC DADOR:</strong> {submission.byUserNic}</Typography>
-                    <Typography paragraph><strong>Doctor NIC:</strong> {submission.doctorNic}</Typography>
-                    <Typography paragraph><strong>Answers:</strong></Typography>
-                    {/*submission.answers.map((answer, index) => (
-                        <Box key={index} sx={{ marginLeft: 2 }}>
-                            <Typography paragraph><strong>Question ID:</strong> {answer.questionId}</Typography>
-                            <Typography paragraph><strong>Answer:</strong> {answer.answer}</Typography>
-                        </Box>
-                    ))*/}
+                    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1}}>
+                        <Typography variant="h6">Respostas</Typography>
+                        {submission.notes.length > 0 && (
+                            <FormControlLabel
+                                value="top"
+                                control={
+                                    <Switch
+                                        checked={notesVisible}
+                                        onChange={() => setNotesVisible(!notesVisible)} color="primary"
+                                    />
+                                }
+                                label="Mostrar Notas"
+                                labelPlacement="top"
+                            />
+                        )}
+                    </Box>
+                    <OldSubmissionsAnswers
+                        formWithAnswers={formWithAnswers}
+                        invalidQuestions={invalidQuestions}
+                        notes={notesVisible ? submission.notes : null}
+                    />
                 </CardContent>
             </Collapse>
         </Card>

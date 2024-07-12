@@ -11,7 +11,7 @@ public interface IFormRepository
     
     public Task<Form> EditForm(Form form);
     
-    public Task<bool> SubmitForm(Submission submission, int nic);
+    public Task<bool> SubmitForm(Submission submission);
     
     public Task<Dictionary<int, Submission>> GetSubmissions();
     
@@ -27,6 +27,5 @@ public interface IFormRepository
     public Task<Review> AddReview(Review review);
     
     public Task<bool> AddNote(Note note);
-    
     public Task<bool> EditInconsistencies(Inconsistencies inconsistencies);
 }

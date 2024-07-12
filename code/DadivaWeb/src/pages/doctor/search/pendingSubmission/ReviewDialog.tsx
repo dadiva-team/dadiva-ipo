@@ -12,7 +12,7 @@ import {Close} from "@mui/icons-material";
 
 interface ReviewDialogProps {
     dialogOpen: boolean;
-    dialogType: 'approve' | 'disapprove' | null;
+    dialogType: 'approved' | 'rejected' | null;
     finalNote: string;
     invalidQuestionsLength: number;
     notesLength: number;
@@ -36,7 +36,7 @@ export function ReviewDialog(
     }: ReviewDialogProps) {
     return (
         <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{dialogType === 'approve' ? 'Aprovar Submissão' : 'Rejeitar Submissão'}</DialogTitle>
+            <DialogTitle>{dialogType === 'approved' ? 'Aprovar Submissão' : 'Rejeitar Submissão'}</DialogTitle>
             <IconButton
                 aria-label="close"
                 color="inherit"
@@ -60,7 +60,7 @@ export function ReviewDialog(
                         width: '100%',
                     }}
                 >
-                    {dialogType === 'disapprove' && (
+                    {dialogType === 'rejected' && (
                         <TextField
                             autoFocus
                             margin="dense"
@@ -74,7 +74,7 @@ export function ReviewDialog(
                             onChange={(e) => setFinalNote(e.target.value)}
                         />
                     )}
-                    {dialogType === 'approve' && invalidQuestionsLength !== notesLength && (
+                    {dialogType === 'approved' && invalidQuestionsLength !== notesLength && (
                         <Typography color="error">
                             Há questões inválidas que não tem notas associadas. Por favor, adicione notas a todas as
                             questões inválidas.

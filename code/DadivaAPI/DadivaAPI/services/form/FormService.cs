@@ -75,7 +75,7 @@ public class FormService(IRepository repository) : IFormService
     public async Task<Result<SubmitFormOutputModel, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic, int formVersion)
     {
         var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion);
-        bool isSubmitted = await repository.SubmitForm(submission, nic);
+        bool isSubmitted = await repository.SubmitForm(submission);
         if (isSubmitted)
         {
             var userAccountStatus = await repository.GetUserAccountStatus(nic);
@@ -198,7 +198,9 @@ public class FormService(IRepository repository) : IFormService
             SubmissionDate = dto.SubmissionDate,
             ByUserNic = dto.ByUserNic,
             Answers = dto.Answers.Select(AnsweredQuestionModel.FromDomain).ToList(),
+            FinalNote = dto.FinalNote,
             FormVersion = dto.FormVersion,
+            Notes = dto.Notes,
             ReviewDate = dto.ReviewDate,
             ReviewStatus = dto.ReviewStatus,
             DoctorNic = dto.DoctorNic

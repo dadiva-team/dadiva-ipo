@@ -69,24 +69,29 @@ namespace DadivaAPI.repositories.form
         
         public async Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip)
         {
-            var submissions = await (from submission in _context.Submissions
+            var submissionsWithNotes = await (from submission in _context.Submissions
                     join review in _context.Reviews on submission.Id equals review.SubmissionId
+                    join note in _context.Notes on review.Id equals note.ReviewId into notesGroup
                     where submission.ByUserNic == nic
                     orderby submission.SubmissionDate descending
-                    select new SubmissionHistoryDto
-                    {
-                        SubmissionId = submission.Id,
-                        SubmissionDate = submission.SubmissionDate,
-                        ByUserNic = submission.ByUserNic,
-                        Answers = submission.AnsweredQuestions,
-                        FormVersion = submission.FormVersion,
-                        ReviewDate = review.ReviewDate,
-                        ReviewStatus = review.Status,
-                        DoctorNic = review.DoctorNic
-                    })
+                    select new { submission, review, Notes = notesGroup })
                 .Skip(skip)
                 .Take(limit + 1)
                 .ToListAsync();
+
+            var submissions = submissionsWithNotes.Select(s => new SubmissionHistoryDto
+            {
+                SubmissionId = s.submission.Id,
+                SubmissionDate = s.submission.SubmissionDate,
+                ByUserNic = s.submission.ByUserNic,
+                Answers = s.submission.AnsweredQuestions,
+                FinalNote = s.review.FinalNote,
+                FormVersion = s.submission.FormVersion,
+                ReviewDate = s.review.ReviewDate,
+                ReviewStatus = s.review.Status,
+                DoctorNic = s.review.DoctorNic,
+                Notes = s.Notes.Select(n => new NoteDto { Id = n.QuestionId, Note = n.NoteText }).ToList()
+            }).ToList();
 
             var hasMoreSubmissions = submissions.Count > limit;
             if (hasMoreSubmissions)
@@ -98,7 +103,7 @@ namespace DadivaAPI.repositories.form
         }
 
 
-        public async Task<bool> SubmitForm(Submission submission, int id)
+        public async Task<bool> SubmitForm(Submission submission)
         {
             await _context.Submissions.AddAsync(submission);
             return await _context.SaveChangesAsync() > 0;
@@ -110,6 +115,7 @@ namespace DadivaAPI.repositories.form
             await _context.SaveChangesAsync();
             return review;
         }
+        
 
         public async Task<bool> AddNote(Note note)
         {

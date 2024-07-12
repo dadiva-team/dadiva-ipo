@@ -19,7 +19,7 @@ export function DoctorNavBar() {
   ];
 
   const medicationItems: NavItem[] = [
-    { text: 'Pesquisar Medicamentos', icon: <SearchIcon />, path: DOCTOR_MEDICATION_SEARCH, disabled: false },
+    { text: 'Por nome', icon: <SearchIcon />, path: DOCTOR_MEDICATION_SEARCH, disabled: false },
   ];
 
   return (

@@ -87,8 +87,8 @@ string? databaseType = builder.Configuration.GetSection("DatabaseType").Get<stri
 switch (databaseType)
 {
     case "PGSQL":
-        //string? connectionString = "Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres";//Environment.GetEnvironmentVariable("DADIVA_CONNECTION_STRING");
-        string? connectionString = Environment.GetEnvironmentVariable("DADIVA_CONNECTION_STRING");
+        string? connectionString = "Host=localhost;Port=5432;Username=postgres;Password=superuser;Database=postgres";//Environment.GetEnvironmentVariable("DADIVA_CONNECTION_STRING");
+        //string? connectionString = Environment.GetEnvironmentVariable("DADIVA_CONNECTION_STRING");
         if (connectionString == null)
         {
             throw new Exception("DADIVA_CONNECTION_STRING must be provided in the environment variables.");

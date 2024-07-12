@@ -3,13 +3,14 @@ import {
     getSubmissionByUserUri,
     getSubmissionsHistoryByUserUri,
     getUserByNicUri,
-    getUsersUri,
+    getUsersUri, notesFromReviewUri,
     reviewSubmissionUri
 } from "../utils/WebApiUris";
 import {SubmissionOutputModel} from "./models/GetSubmissionsOutputModel";
 import {ReviewFormOutputModel} from "./models/ReviewFormOutputModel";
 import {GetUserByNicOutputModel} from "./models/GetUserByNicOutputModel";
 import {SubmissionHistoryOutputModel} from "./models/SubmissionHistoryOutputModel";
+import {NotesFromReviewOutputModel} from "./models/NotesFromReviewOutputModel";
 
 export namespace DoctorServices {
     export async function getUsers(): Promise<{ nic: number }[]> {
@@ -28,6 +29,10 @@ export namespace DoctorServices {
         console.log(getSubmissionsHistoryByUserUri(nic, skip, limit));
         console.log("Requested getSubmissionHistoryByNic")
         return await get(getSubmissionsHistoryByUserUri(nic, skip, limit));
+    }
+
+    export async function getNotesFromReview(reviewId: number): Promise<NotesFromReviewOutputModel> {
+        return await get(notesFromReviewUri(reviewId));
     }
 
     export async function reviewSubmission(sumbission: number, outputModel: ReviewFormOutputModel): Promise<boolean> {

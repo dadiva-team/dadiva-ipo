@@ -15,6 +15,7 @@ export const getSubmissionByUserUri = (nic: number) => `${API_URL}/forms/submiss
 export const getSubmissionsHistoryByUserUri = (nic: number, skip: number, limit: number) =>
   `${API_URL}/forms/submissions/history/${nic}?skip=${skip}&limit=${limit}`;
 export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/forms/review/${submissionId}`;
+export const notesFromReviewUri = (reviewId: number) => `${API_URL}/forms/review/${reviewId}/notes`;
 export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
