@@ -11,14 +11,14 @@ export function useTerms() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [termsError, termsRes] = await handleRequest(TermsServices.getTerms());
+      const [termsError, termsRes] = await handleRequest(TermsServices.getActiveTerms());
       if (termsError) {
         handleError(termsError, setError, nav);
         return;
       }
-      setTerms(termsRes.terms);
+      setTerms(termsRes.content);
 
-      console.log('Terms in useTerms : ' + termsRes);
+      console.log('Terms in useTerms : ' + termsRes.content);
       setIsLoading(false);
     };
 

@@ -116,16 +116,35 @@ public interface IRepository
         return await UserRepository.UpdateUserAccountStatus(userAccountStatus);
     }
     
-    public async Task<Terms?> GetTerms()
+    public async Task<List<Terms>?> GetAllTerms()
     {
-        return await TermsRepository.GetTerms();
+        return await TermsRepository.GetAllTerms();
+    }
+    
+    public async Task<Terms?> GetTermsById(int id)
+    {
+        return await TermsRepository.GetTermsById(id);
+    }
+    
+    public async Task<Terms?> GetActiveTerms()
+    {
+        return await TermsRepository.GetActiveTerms();
     }
     
     public async Task<Boolean> SubmitTerms(Terms terms)
     {
         return await TermsRepository.SubmitTerms(terms);
     }
+    
+    public async Task<Boolean> UpdateTerms(Terms terms, TermsChangeLog changes)
+    {
+        return await TermsRepository.UpdateTerms(terms, changes);
+    }
 
+    public async Task<List<TermsChangeLog>?> GetTermsChangeLog(int termsId)
+    {
+        return await TermsRepository.GetTermsChangeLog(termsId);
+    }
     public async Task<List<string>> SearchMedications(string query)
     {
         return await MedicationRepository.SearchMedications(query);

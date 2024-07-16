@@ -66,7 +66,44 @@ public class InitialData
         DoctorStatus
     ];
 
-   private static readonly Form testForm = new Form
+    private static readonly Terms TestTerms1 = new
+    (
+        "Test Terms 1",
+        "<p>Test1</p>",
+        Admin.Nic,
+        DateTime.UtcNow,
+        Admin.Nic,
+        DateTime.UtcNow,
+        true
+    );
+
+    private static readonly Terms TestTerms2 = new
+    (
+        "Test Terms 2",
+        "<p>Test2</p>",
+        Admin.Nic,
+        DateTime.UtcNow,
+        null,
+        DateTime.UtcNow,
+        false
+    );
+
+    public static readonly List<Terms> Terms =
+    [
+        TestTerms1,
+        TestTerms2
+    ];
+
+    public static readonly TermsChangeLog TestTermsChangeLog = new
+    (
+        1,
+        Admin.Nic,
+        DateTime.UtcNow,
+        "<p>OldContent</p>",
+        "<p>Test1</p>"
+    );
+
+    private static readonly Form testForm = new Form
     (
         [
             new QuestionGroup("Dádivas Anteriores", [
@@ -89,17 +126,19 @@ public class InitialData
         ],
         [
             new Rule(new LogicalCondition([], []), new Event(EventType.showQuestion, new EventParams("q2"))),
-            new Rule(new LogicalCondition([new EvaluationCondition("q2", Operator.notEqual, "")], []), new Event(EventType.nextGroup, null)),
+            new Rule(new LogicalCondition([new EvaluationCondition("q2", Operator.notEqual, "")], []),
+                new Event(EventType.nextGroup, null)),
             new Rule(new LogicalCondition([], []), new Event(EventType.showQuestion, new EventParams("q3"))),
-            new Rule(new LogicalCondition([new EvaluationCondition("q3", Operator.notEqual, "")], []), new Event(EventType.showReview, null))
+            new Rule(new LogicalCondition([new EvaluationCondition("q3", Operator.notEqual, "")], []),
+                new Event(EventType.showReview, null))
         ],
         Admin,
         DateTime.Now.ToUniversalTime()
     );
-    
-   private static readonly Form realForm = new Form
-   (
-       [
+
+    private static readonly Form realForm = new Form
+    (
+        [
             new QuestionGroup("Dádivas Anteriores", [
                 new Question
                 (
@@ -368,24 +407,24 @@ public class InitialData
             ])
         ],
         [],
-       Admin,
-       DateTime.Now.ToUniversalTime()
-   );
-   
+        Admin,
+        DateTime.Now.ToUniversalTime()
+    );
+
     public static readonly Form Form = realForm;
-    
+
     public static readonly List<KeyValuePair<string, string>> CftToManualEntries =
     [
         new KeyValuePair<string, string>(
-            "Derivados do ácido propiónico", 
+            "Derivados do ácido propiónico",
             "Anti-Inflamatórios não esteroides (AINES)"
-            ),
+        ),
         new KeyValuePair<string, string>(
-            "Outros anticoagulantes", 
+            "Outros anticoagulantes",
             "Anticoagulantes"
         ),
         new KeyValuePair<string, string>(
-            "Inibidores da bomba de protões", 
+            "Inibidores da bomba de protões",
             "Antiácidos, incluindo agonistas de recetores H2 e inibidores da bomba de protões"
         ),
         new KeyValuePair<string, string>(

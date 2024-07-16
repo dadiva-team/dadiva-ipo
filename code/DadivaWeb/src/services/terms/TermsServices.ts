@@ -1,11 +1,12 @@
 import { get, put } from '../utils/fetch';
-import { getTermsUri } from '../utils/WebApiUris';
+import { getActiveTermsUri, getTermsUri, updateTermsUri } from '../utils/WebApiUris';
 import { Terms } from '../../domain/Terms/Terms';
+import { UpdateTermsOutputModel } from './models/UpdateTermsOutputModel';
 
 export namespace TermsServices {
-  export async function getTerms(): Promise<Terms> {
+  export async function getTerms(): Promise<Terms[]> {
     try {
-      const res = await get<Terms>(getTermsUri);
+      const res = await get<Terms[]>(getTermsUri);
       console.log('TermServices getTerms res: ' + res);
       return res;
     } catch (e) {
@@ -14,10 +15,24 @@ export namespace TermsServices {
     }
   }
 
-  export async function submitTerms(terms: Terms): Promise<boolean> {
+  export async function getActiveTerms(): Promise<Terms> {
+    try {
+      const res = await get<Terms>(getActiveTermsUri);
+      console.log('TermServices getActiveTerms res: ' + res.content);
+      return res;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  export async function updateTerms(termId: number, submission: UpdateTermsOutputModel): Promise<boolean> {
     try {
       console.log('Submitting terms|||||||||||||||');
-      await put<boolean>(getTermsUri, JSON.stringify(terms));
+      console.log(submission.updatedBy);
+      console.log(submission.newContent);
+      console.log(JSON.stringify(submission));
+      await put<boolean>(updateTermsUri(termId), JSON.stringify(submission));
       return true;
     } catch (e) {
       console.error(e);

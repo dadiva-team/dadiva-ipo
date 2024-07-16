@@ -1,9 +1,18 @@
-export class Terms {
-  constructor(terms: string, authors: string[]) {
-    this.terms = terms;
-    this.authors = authors;
-  }
+export interface Terms {
+  id: number;
+  title: string;
+  content: string;
+  createdBy: number;
+  createdAt: Date;
+  lastModifiedBy: number;
+  lastModifiedAt: number;
+  isActive: boolean;
+}
 
-  terms: string;
-  authors: string[];
+export interface TermsChangeLog {
+  id: number;
+  changesBy: number;
+  ChangedAt: Date;
+  OldContent: string;
+  NewContent: string;
 }

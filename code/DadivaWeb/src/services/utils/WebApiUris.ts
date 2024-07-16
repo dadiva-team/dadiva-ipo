@@ -20,6 +20,8 @@ export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
 export const getTermsUri = `${API_URL}/terms`;
+export const getActiveTermsUri = `${API_URL}/terms/active`;
+export const updateTermsUri = (termsId: number) => `${API_URL}/terms/${termsId}`;
 
 export const searchMedicationsUri = `${API_URL}/medications/search?q=`;
 

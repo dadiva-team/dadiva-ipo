@@ -18,11 +18,15 @@ public class DadivaDbContext : DbContext
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Note> Notes { get; set; }
-    
+    public DbSet<Terms> Terms { get; set; }
+    public DbSet<TermsChangeLog> TermsChangeLogs { get; set; }
     public DbSet<CftToManualEntry> CftToManual { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.HasDefaultSchema("public");
+        
         var options = new JsonSerializerOptions
         {
             Converters = { new AnswerConverter(), new EventConverter(), new ConditionConverter() }
@@ -77,20 +81,31 @@ public class DadivaDbContext : DbContext
                 v => JsonSerializer.Serialize(v, options),
                 v => JsonSerializer.Deserialize<List<AnsweredQuestion>>(v, options));
         
-        modelBuilder.Entity<Submission>()
-            .HasOne<Form>()
-            .WithMany()
-            .HasForeignKey(sub => sub.FormVersion);
-            
         modelBuilder.Entity<AnsweredQuestion>()
             .HasKey(aq => aq.Id);
         modelBuilder.Entity<User>()
             .HasKey(user => user.Nic);
+        modelBuilder.Entity<UserAccountStatus>()
+            .HasKey(uas => uas.UserNic);
         modelBuilder.Entity<Review>()
             .HasKey(r => r.Id);
         modelBuilder.Entity<Note>()
             .HasKey(n => n.Id);
+        modelBuilder.Entity<Terms>()
+            .HasKey(t => t.Id);
+        modelBuilder.Entity<TermsChangeLog>()
+            .HasKey(tcl => tcl.Id);
+        modelBuilder.Entity<TermsChangeLog>()
+            .Property(tcl => tcl.Id)
+            .ValueGeneratedOnAdd()
+            .UseIdentityColumn(); 
+        
         // Configure relationships, if any
+        modelBuilder.Entity<Submission>()
+            .HasOne<Form>()
+            .WithMany()
+            .HasForeignKey(sub => sub.FormVersion);
+        
         modelBuilder.Entity<Review>()
             .HasOne<Submission>()
             .WithMany()
@@ -100,14 +115,21 @@ public class DadivaDbContext : DbContext
             .HasOne<Review>()
             .WithMany()
             .HasForeignKey(n => n.ReviewId);
-        
-        modelBuilder.Entity<UserAccountStatus>()
-            .HasKey(uas => uas.UserNic);
 
         modelBuilder.Entity<UserAccountStatus>()
             .HasOne<User>()
             .WithOne()
             .HasForeignKey<UserAccountStatus>(uas => uas.UserNic);
+        
+        modelBuilder.Entity<TermsChangeLog>()
+            .HasOne<Terms>()
+            .WithMany()
+            .HasForeignKey(tcl => tcl.TermId);
+
+        modelBuilder.Entity<TermsChangeLog>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(tcl => tcl.ChangesBy);
         
         modelBuilder.Entity<CftToManualEntry>(entity =>
         {

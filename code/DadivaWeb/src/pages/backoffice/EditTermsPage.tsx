@@ -1,16 +1,39 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useEditTermsPage } from '../../components/backoffice/editTerms/useEditTermsPage';
-import { Box, Button } from '@mui/material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
 import Editor from '../../components/backoffice/editTerms/Editor';
-import Typography from '@mui/material/Typography';
 import { Jodit } from 'jodit-react';
+import { useCurrentSession } from '../../session/Session';
+import Sidebar from '../../components/backoffice/editTerms/Sidebar';
+import './EditTermsPage.css';
 
 export function EditTermsPage() {
-  const { isLoading, error, setError, termsFetchData, isSubmitted, setIsSubmitted, submitTerms } = useEditTermsPage();
-  const [content, setContent] = useState('');
+  const user = useCurrentSession();
+  const {
+    isLoading,
+    error,
+    setError,
+    termsFetchData,
+    selectedTermId,
+    content,
+    setContent,
+    isSubmitted,
+    setIsSubmitted,
+    handleTermClick,
+    handleUpdateTermRequest,
+    sidebarOpen,
+    setSidebarOpen,
+  } = useEditTermsPage();
+
   const editorRef = useRef<Jodit>();
+
+  useEffect(() => {
+    console.log('sidebarOpen changed: ' + sidebarOpen);
+  }, [sidebarOpen]);
 
   return (
     <div>
@@ -20,27 +43,36 @@ export function EditTermsPage() {
           <ErrorAlert error={error} clearError={() => setError(null)} />
         </Box>
       ) : (
-        <>
-          <Editor
-            ref={editorRef}
-            initialState={termsFetchData ? termsFetchData.terms : ' '}
-            setContent={setContent}
-            setIsSubmitted={setIsSubmitted}
+        <div>
+          <div className={`main-content ${sidebarOpen ? 'shifted' : ''}`}>
+            <div className="toolbar">
+              <Typography variant="h6" gutterBottom>
+                Editor
+              </Typography>
+              <IconButton
+                onClick={() => {
+                  setSidebarOpen(!sidebarOpen);
+                }}
+              >
+                {sidebarOpen ? <ArrowForwardIosIcon /> : <ArrowBackIosNewIcon />}
+              </IconButton>
+            </div>
+
+            <div style={{ padding: '10px' }}>
+              <Editor ref={editorRef} initialState={content} setContent={setContent} setIsSubmitted={setIsSubmitted} />
+              <Button disabled={isSubmitted} onClick={() => handleUpdateTermRequest(selectedTermId, content, user.nic)}>
+                {isSubmitted ? 'Submitted' : 'Submit Terms'}
+              </Button>
+            </div>
+          </div>
+
+          <Sidebar
+            terms={termsFetchData}
+            open={sidebarOpen}
+            onTermClick={handleTermClick}
+            selectedTermId={selectedTermId}
           />
-          <Button
-            disabled={isSubmitted}
-            onClick={() => {
-              submitTerms(content, termsFetchData.authors);
-              editorRef.current && editorRef.current.focus(); // Ensure focus after submit
-            }}
-          >
-            {isSubmitted ? 'Submitted' : 'Submit Terms'}
-          </Button>
-          <Typography>
-            Authors:
-            {termsFetchData?.authors.map(author => ` ${author}`)}
-          </Typography>
-        </>
+        </div>
       )}
     </div>
   );

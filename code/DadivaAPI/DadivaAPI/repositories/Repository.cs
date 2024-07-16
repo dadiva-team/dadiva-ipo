@@ -12,7 +12,7 @@ public class Repository(DadivaDbContext context, ElasticsearchClient client) : I
 {
     public IFormRepository FormRepository { get; } = new FormRepository(context);
     public IUsersRepository UserRepository { get; } = new UsersRepository(context);
-    public ITermsRepository TermsRepository { get; } = new TermsRepository(client);
+    public ITermsRepository TermsRepository { get; } = new TermsRepository(context);
     public IMedicationsRepository MedicationRepository { get; } = new MedicationsRepository();
     
     public ICftToManualRepository CftToManualRepository { get; } = new CftToManualRepository(context);
