@@ -23,7 +23,7 @@ public static class FormRoutes
         group.MapPut("/structure", EditForm).RequireAuthorization("admin");
         group.MapPut("/inconsistencies", EditInconsistencies).RequireAuthorization("admin");
 
-        group.MapGet("/submissions", GetSubmissions).RequireAuthorization("doctor");
+        group.MapGet("/submissions", GetPendingSubmissions).RequireAuthorization("doctor");
         group.MapGet("/submissions/{nic:int}", GetPendingSubmission).AllowAnonymous();//.RequireAuthorization("doctor");
         group.MapGet("/submissions/history/{nic:int}", GetSubmissionHistory).AllowAnonymous();//.RequireAuthorization("doctor");
         //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor");
@@ -31,21 +31,21 @@ public static class FormRoutes
         group.MapPost("/review/{submissionId:int}", ReviewForm).RequireAuthorization("doctor");
     }
 
-    private static async Task<IResult> GetSubmissions(IFormService service)
+    private static async Task<IResult> GetPendingSubmissions(IFormService service)
     {
-        Result<Dictionary<int, Submission>, Problem> result = await service.GetSubmissions();
+        Result<List<Submission>, Problem> result = await service.GetPendingSubmissions();
         return result switch
         {
-            Result<Dictionary<int, Submission>, Problem>.SuccessResult success => Results.Ok(
+            Result<List<Submission>, Problem>.SuccessResult success => Results.Ok(
                 new GetSubmissionsOutputModel(
-                    success.Value.Select(pair => new SubmissionModel(
-                        pair.Value.Id,
-                        pair.Key,
-                        pair.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                        pair.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                        pair.Value.FormVersion
+                    success.Value.Select(submission => new SubmissionModel(
+                        submission.Id,
+                        submission.ByUserNic,
+                        submission.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
+                        submission.SubmissionDate.ToString(CultureInfo.CurrentCulture),
+                        submission.FormVersion
                     )).ToList())),
-            Result<Dictionary<int, Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<List<Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }

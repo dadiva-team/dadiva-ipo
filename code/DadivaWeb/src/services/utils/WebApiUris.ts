@@ -28,3 +28,5 @@ export const updateTermsUri = (termsId: number) => `${API_URL}/terms/${termsId}`
 export const searchMedicationsUri = `${API_URL}/medications/search?q=`;
 
 export const getManualInformationUri = (product: string) => `${API_URL}/manual/${product}`;
+
+export const getPendingSubmissionsUri = `${API_URL}/forms/submissions`;

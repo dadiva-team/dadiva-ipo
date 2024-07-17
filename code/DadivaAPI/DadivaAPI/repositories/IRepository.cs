@@ -39,9 +39,9 @@ public interface IRepository
         return await FormRepository.SubmitForm(submission);
     }
     
-    public async Task<Dictionary<int, Submission>> GetSubmissions()
+    public async Task<List<Submission>> GetPendingSubmissions()
     {
-        return await FormRepository.GetSubmissions();
+        return await FormRepository.GetPendingSubmissions();
     }
 
     public async Task<Submission> GetSubmission(int nic)

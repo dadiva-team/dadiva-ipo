@@ -18,7 +18,7 @@ public interface IFormService
     
     public Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null);
     
-    public Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions();
+    public Task<Result<List<Submission>, Problem>> GetPendingSubmissions();
     public Task<Result<Inconsistencies, Problem>> GetInconsistencies();
 
     public Task<Result<Submission?, Problem>> GetPendingSubmissionsByUserNic(int userNic);

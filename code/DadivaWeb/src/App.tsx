@@ -34,6 +34,7 @@ import DOCTOR_MEDICATION_INFORMATION = Uris.DOCTOR_MEDICATION_INFORMATION;
 import DOCTOR_MEDICATION_SEARCH = Uris.DOCTOR_MEDICATION_SEARCH;
 import { MedicationSearch } from './pages/doctor/medications/MedicationSearch';
 import { MedicationInformation } from './pages/doctor/medications/MedicationInformation';
+import { PendingSubmissions } from './pages/doctor/PendingSubmissions';
 
 export default function App() {
   const user = useCurrentSession();
@@ -53,7 +54,10 @@ export default function App() {
       return <Navigate to={HOME} />;
     }
 
-    if (user?.accountStatus?.status === AccountStatus.PendingReview || user?.accountStatus?.status === AccountStatus.Suspended) {
+    if (
+      user?.accountStatus?.status === AccountStatus.PendingReview ||
+      user?.accountStatus?.status === AccountStatus.Suspended
+    ) {
       return <Navigate to={HOME} />;
     }
 
@@ -76,6 +80,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
+            <Route path="" element={<PendingSubmissions />} />
             <Route path={DOCTOR_SEARCH_NIC} element={<DoctorSearch mode="nic" />} />
             <Route path={DOCTOR_SEARCH_NAME} element={<DoctorSearch mode="name" />} />
             <Route path={DOCTOR_MEDICATION_INFORMATION} element={<MedicationInformation />} />

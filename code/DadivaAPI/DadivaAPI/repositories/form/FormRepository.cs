@@ -62,9 +62,12 @@ namespace DadivaAPI.repositories.form
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Id == id);
         }
 
-        public async Task<Dictionary<int, Submission>> GetSubmissions()
+        public async Task<List<Submission>> GetPendingSubmissions()
         {
-            throw new NotImplementedException();
+            Console.Out.WriteLine("Getting pending submissions in repository");
+            return await _context.Submissions.Where(submission =>
+                    !_context.Reviews.Any(review => review.SubmissionId == submission.Id))
+                .OrderBy(submission => submission.SubmissionDate).ToListAsync();
         }
         
         public async Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip)

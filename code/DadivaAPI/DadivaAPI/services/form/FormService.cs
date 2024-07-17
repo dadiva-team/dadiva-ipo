@@ -169,9 +169,9 @@ public class FormService(IRepository repository) : IFormService
         return Result<Review, Problem>.Success(addedReview);
     }
 
-    public async Task<Result<Dictionary<int, Submission>, Problem>> GetSubmissions()
+    public async Task<Result<List<Submission>, Problem>> GetPendingSubmissions()
     {
-        return Result<Dictionary<int, Submission>, Problem>.Success(await repository.GetSubmissions());
+        return Result<List<Submission>, Problem>.Success(await repository.GetPendingSubmissions());
     }
     
     public async Task<Result<Submission?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
