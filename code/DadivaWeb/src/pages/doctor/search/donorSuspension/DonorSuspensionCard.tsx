@@ -22,7 +22,7 @@ export function DonorSuspensionCard({userSuspension}: DonorSuspensionCard) {
 
     return (
         <Box sx={{gap: 1}}>
-            <Typography sx={{pb: 1}} ><strong>O dador já se encontra suspenso</strong> </Typography>
+            <Typography sx={{pb: 1}} ><strong>O dador encontra-se suspenso</strong> </Typography>
             <Typography>Tipo de Suspensão: {suspensionTypeText(userSuspension.suspensionType)}</Typography>
             <Typography>Data de Início: {new Date(userSuspension.suspensionStartDate).toLocaleDateString()}</Typography>
             {userSuspension.suspensionEndDate && (

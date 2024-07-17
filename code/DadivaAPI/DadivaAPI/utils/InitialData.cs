@@ -149,6 +149,13 @@ public class InitialData
                 ),
                 new Question
                 (
+                "q2- medicamente",
+                "Quais os medicamentos que toma?",
+                ResponseType.medications,
+                null
+                ),
+                new Question
+                (
                     "Q3",
                     "Alguma vez deu sangue ou componentes sanguíneos?",
                     ResponseType.boolean,
