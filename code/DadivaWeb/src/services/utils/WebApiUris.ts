@@ -5,6 +5,8 @@ export const getUsersUri = `${API_URL}/users`;
 export const getUserByNicUri = (nic: number) => `${API_URL}/users/${nic}`;
 
 //export const getUserUri = (nic: number) => `${API_URL}/users/${nic}`;
+export const suspendUserUri = `${API_URL}/users/suspension`;
+export const getUserSuspensionByNicUri = (nic: number) => `${API_URL}/users/suspension/${nic}`;
 export const deleteUserUri = `${API_URL}/users/`;
 export const getFormUri = `${API_URL}/forms/structure`;
 export const getDrugsAndDiseases = `${API_URL}/dnd`;

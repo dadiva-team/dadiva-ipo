@@ -10,16 +10,17 @@ import {
 } from '../utils/DoctorSearchAux';
 import { handleRequest, handleError } from '../../../../services/utils/fetch';
 import {useCurrentSession} from "../../../../session/Session";
-import {ReviewFormOutputModel} from "../../../../services/doctors/models/ReviewFormOutputModel";
+import {ReviewFormRequestModel} from "../../../../services/doctors/models/ReviewFormRequestModel";
 import {DoctorServices} from "../../../../services/doctors/DoctorServices";
 
 interface UsePendingSubmissionCheckProps {
     formGroups: Group[];
     inconsistencies: Inconsistency[];
     submission: Submission;
+    onSubmitedSuccessfully: () => void;
 }
 
-export function usePendingSubmissionResults({ formGroups, submission, inconsistencies }: UsePendingSubmissionCheckProps) {
+export function usePendingSubmissionResults({ formGroups, submission, inconsistencies, onSubmitedSuccessfully }: UsePendingSubmissionCheckProps) {
     const nav = useNavigate();
     const [error, setError] = useState<string | null>(null);
 
@@ -86,7 +87,7 @@ export function usePendingSubmissionResults({ formGroups, submission, inconsiste
                 questionId: note.id,
                 noteText: note.note
             }))
-        } as ReviewFormOutputModel;
+        } as ReviewFormRequestModel;
 
         const [error, res] = await handleRequest(DoctorServices.reviewSubmission(submission.id, reviewData));
         if (error) {
@@ -96,7 +97,7 @@ export function usePendingSubmissionResults({ formGroups, submission, inconsiste
         console.log(res);
         if (res) {
             console.log('Review submitted successfully');
-            nav('/doctor');
+            onSubmitedSuccessfully();
         }
     }
 

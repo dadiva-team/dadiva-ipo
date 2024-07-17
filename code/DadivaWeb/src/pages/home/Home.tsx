@@ -1,20 +1,22 @@
 import React from 'react';
-import { Box } from '@mui/material';
-import { PreDadivaInfoCard } from '../../components/home/PreDadivaInfoCard';
-import { useNavigate } from 'react-router-dom';
-import { Uris } from '../../utils/navigation/Uris';
+import {Box} from '@mui/material';
+import {PreDadivaInfoCard} from '../../components/home/PreDadivaInfoCard';
+import {useNavigate} from 'react-router-dom';
+import {Uris} from '../../utils/navigation/Uris';
+import {Role, useAccountStatus, useCurrentSession, useSessionManager} from '../../session/Session';
+import {PreDadivaLoginCard} from '../../components/home/PreDadivaLoginCard';
+import {PendingReviewCard} from '../../components/home/PendingReviewCard';
+import {useTranslation} from 'react-i18next';
+import {AccountStatus} from "../../services/users/models/LoginOutputModel";
 import BACKOFFICE = Uris.BACKOFFICE;
 import DOCTOR = Uris.DOCTOR;
-import { Role, useCurrentSession, useHasPendingReview, useSessionManager } from '../../session/Session';
-import { PreDadivaLoginCard } from '../../components/home/PreDadivaLoginCard';
-import { PendingReviewCard } from '../../components/home/PendingReviewCard';
-import { useTranslation } from 'react-i18next';
+import {SupensionCard} from "../../components/home/SuspensionCard";
 
 export default function Home() {
   const nav = useNavigate();
   const user = useCurrentSession();
   const sessionManager = useSessionManager();
-  const hasPendingReview = useHasPendingReview();
+  const accountStatus = useAccountStatus();
   const { t } = useTranslation();
 
   return (
@@ -67,17 +69,28 @@ export default function Home() {
           width: '100%',
         }}
       >
-        {user ? (
-          hasPendingReview ? (
-            <PendingReviewCard
-              submissionDate={new Date(user?.accountStatus?.lastSubmissionDate).toLocaleDateString()}
-            />
+          {user ? (
+              (() => {
+                  switch (accountStatus.status) {
+                      case AccountStatus.PendingReview:
+                          return (
+                              <PendingReviewCard
+                                  submissionDate={new Date(user.accountStatus.lastSubmissionDate).toLocaleDateString()}
+                              />
+                          );
+                      case AccountStatus.Suspended:
+                            return (
+                                <SupensionCard
+                                    suspensionDate={new Date(user.accountStatus.suspendedUntil).toLocaleDateString()}
+                                />
+                            );
+                      default:
+                          return <PreDadivaInfoCard />;
+                  }
+              })()
           ) : (
-            <PreDadivaInfoCard />
-          )
-        ) : (
-          <PreDadivaLoginCard />
-        )}
+              <PreDadivaLoginCard />
+          )}
       </Box>
     </div>
   );

@@ -13,6 +13,7 @@ public class DadivaDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<UserAccountStatus> UserAccountStatus { get; set; } 
+    public DbSet<UserSuspension> UserSuspensions { get; set; }
     public DbSet<Form> Forms { get; set; }
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
@@ -87,6 +88,8 @@ public class DadivaDbContext : DbContext
             .HasKey(user => user.Nic);
         modelBuilder.Entity<UserAccountStatus>()
             .HasKey(uas => uas.UserNic);
+        modelBuilder.Entity<UserSuspension>()
+            .HasKey(us => us.UserNic);
         modelBuilder.Entity<Review>()
             .HasKey(r => r.Id);
         modelBuilder.Entity<Note>()
@@ -120,6 +123,11 @@ public class DadivaDbContext : DbContext
             .HasOne<User>()
             .WithOne()
             .HasForeignKey<UserAccountStatus>(uas => uas.UserNic);
+        
+        modelBuilder.Entity<UserSuspension>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(us => us.UserNic);
         
         modelBuilder.Entity<TermsChangeLog>()
             .HasOne<Terms>()

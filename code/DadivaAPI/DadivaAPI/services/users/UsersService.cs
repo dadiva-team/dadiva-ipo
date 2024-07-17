@@ -157,4 +157,104 @@ public class UsersService(IConfiguration config, IRepository repository) : IUser
         return Result<UserWithNameExternalInfo?, Problem>.Success(new UserWithNameExternalInfo(user.Name, user.Nic));
         
     }
+    
+      public async Task<Result<bool, Problem>> AddSuspension(UserSuspensionRequest suspension)
+    {
+        try
+        {
+            DateTime? suspensionEndDate = null;
+            DateTime suspensionStartDate = DateTime.Parse(suspension.SuspensionStartDate).ToUniversalTime();
+            if (suspension.SuspensionEndDate != null)
+            {
+                suspensionEndDate = DateTime.Parse(suspension.SuspensionEndDate).ToUniversalTime();
+            }
+            var userSuspension = new UserSuspension(suspension.UserNic, suspensionStartDate, suspensionEndDate, suspension.Reason, suspension.SuspensionNote, suspension.SuspensionType, suspension.SuspendedBy);
+            bool success = await repository.AddSuspension(userSuspension);
+            if (success)
+            {
+                var userAccountStatus = await repository.GetUserAccountStatus(suspension.UserNic);
+                if (userAccountStatus != null)
+                {
+                    userAccountStatus.Status = AccountStatus.Suspended;
+                    userAccountStatus.SuspendedUntil = suspensionEndDate;
+                    await repository.UpdateUserAccountStatus(userAccountStatus);
+                }
+                return Result<bool, Problem>.Success(true);
+            }
+            return Result<bool, Problem>.Failure(new Problem("addSuspensionError", "Failed to add suspension", 400, "An error occurred while adding the suspension"));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while adding suspension '{e}'");
+            return Result<bool, Problem>.Failure(new Problem("addSuspensionException", "Exception occurred", 500, e.Message));
+        }
+    }
+
+    public async Task<Result<bool, Problem>> UpdateSuspension(UserSuspension suspension)
+    {
+        try
+        {
+            bool success = await repository.UpdateSuspension(suspension);
+            if (success)
+            {
+                var userAccountStatus = await repository.GetUserAccountStatus(suspension.UserNic);
+                if (userAccountStatus != null)
+                {
+                    userAccountStatus.Status = AccountStatus.Suspended;
+                    userAccountStatus.SuspendedUntil = suspension.SuspensionEndDate;
+                    await repository.UpdateUserAccountStatus(userAccountStatus);
+                }
+                return Result<bool, Problem>.Success(true);
+            }
+            return Result<bool, Problem>.Failure(new Problem("updateSuspensionError", "Failed to update suspension", 400, "An error occurred while updating the suspension"));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while updating suspension '{e}'");
+            return Result<bool, Problem>.Failure(new Problem("updateSuspensionException", "Exception occurred", 500, e.Message));
+        }
+    }
+
+    public async Task<Result<UserSuspension?, Problem>> GetSuspension(int userNic)
+    {
+        try
+        {
+            var suspension = await repository.GetSuspension(userNic);
+            if (suspension != null)
+            {
+                return Result<UserSuspension?, Problem>.Success(suspension);
+            }
+            return Result<UserSuspension?, Problem>.Failure(new Problem("suspensionNotFound", "Suspension not found", 404, "The suspension was not found"));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while getting suspension '{e}'");
+            return Result<UserSuspension?, Problem>.Failure(new Problem("getSuspensionException", "Exception occurred", 500, e.Message));
+        }
+    }
+
+    public async Task<Result<bool, Problem>> DeleteSuspension(int userNic)
+    {
+        try
+        {
+            bool success = await repository.DeleteSuspension(userNic);
+            if (success)
+            {
+                var userAccountStatus = await repository.GetUserAccountStatus(userNic);
+                if (userAccountStatus != null)
+                {
+                    userAccountStatus.Status = AccountStatus.Active;
+                    userAccountStatus.SuspendedUntil = null;
+                    await repository.UpdateUserAccountStatus(userAccountStatus);
+                }
+                return Result<bool, Problem>.Success(true);
+            }
+            return Result<bool, Problem>.Failure(new Problem("deleteSuspensionError", "Failed to delete suspension", 400, "An error occurred while deleting the suspension"));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while deleting suspension '{e}'");
+            return Result<bool, Problem>.Failure(new Problem("deleteSuspensionException", "Exception occurred", 500, e.Message));
+        }
+    }
 }

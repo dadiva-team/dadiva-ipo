@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { handleError, handleRequest } from '../../../services/utils/fetch';
-import { DoctorServices } from '../../../services/doctors/DoctorServices';
-import { FormServices } from '../../../services/from/FormServices';
-import { Submission } from '../../../domain/Submission/Submission';
-import { User } from "../../../domain/User/User";
-import { Group } from '../../../domain/Form/Form';
-import { Inconsistency, extractInconsistencies } from "./utils/DoctorSearchAux";
-import { SubmissionHistoryModel } from "../../../services/doctors/models/SubmissionHistoryOutputModel";
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {handleError, handleRequest} from '../../../services/utils/fetch';
+import {DoctorServices} from '../../../services/doctors/DoctorServices';
+import {FormServices} from '../../../services/from/FormServices';
+import {Submission} from '../../../domain/Submission/Submission';
+import {User} from "../../../domain/User/User";
+import {Group} from '../../../domain/Form/Form';
+import {Inconsistency, extractInconsistencies} from "./utils/DoctorSearchAux";
+import {SubmissionHistoryModel} from "../../../services/doctors/models/SubmissionHistoryOutputModel";
+import {Problem} from "../../../services/utils/Problem";
+import {UserSuspension} from "../../../domain/User/UserSuspension";
 
 export function useDoctorSearch() {
     const nav = useNavigate();
@@ -24,14 +26,34 @@ export function useDoctorSearch() {
 
     const [formGroupsCache, setFormGroupsCache] = useState<Map<number, Group[]> | null>(null);
     const [inconsistencies, setInconsistencies] = useState<Inconsistency[] | null>(null);
+    const [fetchedSuspension, setFetchedSuspension] = useState<UserSuspension | null>(null);
+
     const [pendingView, setPendingView] = useState<boolean | null>(null);
     const [oldView, setOldView] = useState<boolean | null>(null);
+    const [suspensionView, setSuspensionView] = useState<boolean | null>(null);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [submissionLimit, setSubmissionLimit] = useState(2);
     const [submissionSkip, setSubmissionSkip] = useState(0);
     const [hasMoreSubmissions, setHasMoreSubmissions] = useState(true);
 
+    const resetErrors = () => {
+        setError(null);
+        setErrorForm(null);
+        setErrorSubmission(null);
+    }
+    const resetState = () => {
+        setPendingSubmission(null);
+        setOldSubmissions(new Map());
+        setUser(null);
+        setPendingView(false);
+        setOldView(false);
+        resetErrors();
+    };
+    const handleSearch = () => {
+        resetState();
+        fetchUser()
+    }
     const fetchFormGroups = async (formVersion: number): Promise<Group[]> => {
         if (formGroupsCache?.has(formVersion)) {
             return formGroupsCache.get(formVersion)!;
@@ -76,7 +98,7 @@ export function useDoctorSearch() {
             return;
         }
 
-        setUser({ name: res.name, nic: res.nic.toString() });
+        setUser({name: res.name, nic: res.nic.toString()});
         setIsLoading(false);
     };
 
@@ -96,6 +118,7 @@ export function useDoctorSearch() {
         setPendingSubmission(res as Submission);
         setPendingView(true);
         setOldView(false)
+        setSuspensionView(false)
     };
 
     const fetchSubmissionHistory = async (limit: number, skip: number, reset: boolean) => {
@@ -113,7 +136,7 @@ export function useDoctorSearch() {
             return;
         }
         await fetchInconsistencies();
-        const { submissionHistory, hasMoreSubmissions } = res
+        const {submissionHistory, hasMoreSubmissions} = res
 
         const newOldSubmissionsMap = new Map(reset ? [] : oldSubmissions);
         for (const submission of submissionHistory) {
@@ -126,7 +149,28 @@ export function useDoctorSearch() {
 
         setOldView(true);
         setPendingView(false);
+        setSuspensionView(false)
     };
+
+    const fetchSuspension = async () => {
+        const [error, res] = await handleRequest(DoctorServices.getDonorSuspension(Number(nic)));
+        if (error) {
+            if (error instanceof Problem && (error.status === 404 || error.status === 400)) {
+                setSuspensionView(true);
+                setOldView(false);
+                setPendingView(false);
+                return
+            }
+            handleError(error, setError, nav);
+        }
+        if (res) {
+            setFetchedSuspension(res);
+
+            setSuspensionView(true);
+            setOldView(false);
+            setPendingView(false);
+        }
+    }
 
     const loadMoreSubmissions = () => {
         const newSkip = submissionSkip + submissionLimit;
@@ -137,14 +181,28 @@ export function useDoctorSearch() {
     };
 
     const togglePendingView = () => {
-        setPendingView(true);
         setOldView(false);
+        setSuspensionView(false);
+        setPendingView(true);
     };
 
     const toggleOldView = () => {
         setPendingView(false);
+        setSuspensionView(false);
         setOldView(true);
     };
+
+    const toggleSuspensionView = () => {
+        setPendingView(false);
+        setOldView(false);
+        setSuspensionView(true);
+    }
+
+    const onSubmitedSuccessfully = () => {
+        setPendingView(false)
+        setPendingSubmission(null)
+        setSuspensionView(null)
+    }
 
     return {
         error,
@@ -157,8 +215,10 @@ export function useDoctorSearch() {
         user,
         formGroupsCache,
         inconsistencies,
+        fetchedSuspension,
         pendingView,
         oldView,
+        suspensionView,
         submissionLimit,
         submissionSkip,
         hasMoreSubmissions,
@@ -166,11 +226,14 @@ export function useDoctorSearch() {
         setError,
         setErrorForm,
         setErrorSubmission,
-        fetchUser,
         fetchPendingSubmission,
         fetchSubmissionHistory,
+        fetchSuspension,
         loadMoreSubmissions,
         togglePendingView,
         toggleOldView,
+        toggleSuspensionView,
+        handleSearch,
+        onSubmitedSuccessfully
     };
 }

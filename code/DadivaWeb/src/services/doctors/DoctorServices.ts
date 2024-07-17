@@ -3,14 +3,16 @@ import {
     getSubmissionByUserUri,
     getSubmissionsHistoryByUserUri,
     getUserByNicUri,
-    getUsersUri, notesFromReviewUri,
-    reviewSubmissionUri
+    getUsersUri, getUserSuspensionByNicUri, notesFromReviewUri,
+    reviewSubmissionUri, suspendUserUri
 } from "../utils/WebApiUris";
 import {SubmissionOutputModel} from "./models/GetSubmissionsOutputModel";
-import {ReviewFormOutputModel} from "./models/ReviewFormOutputModel";
+import {ReviewFormRequestModel} from "./models/ReviewFormRequestModel";
 import {GetUserByNicOutputModel} from "./models/GetUserByNicOutputModel";
 import {SubmissionHistoryOutputModel} from "./models/SubmissionHistoryOutputModel";
 import {NotesFromReviewOutputModel} from "./models/NotesFromReviewOutputModel";
+import {SuspendUserRequestModel} from "./models/SuspendeUserRequestModel";
+import {UserSuspension} from "../../domain/User/UserSuspension";
 
 export namespace DoctorServices {
     export async function getUsers(): Promise<{ nic: number }[]> {
@@ -35,12 +37,27 @@ export namespace DoctorServices {
         return await get(notesFromReviewUri(reviewId));
     }
 
-    export async function reviewSubmission(sumbission: number, outputModel: ReviewFormOutputModel): Promise<boolean> {
+    export async function suspendUser(requestBody: SuspendUserRequestModel ): Promise<boolean> {
         try {
-            console.log(JSON.stringify(outputModel));
+            console.log(JSON.stringify(requestBody));
+            await post(suspendUserUri, JSON.stringify(requestBody));
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    }
+
+    export async function getDonorSuspension(nic: number): Promise<UserSuspension> {
+        return await get(getUserSuspensionByNicUri(nic));
+    }
+
+    export async function reviewSubmission(sumbission: number, requestBody: ReviewFormRequestModel): Promise<boolean> {
+        try {
+            console.log(JSON.stringify(requestBody));
             console.log(reviewSubmissionUri(sumbission));
 
-            await post(reviewSubmissionUri(sumbission), JSON.stringify(outputModel));
+            await post(reviewSubmissionUri(sumbission), JSON.stringify(requestBody));
             return true;
         } catch (e) {
             console.error(e);

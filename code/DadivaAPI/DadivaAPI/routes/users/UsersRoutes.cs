@@ -21,6 +21,11 @@ public static class UsersRoutes
         usersGroup.MapPost("", CreateUser).RequireAuthorization("admin");
         usersGroup.MapGet("", GetUsers).RequireAuthorization("admin");
         usersGroup.MapDelete("/{nic}", DeleteUser).RequireAuthorization("admin");
+        
+        usersGroup.MapPost("/suspension", AddSuspension).AllowAnonymous();
+        usersGroup.MapPost("/suspension/update", UpdateSuspension).AllowAnonymous();
+        usersGroup.MapGet("/suspension/{nic:int}", GetSuspension).AllowAnonymous();
+        usersGroup.MapDelete("/suspension/{nic:int}", DeleteSuspension).AllowAnonymous();
     }
 
     private static async Task<IResult> CreateToken(HttpContext http, [FromBody] CreateTokenInputModel input,
@@ -120,6 +125,50 @@ public static class UsersRoutes
         {
             Result<UserWithNameExternalInfo, Problem>.SuccessResult success => Results.Ok(success.Value),
             Result<UserWithNameExternalInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Unexpected result")
+        };
+    }
+    
+    private static async Task<IResult> AddSuspension([FromBody] UserSuspensionRequest suspension, IUsersService service)
+    {
+        var result = await service.AddSuspension(suspension);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult => Results.Created(),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Unexpected result")
+        };
+    }
+
+    private static async Task<IResult> UpdateSuspension([FromBody] UserSuspension suspension, IUsersService service)
+    {
+        var result = await service.UpdateSuspension(suspension);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult => Results.NoContent(),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Unexpected result")
+        };
+    }
+
+    private static async Task<IResult> GetSuspension([FromRoute] int nic, IUsersService service)
+    {
+        var result = await service.GetSuspension(nic);
+        return result switch
+        {
+            Result<UserSuspension?, Problem>.SuccessResult success => Results.Ok(success.Value),
+            Result<UserSuspension?, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Unexpected result")
+        };
+    }
+
+    private static async Task<IResult> DeleteSuspension([FromRoute] int nic, IUsersService service)
+    {
+        var result = await service.DeleteSuspension(nic);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult => Results.NoContent(),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Unexpected result")
         };
     }

@@ -8,6 +8,7 @@ import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import {PendingSubmissionResults} from './pendingSubmission/PendingSubmissionResults';
 import {OldSubmissionsResults} from "./oldSubmissions/OldSubmissionsResults";
 import {useDoctorSearch} from './useDoctorSearch';
+import {DonorSuspension} from "./donorSuspension/DonorSuspension";
 
 export interface DoctorSearchProps {
     mode: string;
@@ -25,19 +26,24 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
         user,
         formGroupsCache,
         inconsistencies,
+        fetchedSuspension,
         pendingView,
         oldView,
         hasMoreSubmissions,
+        suspensionView,
         setNic,
         setError,
         setErrorForm,
         setErrorSubmission,
-        fetchUser,
         fetchPendingSubmission,
         fetchSubmissionHistory,
+        fetchSuspension,
         loadMoreSubmissions,
         togglePendingView,
         toggleOldView,
+        toggleSuspensionView,
+        handleSearch,
+        onSubmitedSuccessfully
     } = useDoctorSearch();
 
     return (
@@ -52,7 +58,7 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                     <DonorSearchNic
                         nic={nic}
                         setNic={setNic}
-                        handleSearch={fetchUser}
+                        handleSearch={handleSearch}
                         isSearching={isLoading}
                     />
                 </Box>
@@ -67,9 +73,11 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                         historyView={oldView}
                         onCheckPendingSubmission={fetchPendingSubmission}
                         onCheckOldSubmissions={(reset) => fetchSubmissionHistory(2, 0, reset)}  //TODO: Tirar o hardcode do limit e skip
+                        onCheckSuspension={fetchSuspension}
                         pendingAndOldView={!!pendingSubmission && oldSubmissions?.size > 0}
                         onTogglePendingView={togglePendingView}
                         onToggleHistoryView={toggleOldView}
+                        onToggleSuspensionView={toggleSuspensionView}
                     />
                     <Box sx={{marginLeft: 2, width: '80%', borderLeft: '6px solid #1976d2', pl: 2}}>
                         {errorSubmission &&
@@ -80,6 +88,7 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                                 formGroups={formGroupsCache?.get(pendingSubmission.formVersion) || []}
                                 inconsistencies={inconsistencies || []}
                                 submission={pendingSubmission}
+                                onSubmitedSuccessfully={onSubmitedSuccessfully}
                             />
                         )}
                         {oldView && oldSubmissions && (
@@ -90,6 +99,7 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                                 hasMoreSubmissions={hasMoreSubmissions}
                             />
                         )}
+                        {suspensionView && <DonorSuspension nic={user.nic} fetchedSuspension={fetchedSuspension} onSubmitedSuccessfully={onSubmitedSuccessfully}/>}
                     </Box>
                 </Paper>
             )}

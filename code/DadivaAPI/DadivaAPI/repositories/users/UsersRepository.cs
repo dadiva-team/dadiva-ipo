@@ -63,4 +63,43 @@ public class UsersRepository : IUsersRepository
         }
         return await _context.SaveChangesAsync() > 0;
     }
+
+    public async Task<bool> AddSuspension(UserSuspension suspension)
+    {
+        await _context.UserSuspensions.AddAsync(suspension);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> UpdateSuspension(UserSuspension suspension)
+    {
+        var existingSuspension = await _context.UserSuspensions.FindAsync(suspension.UserNic);
+        if (existingSuspension == null)
+        {
+            return false;
+        }
+        existingSuspension.SuspensionStartDate = suspension.SuspensionStartDate;
+        existingSuspension.SuspensionEndDate = suspension.SuspensionEndDate;
+        existingSuspension.Reason = suspension.Reason;
+        existingSuspension.SuspensionNote = suspension.SuspensionNote;
+        existingSuspension.SuspensionType = suspension.SuspensionType;
+        _context.UserSuspensions.Update(existingSuspension);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<UserSuspension?> GetSuspension(int userNic)
+    {
+        return await _context.UserSuspensions
+            .FirstOrDefaultAsync(suspension => suspension.UserNic == userNic);
+    }
+
+    public async Task<bool> DeleteSuspension(int userNic)
+    {
+        var suspension = await _context.UserSuspensions.FindAsync(userNic);
+        if (suspension == null)
+        {
+            return false;
+        }
+        _context.UserSuspensions.Remove(suspension);
+        return await _context.SaveChangesAsync() > 0;
+    }
 }

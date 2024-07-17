@@ -413,6 +413,59 @@ public class InitialData
 
     public static readonly Form Form = realForm;
 
+    /*ion sub1 = new Submission(
+        new List<AnsweredQuestion>
+        {
+            new AnsweredQuestion("Q2", new BooleanAnswer(true)),
+            new AnsweredQuestion("Q3", new BooleanAnswer(true)),
+            new AnsweredQuestion("Q4", new BooleanAnswer(false)),
+            new AnsweredQuestion("Q5", new BooleanAnswer(false)),
+        },
+        DateTime.Now.ToUniversalTime(),
+        Donor.Nic,
+        1
+    );
+    private static readonly Submission sub2 = new Submission(
+        new List<AnsweredQuestion>
+        {
+            new AnsweredQuestion("Q2", new BooleanAnswer(true)),
+            new AnsweredQuestion("Q3", new BooleanAnswer(true)),
+            new AnsweredQuestion("Q4", new BooleanAnswer(false)),
+            new AnsweredQuestion("Q5", new BooleanAnswer(false)),
+        },
+        DateTime.Now.ToUniversalTime(),
+        Donor.Nic,
+        1
+    );
+    
+    public static readonly List<Submission> Submissions = new List<Submission>
+    {
+        sub1,
+        sub2
+    };
+    
+    public static readonly Review rev1 = new Review(
+        sub1.Id,
+        Doctor.Nic,
+        "approved",
+        null,
+        DateTime.Now.ToUniversalTime()
+        );
+    
+    public static readonly Review rev2 = new Review(
+        sub2.Id,
+        Doctor.Nic,
+        "rejected",
+        null,
+        DateTime.Now.ToUniversalTime()
+    );
+    
+    public static readonly List<Review> Reviews = new List<Review>
+    {
+        rev1,
+        rev2
+    };*/
+
     public static readonly List<KeyValuePair<string, string>> CftToManualEntries =
     [
         new KeyValuePair<string, string>(

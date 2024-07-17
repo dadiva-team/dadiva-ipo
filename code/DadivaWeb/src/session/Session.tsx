@@ -96,9 +96,9 @@ export function useUpdateSessionStatus() {
   };
 }
 
-export function useHasPendingReview() {
+export function useAccountStatus() {
   const user = useCurrentSession();
-  return user?.accountStatus?.status === AccountStatus.PendingReview;
+  return user?.accountStatus
 }
 
 export function useLoggedIn() {

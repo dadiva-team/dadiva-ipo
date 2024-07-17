@@ -16,4 +16,9 @@ public interface IUsersRepository
     
     public Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
     
+    public Task<bool> AddSuspension(UserSuspension suspension);
+    public Task<bool> UpdateSuspension(UserSuspension suspension);
+    public Task<UserSuspension?> GetSuspension(int userNic);
+    public Task<bool> DeleteSuspension(int userNic);
+    
 }

@@ -1,4 +1,4 @@
-export interface ReviewFormOutputModel {
+export interface ReviewFormRequestModel {
     doctorNic: number;
     status: string;
     finalNote?: string;

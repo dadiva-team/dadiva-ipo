@@ -51,6 +51,7 @@ export function useNewForm() {
       setError('NIC is not a valid number');
       return;
     }
+    // TODO: Filter answers
 
     const [error, res] = await handleRequest(FormServices.submitForm(nic, formAnswers, formRawFetchData.formVersion));
     if (error) {

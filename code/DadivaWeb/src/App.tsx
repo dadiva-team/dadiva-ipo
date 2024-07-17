@@ -53,7 +53,7 @@ export default function App() {
       return <Navigate to={HOME} />;
     }
 
-    if (user?.accountStatus?.status === AccountStatus.PendingReview) {
+    if (user?.accountStatus?.status === AccountStatus.PendingReview || user?.accountStatus?.status === AccountStatus.Suspended) {
       return <Navigate to={HOME} />;
     }
 

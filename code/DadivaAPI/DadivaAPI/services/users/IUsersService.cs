@@ -20,4 +20,12 @@ public interface IUsersService
     public Task<Result<Boolean, Problem>> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
 
     public Task<Result<UserWithNameExternalInfo?, Problem>> CheckNicExistence(int nic);
+    
+    public Task<Result<bool, Problem>> AddSuspension(UserSuspensionRequest suspension);
+    
+    public Task<Result<bool, Problem>> UpdateSuspension(UserSuspension suspension);
+    
+    public Task<Result<UserSuspension?, Problem>> GetSuspension(int userNic);
+    
+    public Task<Result<bool, Problem>> DeleteSuspension(int userNic);
 }

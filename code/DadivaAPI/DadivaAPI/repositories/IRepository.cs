@@ -16,11 +16,9 @@ public interface IRepository
     public ITermsRepository TermsRepository { get; }
 
     public IMedicationsRepository MedicationRepository { get; }
-
     public ICftToManualRepository CftToManualRepository { get; }
-
     public IManualRepository ManualRepository { get; }
-
+    
     public async Task<Form?> GetForm()
     {
         return await FormRepository.GetForm();
@@ -114,6 +112,26 @@ public interface IRepository
     public async Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
     {
         return await UserRepository.UpdateUserAccountStatus(userAccountStatus);
+    }
+    
+    public async Task<bool> AddSuspension(UserSuspension suspension)
+    {
+        return await UserRepository.AddSuspension(suspension);
+    }
+    
+    public async Task<bool> UpdateSuspension(UserSuspension suspension)
+    {
+        return await UserRepository.UpdateSuspension(suspension);
+    }
+    
+    public async Task<UserSuspension?> GetSuspension(int userNic)
+    {
+        return await UserRepository.GetSuspension(userNic);
+    }
+    
+    public async Task<bool> DeleteSuspension(int userNic)
+    {
+        return await UserRepository.DeleteSuspension(userNic);
     }
     
     public async Task<List<Terms>?> GetAllTerms()

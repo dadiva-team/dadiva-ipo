@@ -10,8 +10,10 @@ interface DoctorSearchButtonsProps {
     historyView: boolean;
     onCheckPendingSubmission: () => void;
     onCheckOldSubmissions: (reset: boolean) => void;
+    onCheckSuspension: () => void;
     onTogglePendingView: () => void;
     onToggleHistoryView: () => void;
+    onToggleSuspensionView: () => void;
     pendingAndOldView: boolean;
 }
 
@@ -22,6 +24,7 @@ export function DoctorSearchButtons(
         historyView,
         onCheckPendingSubmission,
         onCheckOldSubmissions,
+        onCheckSuspension,
         onTogglePendingView,
         onToggleHistoryView,
         pendingAndOldView
@@ -141,6 +144,7 @@ export function DoctorSearchButtons(
                             borderColor: '#f44336',
                         }
                     }}
+                    onClick={onCheckSuspension}
                 >
                     Suspender
                 </Button>

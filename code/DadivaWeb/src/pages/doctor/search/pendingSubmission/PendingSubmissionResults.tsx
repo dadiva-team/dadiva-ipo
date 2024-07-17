@@ -18,9 +18,10 @@ interface PendingSubmissionPendingProps {
     formGroups: Group[];
     inconsistencies: Inconsistency[];
     submission: Submission;
+    onSubmitedSuccessfully: () => void;
 }
 
-export function PendingSubmissionResults({formGroups, submission, inconsistencies}: PendingSubmissionPendingProps) {
+export function PendingSubmissionResults({formGroups, submission, inconsistencies, onSubmitedSuccessfully}: PendingSubmissionPendingProps) {
     const {
         formWithAnswers,
         invalidQuestions,
@@ -37,7 +38,7 @@ export function PendingSubmissionResults({formGroups, submission, inconsistencie
         handleDialogClose,
         handleDialogSubmit,
         setFinalNote,
-    } = usePendingSubmissionResults({formGroups, submission, inconsistencies});
+    } = usePendingSubmissionResults({formGroups, submission, inconsistencies, onSubmitedSuccessfully});
 
     return (
         <Box>
