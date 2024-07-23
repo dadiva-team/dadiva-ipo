@@ -69,6 +69,16 @@ public interface IRepository
         return await FormRepository.GetInconsistencies();
     }
     
+    public async Task<bool> LockSubmission(int submissionId, int doctorId)
+    {
+        return await FormRepository.LockSubmission(submissionId, doctorId);
+    }
+    
+    public async Task<bool> UnlockSubmission(int submissionId, int doctorId)
+    {
+        return await FormRepository.UnlockSubmission(submissionId, doctorId);
+    }
+    
     public async Task<Review> AddReview(Review review)
     {
         return await FormRepository.AddReview(review);

@@ -24,6 +24,10 @@ public interface IFormRepository
     
     public Task<Inconsistencies> GetInconsistencies();
     
+    public Task<bool> LockSubmission(int submissionId, int doctorId);
+    
+    public Task<bool> UnlockSubmission(int submissionId, int doctorId);
+    
     public Task<Review> AddReview(Review review);
     
     public Task<bool> AddNote(Note note);

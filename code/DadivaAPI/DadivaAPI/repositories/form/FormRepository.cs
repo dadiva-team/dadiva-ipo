@@ -104,6 +104,26 @@ namespace DadivaAPI.repositories.form
 
             return (submissions, hasMoreSubmissions);
         }
+        
+        public async Task<bool> LockSubmission(int submissionId, int doctorId)
+        {
+            var submission = await _context.Submissions.FirstOrDefaultAsync(s => s.Id == submissionId);
+            if (submission == null || submission.LockedByDoctorNic != null || submission.ByUserNic == doctorId)
+                return false;
+
+            submission.LockedByDoctorNic = doctorId;
+            return await _context.SaveChangesAsync() > 0;
+        }
+        
+        public async Task<bool> UnlockSubmission(int submissionId, int doctorId)
+        {
+            var submission = await _context.Submissions.FirstOrDefaultAsync(s => s.Id == submissionId);
+            if (submission == null || submission.LockedByDoctorNic != doctorId)
+                return false;
+
+            submission.LockedByDoctorNic = null;
+            return await _context.SaveChangesAsync() > 0;
+        }
 
 
         public async Task<bool> SubmitForm(Submission submission)

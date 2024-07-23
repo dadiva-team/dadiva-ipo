@@ -26,9 +26,31 @@ public static class FormRoutes
         group.MapGet("/submissions", GetPendingSubmissions).RequireAuthorization("doctor");
         group.MapGet("/submissions/{nic:int}", GetPendingSubmission).AllowAnonymous();//.RequireAuthorization("doctor");
         group.MapGet("/submissions/history/{nic:int}", GetSubmissionHistory).AllowAnonymous();//.RequireAuthorization("doctor");
+        group.MapPost("/submissions/{submissionId:int}/lock", LockSubmission).AllowAnonymous();//RequireAuthorization("doctor");
+        group.MapPost("/submissions/{submissionId:int}/unlock", UnlockSubmission).AllowAnonymous();//RequireAuthorization("doctor");
         //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor");
         group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor");
         group.MapPost("/review/{submissionId:int}", ReviewForm).RequireAuthorization("doctor");
+        
+        app.MapGet("/notifications", async context =>
+        {
+            context.Response.Headers["Content-Type"] = "text/event-stream";
+            context.Response.Headers["Cache-Control"] = "no-cache";
+            context.Response.Headers["Connection"] = "keep-alive";
+
+            var notificationService = context.RequestServices.GetService<INotificationService>();
+            if (notificationService == null)
+            {
+                context.Response.StatusCode = 500;
+                await context.Response.WriteAsync("Notification service not available");
+                return;
+            }
+
+            var client = new NotificationClient(context);
+            await notificationService.AddClientAsync(client);
+            await client.ProcessAsync();
+            await notificationService.RemoveClientAsync(client);
+        });
     }
 
     private static async Task<IResult> GetPendingSubmissions(IFormService service)
@@ -43,7 +65,8 @@ public static class FormRoutes
                         submission.ByUserNic,
                         submission.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
                         submission.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                        submission.FormVersion
+                        submission.FormVersion,
+                        submission.LockedByDoctorNic
                     )).ToList())),
             Result<List<Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
@@ -61,7 +84,8 @@ public static class FormRoutes
                     nic,
                     success.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
                     success.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                    success.Value.FormVersion
+                    success.Value.FormVersion,
+                    success.Value.LockedByDoctorNic
                 )),
             Result<Submission, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
@@ -71,7 +95,7 @@ public static class FormRoutes
     private static async Task<IResult> GetSubmissionHistory([FromRoute] int nic, [FromQuery] int limit, [FromQuery] int skip, IFormService service)
     {
         var result = await service.GetSubmissionHistoryByNic(nic, limit, skip);
-        Console.WriteLine(result.ToString());
+        //Console.WriteLine(result.ToString());
         return result switch
         {
             Result<SubmissionHistoryOutputModel, Problem>.SuccessResult success => Results.Ok(success.Value),
@@ -138,13 +162,13 @@ public static class FormRoutes
     private static async Task<IResult> SubmitForm([FromRoute] int nic, [FromBody] SubmitFormRequest input,
         IFormService service)
     {
-        System.Console.WriteLine(input);
+        //System.Console.WriteLine(input);
         Dictionary<string, IAnswer> answers = input.AnsweredQuestions.ToDictionary(
             question => question.QuestionId,
             question => question.Answer.ToAnswer()
         );
-        System.Console.WriteLine("input");
-        System.Console.WriteLine(answers);
+        //System.Console.WriteLine("input");
+        //System.Console.WriteLine(answers);
 
         Result<SubmitFormOutputModel, Problem> result = await service.SubmitForm(answers, nic, input.FormVersion);
         return result switch
@@ -198,6 +222,27 @@ public static class FormRoutes
                 new GetInconsistenciesOutputModel(
                     success.Value.InconsistencyList.Select(RuleModel.FromDomain).ToList())),
             Result<Inconsistencies, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+        };
+    }
+    private static async Task<IResult> LockSubmission([FromRoute] int submissionId, [FromBody] SubmissionLockRequest input, IFormService service)
+    {
+        var result = await service.LockSubmission(submissionId, input.DoctorId);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult => Results.NoContent(),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+        };
+    }
+
+    private static async Task<IResult> UnlockSubmission([FromRoute] int submissionId, [FromBody] SubmissionUnlockRequest input, IFormService service)
+    {
+        var result = await service.UnlockSubmission(submissionId, input.DoctorId);
+        return result switch
+        {
+            Result<bool, Problem>.SuccessResult => Results.NoContent(),
+            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }

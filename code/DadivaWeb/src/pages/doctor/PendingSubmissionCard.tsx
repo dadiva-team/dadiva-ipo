@@ -1,7 +1,7 @@
 import {Group} from "../../domain/Form/Form";
 import {Inconsistency} from "./search/utils/DoctorSearchAux";
 import {Submission} from "../../domain/Submission/Submission";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Box, Button, DialogActions, DialogContentText, Divider, IconButton, Modal, Typography} from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {Close} from "@mui/icons-material";
@@ -9,35 +9,55 @@ import {PendingSubmissionResults} from "./search/pendingSubmission/PendingSubmis
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
+import {handleRequest} from "../../services/utils/fetch";
+import {DoctorServices} from "../../services/doctors/DoctorServices";
 
 export interface PendingSubmissionCardProps {
     formGroups: Group[];
     inconsistencies: Inconsistency[];
     submission: Submission;
     onSubmitedSuccessfully: () => void;
+    locked: boolean;
+    //forceOpenModal: boolean;
+    doctorNic: number
 }
 
-export function PendingSubmissionCard(
-    {
-        formGroups,
-        inconsistencies,
-        submission,
-        onSubmitedSuccessfully
-    }: PendingSubmissionCardProps) {
+export function PendingSubmissionCard({formGroups,inconsistencies, submission, onSubmitedSuccessfully, locked, doctorNic}:PendingSubmissionCardProps) {
     const [openModal, setOpenModal] = useState(false);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
-    const handleOpenModal = () => {
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
+
+        if (openModal) {
+            window.addEventListener('beforeunload', handleBeforeUnload);
+        }
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [openModal]);
+
+    const handleOpenModal = async () => {
+        if (locked) return;
+        const [error] = await handleRequest(DoctorServices.lockSubmission(submission.id, doctorNic));
+        if (error) {
+
+            return;
+        }
         setOpenModal(true);
     };
 
-    const handleCloseModal = () => {
+    const handleCloseModal = async () => {
         setConfirmDialogOpen(true);
     };
 
     const handleConfirmClose = async () => {
         setConfirmDialogOpen(false);
-       setOpenModal(false)
+        setOpenModal(false);
+        await handleRequest(DoctorServices.unlockSubmission(submission.id, doctorNic));
     };
 
     const handleCancelClose = () => {
@@ -46,9 +66,9 @@ export function PendingSubmissionCard(
 
     return (
         <Box sx={{pl: 2}}>
-            <Typography>Formulario submetido: {new Date().toLocaleDateString()}</Typography>
-            <Button endIcon={<OpenInNewIcon/>} onClick={handleOpenModal}>
-                Rever
+            <Typography><strong>Formulario submetido: </strong> {submission.submissionDate}</Typography>
+            <Button endIcon={<OpenInNewIcon/>} onClick={handleOpenModal} disabled={locked}>
+                {locked ? 'Locked' : 'Rever'}
             </Button>
             <Modal
                 open={!!openModal}

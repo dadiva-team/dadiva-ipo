@@ -16,6 +16,9 @@ public interface IFormService
     
     public Task<Result<Submission, Problem>> GetSubmission(int id);
     
+    public Task<Result<bool, Problem>> LockSubmission(int submissionId, int doctorId);
+    public Task<Result<bool, Problem>> UnlockSubmission(int submissionId, int doctorId);
+    
     public Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null);
     
     public Task<Result<List<Submission>, Problem>> GetPendingSubmissions();

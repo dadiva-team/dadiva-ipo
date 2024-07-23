@@ -32,7 +32,7 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 
-//Jwt configuration starts here
+// Jwt configuration starts here
 var jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
 var jwtAudience = builder.Configuration.GetSection("Jwt:Audience").Get<string>();
 var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
@@ -86,7 +86,6 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-
 // Adds authorization such that the jwt bearer token must contain a claim with the key "perms" and the value "admin"
 builder.Services.AddAuthorization(options =>
 {
@@ -105,7 +104,6 @@ string? databaseType = builder.Configuration.GetSection("DatabaseType").Get<stri
 switch (databaseType)
 {
     case "PGSQL":
-
         string? connectionString = Environment.GetEnvironmentVariable("DADIVA_CONNECTION_STRING");
         if (connectionString == null)
         {
@@ -123,7 +121,7 @@ switch (databaseType)
         break;
     default:
         throw new Exception(
-            "DatabaseType must be provided in appsettings.json. Aceepted values are PGSQL or MEMORY.");
+            "DatabaseType must be provided in appsettings.json. Accepted values are PGSQL or MEMORY.");
 }
 
 string? elasticString = Environment.GetEnvironmentVariable("DADIVA_ES_STRING");
@@ -136,6 +134,7 @@ var nodePool = new SingleNodePool(new Uri(elasticString));
 var settings = new ElasticsearchClientSettings(nodePool);
 
 builder.Services.AddSingleton(new ElasticsearchClient(settings));
+builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();
@@ -144,9 +143,6 @@ builder.Services.AddScoped<IMedicationsService, MedicationsService>();
 builder.Services.AddScoped<IManualService, ManualService>();
 
 builder.Services.AddScoped<IRepository, Repository>();
-
-
-
 
 builder.Services.AddCors(options =>
 {

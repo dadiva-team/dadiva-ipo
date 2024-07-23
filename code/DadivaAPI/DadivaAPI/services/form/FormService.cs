@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.repositories.users;
@@ -8,7 +9,7 @@ using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IRepository repository) : IFormService
+public class FormService(IRepository repository, INotificationService notificationService) : IFormService
 {
     public async Task<Result<GetFormOutputModel, Problem>> GetForm()
     {
@@ -86,7 +87,7 @@ public class FormService(IRepository repository) : IFormService
                 ));
         }
         
-        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion);
+        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion, null);
         bool isSubmitted = await repository.SubmitForm(submission);
         if (isSubmitted)
         {
@@ -125,16 +126,51 @@ public class FormService(IRepository repository) : IFormService
         return Result<Submission, Problem>.Success(submission);
     }
     
+    public async Task<Result<bool, Problem>> LockSubmission(int submissionId, int doctorId)
+    {
+        bool isLocked = await repository.LockSubmission(submissionId, doctorId);
+        if (!isLocked)
+            return Result<bool, Problem>.Failure(
+                new Problem(
+                    "lockSubmissionError",
+                    "Unable to lock submission",
+                    400,
+                    "Unable to lock submission"
+                    )
+                );
+        
+        notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "lock", submissionId }));
+        return Result<bool, Problem>.Success(true);
+        
+    }
+
+    public async Task<Result<bool, Problem>> UnlockSubmission(int submissionId, int doctorId)
+    {
+        bool isUnlocked = await repository.UnlockSubmission(submissionId, doctorId);
+        if (!isUnlocked)
+            return Result<bool, Problem>.Failure(
+                new Problem(
+                    "unlockSubmissionError",
+                    "Unable to unlock submission",
+                    400,
+                    "Unable to unlock submission"
+                    )
+                );
+
+        notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
+        return Result<bool, Problem>.Success(true);
+    }
+    
     public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null)
     {
         // Probably not needed
         
-        Console.WriteLine("ReviewForm");
+        /*Console.WriteLine("ReviewForm");
         Console.WriteLine(submissionId);
         Console.WriteLine(doctorNic);
         Console.WriteLine(status);
         Console.WriteLine(finalNote);
-        Console.WriteLine(noteModels);
+        Console.WriteLine(noteModels);*/
         
         Submission? submission = await repository.GetSubmissionById(submissionId);
         /*
@@ -268,21 +304,5 @@ public class FormService(IRepository repository) : IFormService
     {
 
         return Result<bool, Problem>.Success(await repository.EditInconsistencies(inconsistencies));
-    }
-
-    public async Task<Result<Terms?, Problem>> GetTerms()
-    {
-        Terms? terms = null;
-        if (terms is not null)
-            return Result<Terms, Problem>.Success(terms);
-
-        return Result<Terms, Problem>.Failure(
-            new Problem(
-                "IllegalTerms.com",
-                "These terms are illegal",
-                404,
-                "The terms are illegal you go to jail"
-            )
-        );
     }
 }

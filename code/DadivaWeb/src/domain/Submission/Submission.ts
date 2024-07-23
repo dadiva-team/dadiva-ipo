@@ -5,6 +5,7 @@ export interface Submission{
     answers: Answers[];
     submissionDate: string;
     formVersion: number;
+    lockedByDoctorNic?: number;
 }
 
 export interface Answers{
