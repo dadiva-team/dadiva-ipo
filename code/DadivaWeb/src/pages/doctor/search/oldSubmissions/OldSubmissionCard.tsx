@@ -16,6 +16,7 @@ import {SubmissionHistoryModel} from "../../../../services/doctors/models/Submis
 import {buildFormWithAnswers, checkFormValidity, Inconsistency} from "../utils/DoctorSearchAux";
 import {OldSubmissionsAnswers} from "./OldSubmissionAnswers";
 import {Group} from "../../../../domain/Form/Form";
+import {lightGreen, lightRed} from "../../../../components/shared/uiColors";
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -44,7 +45,7 @@ interface OldSubmissionCardProps {
 export function OldSubmissionCard({submission, group, inconsistencies}: OldSubmissionCardProps) {
     const [expanded, setExpanded] = React.useState(false);
     const [notesVisible, setNotesVisible] = React.useState(true);
-    const cardBorder = submission.reviewStatus === 'approved' ? 'green' : 'red';
+    const cardBorder = submission.reviewStatus === 'approved' ? lightGreen : lightRed;
 
     const formWithAnswers = buildFormWithAnswers({
         formGroups: group,

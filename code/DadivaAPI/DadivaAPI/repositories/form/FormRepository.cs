@@ -62,7 +62,7 @@ namespace DadivaAPI.repositories.form
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Id == id);
         }
 
-        public async Task<List<Submission>> GetPendingSubmissions()
+        public async Task<List<Submission>?> GetPendingSubmissions()
         {
             Console.Out.WriteLine("Getting pending submissions in repository");
             return await _context.Submissions.Where(submission =>

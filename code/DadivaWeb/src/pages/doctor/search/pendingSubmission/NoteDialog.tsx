@@ -7,6 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 
 export interface NoteDialogProps {
     open: boolean;
+    question: string
     note?: string;
     onAnswer: (note: string) => void;
     onClose: () => void;

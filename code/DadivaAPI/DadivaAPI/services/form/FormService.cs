@@ -74,11 +74,22 @@ public class FormService(IRepository repository) : IFormService
 
     public async Task<Result<SubmitFormOutputModel, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic, int formVersion)
     {
+        var userAccountStatus = await repository.GetUserAccountStatus(nic);
+        if (userAccountStatus != null && userAccountStatus.Status != AccountStatus.Active)
+        {
+            return Result<SubmitFormOutputModel, Problem>.Failure(
+                new Problem(
+                    "errorSubmitingForm.com",
+                    "Error submitting form",
+                    400,
+                    "An error ocurred while submitting form"
+                ));
+        }
+        
         var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion);
         bool isSubmitted = await repository.SubmitForm(submission);
         if (isSubmitted)
         {
-            var userAccountStatus = await repository.GetUserAccountStatus(nic);
             if (userAccountStatus != null)
             {
                 userAccountStatus.Status = AccountStatus.PendingReview;
@@ -171,7 +182,16 @@ public class FormService(IRepository repository) : IFormService
 
     public async Task<Result<List<Submission>, Problem>> GetPendingSubmissions()
     {
-        return Result<List<Submission>, Problem>.Success(await repository.GetPendingSubmissions());
+        var pendingSubmissions = await repository.GetPendingSubmissions();
+        if (pendingSubmissions == null || !pendingSubmissions.Any())
+            return Result<List<Submission>, Problem>.Failure(
+                new Problem(
+                    "noPendingSubmissions.com",
+                    "No pending submissions",
+                    404,
+                    "De momento não há submissões pendentes")
+            );
+        return Result<List<Submission>, Problem>.Success(pendingSubmissions);
     }
     
     public async Task<Result<Submission?, Problem>> GetPendingSubmissionsByUserNic(int userNic)

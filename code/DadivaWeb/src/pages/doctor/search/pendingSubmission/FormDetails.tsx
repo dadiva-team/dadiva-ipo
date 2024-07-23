@@ -26,7 +26,7 @@ export function FormDetails({ formWithAnswers, invalidQuestions, notes, handleSa
   });
 
   return (
-    <Box sx={{ border: 0.5 }}>
+      <Box sx={{border: 0.5, maxHeight: 300, overflowY: 'auto'}}>
       {formWithAnswers.map((item, index) => {
         const isInvalid = invalidQuestions?.some(invalid => invalid === item.id);
 
@@ -70,7 +70,7 @@ export function FormDetails({ formWithAnswers, invalidQuestions, notes, handleSa
         );
       })}
       {selectedQuestion && (
-        <NoteDialog note={getNoteContent(selectedQuestion.id)} open={open} onAnswer={saveNote} onClose={handleClose} />
+        <NoteDialog question={selectedQuestion.question} note={getNoteContent(selectedQuestion.id)} open={open} onAnswer={saveNote} onClose={handleClose} />
       )}
     </Box>
   );

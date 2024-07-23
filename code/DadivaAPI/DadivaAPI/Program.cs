@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using DadivaAPI.repositories;
 using DadivaAPI.repositories.cftToManual;
 using DadivaAPI.repositories.manual;
@@ -53,6 +54,23 @@ builder.Services.AddAuthentication(x =>
         {
             context.Token = context.Request.Cookies["token"];
             return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            // Prevent the default behavior of returning a 401 Unauthorized status code
+            context.HandleResponse();
+
+            context.Response.ContentType = "application/problem+json";
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            var problemDetails = new
+            {
+                type = "https://localhost:8000/errors/unauthorized",
+                title = "Unauthorized",
+                detail = "You are not authorized to access this resource. Please provide valid credentials.",
+                status = StatusCodes.Status401Unauthorized
+            };
+            var problemJson = JsonSerializer.Serialize(problemDetails);
+            return context.Response.WriteAsync(problemJson);
         }
     };
     options.SaveToken = true;

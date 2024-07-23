@@ -13,7 +13,7 @@ public interface IFormRepository
     
     public Task<bool> SubmitForm(Submission submission);
     
-    public Task<List<Submission>> GetPendingSubmissions();
+    public Task<List<Submission>?> GetPendingSubmissions();
     
     public Task<Submission> GetSubmission(int nic);
     public Task<Submission> GetSubmissionById(int id);

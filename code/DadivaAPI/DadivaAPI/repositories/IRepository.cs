@@ -38,8 +38,8 @@ public interface IRepository
     {
         return await FormRepository.SubmitForm(submission);
     }
-    
-    public async Task<List<Submission>> GetPendingSubmissions()
+
+    public async Task<List<Submission>?> GetPendingSubmissions()
     {
         return await FormRepository.GetPendingSubmissions();
     }

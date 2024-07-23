@@ -2,10 +2,8 @@ import {Group} from '../../../../domain/Form/Form';
 import {Submission} from '../../../../domain/Submission/Submission';
 import React from 'react';
 import {Box, Button, Divider} from '@mui/material';
-import {ErrorAlert} from '../../../../components/shared/ErrorAlert';
 import Typography from '@mui/material/Typography';
 import {FormDetails} from './FormDetails';
-import {PendingActionAlert} from '../../../../components/shared/PendingActionAlert';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import CloseIcon from '@mui/icons-material/Close';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -13,6 +11,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import {usePendingSubmissionResults} from "./usePendingSubmissionResults";
 import {ReviewDialog} from "./ReviewDialog";
 import {Inconsistency} from "../utils/DoctorSearchAux";
+import {InfoAlert} from "../../../../components/shared/InfoAlert";
 
 interface PendingSubmissionPendingProps {
     formGroups: Group[];
@@ -31,7 +30,6 @@ export function PendingSubmissionResults({formGroups, submission, inconsistencie
         dialogType,
         finalNote,
         isSubmitting,
-        setError,
         setShowDetails,
         handleSaveNote,
         handleDialogOpen,
@@ -45,7 +43,7 @@ export function PendingSubmissionResults({formGroups, submission, inconsistencie
             <Typography>Formulario submetido: {submission.submissionDate}</Typography>
             {invalidQuestions?.length > 0 ? (
                 <Box>
-                    <ErrorAlert error={'Formulário parcialmente inválido'} clearError={() => setError(null)}/>
+                    <InfoAlert actionMessage={'Formulário parcialmente inválido'} type={'error'}/>
                     <Typography variant="h6">
                         Existem inconsistências no formulário. Por favor, reveja as seguintes questões:
                     </Typography>
@@ -67,9 +65,9 @@ export function PendingSubmissionResults({formGroups, submission, inconsistencie
                     ))}
                 </Box>
             ) : (
-                <PendingActionAlert
+                <InfoAlert
                     actionMessage={'Formulario parcialmente validado'}
-                    clearActionMessage={() => console.log(':D')}
+                    type={'info'}
                 />
             )}
             <Box sx={{pt: 2}}>

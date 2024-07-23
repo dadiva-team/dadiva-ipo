@@ -32,7 +32,7 @@ export function OldSubmissionsAnswers({formWithAnswers, invalidQuestions, notes}
                         }}
                     >
                         <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={note  ? 8 : 9}>
+                            <Grid item xs={note ? 8 : 9}>
                                 <Box p={2} display="flex" alignItems="center">
                                     {isInvalid && (
                                         <ErrorOutlineIcon
@@ -56,7 +56,9 @@ export function OldSubmissionsAnswers({formWithAnswers, invalidQuestions, notes}
                                 </Grid>
                             )}
                             <Grid item xs={3}>
-                                {renderAnswer(item)}
+                                <Box display="flex" alignItems="center" p={0.5}>
+                                    {renderAnswer(item)}
+                                </Box>
                             </Grid>
                         </Grid>
                         {index < formWithAnswers.length - 1 && <Divider/>}

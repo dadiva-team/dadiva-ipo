@@ -1,13 +1,14 @@
-import { Box, List } from '@mui/material';
+import {Box, Button, List} from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import React from 'react';
 import { navBuilder, NavItem } from '../../components/shared/NavBuilder';
 import Typography from '@mui/material/Typography';
-import { Uris } from '../../utils/navigation/Uris';
+import {Uris} from '../../utils/navigation/Uris';
 import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
 import DOCTOR_SEARCH_NAME = Uris.DOCTOR_SEARCH_NAME;
 import DOCTOR_MEDICATION_SEARCH = Uris.DOCTOR_MEDICATION_SEARCH;
+import DOCTOR = Uris.DOCTOR;
 
 export function DoctorNavBar() {
   const location = useLocation();
@@ -24,6 +25,9 @@ export function DoctorNavBar() {
 
   return (
     <Box sx={{ width: '15%' }}>
+        <Button variant='outlined' sx={{ margin: 2, textAlign: 'center' }} onClick={() =>nav(DOCTOR)}>
+            Submissões Pendentes
+        </Button>
       <Typography variant="h6" sx={{ margin: 2, textAlign: 'center' }}>
         Pesquisa de Dadores
       </Typography>
