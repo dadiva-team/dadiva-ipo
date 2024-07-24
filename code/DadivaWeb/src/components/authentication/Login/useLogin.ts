@@ -4,9 +4,9 @@ import * as React from 'react';
 import reduce from '../utils/Reduce';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { loginNIC } from '../../../services/users/UserServices';
-import {UserAccountStatus} from "../../../services/users/models/LoginOutputModel";
+import { UserAccountStatus } from '../../../services/users/models/LoginOutputModel';
 
-export function useLogin() {
+export function useLogin(returnTo: string) {
   const navigate = useNavigate();
   const sessionManager = useSessionManager();
 
@@ -87,12 +87,10 @@ export function useLogin() {
       accountStatus: accountStatus as UserAccountStatus,
     };
 
-
-    console.log('-----------', session);
-
     sessionManager.setSession(session);
     dispatch({ type: 'success' });
     setLoading(false);
+    navigate(returnTo);
   }
 
   const { nic, password } = state.inputs;

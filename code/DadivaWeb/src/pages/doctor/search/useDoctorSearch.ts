@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { DoctorServices } from '../../../services/doctors/DoctorServices';
 import { FormServices } from '../../../services/from/FormServices';
@@ -13,6 +13,7 @@ import { UserSuspension } from '../../../domain/User/UserSuspension';
 
 export function useDoctorSearch() {
   const nav = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState<string | null>(null);
   const [errorForm, setErrorForm] = useState<string | null>(null);
   const [errorSubmission, setErrorSubmission] = useState<string | null>(null);
@@ -60,7 +61,7 @@ export function useDoctorSearch() {
     } else {
       const [error, res] = await handleRequest(FormServices.getFormByVersion(formVersion));
       if (error) {
-        handleError(error, setErrorForm, nav);
+        handleError(error, setErrorForm, nav, location.pathname);
         return [];
       }
       const formGroups = res.groups as Group[];
@@ -77,7 +78,7 @@ export function useDoctorSearch() {
     if (inconsistencies) return;
     const [error, res] = await handleRequest(FormServices.getInconsistencies());
     if (error) {
-      handleError(error, setError, nav);
+      handleError(error, setError, nav, location.pathname);
       setIsLoading(false);
       return;
     }
@@ -91,7 +92,7 @@ export function useDoctorSearch() {
     const [error, res] = await handleRequest(DoctorServices.getUserByNic(Number(nic)));
 
     if (error) {
-      handleError(error, setError, nav);
+      handleError(error, setError, nav, location.pathname);
       setPendingSubmission(null);
       setUser(null);
       setIsLoading(false);
@@ -108,7 +109,7 @@ export function useDoctorSearch() {
 
     const [error, res] = await handleRequest(DoctorServices.getPendingSubmissionByNic(Number(user.nic)));
     if (error) {
-      handleError(error, setErrorSubmission, nav);
+      handleError(error, setErrorSubmission, nav, location.pathname);
       setPendingSubmission(null);
       return;
     }
@@ -131,7 +132,7 @@ export function useDoctorSearch() {
 
     const [error, res] = await handleRequest(DoctorServices.getSubmissionHistoryByNic(Number(user.nic), limit, skip));
     if (error) {
-      handleError(error, setErrorSubmission, nav);
+      handleError(error, setErrorSubmission, nav, location.pathname);
       setOldSubmissions(new Map());
       return;
     }
@@ -162,7 +163,7 @@ export function useDoctorSearch() {
         setPendingView(false);
         return;
       }
-      handleError(error, setError, nav);
+      handleError(error, setError, nav, location.pathname);
     }
     if (res) {
       setFetchedSuspension(res);

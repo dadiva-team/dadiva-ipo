@@ -1,6 +1,8 @@
 import { NavigateFunction } from 'react-router-dom';
 import { Problem } from './Problem';
 import React from 'react';
+import { Uris } from '../../utils/navigation/Uris';
+import LOGIN = Uris.LOGIN;
 
 export async function fetchAPI<T>(
   input: RequestInfo | URL,
@@ -64,10 +66,18 @@ export async function handleRequest<T, E = Error>(promise: Promise<T>): Promise<
 export function handleError(
   err: Error | Problem,
   setError: React.Dispatch<React.SetStateAction<string | null>>,
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
+  location: string = undefined
 ) {
   if (navigate != undefined && err instanceof Problem && err.status === 401) {
-    navigate('/login');
+    switch (location) {
+      case undefined:
+        navigate(LOGIN);
+        return;
+      default:
+        navigate(LOGIN + `?returnUrl=${location}`);
+        return;
+    }
   } else if (err instanceof Problem) {
     console.log('Problem title is: ' + err.title);
     setError(err.detail);

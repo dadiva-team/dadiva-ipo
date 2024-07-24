@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Login from './pages/authentication/Login';
 import Register from './pages/authentication/Register';
 import { Uris } from './utils/navigation/Uris';
@@ -45,9 +45,10 @@ export default function App() {
   }
 
   function ProtectedRoute({ roles, children }: ProtectedRouteProps) {
+    const location = useLocation();
     console.log(user, roles);
     if (!user) {
-      return <Login />;
+      return <Navigate to={LOGIN + `?returnUrl=${location.pathname}`} />;
     }
 
     if (!roles.includes(user.perms)) {

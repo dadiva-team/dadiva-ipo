@@ -6,10 +6,15 @@ import { Box, Button, CircularProgress, Divider, Paper } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
 import { NicField } from '../../components/authentication/Login/NicField';
+import { useLocation } from 'react-router-dom';
 
 export default function Login() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const returnTo = searchParams.get('returnUrl') || '/';
+
   const { error, setError, nic, password, showPassword, handleChange, handleSubmit, setShowPassword, loading } =
-    useLogin();
+    useLogin(returnTo);
 
   return (
     <Box display="flex" justifyContent="center">
