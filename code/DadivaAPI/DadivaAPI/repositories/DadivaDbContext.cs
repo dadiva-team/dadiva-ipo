@@ -16,6 +16,7 @@ public class DadivaDbContext : DbContext
     public DbSet<UserSuspension> UserSuspensions { get; set; }
     public DbSet<Form> Forms { get; set; }
     public DbSet<Submission> Submissions { get; set; }
+    public DbSet<SubmissionLock> SubmissionLocks { get; set; }
     public DbSet<Inconsistencies> Inconsistencies { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Note> Notes { get; set; }
@@ -108,6 +109,11 @@ public class DadivaDbContext : DbContext
             .HasOne<Form>()
             .WithMany()
             .HasForeignKey(sub => sub.FormVersion);
+        
+        modelBuilder.Entity<SubmissionLock>()
+            .HasOne<Submission>()
+            .WithMany()
+            .HasForeignKey(sl => sl.SubmissionId);
         
         modelBuilder.Entity<Review>()
             .HasOne<Submission>()

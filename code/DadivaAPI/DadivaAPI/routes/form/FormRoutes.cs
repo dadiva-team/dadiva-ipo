@@ -65,8 +65,7 @@ public static class FormRoutes
                         submission.ByUserNic,
                         submission.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
                         submission.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                        submission.FormVersion,
-                        submission.LockedByDoctorNic
+                        submission.FormVersion
                     )).ToList())),
             Result<List<Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
@@ -84,8 +83,7 @@ public static class FormRoutes
                     nic,
                     success.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
                     success.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                    success.Value.FormVersion,
-                    success.Value.LockedByDoctorNic
+                    success.Value.FormVersion
                 )),
             Result<Submission, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
@@ -232,7 +230,7 @@ public static class FormRoutes
         {
             Result<bool, Problem>.SuccessResult => Results.NoContent(),
             Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+            _ => throw new Exception("Unexpected result")
         };
     }
 
@@ -243,7 +241,7 @@ public static class FormRoutes
         {
             Result<bool, Problem>.SuccessResult => Results.NoContent(),
             Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+            _ => throw new Exception("Unexpected result")
         };
     }
     

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {handleError, handleRequest} from '../../services/utils/fetch';
 import {FormServices} from '../../services/from/FormServices';
 import {DoctorServices} from '../../services/doctors/DoctorServices';
@@ -15,14 +15,25 @@ import {notificationsUri} from "../../services/utils/WebApiUris";
 
 export function PendingSubmissions() {
     const nav = useNavigate();
+    const doc = useCurrentSession();
+
     const [error, setError] = useState<string>(null);
     const [isLoading, setIsLoading] = useState(true);
+
     const [pendingSubmissions, setPendingSubmissions] = useState<SubmissionOutputModel[]>([]);
-    const [submissionsMap, setSubmissionsMap] = useState<Map<SubmissionOutputModel, Group[]>>(new Map());
+    const [submissionMap, setSubmissionMap] = useState<Map<SubmissionOutputModel, Group[]>>(new Map());
     const [formGroupsCache, setFormGroupsCache] = useState<Map<number, Group[]> | null>(null);
     const [inconsistencies, setInconsistencies] = useState<Inconsistency[] | null>(null);
     const [lockedSubmissions, setLockedSubmissions] = useState<Set<number>>(new Set());
-    const doc = useCurrentSession();
+
+    const [currentReviewSubmission, setCurrentReviewSubmission] = useState<number | null>(null);
+    const [forceCloseModal, setForceCloseModal] = useState(false);
+
+    const currentReviewSubmissionRef = useRef(currentReviewSubmission);
+
+    useEffect(() => {
+        currentReviewSubmissionRef.current = currentReviewSubmission;
+    }, [currentReviewSubmission]);
 
     useEffect(() => {
         async function fetchFormGroups(formVersion: number): Promise<Group[]> {
@@ -70,7 +81,7 @@ export function PendingSubmissions() {
                 const formGroups = await fetchFormGroups(submission.formVersion);
                 newSubmissionsMap.set(submission, formGroups);
             }
-            setSubmissionsMap(newSubmissionsMap);
+            setSubmissionMap(newSubmissionsMap);
             setIsLoading(false);
             console.log('Submissions:', res.submissions);
         };
@@ -81,29 +92,35 @@ export function PendingSubmissions() {
         console.log('Opening connection to SSE. ', notificationsUri);
 
         const eventSource = new EventSource(notificationsUri);
-        eventSource.onopen = function () {
+        eventSource.onopen = () => {
             console.log('Connection to SSE opened.');
         };
-        console.log('EventSource:', eventSource.readyState);
 
-        eventSource.onmessage = function (event) {
+        eventSource.onmessage = (event) => {
             console.log('Message received:', event.data);
             const data = JSON.parse(event.data);
             if (data.type === 'lock' || data.type === 'unlock') {
-                setLockedSubmissions(prev => {
+                setLockedSubmissions((prev) => {
                     const newSet = new Set(prev);
                     if (data.type === 'lock') {
                         newSet.add(data.submissionId);
                     } else {
                         newSet.delete(data.submissionId);
+                        if (data.reason === 'timeout' && currentReviewSubmissionRef.current === data.submissionId) {
+                            alert(`O tempo de revisão da submissão expirou.`);
+                            setForceCloseModal(true);
+                        }
                     }
                     console.log('Updated locked submissions:', newSet);
                     return newSet;
                 });
             }
+            if (data.type === 'review') {
+                setPendingSubmissions((prev) => prev.filter((submission) => submission.id !== data.submissionId));
+            }
         };
 
-        eventSource.onerror = function (error) {
+        eventSource.onerror = (error) => {
             console.error('EventSource failed:', error);
             // Handle error but don't close the connection
         };
@@ -114,10 +131,14 @@ export function PendingSubmissions() {
         };
     }, []);
 
-    useEffect(() => {
-        console.log("Monitor")
-        console.log(lockedSubmissions)
-    }, [lockedSubmissions])
+    const handleOpenReview = (submissionId: number) => {
+        setCurrentReviewSubmission(submissionId);
+    };
+
+    const handleCloseReview = () => {
+        setCurrentReviewSubmission(null);
+        setForceCloseModal(false);
+    };
 
     return (
         <>
@@ -126,31 +147,26 @@ export function PendingSubmissions() {
             ) : (
                 <Paper sx={{p: 2}}>
                     <Typography variant="h6" sx={{p: 1}}> Submissões Pendentes </Typography>
-                    {error && <ErrorAlert error={error} clearError={() => {
-                        setError(null)
-                    }}/>}
-                    {pendingSubmissions.map(submission => {
-                        /*console.log(`Submission ID: ${submission.id}, Locked By Doctor NIC: ${submission.lockedByDoctorNic}, SameDoctor: ${submission.lockedByDoctorNic == doc.nic},
-                        Doctor NIC: ${doc.nic}, Locked Submissions: ${lockedSubmissions.has(submission.id)}, if: ${(submission.lockedByDoctorNic !== null && submission.lockedByDoctorNic != doc.nic)}`);*/
-                        return (
-                            <Box key={submission.id}>
-                                <PendingSubmissionCard
-                                    formGroups={submissionsMap.get(submission)}
-                                    inconsistencies={inconsistencies}
-                                    submission={submission}
-                                    onSubmitedSuccessfully={() => window.location.reload()} // Temporary solution
-                                    //forceOpenModal={(lockedSubmissions.has(submission.id) ||submission.lockedByDoctorNic !== null && submission.lockedByDoctorNic == doc.nic)}
-                                    locked={lockedSubmissions.has(submission.id) || (submission.lockedByDoctorNic !== null && submission.lockedByDoctorNic != doc.nic)}
-                                    doctorNic={doc.nic}
-                                />
-                                <Divider sx={{p: 0.5}}/>
-                            </Box>
-                        );
-                    })}
+                    {error && <ErrorAlert error={error} clearError={() => setError(null)}/>}
+                    {pendingSubmissions.map(submission => (
+                        <Box key={submission.id}>
+                            <PendingSubmissionCard
+                                formGroups={submissionMap.get(submission)}
+                                inconsistencies={inconsistencies}
+                                submission={submission}
+                                onSubmitedSuccessfully={() => console.log(":D")}
+                                locked={lockedSubmissions.has(submission.id)}
+                                doctorNic={doc.nic}
+                                isReviewing={currentReviewSubmission === submission.id}
+                                onOpenReview={() => handleOpenReview(submission.id)}
+                                onCloseReview={handleCloseReview}
+                                forceCloseModal={forceCloseModal}
+                            />
+                            <Divider sx={{p: 0.5}}/>
+                        </Box>
+                    ))}
                 </Paper>
-            )
-            }
+            )}
         </>
-    )
+    );
 }
-

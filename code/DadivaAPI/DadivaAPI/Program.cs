@@ -136,6 +136,8 @@ var settings = new ElasticsearchClientSettings(nodePool);
 builder.Services.AddSingleton(new ElasticsearchClient(settings));
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 
+builder.Services.AddHostedService<UnlockExpiredSubmissionsService>();
+
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<ITermsService, TermsService>();

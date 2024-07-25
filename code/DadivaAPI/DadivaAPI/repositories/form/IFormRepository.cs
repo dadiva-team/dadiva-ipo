@@ -16,7 +16,7 @@ public interface IFormRepository
     public Task<List<Submission>?> GetPendingSubmissions();
     
     public Task<Submission> GetSubmission(int nic);
-    public Task<Submission> GetSubmissionById(int id);
+    public Task<Submission?> GetSubmissionById(int id);
 
     public Task<Submission?> GetLatestPendingSubmissionByUser(int userNic);
 
@@ -27,7 +27,10 @@ public interface IFormRepository
     public Task<bool> LockSubmission(int submissionId, int doctorId);
     
     public Task<bool> UnlockSubmission(int submissionId, int doctorId);
-    
+
+    public Task<List<SubmissionLock>> GetExpiredLocks(TimeSpan timeout);
+
+    public Task<bool> SubmissionExists(int id);
     public Task<Review> AddReview(Review review);
     
     public Task<bool> AddNote(Note note);

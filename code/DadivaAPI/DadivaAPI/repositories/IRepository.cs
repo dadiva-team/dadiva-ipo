@@ -49,7 +49,7 @@ public interface IRepository
         return await FormRepository.GetSubmission(nic);
     }
     
-    public async Task<Submission> GetSubmissionById(int id)
+    public async Task<Submission?> GetSubmissionById(int id)
     {
         return await FormRepository.GetSubmissionById(id);
     }
@@ -77,6 +77,16 @@ public interface IRepository
     public async Task<bool> UnlockSubmission(int submissionId, int doctorId)
     {
         return await FormRepository.UnlockSubmission(submissionId, doctorId);
+    }
+    
+    public Task<List<SubmissionLock>> GetExpiredLocks(TimeSpan timeout)
+    {
+        return FormRepository.GetExpiredLocks(timeout);
+    }
+    
+    public Task<bool> SubmissionExists(int id)
+    {
+        return FormRepository.SubmissionExists(id);
     }
     
     public async Task<Review> AddReview(Review review)

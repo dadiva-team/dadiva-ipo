@@ -87,7 +87,7 @@ public class FormService(IRepository repository, INotificationService notificati
                 ));
         }
         
-        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion, null);
+        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion);
         bool isSubmitted = await repository.SubmitForm(submission);
         if (isSubmitted)
         {
@@ -130,35 +130,39 @@ public class FormService(IRepository repository, INotificationService notificati
     {
         bool isLocked = await repository.LockSubmission(submissionId, doctorId);
         if (!isLocked)
+        {
             return Result<bool, Problem>.Failure(
-                new Problem(
-                    "lockSubmissionError",
-                    "Unable to lock submission",
-                    400,
-                    "Unable to lock submission"
-                    )
-                );
-        
-        notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "lock", submissionId }));
+                new Problem("lockSubmissionError", "Unable to lock submission", 400, "Unable to lock submission")
+            );
+        }
+
+        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "lock", submissionId }));
         return Result<bool, Problem>.Success(true);
-        
     }
 
     public async Task<Result<bool, Problem>> UnlockSubmission(int submissionId, int doctorId)
     {
         bool isUnlocked = await repository.UnlockSubmission(submissionId, doctorId);
         if (!isUnlocked)
+        {
             return Result<bool, Problem>.Failure(
-                new Problem(
-                    "unlockSubmissionError",
-                    "Unable to unlock submission",
-                    400,
-                    "Unable to unlock submission"
-                    )
-                );
+                new Problem("unlockSubmissionError", "Unable to unlock submission", 400, "Unable to unlock submission")
+            );
+        }
 
-        notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
+        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
         return Result<bool, Problem>.Success(true);
+    }
+    
+    public async Task UnlockExpiredSubmissions(TimeSpan lockTimeout)
+    {
+        var expiredLocks = await repository.GetExpiredLocks(lockTimeout);
+        foreach (var expiredLock in expiredLocks)
+        {
+            await repository.UnlockSubmission(expiredLock.SubmissionId, expiredLock.LockedByDoctorNic);
+            var message = JsonSerializer.Serialize(new { type = "unlock", submissionId = expiredLock.SubmissionId, reason = "timeout" });
+            await notificationService.NotifyAllAsync(message);
+        }
     }
     
     public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null)
@@ -184,7 +188,8 @@ public class FormService(IRepository repository, INotificationService notificati
             );*/
         
         var review = new Review(
-            submissionId,doctorNic,
+            submissionId,
+            doctorNic,
             status,
             finalNote,
             DateTime.UtcNow
@@ -211,6 +216,8 @@ public class FormService(IRepository repository, INotificationService notificati
             userAccountStatus.Status = AccountStatus.Active;
             await repository.UpdateUserAccountStatus(userAccountStatus);
         }
+        
+        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "review", submissionId }));
 
 
         return Result<Review, Problem>.Success(addedReview);

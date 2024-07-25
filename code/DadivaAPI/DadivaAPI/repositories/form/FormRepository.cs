@@ -57,7 +57,7 @@ namespace DadivaAPI.repositories.form
                 .FirstOrDefaultAsync();
         }
         
-        public async Task<Submission> GetSubmissionById(int id)
+        public async Task<Submission?> GetSubmissionById(int id)
         {
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Id == id);
         }
@@ -105,24 +105,46 @@ namespace DadivaAPI.repositories.form
             return (submissions, hasMoreSubmissions);
         }
         
-        public async Task<bool> LockSubmission(int submissionId, int doctorId)
+        public async Task<bool> LockSubmission(int submissionId, int doctorNic)
         {
-            var submission = await _context.Submissions.FirstOrDefaultAsync(s => s.Id == submissionId);
-            if (submission == null || submission.LockedByDoctorNic != null || submission.ByUserNic == doctorId)
+            var existingLock = await _context.SubmissionLocks.FirstOrDefaultAsync(l => l.SubmissionId == submissionId);
+            if (existingLock != null && (existingLock.LockedByDoctorNic != doctorNic))
                 return false;
 
-            submission.LockedByDoctorNic = doctorId;
+            if (existingLock == null)
+            {
+                _context.SubmissionLocks.Add(new SubmissionLock(submissionId,doctorNic,DateTime.UtcNow));
+            }
+            else
+            {
+                existingLock.LockDate = DateTime.UtcNow;
+                existingLock.LockedByDoctorNic = doctorNic;
+            }
+
             return await _context.SaveChangesAsync() > 0;
         }
         
-        public async Task<bool> UnlockSubmission(int submissionId, int doctorId)
+        public async Task<bool> UnlockSubmission(int submissionId, int doctorNic)
         {
-            var submission = await _context.Submissions.FirstOrDefaultAsync(s => s.Id == submissionId);
-            if (submission == null || submission.LockedByDoctorNic != doctorId)
+            var existingLock = await _context.SubmissionLocks.FirstOrDefaultAsync(l => l.SubmissionId == submissionId);
+            if (existingLock == null || existingLock.LockedByDoctorNic != doctorNic)
                 return false;
 
-            submission.LockedByDoctorNic = null;
+            _context.SubmissionLocks.Remove(existingLock);
             return await _context.SaveChangesAsync() > 0;
+        }
+        
+        public async Task<List<SubmissionLock>> GetExpiredLocks(TimeSpan timeout)
+        {
+            return await _context.SubmissionLocks
+                .Where(l => l.LockDate < DateTime.UtcNow - timeout)
+                .ToListAsync();
+        }
+
+        
+        public async Task<bool> SubmissionExists(int id)
+        {
+            return await _context.Submissions.AnyAsync(e => e.Id == id);
         }
 
 
