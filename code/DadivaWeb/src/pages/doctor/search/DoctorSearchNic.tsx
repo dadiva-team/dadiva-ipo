@@ -34,7 +34,8 @@ export function DonorSearchNic({nic, setNic, handleSearch, isSearching}: DonorSe
                 type={'number'}
                 required
                 rows={2}
-                defaultValue={'123456789'}
+                value={nic.length > 0 ? nic : '123456789'}
+                //defaultValue={nic.length > 0 ? nic : '123456789'}
                 onKeyPress={handleKeyPress}
                 onChange={handleChange}
                 label="Introduza o NIC do dador"

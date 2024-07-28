@@ -12,6 +12,7 @@ import {extractInconsistencies, Inconsistency} from "./search/utils/DoctorSearch
 import {PendingSubmissionCard} from "./PendingSubmissionCard";
 import {useCurrentSession} from "../../session/Session";
 import {notificationsUri} from "../../services/utils/WebApiUris";
+import {Submission} from "../../domain/Submission/Submission";
 
 export function PendingSubmissions() {
     const nav = useNavigate();
@@ -21,13 +22,15 @@ export function PendingSubmissions() {
     const [isLoading, setIsLoading] = useState(true);
 
     const [pendingSubmissions, setPendingSubmissions] = useState<SubmissionOutputModel[]>([]);
-    const [submissionMap, setSubmissionMap] = useState<Map<SubmissionOutputModel, Group[]>>(new Map());
+    const [submissionMap, setSubmissionMap] = useState<Map<Submission, Group[]>>(new Map());
     const [formGroupsCache, setFormGroupsCache] = useState<Map<number, Group[]> | null>(null);
     const [inconsistencies, setInconsistencies] = useState<Inconsistency[] | null>(null);
     const [lockedSubmissions, setLockedSubmissions] = useState<Set<number>>(new Set());
 
+
     const [currentReviewSubmission, setCurrentReviewSubmission] = useState<number | null>(null);
     const [forceCloseModal, setForceCloseModal] = useState(false);
+    const [lockedByCurrentDoctor, setLockedByCurrentDoctor] = useState<SubmissionOutputModel | null>(null);
 
     const currentReviewSubmissionRef = useRef(currentReviewSubmission);
 
@@ -76,17 +79,30 @@ export function PendingSubmissions() {
             }
             await fetchInconsistencies();
             setPendingSubmissions(res.submissions as SubmissionOutputModel[]);
-            const newSubmissionsMap: Map<SubmissionOutputModel, Group[]> = new Map([]);
+
+            const newSubmissionsMap: Map<Submission, Group[]> = new Map([]);
+            const newLockedSubmissions: Set<number> = new Set();
             for (const submission of res.submissions) {
-                const formGroups = await fetchFormGroups(submission.formVersion);
-                newSubmissionsMap.set(submission, formGroups);
+                const formGroups = await fetchFormGroups(submission.submission.formVersion);
+                newSubmissionsMap.set(submission.submission, formGroups);
+                console.log('Submission:', submission.lockedByDoctorNic, doc.nic);
+                if (submission.lockedByDoctorNic != null && submission.lockedByDoctorNic != doc.nic) {
+                    newLockedSubmissions.add(submission.submission.id);
+                } else if (submission.lockedByDoctorNic == doc.nic) {
+                    setLockedByCurrentDoctor(submission);
+                }
             }
+
             setSubmissionMap(newSubmissionsMap);
+            setLockedSubmissions(newLockedSubmissions);
             setIsLoading(false);
             console.log('Submissions:', res.submissions);
         };
-        fetch();
-    }, [formGroupsCache, inconsistencies, nav]);
+        if (pendingSubmissions.length === 0) {
+            fetch();
+        }
+
+    }, [doc.nic, formGroupsCache, inconsistencies, nav, pendingSubmissions.length]);
 
     useEffect(() => {
         console.log('Opening connection to SSE. ', notificationsUri);
@@ -116,7 +132,7 @@ export function PendingSubmissions() {
                 });
             }
             if (data.type === 'review') {
-                setPendingSubmissions((prev) => prev.filter((submission) => submission.id !== data.submissionId));
+                setPendingSubmissions((prev) => prev.filter((submission) => submission.submission.id !== data.submissionId));
             }
         };
 
@@ -140,31 +156,60 @@ export function PendingSubmissions() {
         setForceCloseModal(false);
     };
 
+
     return (
         <>
             {isLoading ? (
                 <LoadingSpinner text={'A Carregar Submissões...'}/>
             ) : (
                 <Paper sx={{p: 2}}>
-                    <Typography variant="h6" sx={{p: 1}}> Submissões Pendentes </Typography>
-                    {error && <ErrorAlert error={error} clearError={() => setError(null)}/>}
-                    {pendingSubmissions.map(submission => (
-                        <Box key={submission.id}>
-                            <PendingSubmissionCard
-                                formGroups={submissionMap.get(submission)}
-                                inconsistencies={inconsistencies}
-                                submission={submission}
-                                onSubmitedSuccessfully={() => console.log(":D")}
-                                locked={lockedSubmissions.has(submission.id)}
-                                doctorNic={doc.nic}
-                                isReviewing={currentReviewSubmission === submission.id}
-                                onOpenReview={() => handleOpenReview(submission.id)}
-                                onCloseReview={handleCloseReview}
-                                forceCloseModal={forceCloseModal}
-                            />
-                            <Divider sx={{p: 0.5}}/>
-                        </Box>
-                    ))}
+                    {lockedByCurrentDoctor ? (
+                        <>
+                            <Typography variant="h6" sx={{p: 1, pb: 2, color: 'warning.main'}}>Tem uma revisão por concluir ...</Typography>
+                            <Box>
+                                <PendingSubmissionCard
+                                    formGroups={submissionMap.get(lockedByCurrentDoctor.submission)}
+                                    inconsistencies={inconsistencies}
+                                    submission={lockedByCurrentDoctor.submission}
+                                    locked={false}
+                                    doctorNic={doc.nic}
+                                    isReviewing={currentReviewSubmission === lockedByCurrentDoctor.submission.id}
+                                    onSubmitedSuccessfully={() => {
+                                        setLockedByCurrentDoctor(null)
+                                    }}
+                                    onOpenReview={() => handleOpenReview(lockedByCurrentDoctor.submission.id)}
+                                    onCloseReview={() => {
+                                        handleCloseReview()
+                                        setLockedByCurrentDoctor(null)
+                                    }}
+                                    forceCloseModal={forceCloseModal}
+                                />
+                            </Box>
+                        </>
+                    ) : (
+                        <>
+                            <Typography variant="h6" sx={{p: 1, pb: 2}}> Submissões Pendentes </Typography>
+                            {error && <ErrorAlert error={error} clearError={() => setError(null)}/>}
+                            {pendingSubmissions.map(({submission}) => (
+                                <Box key={submission.id}>
+                                    <PendingSubmissionCard
+                                        formGroups={submissionMap.get(submission)}
+                                        inconsistencies={inconsistencies}
+                                        submission={submission}
+                                        locked={lockedSubmissions.has(submission.id)}
+                                        onSubmitedSuccessfully={() => {
+                                        }}
+                                        doctorNic={doc.nic}
+                                        isReviewing={currentReviewSubmission === submission.id}
+                                        onOpenReview={() => handleOpenReview(submission.id)}
+                                        onCloseReview={handleCloseReview}
+                                        forceCloseModal={forceCloseModal}
+                                    />
+                                    <Divider sx={{p: 0.5}}/>
+                                </Box>
+                            ))}
+                        </>
+                    )}
                 </Paper>
             )}
         </>

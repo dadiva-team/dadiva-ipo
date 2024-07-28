@@ -11,17 +11,20 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import {handleRequest} from '../../services/utils/fetch';
 import {DoctorServices} from '../../services/doctors/DoctorServices';
+import {useNavigate} from "react-router-dom";
+import {Uris} from "../../utils/navigation/Uris";
+import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
 
 export interface PendingSubmissionCardProps {
     formGroups: Group[];
     inconsistencies: Inconsistency[];
     submission: Submission;
-    onSubmitedSuccessfully: () => void;
     locked: boolean;
     doctorNic: number;
     isReviewing: boolean;
     onOpenReview: () => void;
     onCloseReview: () => void;
+    onSubmitedSuccessfully: () => void;
     forceCloseModal: boolean;
 }
 
@@ -30,14 +33,15 @@ export function PendingSubmissionCard(
         formGroups,
         inconsistencies,
         submission,
-        onSubmitedSuccessfully,
         locked,
         doctorNic,
         isReviewing,
         onOpenReview,
         onCloseReview,
+        onSubmitedSuccessfully,
         forceCloseModal
     }: PendingSubmissionCardProps) {
+    const nav = useNavigate();
     const [openModal, setOpenModal] = useState(false);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
@@ -81,7 +85,7 @@ export function PendingSubmissionCard(
     };
 
     useEffect(() => {
-        if(openModal && forceCloseModal){
+        if (openModal && forceCloseModal) {
             setOpenModal(false)
             onCloseReview()
         }
@@ -125,10 +129,14 @@ export function PendingSubmissionCard(
                         inconsistencies={inconsistencies}
                         submission={submission}
                         onSubmitedSuccessfully={() => {
-                            onSubmitedSuccessfully();
                             handleCloseModal();
+                            onSubmitedSuccessfully();
                         }}
                     />
+                    <Button sx={{pt: 2}} onClick={() => nav(DOCTOR_SEARCH_NIC + `?nic=${submission.nic}`)}
+                            endIcon={<OpenInNewIcon/>}>
+                        Ver perfil do dador
+                    </Button>
                 </Box>
             </Modal>
             <Dialog

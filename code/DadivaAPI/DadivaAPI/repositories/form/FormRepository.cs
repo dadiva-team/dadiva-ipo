@@ -48,13 +48,23 @@ namespace DadivaAPI.repositories.form
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.ByUserNic == nic);
         }
         
-        public async Task<Submission?> GetLatestPendingSubmissionByUser(int userNic)
+        public async Task<SubmissionPendingDto?> GetLatestPendingSubmissionByUser(int userNic)
         {
-            return await _context.Submissions
-                .Where(submission => submission.ByUserNic == userNic && 
-                                     !_context.Reviews.Any(review => review.SubmissionId == submission.Id))
-                .OrderByDescending(submission => submission.SubmissionDate)
-                .FirstOrDefaultAsync();
+            return await (from submission in _context.Submissions
+                join subLock in _context.SubmissionLocks
+                    on submission.Id equals subLock.SubmissionId into locks
+                from subLock in locks.DefaultIfEmpty()
+                where submission.ByUserNic == userNic && !_context.Reviews.Any(review => review.SubmissionId == submission.Id)
+                orderby submission.SubmissionDate descending
+                select new SubmissionPendingDto
+                {
+                    Id = submission.Id,
+                    Answers = submission.AnsweredQuestions,
+                    SubmissionDate = submission.SubmissionDate,
+                    ByUserNic = submission.ByUserNic,
+                    FormVersion = submission.FormVersion,
+                    LockedByDoctorNic = subLock.LockedByDoctorNic
+                }).FirstOrDefaultAsync();
         }
         
         public async Task<Submission?> GetSubmissionById(int id)
@@ -62,12 +72,26 @@ namespace DadivaAPI.repositories.form
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Id == id);
         }
 
-        public async Task<List<Submission>?> GetPendingSubmissions()
+        public async Task<List<SubmissionPendingDto>?> GetPendingSubmissions()
         {
             Console.Out.WriteLine("Getting pending submissions in repository");
-            return await _context.Submissions.Where(submission =>
-                    !_context.Reviews.Any(review => review.SubmissionId == submission.Id))
-                .OrderBy(submission => submission.SubmissionDate).ToListAsync();
+            
+            return await (from submission in _context.Submissions
+                join subLock in _context.SubmissionLocks
+                    on submission.Id equals subLock.SubmissionId into locks
+                from subLock in locks.DefaultIfEmpty()
+                where !_context.Reviews.Any(review => review.SubmissionId == submission.Id)
+                orderby submission.SubmissionDate
+                select new SubmissionPendingDto
+                {
+                    Id = submission.Id,
+                    Answers = submission.AnsweredQuestions,
+                    SubmissionDate = submission.SubmissionDate,
+                    ByUserNic = submission.ByUserNic,
+                    FormVersion = submission.FormVersion,
+                    LockedByDoctorNic = subLock.LockedByDoctorNic
+                }).ToListAsync();
+            
         }
         
         public async Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip)

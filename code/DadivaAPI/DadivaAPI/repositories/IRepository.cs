@@ -39,7 +39,7 @@ public interface IRepository
         return await FormRepository.SubmitForm(submission);
     }
 
-    public async Task<List<Submission>?> GetPendingSubmissions()
+    public async Task<List<SubmissionPendingDto>?> GetPendingSubmissions()
     {
         return await FormRepository.GetPendingSubmissions();
     }
@@ -54,7 +54,7 @@ public interface IRepository
         return await FormRepository.GetSubmissionById(id);
     }
     
-    public async Task<Submission?> GetLatestPendingSubmissionByUser(int userNic)
+    public async Task<SubmissionPendingDto?> GetLatestPendingSubmissionByUser(int userNic)
     {
         return await FormRepository.GetLatestPendingSubmissionByUser(userNic);
     }

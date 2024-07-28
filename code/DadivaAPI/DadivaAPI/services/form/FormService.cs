@@ -1,12 +1,9 @@
 using System.Text.Json;
 using DadivaAPI.domain;
 using DadivaAPI.repositories;
-using DadivaAPI.repositories.users;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.services.form.dtos;
 using DadivaAPI.utils;
-using Elastic.Clients.Elasticsearch;
-
 namespace DadivaAPI.services.form;
 
 public class FormService(IRepository repository, INotificationService notificationService) : IFormService
@@ -167,17 +164,7 @@ public class FormService(IRepository repository, INotificationService notificati
     
     public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null)
     {
-        // Probably not needed
-        
-        /*Console.WriteLine("ReviewForm");
-        Console.WriteLine(submissionId);
-        Console.WriteLine(doctorNic);
-        Console.WriteLine(status);
-        Console.WriteLine(finalNote);
-        Console.WriteLine(noteModels);*/
-        
         Submission? submission = await repository.GetSubmissionById(submissionId);
-        /*
         if (submission == null)
             return Result<Review, Problem>.Failure(
                 new Problem(
@@ -185,7 +172,7 @@ public class FormService(IRepository repository, INotificationService notificati
                     "Error getting submission",
                     404,
                     "An error occurred while getting submission") //TODO Create Problems types for form
-            );*/
+            );
         
         var review = new Review(
             submissionId,
@@ -210,6 +197,8 @@ public class FormService(IRepository repository, INotificationService notificati
                 await repository.AddNote(newNote);
             }
         }
+        
+        // Unlock user account
         var userAccountStatus = await repository.GetUserAccountStatus(submission.ByUserNic);
         if (userAccountStatus != null)
         {
@@ -217,40 +206,53 @@ public class FormService(IRepository repository, INotificationService notificati
             await repository.UpdateUserAccountStatus(userAccountStatus);
         }
         
+        // Remove lock
+        await repository.UnlockSubmission(submissionId, doctorNic);
+        
+        // Sending notification to all doctors using the /pendingSubmission page that they can delete this submission from the list
         await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "review", submissionId }));
 
 
         return Result<Review, Problem>.Success(addedReview);
     }
 
-    public async Task<Result<List<Submission>, Problem>> GetPendingSubmissions()
+    public async Task<Result<List<SubmissionModelWithLockInfo>, Problem>> GetPendingSubmissions()
     {
         var pendingSubmissions = await repository.GetPendingSubmissions();
         if (pendingSubmissions == null || !pendingSubmissions.Any())
-            return Result<List<Submission>, Problem>.Failure(
+            return Result<List<SubmissionModelWithLockInfo>, Problem>.Failure(
                 new Problem(
                     "noPendingSubmissions.com",
                     "No pending submissions",
                     404,
                     "De momento não há submissões pendentes")
             );
-        return Result<List<Submission>, Problem>.Success(pendingSubmissions);
+
+        var pendingSubmissionsWithLockInfo = pendingSubmissions.Select(dto =>
+        {
+            var outputModel = ConvertToOutputModel(dto);
+            return outputModel;
+        }).ToList();
+        
+        return Result<List<SubmissionModelWithLockInfo>, Problem>.Success(pendingSubmissionsWithLockInfo);
     }
     
-    public async Task<Result<Submission?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
+    public async Task<Result<SubmissionModelWithLockInfo?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
     {
         var pendingSubmission = await repository.GetLatestPendingSubmissionByUser(userNic);
     
         if (pendingSubmission == null)
-            return Result<Submission?, Problem>.Failure(
+            return Result<SubmissionModelWithLockInfo?, Problem>.Failure(
                 new Problem(
                     "noPendingSubmission.com",
                     "No pending submission",
                     404,
                     "The user has no pending submissions")
             );
+        
+        
 
-        return Result<Submission?, Problem>.Success(pendingSubmission);
+        return Result<SubmissionModelWithLockInfo?, Problem>.Success(ConvertToOutputModel(pendingSubmission));
     }
     
     private SubmissionHistoryModel ConvertToOutputModel(SubmissionHistoryDto dto)
@@ -268,6 +270,16 @@ public class FormService(IRepository repository, INotificationService notificati
             ReviewStatus = dto.ReviewStatus,
             DoctorNic = dto.DoctorNic
         };
+    }
+    
+    private SubmissionModelWithLockInfo ConvertToOutputModel(SubmissionPendingDto dto)
+    {
+        return new SubmissionModelWithLockInfo(
+            new SubmissionModel(
+                dto.Id, dto.ByUserNic, dto.Answers.Select(AnsweredQuestionModel.FromDomain).ToList(),
+                dto.SubmissionDate.ToShortDateString(), dto.FormVersion
+            ), dto.LockedByDoctorNic);
+
     }
 
     public async Task<Result<SubmissionHistoryOutputModel, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip)

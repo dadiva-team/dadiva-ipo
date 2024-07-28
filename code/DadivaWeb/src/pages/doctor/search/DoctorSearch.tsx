@@ -42,7 +42,7 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
         togglePendingView,
         toggleOldView,
         toggleSuspensionView,
-        handleSearch,
+        handleSearchAndUpdateQuery,
         onSubmitedSuccessfully
     } = useDoctorSearch();
 
@@ -58,7 +58,7 @@ export function DoctorSearch({mode}: DoctorSearchProps) {
                     <DonorSearchNic
                         nic={nic}
                         setNic={setNic}
-                        handleSearch={handleSearch}
+                        handleSearch={handleSearchAndUpdateQuery}
                         isSearching={isLoading}
                     />
                 </Box>

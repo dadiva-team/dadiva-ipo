@@ -24,7 +24,7 @@ export function DoctorNavBar() {
   ];
 
   return (
-    <Box sx={{ width: '15%' }}>
+    <Box sx={{ width: '15%', display: 'flex', flexDirection: 'column' }}>
         <Button variant='outlined' sx={{ margin: 2, textAlign: 'center' }} onClick={() =>nav(DOCTOR)}>
             Submissões Pendentes
         </Button>

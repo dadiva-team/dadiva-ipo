@@ -55,19 +55,15 @@ public static class FormRoutes
 
     private static async Task<IResult> GetPendingSubmissions(IFormService service)
     {
-        Result<List<Submission>, Problem> result = await service.GetPendingSubmissions();
+        Result<List<SubmissionModelWithLockInfo>, Problem> result = await service.GetPendingSubmissions();
         return result switch
         {
-            Result<List<Submission>, Problem>.SuccessResult success => Results.Ok(
+            Result<List<SubmissionModelWithLockInfo>, Problem>.SuccessResult success => Results.Ok(
                 new GetSubmissionsOutputModel(
-                    success.Value.Select(submission => new SubmissionModel(
-                        submission.Id,
-                        submission.ByUserNic,
-                        submission.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                        submission.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                        submission.FormVersion
+                    success.Value.Select(submission => new SubmissionModelWithLockInfo(
+                      Submission: submission.Submission, LockedByDoctorNic: submission.LockedByDoctorNic
                     )).ToList())),
-            Result<List<Submission>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<List<SubmissionModelWithLockInfo>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
@@ -77,15 +73,12 @@ public static class FormRoutes
         var result = await service.GetPendingSubmissionsByUserNic(nic);
         return result switch
         {
-            Result<Submission, Problem>.SuccessResult success => Results.Ok(
-                new SubmissionModel(
-                    success.Value.Id,
-                    nic,
-                    success.Value.AnsweredQuestions.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                    success.Value.SubmissionDate.ToString(CultureInfo.CurrentCulture),
-                    success.Value.FormVersion
+            Result<SubmissionModelWithLockInfo, Problem>.SuccessResult success => Results.Ok(
+                new SubmissionModelWithLockInfo(
+                    Submission: success.Value.Submission,
+                    LockedByDoctorNic: success.Value.LockedByDoctorNic
                 )),
-            Result<Submission, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<SubmissionModelWithLockInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
@@ -93,7 +86,6 @@ public static class FormRoutes
     private static async Task<IResult> GetSubmissionHistory([FromRoute] int nic, [FromQuery] int limit, [FromQuery] int skip, IFormService service)
     {
         var result = await service.GetSubmissionHistoryByNic(nic, limit, skip);
-        //Console.WriteLine(result.ToString());
         return result switch
         {
             Result<SubmissionHistoryOutputModel, Problem>.SuccessResult success => Results.Ok(success.Value),
