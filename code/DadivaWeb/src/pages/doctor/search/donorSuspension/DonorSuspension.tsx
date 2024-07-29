@@ -36,8 +36,9 @@ export function DonorSuspension({nic, fetchedSuspension, onSubmitedSuccessfully}
 
     const today = new Date().toISOString();
     const [suspensionStartDateToday, setSuspensionStartDateToday] = useState<boolean>(true);
-    const [suspensionStartDate, setSuspensionStartDate] = useState(today.split('T')[0]);
+    const [suspensionStartDate, setSuspensionStartDate] = useState(new Date().toISOString().split('T')[0]);
     const [suspensionEndDate, setSuspensionEndDate] = useState('');
+    const [duration, setDuration] = useState<number>(0);
 
 
     const submitSuspension = async () => {
@@ -59,35 +60,40 @@ export function DonorSuspension({nic, fetchedSuspension, onSubmitedSuccessfully}
         }
     }
 
+    const calculateSuspensionEndDate = (months: number) => {
+        const startDate = new Date(suspensionStartDate);
+        startDate.setMonth(startDate.getMonth() + months);
+        setSuspensionEndDate(startDate.toISOString().split('T')[0]);
+    }
+
 
     useEffect(() => {
-        if (suspensionStartDateToday) {
-            setSuspensionStartDate(today.split('T')[0]);
-        } else {
-            setSuspensionStartDate('')
-        }
-    }, [suspensionStartDateToday, today]);
-
-    //TODO get a better way to calculate the duration
-
-    const calculateDuration = () => {
-        if (suspensionStartDate && suspensionEndDate) {
+        console.log(`suspensionStartDate ${suspensionStartDate}, ${suspensionEndDate}`)
+        const calculateDuration = () => {
             const startDate = new Date(suspensionStartDate);
             const endDate = new Date(suspensionEndDate);
             const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-            return `${duration} dias`;
-        }
-    };
+            setDuration(duration);
+        };
 
-    useEffect(() => {
-        console.log(suspensionStartDate, suspensionEndDate)
-    }, [suspensionStartDate, suspensionEndDate])
+        if (suspensionStartDateToday) {
+            setSuspensionStartDate(today.split('T')[0]);
+        }
+
+        if (suspensionStartDate && suspensionEndDate) {
+            calculateDuration();
+        }
+
+        if (suspensionType === SuspensionType.Permanent) {
+            setSuspensionEndDate(null)
+        }
+    }, [suspensionStartDate, suspensionEndDate, today, suspensionStartDateToday, suspensionType])
 
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
             {fetchedSuspension ? (
-               <DonorSuspensionCard userSuspension={fetchedSuspension}/>
+                <DonorSuspensionCard userSuspension={fetchedSuspension}/>
             ) : (
                 <>
                     {error && <ErrorAlert error={error} clearError={() => setError(null)}/>}
@@ -96,7 +102,13 @@ export function DonorSuspension({nic, fetchedSuspension, onSubmitedSuccessfully}
                         <FormLabel>Tipo de suspensão</FormLabel>
                         <RadioGroup
                             row
-                            onChange={(e) => setSuspensionType(Number(e.target.value) as SuspensionType)}
+                            onChange={(e) => {
+                                setMonths('')
+                                setDuration(0)
+                                setSuspensionStartDate(today.split('T')[0])
+                                setSuspensionEndDate('')
+                                setSuspensionType(Number(e.target.value) as SuspensionType)
+                            }}
                         >
                             <FormControlLabel value={SuspensionType.BetweenDonations} control={<Radio/>}
                                               label="Entre Dadivas"/>
@@ -110,12 +122,15 @@ export function DonorSuspension({nic, fetchedSuspension, onSubmitedSuccessfully}
                             <InputLabel>Duração</InputLabel>
                             <Select
                                 value={months}
-                                onChange={(e) => setMonths(e.target.value)}
+                                onChange={(e) => {
+                                    setMonths(e.target.value);
+                                    calculateSuspensionEndDate(Number(e.target.value))
+                                }}
                                 label="Duração"
                                 required
                             >
-                                <MenuItem value="2">2 Meses</MenuItem>
                                 <MenuItem value="3">3 Meses</MenuItem>
+                                <MenuItem value="4">4 Meses</MenuItem>
                             </Select>
 
                         </FormControl>
@@ -155,7 +170,6 @@ export function DonorSuspension({nic, fetchedSuspension, onSubmitedSuccessfully}
                                         InputLabelProps={{shrink: true}}
                                         value={suspensionStartDate}
                                         onChange={(e) => setSuspensionStartDate(e.target.value)}
-                                        sx={{my: 1}}
                                     />
                                 )}
                                 <TextField
@@ -167,16 +181,6 @@ export function DonorSuspension({nic, fetchedSuspension, onSubmitedSuccessfully}
                                     required
                                 />
                             </Box>
-                            {/*suspensionStartDate && <Typography>
-                        Data de inicio: {suspensionStartDate}
-                    </Typography>*/}
-                            {/*suspensionEndDate && <Typography>
-                        Data do fim: {suspensionEndDate}
-                    </Typography>*/}
-
-                            {suspensionStartDate && suspensionEndDate && <Typography>
-                                Duração: {calculateDuration()}
-                            </Typography>}
                             <TextField
                                 sx={{width: '70%'}}
                                 multiline={true}
@@ -188,8 +192,39 @@ export function DonorSuspension({nic, fetchedSuspension, onSubmitedSuccessfully}
                             />
                         </Box>
                     )}
-                    <Button disabled={!suspensionStartDate || !suspensionEndDate} onClick={submitSuspension}
-                            sx={{color: 'error'}}>
+                    <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                        {suspensionStartDate && suspensionEndDate && (
+                            <>
+                                <Typography>
+                                    Data de inicio: {suspensionStartDate}
+                                </Typography>
+                                <Typography>
+                                    →
+                                </Typography>
+                            </>
+                        )}
+                        {suspensionEndDate && (
+                            <Typography>
+                                Data do fim: {suspensionEndDate}
+                            </Typography>
+                        )}
+                    </Box>
+
+                    {suspensionStartDate && suspensionEndDate && duration >= 0 &&
+                        <Typography>
+                            Duração: {duration} dia(s)
+                        </Typography>
+                    }
+                    <Button
+                        disabled={
+                            !suspensionStartDate ||
+                            (suspensionType !== SuspensionType.Permanent && !suspensionEndDate) ||
+                            (suspensionType !== SuspensionType.Permanent && duration <= 0) ||
+                            (suspensionType !== SuspensionType.BetweenDonations && reason.length === 0)
+                        }
+                        onClick={submitSuspension}
+                        sx={{color: 'error'}}
+                    >
                         Suspender
                     </Button>
                 </>)}

@@ -125,6 +125,7 @@ export function PendingSubmissions() {
                         if (data.reason === 'timeout' && currentReviewSubmissionRef.current === data.submissionId) {
                             alert(`O tempo de revisão da submissão expirou.`);
                             setForceCloseModal(true);
+                            setLockedByCurrentDoctor(null)
                         }
                     }
                     console.log('Updated locked submissions:', newSet);
