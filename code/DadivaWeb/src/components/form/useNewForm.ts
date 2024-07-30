@@ -5,12 +5,10 @@ import { Engine } from 'json-rules-engine';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
 import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useCurrentSession, useUpdateSessionStatus } from '../../session/Session';
 import { AccountStatus } from '../../services/users/models/LoginOutputModel';
-import { form } from './MockForm';
 
-export function useNewForm() {
+export function useNewForm(playgroundForm?: Form) {
   const session = useCurrentSession();
   const updateSessionStatus = useUpdateSessionStatus();
   const nic = session?.nic;
@@ -69,15 +67,16 @@ export function useNewForm() {
 
   useEffect(() => {
     const fetch = async () => {
-      /*const [error, res] = await handleRequest(FormServices.getForm());
+      if (playgroundForm) {
+        return playgroundForm;
+      }
+      const [error, res] = await handleRequest(FormServices.getForm());
       if (error) {
         handleError(error, setError, nav);
         return;
-      }*/
+      }
       // Mock form for tests
-      const res = form;
-
-      console.log('formfetched:' + res);
+      //res = form;
       return res;
     };
 
@@ -120,7 +119,7 @@ export function useNewForm() {
         setIsLoading(false);
       });
     }
-  }, [engine, formRawFetchData, isLoading, nav]);
+  }, [engine, formRawFetchData, isLoading, nav, playgroundForm]);
 
   useEffect(() => {
     if (!formRawFetchData) return;

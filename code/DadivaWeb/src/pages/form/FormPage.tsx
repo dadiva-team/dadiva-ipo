@@ -3,8 +3,12 @@ import React, { useState } from 'react';
 import FormWithRuleEngine from '../../components/form/FormWithRuleEngine';
 import { ReviewForm } from '../../components/form/ReviewForm';
 import { Box, Button } from '@mui/material';
+import { Form } from '../../domain/Form/Form';
 
-export function Form() {
+interface FormProps {
+  formPlayground?: Form;
+}
+export function FormPage({ formPlayground }: FormProps) {
   const {
     isLoading,
     error,
@@ -22,8 +26,8 @@ export function Form() {
     onEditRequest,
     onNextQuestion,
     onPrevQuestion,
-    submitForm
-  } = useNewForm();
+    submitForm,
+  } = useNewForm(formPlayground);
 
   const [reviewMode, setReviewMode] = useState(true);
 
@@ -66,6 +70,7 @@ export function Form() {
         showQuestions={showQuestions}
         onEditRequest={(questionId, type, answer) => onChangeAnswer(questionId, type, answer)}
         onSubmitRequest={() => submitForm()}
+        isPlaygroundTest={formPlayground != undefined}
       />
       <Button onClick={() => setReviewMode(!reviewMode)}>Review</Button>
     </Box>

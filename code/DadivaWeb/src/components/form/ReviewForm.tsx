@@ -15,6 +15,7 @@ interface ReviewFormProps {
   showQuestions: Record<string, boolean>[];
   onEditRequest: (questionId: string, type: string, answer: string) => void;
   onSubmitRequest: () => void;
+  isPlaygroundTest: boolean;
 }
 
 interface ItemProps {
@@ -29,6 +30,7 @@ export function ReviewForm({
   showQuestions,
   onEditRequest,
   onSubmitRequest,
+  isPlaygroundTest,
 }: ReviewFormProps) {
   const [open, setOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<Question>(null);
@@ -175,7 +177,7 @@ export function ReviewForm({
             </Grid>
           </Box>
         ))}
-      {formData && (
+      {formData && !isPlaygroundTest && (
         <Button
           onClick={onSubmitRequest}
           variant="contained"

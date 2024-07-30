@@ -24,7 +24,7 @@ public class Token
                 new Claim("name", user.Name),
                 new Claim("perms", user.Role.ToString())
             },
-            expires: DateTime.Now.AddMinutes(30),
+            expires: DateTime.Now.AddMinutes(1),
             signingCredentials: credentials
         );
 

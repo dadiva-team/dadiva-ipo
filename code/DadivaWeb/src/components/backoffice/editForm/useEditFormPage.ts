@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Group as GroupDomain, Question, ShowCondition } from '../../../domain/Form/Form';
 import { FormServices } from '../../../services/from/FormServices';
 import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
+import { Uris } from '../../../utils/navigation/Uris';
+import BACKOFFICE = Uris.BACKOFFICE;
 
 export function useEditFormPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,7 +19,7 @@ export function useEditFormPage() {
   };
 
   const [deletingQuestion, setDeletingQuestion] = useState<DeletingQuestionState>(null);
-
+  const [formPlaygroundModalOpen, setFormPlaygroundModalOpen] = useState(false);
   const [creatingQuestion, setCreatingQuestion] = useState(false);
 
   const [editingGroup, setEditingGroup] = useState<GroupDomain>(null);
@@ -267,7 +269,7 @@ export function useEditFormPage() {
       return {
         groups: updatedGroups,
         rules: newRules,
-        formVersion: oldForm.formVersion
+        formVersion: oldForm.formVersion,
       };
     });
   }
@@ -345,7 +347,7 @@ export function useEditFormPage() {
       return {
         groups: newGroups,
         rules: calculateRules(newGroups),
-        formVersion: oldForm.formVersion
+        formVersion: oldForm.formVersion,
       };
     });
   }
@@ -396,7 +398,7 @@ export function useEditFormPage() {
         return {
           groups: reorderedGroups,
           rules: calculateRules(reorderedGroups),
-          formVersion: oldForm.formVersion
+          formVersion: oldForm.formVersion,
         };
       });
     }
@@ -422,7 +424,7 @@ export function useEditFormPage() {
         ...oldForm,
         groups: reorderedGroups,
         rules: newRules,
-        formVersion: oldForm.formVersion
+        formVersion: oldForm.formVersion,
       };
     });
   }
@@ -451,10 +453,23 @@ export function useEditFormPage() {
     });
   }
 
-  function saveForm() {
-    FormServices.saveForm(formFetchData).then(res => {
-      if (res) nav('/');
-    });
+  const closeModalPlayground = () => {
+    setFormPlaygroundModalOpen(false);
+  };
+
+  const openModalPlayground = () => {
+    setFormPlaygroundModalOpen(true);
+  };
+
+  async function saveForm() {
+    const [error, res] = await handleRequest(FormServices.saveForm(formFetchData));
+
+    if (error) {
+      handleError(error, setError, nav);
+      return;
+    }
+
+    if (res) nav(BACKOFFICE);
   }
 
   return {
@@ -489,6 +504,9 @@ export function useEditFormPage() {
     handleAddQuestion,
     moveGroup,
     deleteGroup,
+    formPlaygroundModalOpen,
+    closeModalPlayground,
+    openModalPlayground,
     saveForm,
   };
 }

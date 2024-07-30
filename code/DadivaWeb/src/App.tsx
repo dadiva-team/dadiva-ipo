@@ -5,7 +5,7 @@ import Register from './pages/authentication/Register';
 import { Uris } from './utils/navigation/Uris';
 import Home from './pages/home/Home';
 import { Header } from './components/home/Header';
-import { Form } from './pages/form/Form';
+import { FormPage } from './pages/form/FormPage';
 import { Backoffice } from './pages/backoffice/Backoffice';
 import { BackofficeMockChart } from './components/backoffice/BackofficeMockChart';
 import { EditTermsPage } from './pages/backoffice/EditTermsPage';
@@ -99,7 +99,7 @@ export default function App() {
             path={FORM}
             element={
               <ProtectedRoute roles={[Role.DONOR, Role.DOCTOR, Role.ADMIN]}>
-                <Form />
+                <FormPage />
               </ProtectedRoute>
             }
           />
