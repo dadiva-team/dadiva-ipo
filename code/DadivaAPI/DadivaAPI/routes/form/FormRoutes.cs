@@ -17,21 +17,26 @@ public static class FormRoutes
     {
         var group = app.MapGroup("/forms");
         group.MapGet("/structure", GetForm).RequireAuthorization("donor");
-        group.MapGet("/structure/{version:int}", GetFormWithVersion).AllowAnonymous();//.RequireAuthorization("doctor");
+        group.MapGet("/structure/{version:int}", GetFormWithVersion)
+            .AllowAnonymous(); //.RequireAuthorization("doctor");
         group.MapPost("/submissions/{nic:int}", SubmitForm).RequireAuthorization("donor");
 
         group.MapPut("/structure", EditForm).RequireAuthorization("admin");
         group.MapPut("/inconsistencies", EditInconsistencies).RequireAuthorization("admin");
 
         group.MapGet("/submissions", GetPendingSubmissions).RequireAuthorization("doctor");
-        group.MapGet("/submissions/{nic:int}", GetPendingSubmission).AllowAnonymous();//.RequireAuthorization("doctor");
-        group.MapGet("/submissions/history/{nic:int}", GetSubmissionHistory).AllowAnonymous();//.RequireAuthorization("doctor");
-        group.MapPost("/submissions/{submissionId:int}/lock", LockSubmission).AllowAnonymous();//RequireAuthorization("doctor");
-        group.MapPost("/submissions/{submissionId:int}/unlock", UnlockSubmission).AllowAnonymous();//RequireAuthorization("doctor");
+        group.MapGet("/submissions/{nic:int}", GetPendingSubmission)
+            .AllowAnonymous(); //.RequireAuthorization("doctor");
+        group.MapGet("/submissions/history/{nic:int}", GetSubmissionHistory)
+            .AllowAnonymous(); //.RequireAuthorization("doctor");
+        group.MapPost("/submissions/{submissionId:int}/lock", LockSubmission)
+            .AllowAnonymous(); //RequireAuthorization("doctor");
+        group.MapPost("/submissions/{submissionId:int}/unlock", UnlockSubmission)
+            .AllowAnonymous(); //RequireAuthorization("doctor");
         //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor");
         group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor");
         group.MapPost("/review/{submissionId:int}", ReviewForm).RequireAuthorization("doctor");
-        
+
         app.MapGet("/notifications", async context =>
         {
             context.Response.Headers["Content-Type"] = "text/event-stream";
@@ -82,8 +87,9 @@ public static class FormRoutes
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
-    
-    private static async Task<IResult> GetSubmissionHistory([FromRoute] int nic, [FromQuery] int limit, [FromQuery] int skip, IFormService service)
+
+    private static async Task<IResult> GetSubmissionHistory([FromRoute] int nic, [FromQuery] int limit,
+        [FromQuery] int skip, IFormService service)
     {
         var result = await service.GetSubmissionHistoryByNic(nic, limit, skip);
         return result switch
@@ -93,15 +99,14 @@ public static class FormRoutes
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
-    
+
     private static async Task<IResult> GetForm(IFormService service, ClaimsPrincipal user)
     {
-        
         (user.Identity as ClaimsIdentity).Claims.ToList().ForEach(claim =>
         {
             Console.Out.WriteLine(claim.Type + ": " + claim.Value);
         });
-        
+
         var options = new JsonSerializerOptions();
         options.Converters.Add(new JsonStringEnumConverter());
 
@@ -111,18 +116,16 @@ public static class FormRoutes
         {
             Result<GetFormOutputModel, Problem>.SuccessResult success =>
                 Results.Json(new GetFormOutputModel(
-                        success.Value.Groups,
-                        success.Value.Rules,
-                        success.Value.FormVersion
-                    ),
-                    options,
-                    statusCode: 200),
+                    success.Value.Groups,
+                    success.Value.Rules,
+                    success.Value.FormVersion
+                ), options, statusCode: 200),
             Result<GetFormOutputModel, Problem>.FailureResult failure =>
                 Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
-    
+
     private static async Task<IResult> GetFormWithVersion([FromRoute] int version, IFormService service)
     {
         Result<GetFormWithVersionOutputModel, Problem> result = await service.GetFormWithVersion(version);
@@ -172,9 +175,12 @@ public static class FormRoutes
         };
     }
 
-    private static async Task<IResult> EditForm(HttpContext context, [FromBody] EditFormRequest input, IFormService service)
+    private static async Task<IResult> EditForm(HttpContext context, [FromBody] EditFormRequest input,
+        IFormService service)
     {
-        var user = new User(int.Parse(context.User.Claims.First(claim => claim.Type == "nic").Value), context.User.Claims.First(claim => claim.Type == "name").Value, "", Enum.Parse<Role>(context.User.Claims.First(claim => claim.Type == "perms").Value));
+        var user = new User(int.Parse(context.User.Claims.First(claim => claim.Type == "nic").Value),
+            context.User.Claims.First(claim => claim.Type == "name").Value, "",
+            Enum.Parse<Role>(context.User.Claims.First(claim => claim.Type == "perms").Value));
         Result<Form, Problem> result = await service.EditForm(input.Groups, input.Rules, user);
         return result switch
         {
@@ -215,7 +221,9 @@ public static class FormRoutes
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
-    private static async Task<IResult> LockSubmission([FromRoute] int submissionId, [FromBody] SubmissionLockRequest input, IFormService service)
+
+    private static async Task<IResult> LockSubmission([FromRoute] int submissionId,
+        [FromBody] SubmissionLockRequest input, IFormService service)
     {
         var result = await service.LockSubmission(submissionId, input.DoctorId);
         return result switch
@@ -226,7 +234,8 @@ public static class FormRoutes
         };
     }
 
-    private static async Task<IResult> UnlockSubmission([FromRoute] int submissionId, [FromBody] SubmissionUnlockRequest input, IFormService service)
+    private static async Task<IResult> UnlockSubmission([FromRoute] int submissionId,
+        [FromBody] SubmissionUnlockRequest input, IFormService service)
     {
         var result = await service.UnlockSubmission(submissionId, input.DoctorId);
         return result switch
@@ -236,23 +245,24 @@ public static class FormRoutes
             _ => throw new Exception("Unexpected result")
         };
     }
-    
-    private static async Task<IResult> ReviewForm(int submissionId, [FromBody] ReviewFormRequest input, IFormService service)
+
+    private static async Task<IResult> ReviewForm(int submissionId, [FromBody] ReviewFormRequest input,
+        IFormService service)
     {
         try
         {
-            Result<Review, Problem> result = await service.ReviewForm(submissionId, input.DoctorNic, input.Status, input.FinalNote, input.Notes);
+            Result<Review, Problem> result = await service.ReviewForm(submissionId, input.DoctorNic, input.Status,
+                input.FinalNote, input.Notes);
             return result switch
-                {
-                    Result<Review, Problem>.SuccessResult success => Results.NoContent(),
-                    Result<Review, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-                    _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
-                };
+            {
+                Result<Review, Problem>.SuccessResult success => Results.NoContent(),
+                Result<Review, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+                _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
+            };
         }
         catch (Exception ex)
         {
             return Results.BadRequest(ex.Message);
         }
     }
-    
 }

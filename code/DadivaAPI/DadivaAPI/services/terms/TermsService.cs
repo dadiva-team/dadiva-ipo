@@ -85,8 +85,6 @@ public class TermsService(IRepository repository) : ITermsService
         );
         
         curTerms.Content = newContent;
-        curTerms.LastModifiedBy = updatedBy;
-        curTerms.LastModifiedAt = DateTime.UtcNow;
 
         await repository.UpdateTerms(curTerms, changes);
         return Result<Boolean, Problem>.Success(true);

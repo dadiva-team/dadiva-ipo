@@ -72,8 +72,6 @@ public class InitialData
         "<p>Test1</p>",
         Admin.Nic,
         DateTime.UtcNow,
-        Admin.Nic,
-        DateTime.UtcNow,
         true
     );
 
@@ -82,8 +80,6 @@ public class InitialData
         "Test Terms 2",
         "<p>Test2</p>",
         Admin.Nic,
-        DateTime.UtcNow,
-        null,
         DateTime.UtcNow,
         false
     );

@@ -1,13 +1,14 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Form} from '../../domain/Form/Form';
-import {Engine} from 'json-rules-engine';
-import {handleError, handleRequest} from '../../services/utils/fetch';
-import {FormServices} from '../../services/from/FormServices';
-import {updateFormAnswers, updateQuestionColors, updateShowQuestions} from './utils/FormUtils';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Form } from '../../domain/Form/Form';
+import { Engine } from 'json-rules-engine';
+import { handleError, handleRequest } from '../../services/utils/fetch';
+import { FormServices } from '../../services/from/FormServices';
+import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {useCurrentSession, useUpdateSessionStatus} from '../../session/Session';
-import {AccountStatus} from "../../services/users/models/LoginOutputModel";
+import { useCurrentSession, useUpdateSessionStatus } from '../../session/Session';
+import { AccountStatus } from '../../services/users/models/LoginOutputModel';
+import { form } from './MockForm';
 
 export function useNewForm() {
   const session = useCurrentSession();
@@ -60,7 +61,7 @@ export function useNewForm() {
     }
     console.log('Form saved');
     if (res) {
-      console.log('res ',res)
+      console.log('res ', res);
       updateSessionStatus(AccountStatus.PendingReview, res);
       nav('/');
     }
@@ -68,13 +69,15 @@ export function useNewForm() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [error, res] = await handleRequest(FormServices.getForm());
+      /*const [error, res] = await handleRequest(FormServices.getForm());
       if (error) {
         handleError(error, setError, nav);
         return;
-      }
+      }*/
       // Mock form for tests
-      //res = form;
+      const res = form;
+
+      console.log('formfetched:' + res);
       return res;
     };
 
