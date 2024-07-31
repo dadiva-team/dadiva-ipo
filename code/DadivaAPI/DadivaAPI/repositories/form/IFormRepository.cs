@@ -1,38 +1,37 @@
-using DadivaAPI.domain;
-using DadivaAPI.services.form.dtos;
+using DadivaAPI.repositories.Entities;
 
 namespace DadivaAPI.repositories.form;
 
 public interface IFormRepository
 {
-    public Task<Form> GetForm();
+    public Task<FormEntity> GetForm();
     
-    public Task<Form?> GetFormWithVersion(int version);
+    public Task<FormEntity?> GetFormWithVersion(int version);
     
-    public Task<Form> EditForm(Form form);
+    public Task<FormEntity> EditForm(FormEntity form);
     
-    public Task<bool> SubmitForm(Submission submission);
+    public Task<bool> SubmitForm(SubmissionEntity submission);
     
-    public Task<List<SubmissionPendingDto>?> GetPendingSubmissions();
+    public Task<List<SubmissionEntity>?> GetPendingSubmissions();
     
-    public Task<Submission> GetSubmission(int nic);
-    public Task<Submission?> GetSubmissionById(int id);
+    public Task<SubmissionEntity> GetSubmission(int nic);
+    public Task<SubmissionEntity?> GetSubmissionById(int id);
 
-    public Task<SubmissionPendingDto?> GetLatestPendingSubmissionByUser(int userNic);
+    public Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(int userNic);
 
-    public Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip);
+    public Task<(List<SubmissionEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip);
     
-    public Task<Inconsistencies> GetInconsistencies();
+    public Task<InconsistencyEntity> GetInconsistencies();
     
     public Task<bool> LockSubmission(int submissionId, int doctorId);
     
     public Task<bool> UnlockSubmission(int submissionId, int doctorId);
 
-    public Task<List<SubmissionLock>> GetExpiredLocks(TimeSpan timeout);
+    public Task<List<SubmissionEntity>> GetExpiredLocks(TimeSpan timeout);
 
     public Task<bool> SubmissionExists(int id);
-    public Task<Review> AddReview(Review review);
+    public Task<ReviewEntity> AddReview(ReviewEntity review);
     
-    public Task<bool> AddNote(Note note);
-    public Task<bool> EditInconsistencies(Inconsistencies inconsistencies);
+    public Task<bool> AddNote(string note, int submissionId);
+    public Task<bool> EditInconsistencies(InconsistencyEntity inconsistencies);
 }
