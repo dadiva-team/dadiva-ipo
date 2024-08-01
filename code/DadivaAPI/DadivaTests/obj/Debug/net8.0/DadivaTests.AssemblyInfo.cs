@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DadivaTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3f5db9f863d798ad0ee3fc7cd80921e6ab5a095")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("DadivaTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DadivaTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

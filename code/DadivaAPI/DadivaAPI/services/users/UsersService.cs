@@ -1,6 +1,7 @@
 using DadivaAPI.domain;
 using DadivaAPI.domain.user;
 using DadivaAPI.repositories;
+using DadivaAPI.routes.users.models;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
 using FluentResults;
@@ -84,10 +85,8 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
         });
     }
 
-    public async Task<Result<List<UserExternalInfo>>> GetUsers(string token)
+    public async Task<Result<List<UserExternalInfo>>> GetUsers()
     {
-        //TODO add check user authentication, can users be null(beyond an error case)?
-        // idk know what this to do is
         return await context.WithTransaction(async () =>
         {
             var users = (await repository.GetUsers()).Select(user => user.ToDomain())
@@ -119,56 +118,120 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
         });
     }
 
-    public async Task<Result> AddSuspension(UserSuspensionRequest suspensionRequest)
+    public async Task<Result> AddSuspension( 
+        string donorNic,
+        string doctorNic,
+        string type,
+        string startDate,
+        string? endDate,
+        string? reason,
+        string? note
+        )
     {
         return await context.WithTransaction(async () =>
         {
-            var suspendedUser = (await repository.GetUserByNic(suspensionRequest.UserNic))?.ToDomain();
-            var doctorUser = (await repository.GetUserByNic(suspensionRequest.SuspendedBy))?.ToDomain();
+            var suspendedUser = (await repository.GetUserByNic(donorNic))?.ToDomain();
+            var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
 
             if (suspendedUser == null)
-                return Result.Fail(new UserError.TokenCreationError()); //TODO: Custom Error
+                return Result.Fail(new UserError.UnknownDonor());
 
             if (doctorUser == null)
-                return Result.Fail(new UserError.TokenCreationError()); //TODO: Custom Error
+                return Result.Fail(new UserError.UnknownDoctor());
 
             DateTime? suspensionEndDate = null;
-            var suspensionStartDate = DateTime.Parse(suspensionRequest.SuspensionStartDate).ToUniversalTime();
-            if (suspensionRequest.SuspensionEndDate != null)
+            var suspensionStartDate = DateTime.Parse(startDate).ToUniversalTime();
+            if (endDate != null)
             {
-                suspensionEndDate = DateTime.Parse(suspensionRequest.SuspensionEndDate).ToUniversalTime();
+                suspensionEndDate = DateTime.Parse(endDate).ToUniversalTime();
+            }
+
+            if (!Enum.TryParse<SuspensionType>(type, out var parsedType))
+            {
+                return Result.Fail(new UserError.InvalidSuspensionTypeError());
             }
 
             var suspension = new Suspension(suspendedUser, doctorUser, suspensionStartDate,
-                suspensionRequest.SuspensionType,
-                suspensionRequest.SuspensionNote, suspensionRequest.Reason, suspensionEndDate);
+                parsedType,note, reason, suspensionEndDate);
 
             bool success = await repository.AddSuspension(suspension.ToEntity());
             return !success
-                ? Result.Fail(new UserError.TokenCreationError()) //TODO: Custom Error
+                ? Result.Fail(new UserError.UnknownError())
                 : Result.Ok();
         });
     }
 
-    public async Task<Result> UpdateSuspension(Suspension suspension)
+    public async Task<Result> UpdateSuspension(
+        string donorNic,
+        string doctorNic,
+        string startDate,
+        string type,
+        string? endDate,
+        string? note,
+        string? reason
+        )
     {
         return await context.WithTransaction(async () =>
         {
-            var success = await repository.UpdateSuspension(suspension.ToEntity());
+            
+            var suspensionEntity = await repository.GetSuspension(donorNic);
+            if (suspensionEntity is null)
+            {
+                return Result.Fail(new UserError.UserHasNoSuspensionError());
+            }
+            
+
+            suspensionEntity.StartDate = DateTime.Parse(startDate).ToUniversalTime();
+            suspensionEntity.Type = type;
+
+            if (endDate is not null && type != "permanent")
+            {
+                suspensionEntity.EndDate = DateTime.Parse(endDate).ToUniversalTime();
+            }
+            else
+            {
+                return Result.Fail(new UserError.InvalidEndDateTypeError());
+            }
+            
+            var doctorEntity = await repository.GetUserByNic(doctorNic);
+            
+            if (doctorEntity is null)
+            {
+                return Result.Fail(new UserError.UnknownDoctor());
+            }
+
+            suspensionEntity.Doctor = doctorEntity;
+            suspensionEntity.Note = note;
+            suspensionEntity.Reason = reason;
+            
+            var success = await repository.UpdateSuspension(suspensionEntity);
             return !success
-                ? Result.Fail(new UserError.TokenCreationError()) //TODO: Custom Error
+                ? Result.Fail(new UserError.UnknownError())
                 : Result.Ok();
         });
     }
 
-    public async Task<Result<Suspension>> GetSuspension(string userNic)
+    public async Task<Result<SuspensionWithNamesExternalInfo>> GetSuspension(string userNic)
     {
         return await context.WithTransaction(async () =>
         {
-            var suspension = await repository.GetSuspension(userNic);
-            return suspension == null
-                ? Result.Fail(new UserError.TokenCreationError()) //TODO: Custom Error
-                : Result.Ok(suspension.ToDomain());
+            var suspensionEntity = await repository.GetSuspension(userNic);
+            if (suspensionEntity is null)
+            {
+                return Result.Fail(new UserError.TokenCreationError());
+            }
+            
+            return Result.Ok( new SuspensionWithNamesExternalInfo(
+                    suspensionEntity.Donor.Nic,
+                    suspensionEntity.Donor.Name,
+                    suspensionEntity.Doctor.Nic,
+                    suspensionEntity.Doctor.Name,
+                    suspensionEntity.Type,
+                    suspensionEntity.StartDate.ToString(),
+                    suspensionEntity.EndDate?.ToString(),
+                    suspensionEntity.Reason,
+                    suspensionEntity.Note
+                    ));
         });
     }
 

@@ -5580,19 +5580,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Wild\\.nuget\\packages\\": {}
+    "C:\\Users\\Luis\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Wild\\Desktop\\Cadeiras\\6\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaTests\\DadivaTests.csproj",
+      "projectUniqueName": "C:\\Users\\Luis\\Desktop\\ISEL\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaTests\\DadivaTests.csproj",
       "projectName": "DadivaTests",
-      "projectPath": "C:\\Users\\Wild\\Desktop\\Cadeiras\\6\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaTests\\DadivaTests.csproj",
-      "packagesPath": "C:\\Users\\Wild\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Wild\\Desktop\\Cadeiras\\6\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaTests\\obj\\",
+      "projectPath": "C:\\Users\\Luis\\Desktop\\ISEL\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaTests\\DadivaTests.csproj",
+      "packagesPath": "C:\\Users\\Luis\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Luis\\Desktop\\ISEL\\PS\\dadiva-ipo\\code\\DadivaAPI\\DadivaTests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Wild\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Luis\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -5655,7 +5655,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

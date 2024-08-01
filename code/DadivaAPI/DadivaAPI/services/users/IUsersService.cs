@@ -1,5 +1,3 @@
-using DadivaAPI.domain;
-using DadivaAPI.domain.user;
 using DadivaAPI.services.users.dtos;
 using FluentResults;
 
@@ -19,17 +17,33 @@ public interface IUsersService
         string? placeOfBirth
     );
 
-    public Task<Result<List<UserExternalInfo>>> GetUsers(string token);
+    public Task<Result<List<UserExternalInfo>>> GetUsers();
 
     public Task<Result> DeleteUser(string nic);
 
     public Task<Result<UserWithNameExternalInfo>> CheckNicExistence(string nic);
 
-    public Task<Result> AddSuspension(UserSuspensionRequest suspensionRequest);
+    public Task<Result> AddSuspension(
+        string donorNic,
+        string doctorNic,
+        string type,
+        string startDate,
+        string? endDate,
+        string? reason,
+        string? note
+    );
 
-    public Task<Result> UpdateSuspension(Suspension suspension);
+    public Task<Result> UpdateSuspension(
+        string donorNic,
+        string doctorNic,
+        string startDate,
+        string type,
+        string? endDate,
+        string? note,
+        string? reason
+    );
 
-    public Task<Result<Suspension>> GetSuspension(string userNic);
+    public Task<Result<SuspensionWithNamesExternalInfo>> GetSuspension(string userNic);
 
     public Task<Result> DeleteSuspension(string userNic);
 }

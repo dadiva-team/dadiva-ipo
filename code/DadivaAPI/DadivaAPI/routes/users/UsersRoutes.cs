@@ -1,13 +1,7 @@
-using DadivaAPI.domain;
-using DadivaAPI.domain.user;
 using DadivaAPI.routes.users.models;
 using DadivaAPI.routes.utils;
 using DadivaAPI.services.users;
-using DadivaAPI.services.users.dtos;
-using DadivaAPI.utils;
-using Elastic.Clients.Elasticsearch.Core.TermVectors;
 using FluentResults;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DadivaAPI.routes.users;
@@ -27,8 +21,8 @@ public static class UsersRoutes
 
         usersGroup.MapPost("/suspension", AddSuspension).AllowAnonymous();
         usersGroup.MapPost("/suspension/update", UpdateSuspension).AllowAnonymous();
-        usersGroup.MapGet("/suspension/{nic:int}", GetSuspension).AllowAnonymous();
-        usersGroup.MapDelete("/suspension/{nic:int}", DeleteSuspension).AllowAnonymous();
+        usersGroup.MapGet("/suspension/{nic}", GetSuspension).AllowAnonymous();
+        usersGroup.MapDelete("/suspension/{nic}", DeleteSuspension).AllowAnonymous();
     }
 
     private static async Task<IResult> CreateToken(HttpContext http, [FromBody] CreateTokenInputModel input,
@@ -63,7 +57,7 @@ public static class UsersRoutes
 
     private static async Task<IResult> GetUsers(IUsersService service)
     {
-        return (await service.GetUsers("Need to validate role")).HandleRequest(ueis =>
+        return (await service.GetUsers()).HandleRequest(ueis =>
         {
             return Results.Ok(new GetUsersOutputModel(ueis.Select(uei => uei.Nic).ToList()));
         });
@@ -82,41 +76,53 @@ public static class UsersRoutes
         );
     }
 
-    private static async Task<IResult> AddSuspension([FromBody] AddSuspensionInputModel suspension, IUsersService service)
+    private static async Task<IResult> AddSuspension([FromBody] AddSuspensionInputModel suspension,
+        IUsersService service)
     {
-        return (await service.AddSuspension(suspension)).HandleRequest(Results.Created);
+        return (await service.AddSuspension(suspension.DonorNic, suspension.DoctorNic,
+                suspension.Type, suspension.StartDate, suspension.EndDate,
+                suspension.Reason, suspension.Note))
+            .HandleRequest(Results.Created);
     }
 
-    private static async Task<IResult> UpdateSuspension([FromBody] UpdateSuspensionInputModel suspension, IUsersService service)
+    private static async Task<IResult> UpdateSuspension([FromBody] UpdateSuspensionInputModel suspension,
+        IUsersService service)
     {
-        var result = await service.UpdateSuspension(suspension);
-        return result switch
-        {
-            Result<bool, Problem>.SuccessResult => Results.NoContent(),
-            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("Unexpected result")
-        };
+        return (await service.UpdateSuspension(
+                suspension.DonorNic,
+                suspension.DoctorNic,
+                suspension.StartDate,
+                suspension.Type,
+                suspension.EndDate,
+                suspension.Note,
+                suspension.Reason)
+            ).HandleRequest(Results.NoContent);
     }
 
-    private static async Task<IResult> GetSuspension([FromRoute] int nic, IUsersService service)
+    private static async Task<IResult> GetSuspension([FromRoute] string nic, IUsersService service)
     {
-        var result = await service.GetSuspension(nic);
-        return result switch
-        {
-            Result<UserSuspension?, Problem>.SuccessResult success => Results.Ok(success.Value),
-            Result<UserSuspension?, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("Unexpected result")
-        };
+        return (await service.GetSuspension(nic)).HandleRequest(
+            suspension =>
+            {
+                var outputModel = new GetSuspensionOutputModel(
+                    suspension.DonorNic,
+                    suspension.DonorName,
+                    suspension.DoctorNic,
+                    suspension.DoctorName,
+                    suspension.SuspensionType,
+                    suspension.SuspensionStartDate,
+                    suspension.SuspensionEndDate,
+                    suspension.Reason,
+                    suspension.SuspensionNote
+                );
+
+                return Results.Ok(outputModel);
+            }
+        );
     }
 
-    private static async Task<IResult> DeleteSuspension([FromRoute] int nic, IUsersService service)
+    private static async Task<IResult> DeleteSuspension([FromRoute] string nic, IUsersService service)
     {
-        var result = await service.DeleteSuspension(nic);
-        return result switch
-        {
-            Result<bool, Problem>.SuccessResult => Results.NoContent(),
-            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("Unexpected result")
-        };
+        return (await service.DeleteSuspension(nic)).HandleRequest(Results.NoContent);
     }
 }
