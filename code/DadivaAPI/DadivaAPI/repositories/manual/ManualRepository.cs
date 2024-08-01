@@ -1,42 +1,22 @@
-using DadivaAPI.domain;
-using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.QueryDsl;
-using Microsoft.IdentityModel.Tokens;
+using DadivaAPI.repositories.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.repositories.manual;
 
-public class ManualRepository(ElasticsearchClient client) : IManualRepository
+public class ManualRepository : IManualRepository
 {
-    private const string ManualIndex = "manual";
+    private readonly DadivaDbContext _context;
 
-    public async Task<List<ManualInformation>> GetManualInformations(List<string> manualEntries)
+    public ManualRepository(DadivaDbContext context)
     {
-        var termsQueryField = new TermsQueryField(manualEntries.Select(FieldValue.String).ToList());
+        _context = context;
+    }
 
-
-        var response = await client.SearchAsync<ManualInformation>(
-            idx =>
-                idx
-                    .Index(ManualIndex)
-                    .Query(new TermsQuery
-                    {
-                        Field = "groupName.keyword",
-                        Terms = termsQueryField
-                    })
-        );
-
-        if (!response.IsValidResponse)
-        {
-            throw new Exception("Search query failed", response.ApiCallDetails.OriginalException);
-        }
-
-        Console.Out.WriteLine("GetManualInformations response:");
-        if (response.Documents.IsNullOrEmpty()) Console.Out.WriteLine("No response entries found");
-        foreach (var document in response.Documents)
-        {
-            Console.Out.WriteLine(document);
-        }
-        
-        return response.Documents.ToList();
+    public async Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts)
+    {
+        return await _context.Cfts
+            .Where(c => cfts.Contains(c.Name))
+            .Select(c => c.ManualEntry)
+            .ToListAsync();
     }
 }

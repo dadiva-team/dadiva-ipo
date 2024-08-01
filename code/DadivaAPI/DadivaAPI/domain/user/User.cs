@@ -1,21 +1,64 @@
-namespace DadivaAPI.domain;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.RegularExpressions;
+using Isopoh.Cryptography.Argon2;
+using Microsoft.IdentityModel.Tokens;
 
-public record User(int Nic, string Name, string HashedPassword, Role Role)
+namespace DadivaAPI.domain.user;
+
+public partial record User(
+    string Nic,
+    string Name,
+    string HashedPassword,
+    List<Role> Roles,
+    string? Token = null,
+    bool? IsVerified = null,
+    DateTime? DateOfBirth = null,
+    string? PlaceOfBirth = null)
 {
+    [GeneratedRegex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\[\]{}|;:'"",.<>?/`~]).*$")]
+    private static partial Regex PasswordRegex();
+
     public static bool IsValidPassword(string password)
     {
-        return password.Length >= 8;
-        //return password.Length >= 8 && password.Any(char.IsDigit) && password.Any(char.IsUpper) && password.Any(char.IsLower);
+        return password.Length is >= 12 and <= 64 && PasswordRegex().IsMatch(password);
     }
 
-    public static bool IsValidNic(int nic)
+    public static bool IsValidNic(string nic)
     {
-        return nic.ToString().Length == 8;
+        return nic.Length == 8 && nic.All(char.IsDigit);
     }
 
     public static string HashPassword(string password)
     {
-        //TODO: TEMPORARY FAKE HASHING
-        return $"{password}hashed";
+        if (!IsValidPassword(password)) throw new ArgumentException("Invalid password");
+        return Argon2.Hash(password, secret: Environment.GetEnvironmentVariable("DADIVA_API_PASSWORD_PEPPER"));
+    }
+
+    public bool VerifyPassword(string password)
+    {
+        return Argon2.Verify(HashedPassword, password,
+            secret: Environment.GetEnvironmentVariable("DADIVA_API_PASSWORD_PEPPER"));
+    }
+
+    public string GenerateToken(string key, string issuer, string audience)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.Name, Nic),
+                new Claim(ClaimTypes.Role, GetType().Name)
+            }),
+            Expires = DateTime.UtcNow.AddDays(1),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+                SecurityAlgorithms.HmacSha256Signature),
+            Issuer = issuer,
+            Audience = audience
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
     }
 }

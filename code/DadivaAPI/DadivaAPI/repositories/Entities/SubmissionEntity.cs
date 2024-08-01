@@ -5,9 +5,9 @@ public class SubmissionEntity
     public int Id { get; set; }
     public required DateTime Date { get; set; }
     
-    public required DonorEntity Donor { get; set; }
+    public required UserEntity Donor { get; set; }
     
-    public DoctorEntity? LockedBy { get; set; }
+    public UserEntity? LockedBy { get; set; }
     
     public required FormEntity Form { get; set; }
     

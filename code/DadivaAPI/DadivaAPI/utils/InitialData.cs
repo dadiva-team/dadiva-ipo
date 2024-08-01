@@ -1,4 +1,5 @@
 using DadivaAPI.domain;
+using User = DadivaAPI.domain.user.User;
 
 namespace DadivaAPI.utils;
 

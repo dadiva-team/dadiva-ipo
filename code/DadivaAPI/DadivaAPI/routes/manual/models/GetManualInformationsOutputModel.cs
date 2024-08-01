@@ -7,7 +7,7 @@ public record ExampleOutputModel(
     List<string> Criteria
 )
 {
-    public static ExampleOutputModel FromDomain(Example domain)
+    public static ExampleOutputModel FromDomain(EntryExample domain)
     {
         return new ExampleOutputModel(domain.Examples, domain.Criteria);
     }
@@ -18,7 +18,7 @@ public record ManualInformationOutputModel(
     List<ExampleOutputModel> Examples
 )
 {
-    public static ManualInformationOutputModel FromDomain(ManualInformation domain)
+    public static ManualInformationOutputModel FromDomain(ManualEntry domain)
     {
         return new ManualInformationOutputModel(domain.GroupName,
             domain.Examples.Select(ExampleOutputModel.FromDomain).ToList());

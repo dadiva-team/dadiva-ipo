@@ -18,17 +18,17 @@ public static class ManualRoutes
     private static async Task<IResult> GetManualInformation([FromRoute] string product, IManualService service)
     {
         Console.Out.WriteLine("GetManualInformation product: " + product);
-        Result<List<ManualInformation>, Problem> result = await service.GetManualInformation(product);
-        foreach (var manualInformation in (result as Result<List<ManualInformation>, Problem>.SuccessResult).Value)
+        Result<List<ManualEntry>, Problem> result = await service.GetManualInformation(product);
+        foreach (var manualInformation in (result as Result<List<ManualEntry>, Problem>.SuccessResult).Value)
         {
             Console.Out.WriteLine(manualInformation);
         }
         return result switch
         {
-            Result<List<ManualInformation>, Problem>.SuccessResult success => Results.Ok(
+            Result<List<ManualEntry>, Problem>.SuccessResult success => Results.Ok(
                 new GetManualInformationsOutputModel(success.Value.Select(ManualInformationOutputModel.FromDomain)
                     .ToList())),
-            Result<List<ManualInformation>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<List<ManualEntry>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }

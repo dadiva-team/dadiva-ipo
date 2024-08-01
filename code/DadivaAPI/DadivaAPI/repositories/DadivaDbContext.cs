@@ -10,9 +10,6 @@ public class DadivaDbContext : DbContext
     }
     
     public DbSet<UserEntity> Users { get; set; }
-    public DbSet<DonorEntity> Donors { get; set; }
-    public DbSet<DoctorEntity> Doctors { get; set; }
-    public DbSet<AdminEntity> Admins { get; set; }
     
     public DbSet<SuspensionEntity> Suspensions { get; set; }
     

@@ -13,7 +13,7 @@ public class FormEntity
 
     public required List<SubmissionEntity> Submissions { get; set; }
 
-    public required AdminEntity Admin { get; set; }
+    public required UserEntity Admin { get; set; }
 
     public FormEntity? PreviousForm { get; set; }
     

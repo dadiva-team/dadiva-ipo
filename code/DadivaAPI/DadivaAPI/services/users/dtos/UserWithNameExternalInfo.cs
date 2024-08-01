@@ -1,3 +1,3 @@
 namespace DadivaAPI.services.users.dtos;
 
-public record UserWithNameExternalInfo(string Name, int Nic);
+public record UserWithNameExternalInfo(string Name, string Nic);

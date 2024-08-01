@@ -1,3 +1,3 @@
 namespace DadivaAPI.routes.users.models;
 
-public record CreateUserOutputModel(int Nic);
+public record CreateUserOutputModel(string Nic);

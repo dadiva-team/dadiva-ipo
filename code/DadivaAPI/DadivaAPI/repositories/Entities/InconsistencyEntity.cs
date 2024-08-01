@@ -10,7 +10,7 @@ public class InconsistencyEntity
     
     public required List<RuleEntity> Rules { get; set; }
     
-    public required AdminEntity Admin { get; set; }
+    public required UserEntity Admin { get; set; }
     
     public required FormEntity Form { get; set; }
     

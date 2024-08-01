@@ -1,24 +1,21 @@
-using DadivaAPI.domain;
+using DadivaAPI.repositories.Entities;
 
 namespace DadivaAPI.repositories.users;
 
 public interface IUsersRepository
 {
-    public Task<bool> AddUser(User user);
+    public Task<bool> AddUser(UserEntity user);
 
-    public Task<List<User>?> GetUsers();
+    public Task<List<UserEntity>> GetUsers();
 
-    public Task<User?> GetUserByNic(int nic);
+    public Task<UserEntity?> GetUserByNic(string nic);
+    
+    public Task<bool> UpdateUser(UserEntity user);
 
-    public Task<Boolean> DeleteUser(int nic);
-    
-    public Task<UserAccountStatus?> GetUserAccountStatus(int userNic);
-    
-    public Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
-    
-    public Task<bool> AddSuspension(UserSuspension suspension);
-    public Task<bool> UpdateSuspension(UserSuspension suspension);
-    public Task<UserSuspension?> GetSuspension(int userNic);
-    public Task<bool> DeleteSuspension(int userNic);
-    
+    public Task<bool> DeleteUser(string nic);
+
+    public Task<bool> AddSuspension(SuspensionEntity suspension);
+    public Task<bool> UpdateSuspension(SuspensionEntity suspension);
+    public Task<SuspensionEntity?> GetSuspension(string userNic);
+    public Task<bool> DeleteSuspension(string userNic);
 }

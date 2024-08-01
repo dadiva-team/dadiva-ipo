@@ -2,6 +2,7 @@ using DadivaAPI.domain;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.services.form.dtos;
 using DadivaAPI.utils;
+using User = DadivaAPI.domain.user.User;
 
 namespace DadivaAPI.services.form;
 

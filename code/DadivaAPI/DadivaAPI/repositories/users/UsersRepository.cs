@@ -1,105 +1,89 @@
-using DadivaAPI.domain;
+using DadivaAPI.repositories.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.repositories.users;
 
 public class UsersRepository : IUsersRepository
 {
-    
     private readonly DadivaDbContext _context;
-        
+
     public UsersRepository(DadivaDbContext context)
     {
         _context = context;
     }
 
-    public async Task<bool> AddUser(User user)
+    public async Task<bool> AddUser(UserEntity user)
     {
         await _context.Users.AddAsync(user);
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<List<User>?> GetUsers()
+    public async Task<List<UserEntity>> GetUsers()
     {
         return await _context.Users.ToListAsync();
     }
 
-    public async Task<User?> GetUserByNic(int nic)
+    public async Task<UserEntity?> GetUserByNic(string nic)
     {
-        foreach (var user in await _context.Users.ToListAsync())
-        {
-            Console.Out.WriteLine("nic: " + user.Nic + " name: " + user.Name + " password: " + user.HashedPassword + " role: " + user.Role);
-        }
-
         return await _context.Users.FindAsync(nic);
     }
 
-    public async Task<bool> DeleteUser(int nic)
+    public async Task<bool> UpdateUser(UserEntity user)
     {
-        _context.Users.Remove(await _context.Users.FindAsync(nic) ?? throw new Exception("User not found"));
-        return await _context.SaveChangesAsync() > 0;
-    }
-    
-    public async Task<UserAccountStatus?> GetUserAccountStatus(int userNic)
-    {
-        return await _context.UserAccountStatus
-            .FirstOrDefaultAsync(status => status.UserNic == userNic);
-    }
-
-    public async Task<bool> UpdateUserAccountStatus(UserAccountStatus userAccountStatus)
-    {
-        var existingStatus = await _context.UserAccountStatus.FindAsync(userAccountStatus.UserNic);
-        if (existingStatus == null)
+        if (await _context.Users.FindAsync(user.Nic) != user)
         {
-            await _context.UserAccountStatus.AddAsync(userAccountStatus);
+            return false;
         }
-        else
+        
+        _context.Users.Update(user);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteUser(string nic)
+    {
+        var user = await _context.Users.FindAsync(nic);
+        if (user == null)
         {
-            existingStatus.Status = userAccountStatus.Status;
-            existingStatus.SuspendedUntil = userAccountStatus.SuspendedUntil;
-            existingStatus.LastSubmissionDate = userAccountStatus.LastSubmissionDate;
-            existingStatus.LastSubmissionId = userAccountStatus.LastSubmissionId;
-            _context.UserAccountStatus.Update(existingStatus);
+            return false;
         }
+
+        _context.Users.Remove(user);
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> AddSuspension(UserSuspension suspension)
+    public async Task<bool> AddSuspension(SuspensionEntity suspension)
     {
-        await _context.UserSuspensions.AddAsync(suspension);
+        await _context.Suspensions.AddAsync(suspension);
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> UpdateSuspension(UserSuspension suspension)
+    public async Task<bool> UpdateSuspension(SuspensionEntity suspension)
     {
-        var existingSuspension = await _context.UserSuspensions.FindAsync(suspension.UserNic);
+        var existingSuspension = await _context.Suspensions.FindAsync(suspension.Id);
         if (existingSuspension == null)
         {
             return false;
         }
-        existingSuspension.SuspensionStartDate = suspension.SuspensionStartDate;
-        existingSuspension.SuspensionEndDate = suspension.SuspensionEndDate;
-        existingSuspension.Reason = suspension.Reason;
-        existingSuspension.SuspensionNote = suspension.SuspensionNote;
-        existingSuspension.SuspensionType = suspension.SuspensionType;
-        _context.UserSuspensions.Update(existingSuspension);
+
+        _context.Suspensions.Update(suspension);
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<UserSuspension?> GetSuspension(int userNic)
+    public async Task<SuspensionEntity?> GetSuspension(string userNic)
     {
-        return await _context.UserSuspensions
-            .FirstOrDefaultAsync(suspension => suspension.UserNic == userNic);
+        return await _context.Suspensions
+            .FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
     }
 
-    public async Task<bool> DeleteSuspension(int userNic)
+    public async Task<bool> DeleteSuspension(string userNic)
     {
-        var suspension = await _context.UserSuspensions.FindAsync(userNic);
+        var suspension = await _context.Suspensions.FindAsync(userNic);
         if (suspension == null)
         {
             return false;
         }
-        _context.UserSuspensions.Remove(suspension);
+
+        _context.Suspensions.Remove(suspension);
         return await _context.SaveChangesAsync() > 0;
     }
 }

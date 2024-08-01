@@ -14,5 +14,5 @@ public class TermsEntity
     
     public TermsEntity? PreviousTerms { get; set; }
     
-    public required AdminEntity Admin { get; set; }
+    public required UserEntity Admin { get; set; }
 }

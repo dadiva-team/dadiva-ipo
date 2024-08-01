@@ -5,5 +5,5 @@ namespace DadivaAPI.services.manual;
 
 public interface IManualService
 {
-    public Task<Result<List<ManualInformation>, Problem>> GetManualInformation(string productName);
+    public Task<Result<List<ManualEntry>, Problem>> GetManualInformation(string productName);
 }

@@ -11,6 +11,6 @@ public class SuspensionEntity
     [MaxLength(256)] public required DateTime? EndDate { get; set; }
     [MaxLength(256)] public required string Type { get; set; }
     
-    public required DonorEntity Donor { get; set; }
-    public required DoctorEntity Doctor { get; set; }
+    public required UserEntity Donor { get; set; }
+    public required UserEntity Doctor { get; set; }
 }

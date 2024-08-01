@@ -1,4 +1,4 @@
-using DadivaAPI.repositories.cftToManual;
+using DadivaAPI.repositories.Entities;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.manual;
 using DadivaAPI.repositories.medications;
@@ -8,14 +8,53 @@ using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.repositories;
 
-public class Repository(DadivaDbContext context, ElasticsearchClient client) : IRepository
+public class Repository(DadivaDbContext context) : IRepository
 {
     public IFormRepository FormRepository { get; } = new FormRepository(context);
     public IUsersRepository UserRepository { get; } = new UsersRepository(context);
     public ITermsRepository TermsRepository { get; } = new TermsRepository(context);
     public IMedicationsRepository MedicationRepository { get; } = new MedicationsRepository();
+    public IManualRepository ManualRepository { get; } = new ManualRepository(context);
+
+    public Task<UserEntity?> GetUserByNic(string nic)
+    {
+        return UserRepository.GetUserByNic(nic);
+    }
+
+    public Task<bool> AddUser(UserEntity user)
+    {
+        return UserRepository.AddUser(user);
+    }
+
+    public Task<bool> UpdateUser(UserEntity user)
+    {
+        return UserRepository.UpdateUser(user);
+    }
     
-    public ICftToManualRepository CftToManualRepository { get; } = new CftToManualRepository(context);
-    
-    public IManualRepository ManualRepository { get; } = new ManualRepository(client);
+    public Task<List<UserEntity>> GetUsers()
+    {
+        return UserRepository.GetUsers();
+    }
+
+    public Task<bool> DeleteUser(string nic)
+    {
+        return UserRepository.DeleteUser(nic);
+    }
+
+    public Task<bool> AddSuspension(SuspensionEntity suspension)
+    {
+        return UserRepository.AddSuspension(suspension);
+    }
+    public Task<bool> UpdateSuspension(SuspensionEntity suspension)
+    {
+        return UserRepository.UpdateSuspension(suspension);
+    }
+    public Task<SuspensionEntity?> GetSuspension(string userNic)
+    {
+        return UserRepository.GetSuspension(userNic);
+    }
+    public Task<bool> DeleteSuspension(string userNic)
+    {
+        return UserRepository.DeleteSuspension(userNic);
+    }
 }

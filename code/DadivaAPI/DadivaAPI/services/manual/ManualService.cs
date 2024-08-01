@@ -7,7 +7,7 @@ namespace DadivaAPI.services.manual;
 
 public class ManualService(IRepository repository) : IManualService
 {
-    public async Task<Result<List<ManualInformation>, Problem>> GetManualInformation(string productName)
+    public async Task<Result<List<ManualEntry>, Problem>> GetManualInformation(string productName)
     {
         Console.Out.WriteLine("Service.GetManualInformation product: " + productName);
         var manualEntries = await repository.GetManualEntriesFromCfts(await repository.GetCfts(productName));
@@ -17,6 +17,6 @@ public class ManualService(IRepository repository) : IManualService
         {
             Console.Out.WriteLine(manualEntry);
         }
-        return Result<List<ManualInformation>, Problem>.Success(await repository.GetManualInformations(manualEntries));
+        return Result<List<ManualEntry>, Problem>.Success(await repository.GetManualInformations(manualEntries));
     }
 }
