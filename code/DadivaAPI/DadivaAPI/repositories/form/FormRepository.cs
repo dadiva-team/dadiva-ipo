@@ -13,9 +13,9 @@ namespace DadivaAPI.repositories.form
             _context = context;
         }
         
-        public async Task<FormEntity> GetForm()
+        public async Task<FormEntity?> GetForm()
         {
-            return await _context.Forms.OrderBy(form => form.Date).LastOrDefaultAsync() ?? throw new Exception("Form not found");
+            return await _context.Forms.OrderBy(form => form.Date).LastOrDefaultAsync();
         }
         
         public async Task<FormEntity?> GetFormWithVersion(int version)

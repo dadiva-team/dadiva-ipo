@@ -134,10 +134,10 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
             var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
 
             if (suspendedUser == null)
-                return Result.Fail(new UserError.UnknownDonor());
+                return Result.Fail(new UserError.UnknownDonorError());
 
             if (doctorUser == null)
-                return Result.Fail(new UserError.UnknownDoctor());
+                return Result.Fail(new UserError.UnknownDoctorError());
 
             DateTime? suspensionEndDate = null;
             var suspensionStartDate = DateTime.Parse(startDate).ToUniversalTime();
@@ -197,7 +197,7 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
             
             if (doctorEntity is null)
             {
-                return Result.Fail(new UserError.UnknownDoctor());
+                return Result.Fail(new UserError.UnknownDoctorError());
             }
 
             suspensionEntity.Doctor = doctorEntity;

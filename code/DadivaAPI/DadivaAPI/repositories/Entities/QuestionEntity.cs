@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DadivaAPI.domain;
 
 namespace DadivaAPI.repositories.Entities;
 
@@ -10,4 +11,11 @@ public class QuestionEntity
     public List<string>? Options { get; set; }
     
     public required QuestionGroupEntity QuestionGroup { get; set; }
+
+    public Question ToDomain()
+    {
+        Enum.TryParse<ResponseType>(Type, true, out var parsedType);
+        return new Question(Id.ToString(), Text, parsedType, Options);
+
+    }
 }

@@ -4,7 +4,7 @@ namespace DadivaAPI.repositories.form;
 
 public interface IFormRepository
 {
-    public Task<FormEntity> GetForm();
+    public Task<FormEntity?> GetForm();
     
     public Task<FormEntity?> GetFormWithVersion(int version);
     

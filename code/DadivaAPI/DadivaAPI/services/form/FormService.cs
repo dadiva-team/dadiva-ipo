@@ -1,79 +1,65 @@
 using System.Text.Json;
 using DadivaAPI.domain;
 using DadivaAPI.repositories;
+using DadivaAPI.repositories.Entities;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.services.form.dtos;
+using DadivaAPI.services.users;
 using DadivaAPI.utils;
+using FluentResults;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using User = DadivaAPI.domain.user.User;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IRepository repository, INotificationService notificationService) : IFormService
+public class FormService(IRepository repository, DbContext context, INotificationService notificationService)
+    : IFormService
 {
-    public async Task<Result<GetFormOutputModel, Problem>> GetForm()
+    public async Task<Result<GetFormOutputModel>> GetForm(string nic)
     {
-        Form? form = await repository.GetForm();
-        if (form is null)
-            return Result<GetFormOutputModel, Problem>.Failure(
-                new Problem(
-                    "errorGettingForm.com",
-                    "Error getting form",
-                    400,
-                    "An error occurred while getting form") //TODO Create Problems types for form
-            );
+        return await context.WithTransaction(async () =>
+        {
+            var user = await repository.GetUserByNic(nic);
+            if (user is null) return Result.Fail(new UserError.UnknownDonorError());
+            if (user.Suspensions is not null) return Result.Fail(new UserError.SuspendedDonorError());
 
-        return Result<GetFormOutputModel, Problem>.Success(new GetFormOutputModel(
-                form.Groups.Select(QuestionGroupModel.FromDomain).ToList(),
-                form.Rules.Select(RuleModel.FromDomain).ToList(),
-                form.Id
-            )
-        );
-    }
-    
-    public async Task<Result<GetFormWithVersionOutputModel, Problem>> GetFormWithVersion(int version)
-    {
-        Form? form = await repository.GetFormWithVersion(version);
-        if (form is null)
-            return Result<GetFormWithVersionOutputModel, Problem>.Failure(
-                new Problem(
-                    "errorGettingFormWithVersion.com",
-                    "Error getting form with version $version",
-                    400,
-                    "An error occurred while getting form") //TODO Create Problems types for form
-            );
+            var formEntity = await repository.GetForm();
+            if (formEntity is null)
+            {
+                return Result.Fail(new FormErrors.NoFormError());
+            }
 
-        return Result<GetFormWithVersionOutputModel, Problem>.Success(new GetFormWithVersionOutputModel(
-            form.Groups.Select(QuestionGroupModel.FromDomain).ToList(),
-            form.Id
-        ));
+            var formDomain = formEntity.ToDomain();
+
+            return Result.Ok(new GetFormOutputModel(
+                formDomain.Groups.Select(QuestionGroupModel.FromDomain).ToList(),
+                formDomain.Rules.Select(RuleModel.FromDomain).ToList()
+            ));
+        });
     }
 
-    public async Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules, User user)
+    public async Task<Result<SubmitFormOutputModel>> SubmitForm(Dictionary<string, IAnswer> answers, string nic,
+        int formVersion)
     {
+        return await context.WithTransaction(async () =>
+        {
+            var userEntity = await repository.GetUserByNic(nic);
+            
+            if (userEntity is null) return Result.Fail(new UserError.UnknownDonorError());
+            if (userEntity.Suspensions is not null) return Result.Fail(new UserError.SuspendedDonorError());
+            
+            var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(),
+                DateTime.Now.ToUniversalTime(), nic, formVersion); 
+            
+            var submissionEntity = new SubmissionEntity(
+                
+                );
+            bool isSubmitted = await repository.SubmitForm(submission.ToEntity());
+            
+        });
 
-        Form form = new Form
-        (
-            groups.ConvertAll(QuestionGroupModel.ToDomain).ToList(),
-            rules.ConvertAll(RuleModel.ToDomain).ToList(),
-            user,
-            DateTime.Now.ToUniversalTime()
-        );
 
-        return Result<Form, Problem>.Success(await repository.EditForm(form));
-        /*
-        if (isSubmited) return Result<bool, Problem>.Success(true);
-        return Result<bool, Problem>.Failure(
-            new Problem(
-                "errorSubmitingForm.com",
-                "Error submitting form",
-                400,
-                "An error ocurred while submitting form"
-            )); //TODO Create Problems types for form
-            */
-    }
-
-    public async Task<Result<SubmitFormOutputModel, Problem>> SubmitForm(Dictionary<string, IAnswer> answers, int nic, int formVersion)
-    {
         var userAccountStatus = await repository.GetUserAccountStatus(nic);
         if (userAccountStatus != null && userAccountStatus.Status != AccountStatus.Active)
         {
@@ -85,8 +71,9 @@ public class FormService(IRepository repository, INotificationService notificati
                     "An error ocurred while submitting form"
                 ));
         }
-        
-        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(), DateTime.Now.ToUniversalTime(), nic, formVersion);
+
+        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(),
+            DateTime.Now.ToUniversalTime(), nic, formVersion);
         bool isSubmitted = await repository.SubmitForm(submission);
         if (isSubmitted)
         {
@@ -113,7 +100,8 @@ public class FormService(IRepository repository, INotificationService notificati
 
     public async Task<Result<Submission, Problem>> GetSubmission(int id)
     {
-        Submission? submission = await repository.GetSubmission(id);
+        UserEntity? user =
+            Submission ? submission = await repository.GetSubmission(id);
         if (submission == null)
             return Result<Submission, Problem>.Failure(
                 new Problem(
@@ -124,7 +112,7 @@ public class FormService(IRepository repository, INotificationService notificati
             );
         return Result<Submission, Problem>.Success(submission);
     }
-    
+
     public async Task<Result<bool, Problem>> LockSubmission(int submissionId, int doctorId)
     {
         bool isLocked = await repository.LockSubmission(submissionId, doctorId);
@@ -152,19 +140,21 @@ public class FormService(IRepository repository, INotificationService notificati
         await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
         return Result<bool, Problem>.Success(true);
     }
-    
+
     public async Task UnlockExpiredSubmissions(TimeSpan lockTimeout)
     {
         var expiredLocks = await repository.GetExpiredLocks(lockTimeout);
         foreach (var expiredLock in expiredLocks)
         {
             await repository.UnlockSubmission(expiredLock.SubmissionId, expiredLock.LockedByDoctorNic);
-            var message = JsonSerializer.Serialize(new { type = "unlock", submissionId = expiredLock.SubmissionId, reason = "timeout" });
+            var message = JsonSerializer.Serialize(new
+                { type = "unlock", submissionId = expiredLock.SubmissionId, reason = "timeout" });
             await notificationService.NotifyAllAsync(message);
         }
     }
-    
-    public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null)
+
+    public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status,
+        string? finalNote, List<NoteModel>? noteModels = null)
     {
         Submission? submission = await repository.GetSubmissionById(submissionId);
         if (submission == null)
@@ -175,7 +165,7 @@ public class FormService(IRepository repository, INotificationService notificati
                     404,
                     "An error occurred while getting submission") //TODO Create Problems types for form
             );
-        
+
         var review = new Review(
             submissionId,
             doctorNic,
@@ -183,9 +173,9 @@ public class FormService(IRepository repository, INotificationService notificati
             finalNote,
             DateTime.UtcNow
         );
-        
+
         var addedReview = await repository.AddReview(review);
-        
+
         if (noteModels != null && noteModels.Any())
         {
             foreach (var note in noteModels)
@@ -199,18 +189,18 @@ public class FormService(IRepository repository, INotificationService notificati
                 await repository.AddNote(newNote);
             }
         }
-        
+
         // Unlock user account
-        var userAccountStatus = await repository.GetUserAccountStatus(submission.ByUserNic);
+        var userAccountStatus = await repository.GetUserAccountStatus(submission.Donor);
         if (userAccountStatus != null)
         {
             userAccountStatus.Status = AccountStatus.Active;
             await repository.UpdateUserAccountStatus(userAccountStatus);
         }
-        
+
         // Remove lock
         await repository.UnlockSubmission(submissionId, doctorNic);
-        
+
         // Sending notification to all doctors using the /pendingSubmission page that they can delete this submission from the list
         await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "review", submissionId }));
 
@@ -235,14 +225,14 @@ public class FormService(IRepository repository, INotificationService notificati
             var outputModel = ConvertToOutputModel(dto);
             return outputModel;
         }).ToList();
-        
+
         return Result<List<SubmissionModelWithLockInfo>, Problem>.Success(pendingSubmissionsWithLockInfo);
     }
-    
+
     public async Task<Result<SubmissionModelWithLockInfo?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
     {
         var pendingSubmission = await repository.GetLatestPendingSubmissionByUser(userNic);
-    
+
         if (pendingSubmission == null)
             return Result<SubmissionModelWithLockInfo?, Problem>.Failure(
                 new Problem(
@@ -251,12 +241,11 @@ public class FormService(IRepository repository, INotificationService notificati
                     404,
                     "The user has no pending submissions")
             );
-        
-        
+
 
         return Result<SubmissionModelWithLockInfo?, Problem>.Success(ConvertToOutputModel(pendingSubmission));
     }
-    
+
     private SubmissionHistoryModel ConvertToOutputModel(SubmissionHistoryDto dto)
     {
         return new SubmissionHistoryModel
@@ -273,7 +262,7 @@ public class FormService(IRepository repository, INotificationService notificati
             DoctorNic = dto.DoctorNic
         };
     }
-    
+
     private SubmissionModelWithLockInfo ConvertToOutputModel(SubmissionPendingDto dto)
     {
         return new SubmissionModelWithLockInfo(
@@ -281,10 +270,10 @@ public class FormService(IRepository repository, INotificationService notificati
                 dto.Id, dto.ByUserNic, dto.Answers.Select(AnsweredQuestionModel.FromDomain).ToList(),
                 dto.SubmissionDate.ToShortDateString(), dto.FormVersion
             ), dto.LockedByDoctorNic);
-
     }
 
-    public async Task<Result<SubmissionHistoryOutputModel, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip)
+    public async Task<Result<SubmissionHistoryOutputModel, Problem>> GetSubmissionHistoryByNic(int nic, int limit,
+        int skip)
     {
         var (submissionHistoryDtos, hasMoreSubmissions) = await repository.GetSubmissionHistoryByNic(nic, limit, skip);
 
@@ -299,7 +288,7 @@ public class FormService(IRepository repository, INotificationService notificati
             );
         }
 
-        var submissionHistoryModels = submissionHistoryDtos.Select(dto => 
+        var submissionHistoryModels = submissionHistoryDtos.Select(dto =>
         {
             var outputModel = ConvertToOutputModel(dto);
             return outputModel;
@@ -310,9 +299,9 @@ public class FormService(IRepository repository, INotificationService notificati
             {
                 SubmissionHistory = submissionHistoryModels,
                 HasMoreSubmissions = hasMoreSubmissions
-            } );
+            });
     }
-    
+
     public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()
     {
         Inconsistencies? inconsistencies = await repository.GetInconsistencies();
@@ -320,10 +309,9 @@ public class FormService(IRepository repository, INotificationService notificati
             inconsistencies = new Inconsistencies(new List<Rule>());
         return Result<Inconsistencies, Problem>.Success(inconsistencies);
     }
-    
+
     public async Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies)
     {
-
         return Result<bool, Problem>.Success(await repository.EditInconsistencies(inconsistencies));
     }
 }

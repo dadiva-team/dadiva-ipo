@@ -1,121 +1,81 @@
-using System.Text.Json;
 using DadivaAPI.domain;
 using DadivaAPI.repositories;
+using DadivaAPI.repositories.Entities;
+using DadivaAPI.services.terms.dtos;
+using DadivaAPI.services.users;
 using DadivaAPI.utils;
+using FluentResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.terms;
 
-public class TermsService(IRepository repository) : ITermsService
+public class TermsService(IRepository repository, DbContext context) : ITermsService
 {
-    public async Task<Result<List<Terms>, Problem>> GetTerms()
+    public async Task<Result<TermsExternalInfo>> GetActiveTerms(string language)
     {
-        
-        List<Terms>? terms = await repository.GetAllTerms();
+        return await context.WithTransaction(async () =>
+        {
+            if (!Enum.TryParse<Languages>(language, out var parsedLanguage))
+            {
+                return Result.Fail(new TermsErrors.InvalidLanguageError());
+            }
 
-        if (terms is null || terms.Count == 0)
-            return Result<List<Terms>, Problem>.Failure(
-                new Problem(
-                    "noTermsFound.com",
-                    "No terms were found",
-                    400,
-                    "There are currently no terms"
-                )
+            var termsEntity = await repository.GetActiveTerms(language);
+
+            //defaulting to english terms if desired language isn't available, questionable
+            if (termsEntity is null && language != "en")
+            {
+                termsEntity = await repository.GetActiveTerms("en");
+            }
+
+            if (termsEntity is null) return Result.Fail(new TermsErrors.NoTermsError());
+
+            return Result.Ok(
+                new TermsExternalInfo(termsEntity.Content)
             );
-
-        return Result<List<Terms>, Problem>.Success(terms);
+        });
     }
     
-    public async Task<Result<Terms, Problem>> GetActiveTerms()
+    public async Task<Result<TermsHistoryExternalInfo>> GetTermsHistory(string language)
     {
-        
-        Terms? terms = await repository.GetActiveTerms();
+        return await context.WithTransaction(async () =>
+        {
+            if (!Enum.TryParse<Languages>(language, out var parsedLanguage))
+            {
+                return Result.Fail(new TermsErrors.InvalidLanguageError());
+            }
 
-        if (terms is null)
-            return Result<Terms, Problem>.Failure(
-                new Problem(
-                    "noTermsFound.com",
-                    "No terms were found",
-                    400,
-                    "There are no active terms"
-                )
+            var history = await repository.GetTermsHistory(language);
+            
+            if (history is null) return Result.Fail(new TermsErrors.NoTermsError());
+            
+            return Result.Ok(
+                new TermsHistoryExternalInfo(
+                    history.Select(info=> new TermsInfo(
+                        info.Content,
+                        info.Date.ToString(),
+                        info.Reason,
+                        info.Admin.Name,
+                        info.Admin.Nic
+                        )).ToList())
             );
-
-        return Result<Terms, Problem>.Success(terms);
+        });
     }
 
-    public async Task<Result<bool, Problem>> SubmitTerms(Terms terms)
+
+    public async Task<Result> SubmitTerms(string createdBy, string content, string language, string? reason)
     {
-        bool isSubmited = await repository.SubmitTerms(terms);
-        
-        Console.WriteLine(isSubmited);
-        if (isSubmited is true)
-            return Result<Boolean, Problem>.Success(isSubmited);
+        return await context.WithTransaction(async () =>
+        {
+            if (!Enum.TryParse<Languages>(language, out var parsedLanguage))
+            {
+                return Result.Fail(new TermsErrors.InvalidLanguageError());
+            }
+            
+            
+            var success = await repository.SubmitTerms(content, language, reason);
 
-
-        return Result<Boolean, Problem>.Failure(
-            new Problem(
-                "errorSubmittingTerms.com",
-                "Error submitting terms",
-                400,
-                "An error occurred while submitting terms"
-            )
-        );
-    }
-    
-    public async Task<Result<Boolean, Problem>> UpdateTerms(int termId, int updatedBy, string newContent)
-    {
-        Terms? curTerms = await repository.GetTermsById(termId);
-        
-        if (curTerms is null)
-            return Result<Boolean, Problem>.Failure(
-                new Problem(
-                    "errorUpdatingTerms.com",
-                    "Error updating terms",
-                    400,
-                    "The terms being updated don't exist"
-                )
-            );
-
-        TermsChangeLog changes = new(
-            curTerms.Id,
-            updatedBy,
-            DateTime.UtcNow,
-            curTerms.Content,
-            newContent
-        );
-        
-        curTerms.Content = newContent;
-
-        await repository.UpdateTerms(curTerms, changes);
-        return Result<Boolean, Problem>.Success(true);
-    }
-    
-    public async Task<Result<List<TermsChangeLog>, Problem>> GetTermsChangeLog(int termsId)
-    {
-        Terms? curTerms = await repository.GetTermsById(termsId);
-        
-        if (curTerms is null)
-            return Result<List<TermsChangeLog>, Problem>.Failure(
-                new Problem(
-                    "errorGettingTermsChangeLog.com",
-                    "Error Getting Terms Change Log",
-                    400,
-                    "The terms you've supplied don't exist"
-                )
-            );
-
-        List<TermsChangeLog>? changes = await repository.GetTermsChangeLog(termsId);
-        
-        if(changes is null || changes.Count == 0)
-            return Result<List<TermsChangeLog>, Problem>.Failure(
-                new Problem(
-                    "errorGettingTermsChangeLog.com",
-                    "Error Getting Terms Change Log",
-                    400,
-                    "The terms you've supplied haven't been changed"
-                )
-            );
-        
-        return Result<List<TermsChangeLog>, Problem>.Success(changes);
+            return success ? Result.Ok() : Result.Fail(new TermsErrors.UnknownTermsError());
+        });
     }
 }

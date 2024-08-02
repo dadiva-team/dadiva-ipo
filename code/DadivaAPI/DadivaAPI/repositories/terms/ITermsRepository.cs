@@ -1,14 +1,11 @@
-using System.Text.Json;
-using DadivaAPI.domain;
+using DadivaAPI.repositories.Entities;
 
 namespace DadivaAPI.repositories.terms;
 
 public interface ITermsRepository
 { 
-    public Task<List<Terms>?> GetAllTerms();
-    public Task<Terms?> GetActiveTerms();
-    public Task<Terms?> GetTermsById(int id);
-    public Task<bool> UpdateTerms(Terms terms, TermsChangeLog changes);
-    public Task<Boolean> SubmitTerms(Terms terms);
-    public Task<List<TermsChangeLog>?> GetTermsChangeLog(int termsId);
+    public Task<TermsEntity?> GetActiveTerms(string language);
+    public Task<List<TermsEntity>?> GetTermsHistory(string language);
+    public Task<TermsEntity?> GetTermsById(int id);
+    public Task<bool> SubmitTerms(TermsEntity terms);
 }

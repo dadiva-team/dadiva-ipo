@@ -28,4 +28,12 @@ public interface IRepository
     public Task<bool> UpdateSuspension(SuspensionEntity suspension);
     public Task<SuspensionEntity?> GetSuspension(string userNic);
     public Task<bool> DeleteSuspension(string userNic);
+
+    public Task<FormEntity?> GetForm();
+
+    public Task<TermsEntity?> GetActiveTerms(string language);
+    public Task<List<TermsEntity>?> GetTermsHistory(string language);
+    public Task<TermsEntity?> GetTermsById(int id);
+    public Task<bool> SubmitTerms(string content, string language, string? reason);
+    
 }

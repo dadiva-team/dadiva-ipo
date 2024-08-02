@@ -4,7 +4,6 @@ using DadivaAPI.repositories.manual;
 using DadivaAPI.repositories.medications;
 using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
-using Elastic.Clients.Elasticsearch;
 
 namespace DadivaAPI.repositories;
 
@@ -56,5 +55,30 @@ public class Repository(DadivaDbContext context) : IRepository
     public Task<bool> DeleteSuspension(string userNic)
     {
         return UserRepository.DeleteSuspension(userNic);
+    }
+
+    public Task<FormEntity?> GetForm()
+    {
+        return FormRepository.GetForm();
+    }
+
+    public Task<TermsEntity?> GetActiveTerms(string language)
+    {
+        return TermsRepository.GetActiveTerms(language);
+    }
+
+    public Task<List<TermsEntity>?> GetTermsHistory(string language)
+    {
+        return TermsRepository.GetTermsHistory(language);
+    }
+
+    public Task<TermsEntity?> GetTermsById(int id)
+    {
+        return TermsRepository.GetTermsById(id);
+    }
+
+    public Task<bool> SubmitTerms(TermsEntity terms)
+    {
+        return TermsRepository.SubmitTerms(terms);
     }
 }

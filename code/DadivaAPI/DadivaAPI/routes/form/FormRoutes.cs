@@ -103,6 +103,8 @@ public static class FormRoutes
 
     private static async Task<IResult> GetForm(IFormService service, ClaimsPrincipal user)
     {
+        
+        
         (user.Identity as ClaimsIdentity).Claims.ToList().ForEach(claim =>
         {
             Console.Out.WriteLine(claim.Type + ": " + claim.Value);
