@@ -208,11 +208,11 @@ public class FormService(IRepository repository, DbContext context, INotificatio
         return Result<Review, Problem>.Success(addedReview);
     }
 
-    public async Task<Result<List<SubmissionModelWithLockInfo>, Problem>> GetPendingSubmissions()
+    public async Task<Result<List<SubmissionWithLockExternalInfo>, Problem>> GetPendingSubmissions()
     {
         var pendingSubmissions = await repository.GetPendingSubmissions();
         if (pendingSubmissions == null || !pendingSubmissions.Any())
-            return Result<List<SubmissionModelWithLockInfo>, Problem>.Failure(
+            return Result<List<SubmissionWithLockExternalInfo>, Problem>.Failure(
                 new Problem(
                     "noPendingSubmissions.com",
                     "No pending submissions",
@@ -226,15 +226,15 @@ public class FormService(IRepository repository, DbContext context, INotificatio
             return outputModel;
         }).ToList();
 
-        return Result<List<SubmissionModelWithLockInfo>, Problem>.Success(pendingSubmissionsWithLockInfo);
+        return Result<List<SubmissionWithLockExternalInfo>, Problem>.Success(pendingSubmissionsWithLockInfo);
     }
 
-    public async Task<Result<SubmissionModelWithLockInfo?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
+    public async Task<Result<SubmissionWithLockExternalInfo?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
     {
         var pendingSubmission = await repository.GetLatestPendingSubmissionByUser(userNic);
 
         if (pendingSubmission == null)
-            return Result<SubmissionModelWithLockInfo?, Problem>.Failure(
+            return Result<SubmissionWithLockExternalInfo?, Problem>.Failure(
                 new Problem(
                     "noPendingSubmission.com",
                     "No pending submission",
@@ -243,7 +243,7 @@ public class FormService(IRepository repository, DbContext context, INotificatio
             );
 
 
-        return Result<SubmissionModelWithLockInfo?, Problem>.Success(ConvertToOutputModel(pendingSubmission));
+        return Result<SubmissionWithLockExternalInfo?, Problem>.Success(ConvertToOutputModel(pendingSubmission));
     }
 
     private SubmissionHistoryModel ConvertToOutputModel(SubmissionHistoryDto dto)
@@ -263,9 +263,9 @@ public class FormService(IRepository repository, DbContext context, INotificatio
         };
     }
 
-    private SubmissionModelWithLockInfo ConvertToOutputModel(SubmissionPendingDto dto)
+    private SubmissionWithLockExternalInfo ConvertToOutputModel(SubmissionPendingDto dto)
     {
-        return new SubmissionModelWithLockInfo(
+        return new SubmissionWithLockExternalInfo(
             new SubmissionModel(
                 dto.Id, dto.ByUserNic, dto.Answers.Select(AnsweredQuestionModel.FromDomain).ToList(),
                 dto.SubmissionDate.ToShortDateString(), dto.FormVersion

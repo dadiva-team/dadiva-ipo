@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DadivaAPI.domain;
 
 namespace DadivaAPI.repositories.Entities;
 
@@ -9,4 +10,12 @@ public class AnsweredQuestionEntity
     
     public required QuestionEntity Question { get; set; }
     public required AnswerEntity Answer { get; set; }
+
+    public AnsweredQuestion ToDomain()
+    {
+        return new AnsweredQuestion(
+            Question.Id.ToString(),
+            Answer.ToDomain()
+        );
+    }
 }

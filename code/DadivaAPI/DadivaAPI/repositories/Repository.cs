@@ -2,6 +2,7 @@ using DadivaAPI.repositories.Entities;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.manual;
 using DadivaAPI.repositories.medications;
+using DadivaAPI.repositories.submissions;
 using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
 
@@ -9,8 +10,9 @@ namespace DadivaAPI.repositories;
 
 public class Repository(DadivaDbContext context) : IRepository
 {
-    public IFormRepository FormRepository { get; } = new FormRepository(context);
     public IUsersRepository UserRepository { get; } = new UsersRepository(context);
+    public IFormRepository FormRepository { get; } = new FormRepository(context);
+    public ISubmissionRepository SubmissionRepository { get; } = new SubmissionRepository(context);
     public ITermsRepository TermsRepository { get; } = new TermsRepository(context);
     public IMedicationsRepository MedicationRepository { get; } = new MedicationsRepository();
     public IManualRepository ManualRepository { get; } = new ManualRepository(context);
@@ -77,8 +79,59 @@ public class Repository(DadivaDbContext context) : IRepository
         return TermsRepository.GetTermsById(id);
     }
 
-    public Task<bool> SubmitTerms(TermsEntity terms)
+    public Task<bool> SubmitTerms1(TermsEntity terms)
     {
         return TermsRepository.SubmitTerms(terms);
+    }
+    
+    public Task<List<SubmissionEntity>?> GetPendingSubmissions()
+    {
+        return SubmissionRepository.GetPendingSubmissions();
+    }
+    
+    public Task<SubmissionEntity?> GetSubmissionById(int id)
+    {
+        return SubmissionRepository.GetSubmissionById(id);
+    }
+    
+    public Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(string userNic)
+    {
+        return SubmissionRepository.GetLatestPendingSubmissionByUser(userNic);
+    }
+    
+    public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
+        int limit, int skip)
+    {
+        return SubmissionRepository.GetSubmissionHistoryByUser(nic, limit, skip);
+    }
+    
+    public Task<LockEntity?> GetLock(int submissionId)
+    {
+        return SubmissionRepository.GetLock(submissionId);
+    }
+    
+    public Task<bool> LockSubmission(LockEntity lockEntity)
+    {
+        return SubmissionRepository.LockSubmission(lockEntity);
+    }
+    
+    public Task<bool> UpdatedLockedSubmission(LockEntity lockEntity)
+    {
+        return SubmissionRepository.UpdatedLockedSubmission(lockEntity);
+    }
+    
+    public Task<bool> UnlockSubmission(LockEntity lockEntity)
+    {
+        return SubmissionRepository.UnlockSubmission(lockEntity);
+    }
+    
+    public Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout)
+    {
+        return SubmissionRepository.GetExpiredLocks(timeout);
+    }
+    
+    public Task<bool> SubmissionExists(int id)
+    {
+        return SubmissionRepository.SubmissionExists(id);
     }
 }

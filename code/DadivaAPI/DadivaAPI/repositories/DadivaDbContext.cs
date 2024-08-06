@@ -32,7 +32,7 @@ public class DadivaDbContext : DbContext
     public DbSet<TopLevelConditionEntity> TopLevelConditions { get; set; }
     public DbSet<AllConditionEntity> AllConditions { get; set; }
     public DbSet<AnyConditionEntity> AnyConditions { get; set; }
-    public DbSet<NotConditionEntity> NotConditions { get; set; }
+    //public DbSet<NotConditionEntity> NotConditions { get; set; }
     
     public DbSet<InconsistencyEntity> Inconsistencies { get; set; }
     
@@ -42,6 +42,8 @@ public class DadivaDbContext : DbContext
     public DbSet<StringAnswerEntity> StringAnswers { get; set; }
     public DbSet<StringListAnswerEntity> StringListAnswers { get; set; }
     public DbSet<BooleanAnswerEntity> BooleanAnswers { get; set; }
+    
+    public DbSet<LockEntity> Locks { get; set; }
     
     public DbSet<ReviewEntity> Reviews { get; set; }
 }

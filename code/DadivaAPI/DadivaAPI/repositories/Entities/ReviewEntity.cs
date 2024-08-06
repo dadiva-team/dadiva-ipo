@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DadivaAPI.routes.form.models;
 
 namespace DadivaAPI.repositories.Entities;
 

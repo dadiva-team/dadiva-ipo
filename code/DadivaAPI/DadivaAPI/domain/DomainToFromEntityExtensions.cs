@@ -27,7 +27,7 @@ public static class DomainToFromEntityExtensions
             DateOfBirth = domain.DateOfBirth
         };
     }
-    
+
     public static SuspensionEntity ToEntity(this Suspension domain)
     {
         return new SuspensionEntity
@@ -41,9 +41,30 @@ public static class DomainToFromEntityExtensions
             Type = domain.Type.ToString()
         };
     }
-    
+
     public static Suspension ToDomain(this SuspensionEntity domain)
     {
-        return new Suspension(domain.Donor.ToDomain(), domain.Doctor.ToDomain(), domain.StartDate, Enum.Parse<SuspensionType>(domain.Type), domain.Note, domain.Reason, domain.EndDate, domain.Id);
+        return new Suspension(domain.Donor.ToDomain(), domain.Doctor.ToDomain(), domain.StartDate,
+            Enum.Parse<SuspensionType>(domain.Type), domain.Note, domain.Reason, domain.EndDate, domain.Id);
+    }
+
+
+    public static LockEntity ToEntity(Lock domain)
+    {
+        return new LockEntity
+        {
+            Id = domain.Id,
+            EntityId = domain.EntityId,
+            LockEntityType = domain.LockEntityType,
+            Doctor = domain.Doctor.ToEntity(),
+            LockDate = domain.LockDate
+        };
+    }
+
+    public static Submission ToDomain(this SubmissionEntity entity)
+    {
+        return new Submission(
+            entity.Id, entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status, 
+            entity.Donor.ToDomain(), entity.Form.ToDomain(), entity.LockedBy.ToDomain());
     }
 }

@@ -1,22 +1,30 @@
+using DadivaAPI.domain.user;
+using DadivaAPI.repositories.Entities;
+using DadivaAPI.routes.form.models;
+using DadivaAPI.services.submissions.dtos;
+
 namespace DadivaAPI.domain;
 
-
-public class Submission
+public record Submission(
+    int Id,
+    List<AnsweredQuestion> AnsweredQuestions,
+    DateTime SubmissionDate,
+    SubmissionStatus Status,
+    User Donor,
+    Form Form,
+    Lock Locked
+)
 {
-    public int Id { get; init; }
-    public List<AnsweredQuestion> AnsweredQuestions { get; set; }
-    public DateTime SubmissionDate { get; set; }
-    public int ByUserNic { get; set; }
-    public int FormVersion { get; set; }
-    public Submission(List<AnsweredQuestion> answeredQuestions, DateTime submissionDate, int byUserNic, int formVersion)
+    public bool IsFullyAnswered()
     {
-        AnsweredQuestions = answeredQuestions;
-        SubmissionDate = submissionDate;
-        ByUserNic = byUserNic;
-        FormVersion = formVersion;
+        return AnsweredQuestions.All(q => q.Answer.ValidateAnswer());
+    }
+    
+    public SubmissionWithLockExternalInfo ToExternalInfo()
+    {
+        return new SubmissionWithLockExternalInfo( Id, SubmissionDate, Status, Donor.Nic, Donor.Name, Form.Id, Locked.ToExternalInfo());
     }
 }
-
 
 public class SubmissionLock
 {

@@ -61,15 +61,15 @@ public static class FormRoutes
 
     private static async Task<IResult> GetPendingSubmissions(IFormService service)
     {
-        Result<List<SubmissionModelWithLockInfo>, Problem> result = await service.GetPendingSubmissions();
+        Result<List<SubmissionWithLockExternalInfo>, Problem> result = await service.GetPendingSubmissions();
         return result switch
         {
-            Result<List<SubmissionModelWithLockInfo>, Problem>.SuccessResult success => Results.Ok(
+            Result<List<SubmissionWithLockExternalInfo>, Problem>.SuccessResult success => Results.Ok(
                 new GetSubmissionsOutputModel(
-                    success.Value.Select(submission => new SubmissionModelWithLockInfo(
+                    success.Value.Select(submission => new SubmissionWithLockExternalInfo(
                       Submission: submission.Submission, LockedByDoctorNic: submission.LockedByDoctorNic
                     )).ToList())),
-            Result<List<SubmissionModelWithLockInfo>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<List<SubmissionWithLockExternalInfo>, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }
@@ -79,12 +79,12 @@ public static class FormRoutes
         var result = await service.GetPendingSubmissionsByUserNic(nic);
         return result switch
         {
-            Result<SubmissionModelWithLockInfo, Problem>.SuccessResult success => Results.Ok(
-                new SubmissionModelWithLockInfo(
+            Result<SubmissionWithLockExternalInfo, Problem>.SuccessResult success => Results.Ok(
+                new SubmissionWithLockExternalInfo(
                     Submission: success.Value.Submission,
                     LockedByDoctorNic: success.Value.LockedByDoctorNic
                 )),
-            Result<SubmissionModelWithLockInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
+            Result<SubmissionWithLockExternalInfo, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
             _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
         };
     }

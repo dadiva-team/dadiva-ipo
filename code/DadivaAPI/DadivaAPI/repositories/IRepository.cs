@@ -2,6 +2,7 @@ using DadivaAPI.repositories.Entities;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.manual;
 using DadivaAPI.repositories.medications;
+using DadivaAPI.repositories.submissions;
 using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
 
@@ -9,10 +10,10 @@ namespace DadivaAPI.repositories;
 
 public interface IRepository
 {
-    public IFormRepository FormRepository { get; }
     public IUsersRepository UserRepository { get; }
+    public IFormRepository FormRepository { get; }
+    public ISubmissionRepository SubmissionRepository { get; }
     public ITermsRepository TermsRepository { get; }
-
     public IMedicationsRepository MedicationRepository { get; }
     public IManualRepository ManualRepository { get; }
     
@@ -35,5 +36,26 @@ public interface IRepository
     public Task<List<TermsEntity>?> GetTermsHistory(string language);
     public Task<TermsEntity?> GetTermsById(int id);
     public Task<bool> SubmitTerms(string content, string language, string? reason);
+    
+    public Task<List<SubmissionEntity>?> GetPendingSubmissions();
+
+    public Task<SubmissionEntity?> GetSubmissionById(int id);
+
+    public Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(string userNic);
+
+    public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
+        int limit, int skip);
+
+    public Task<LockEntity?> GetLock(int submissionId);
+
+    public Task<bool> LockSubmission(LockEntity lockEntity);
+    
+    public Task<bool> UpdatedLockedSubmission(LockEntity lockEntity);
+
+    public Task<bool> UnlockSubmission(LockEntity lockEntity);
+
+    public Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout);
+
+    public Task<bool> SubmissionExists(int id);
     
 }

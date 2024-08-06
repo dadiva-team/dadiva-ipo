@@ -11,6 +11,6 @@ public record AnsweredQuestionModel(string QuestionId, JsonElement Answer)
         string json = JsonConvert.SerializeObject(answeredQuestion.Answer);
         using var jsonDoc = JsonDocument.Parse(json);
         JsonElement element = jsonDoc.RootElement.GetProperty("Content").Clone();
-        return new AnsweredQuestionModel(answeredQuestion.QuestionID, element);
+        return new AnsweredQuestionModel(answeredQuestion.QuestionId, element);
     }
 };

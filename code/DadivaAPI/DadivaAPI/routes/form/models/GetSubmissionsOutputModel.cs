@@ -1,5 +1,7 @@
+using DadivaAPI.domain;
+using DadivaAPI.repositories.Entities;
+using DadivaAPI.services.submissions.dtos;
+
 namespace DadivaAPI.routes.form.models;
 
-public record GetSubmissionsOutputModel(List<SubmissionModelWithLockInfo> Submissions);
-public record  SubmissionModelWithLockInfo(SubmissionModel Submission, int? LockedByDoctorNic);
-public record SubmissionModel(int Id, int Nic, List<AnsweredQuestionModel> Answers, string SubmissionDate, int FormVersion);
+public record GetSubmissionsOutputModel(List<SubmissionWithLockExternalInfo> Submissions);
