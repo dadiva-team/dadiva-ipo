@@ -1,6 +1,3 @@
 namespace DadivaAPI.repositories.Entities;
 
-public abstract class TopLevelConditionEntity : NestedConditionEntity
-{
-    
-}
+public abstract class TopLevelConditionEntity : NestedConditionEntity;

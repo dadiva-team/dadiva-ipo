@@ -15,7 +15,7 @@ public class RuleEntity
     public Rule ToDomain()
     {
         return new Rule(
-            TopLevelCondition.ToCondition() as LogicalCondition, 
+            TopLevelCondition.ToDomain() as LogicalCondition, 
             Event.ToDomain()
             );
     }

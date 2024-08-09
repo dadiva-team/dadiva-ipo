@@ -7,8 +7,21 @@ namespace DadivaAPI.services.form;
 
 public interface IFormService
 {
-    public Task<Result<GetFormOutputModel>> GetForm();
-    public Task<Result<SubmitFormOutputModel>> SubmitForm(Dictionary<string,IAnswer> answers, int nic, int formVersion);
-    public Task<Result<Inconsistencies>> GetInconsistencies();
-    public Task<Result<bool>> EditInconsistencies(Inconsistencies inconsistencies);
+    public Task<Result<GetFormOutputModel>> GetForm(string language);
+
+    public Task<Result> AddForm(
+        List<QuestionGroupModel> questionGroups,
+        List<RuleModel> rules,
+        string language,
+        string? reason,
+        string nic
+    );
+
+    public Task<Result<GetInconsistenciesOutputModel>> GetInconsistencies();
+    public Task<Result> EditInconsistencies(
+        List<RuleModel> inconsistencies,
+        string nic,
+        string language,
+        string? reason
+    );
 }

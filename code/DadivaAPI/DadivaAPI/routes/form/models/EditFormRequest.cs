@@ -3,4 +3,10 @@ using DadivaAPI.domain;
 
 namespace DadivaAPI.routes.form.models;
 
-public record EditFormRequest(List<QuestionGroupModel> Groups, List<RuleModel> Rules);
+public record EditFormRequest(
+    string Language,
+    List<QuestionGroupModel> Groups,
+    List<RuleModel> Rules,
+    string? Reason,
+    string Nic
+    );

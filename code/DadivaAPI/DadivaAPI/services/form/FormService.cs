@@ -1,34 +1,36 @@
-using System.Text.Json;
 using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.repositories.Entities;
 using DadivaAPI.routes.form.models;
-using DadivaAPI.services.form.dtos;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using User = DadivaAPI.domain.user.User;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IRepository repository, DbContext context, INotificationService notificationService)
+public class FormService(IRepository repository, DbContext context)
     : IFormService
 {
-    public async Task<Result<GetFormOutputModel>> GetForm(string nic)
+    public async Task<Result<GetFormOutputModel>> GetForm(string language)
     {
         return await context.WithTransaction(async () =>
         {
-            var user = await repository.GetUserByNic(nic);
+            /*var user = await repository.GetUserByNic(nic);
             if (user is null) return Result.Fail(new UserError.UnknownDonorError());
-            if (user.Suspensions is not null) return Result.Fail(new UserError.SuspendedDonorError());
+            if (user.Suspensions is not null) return Result.Fail(new UserError.SuspendedDonorError());*/
 
-            var formEntity = await repository.GetForm();
-            if (formEntity is null)
+            if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
+                return Result.Fail(new FormErrors.InvalidLanguageError());
+
+
+            var formEntity = await repository.GetForm(language);
+            if (formEntity is null && parsedLanguage != FormLanguages.En)
             {
-                return Result.Fail(new FormErrors.NoFormError());
+                formEntity = await repository.GetForm("en");
             }
+
+            if (formEntity is null) return new FormErrors.NoFormError();
 
             var formDomain = formEntity.ToDomain();
 
@@ -39,279 +41,103 @@ public class FormService(IRepository repository, DbContext context, INotificatio
         });
     }
 
-    public async Task<Result<SubmitFormOutputModel>> SubmitForm(Dictionary<string, IAnswer> answers, string nic,
-        int formVersion)
+    public async Task<Result> AddForm(
+        List<QuestionGroupModel> questionGroups,
+        List<RuleModel> rules,
+        string language,
+        string? reason,
+        string nic)
     {
         return await context.WithTransaction(async () =>
         {
             var userEntity = await repository.GetUserByNic(nic);
-            
             if (userEntity is null) return Result.Fail(new UserError.UnknownDonorError());
-            if (userEntity.Suspensions is not null) return Result.Fail(new UserError.SuspendedDonorError());
-            
-            var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(),
-                DateTime.Now.ToUniversalTime(), nic, formVersion); 
-            
-            var submissionEntity = new SubmissionEntity(
-                
-                );
-            bool isSubmitted = await repository.SubmitForm(submission.ToEntity());
-            
+
+            if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
+                return Result.Fail(new FormErrors.InvalidLanguageError());
+
+            var formDomain = new Form(
+                questionGroups.Select(qgm => QuestionGroupModel.ToDomain(qgm)).ToList(),
+                rules.Select(rm => RuleModel.ToDomain(rm)).ToList(),
+                parsedLanguage,
+                userEntity.ToDomain()
+            );
+
+            var formEntity = formDomain.ToEntity(
+                await repository.GetForm(language),
+                reason
+            );
+
+            var success = await repository.AddForm(formEntity);
+            return !success ? Result.Fail(new FormErrors.UnknownError()) : Result.Ok();
         });
+    }
 
 
-        var userAccountStatus = await repository.GetUserAccountStatus(nic);
-        if (userAccountStatus != null && userAccountStatus.Status != AccountStatus.Active)
+    public async Task<Result<GetInconsistenciesOutputModel>> GetInconsistencies()
+    {
+        return await context.WithTransaction(async () =>
         {
-            return Result<SubmitFormOutputModel, Problem>.Failure(
-                new Problem(
-                    "errorSubmitingForm.com",
-                    "Error submitting form",
-                    400,
-                    "An error ocurred while submitting form"
-                ));
-        }
-
-        var submission = new Submission(answers.Select(a => new AnsweredQuestion(a.Key, a.Value)).ToList(),
-            DateTime.Now.ToUniversalTime(), nic, formVersion);
-        bool isSubmitted = await repository.SubmitForm(submission);
-        if (isSubmitted)
-        {
-            if (userAccountStatus != null)
+            var inconsistencyEntity = await repository.GetInconsistencies();
+            if (inconsistencyEntity is null)
             {
-                userAccountStatus.Status = AccountStatus.PendingReview;
-                userAccountStatus.LastSubmissionDate = submission.SubmissionDate;
-                userAccountStatus.LastSubmissionId = submission.Id;
-                await repository.UpdateUserAccountStatus(userAccountStatus);
+                return Result.Fail(new FormErrors.NoInconsistenciesError());
             }
 
-            return Result<SubmitFormOutputModel, Problem>.Success(new SubmitFormOutputModel(
-                submission.SubmissionDate, submission.Id));
-        }
+            var inconsistencyDomain = inconsistencyEntity.ToDomain().InconsistencyList;
 
-        return Result<SubmitFormOutputModel, Problem>.Failure(
-            new Problem(
-                "errorSubmitingForm.com",
-                "Error submitting form",
-                400,
-                "An error ocurred while submitting form"
+            return Result.Ok(new GetInconsistenciesOutputModel(
+                inconsistencyEntity
+                    .ToDomain()
+                    .InconsistencyList
+                    .Select(RuleModel.FromDomain)
+                    .ToList()
             ));
+        });
     }
 
-    public async Task<Result<Submission, Problem>> GetSubmission(int id)
+    public async Task<Result> EditInconsistencies(
+        List<RuleModel> inconsistencies,
+        string nic,
+        string language,
+        string? reason
+    )
     {
-        UserEntity? user =
-            Submission ? submission = await repository.GetSubmission(id);
-        if (submission == null)
-            return Result<Submission, Problem>.Failure(
-                new Problem(
-                    "errorGettingSubmission.com",
-                    "Error getting submission",
-                    404,
-                    "An error occurred while getting submission") //TODO Create Problems types for form
-            );
-        return Result<Submission, Problem>.Success(submission);
-    }
-
-    public async Task<Result<bool, Problem>> LockSubmission(int submissionId, int doctorId)
-    {
-        bool isLocked = await repository.LockSubmission(submissionId, doctorId);
-        if (!isLocked)
+        return await context.WithTransaction(async () =>
         {
-            return Result<bool, Problem>.Failure(
-                new Problem("lockSubmissionError", "Unable to lock submission", 400, "Unable to lock submission")
-            );
-        }
+            var admin = await repository.GetUserByNic(nic);
 
-        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "lock", submissionId }));
-        return Result<bool, Problem>.Success(true);
-    }
-
-    public async Task<Result<bool, Problem>> UnlockSubmission(int submissionId, int doctorId)
-    {
-        bool isUnlocked = await repository.UnlockSubmission(submissionId, doctorId);
-        if (!isUnlocked)
-        {
-            return Result<bool, Problem>.Failure(
-                new Problem("unlockSubmissionError", "Unable to unlock submission", 400, "Unable to unlock submission")
-            );
-        }
-
-        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
-        return Result<bool, Problem>.Success(true);
-    }
-
-    public async Task UnlockExpiredSubmissions(TimeSpan lockTimeout)
-    {
-        var expiredLocks = await repository.GetExpiredLocks(lockTimeout);
-        foreach (var expiredLock in expiredLocks)
-        {
-            await repository.UnlockSubmission(expiredLock.SubmissionId, expiredLock.LockedByDoctorNic);
-            var message = JsonSerializer.Serialize(new
-                { type = "unlock", submissionId = expiredLock.SubmissionId, reason = "timeout" });
-            await notificationService.NotifyAllAsync(message);
-        }
-    }
-
-    public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status,
-        string? finalNote, List<NoteModel>? noteModels = null)
-    {
-        Submission? submission = await repository.GetSubmissionById(submissionId);
-        if (submission == null)
-            return Result<Review, Problem>.Failure(
-                new Problem(
-                    "errorGettingSubmission.com",
-                    "Error getting submission",
-                    404,
-                    "An error occurred while getting submission") //TODO Create Problems types for form
-            );
-
-        var review = new Review(
-            submissionId,
-            doctorNic,
-            status,
-            finalNote,
-            DateTime.UtcNow
-        );
-
-        var addedReview = await repository.AddReview(review);
-
-        if (noteModels != null && noteModels.Any())
-        {
-            foreach (var note in noteModels)
+            if (admin is null)
             {
-                var newNote = new Note(
-                    addedReview.Id,
-                    note.QuestionId,
-                    note.NoteText
-                );
-
-                await repository.AddNote(newNote);
+                return Result.Fail(new UserError.UnknownAdminError());
             }
-        }
 
-        // Unlock user account
-        var userAccountStatus = await repository.GetUserAccountStatus(submission.Donor);
-        if (userAccountStatus != null)
-        {
-            userAccountStatus.Status = AccountStatus.Active;
-            await repository.UpdateUserAccountStatus(userAccountStatus);
-        }
+            if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
+                return Result.Fail(new FormErrors.InvalidLanguageError());
 
-        // Remove lock
-        await repository.UnlockSubmission(submissionId, doctorNic);
+            var ruleEntities = inconsistencies
+                .Select(RuleModel.ToDomain)
+                .Select(r => r.ToEntity())
+                .ToList();
 
-        // Sending notification to all doctors using the /pendingSubmission page that they can delete this submission from the list
-        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "review", submissionId }));
-
-
-        return Result<Review, Problem>.Success(addedReview);
-    }
-
-    public async Task<Result<List<SubmissionWithLockExternalInfo>, Problem>> GetPendingSubmissions()
-    {
-        var pendingSubmissions = await repository.GetPendingSubmissions();
-        if (pendingSubmissions == null || !pendingSubmissions.Any())
-            return Result<List<SubmissionWithLockExternalInfo>, Problem>.Failure(
-                new Problem(
-                    "noPendingSubmissions.com",
-                    "No pending submissions",
-                    404,
-                    "De momento não há submissões pendentes")
-            );
-
-        var pendingSubmissionsWithLockInfo = pendingSubmissions.Select(dto =>
-        {
-            var outputModel = ConvertToOutputModel(dto);
-            return outputModel;
-        }).ToList();
-
-        return Result<List<SubmissionWithLockExternalInfo>, Problem>.Success(pendingSubmissionsWithLockInfo);
-    }
-
-    public async Task<Result<SubmissionWithLockExternalInfo?, Problem>> GetPendingSubmissionsByUserNic(int userNic)
-    {
-        var pendingSubmission = await repository.GetLatestPendingSubmissionByUser(userNic);
-
-        if (pendingSubmission == null)
-            return Result<SubmissionWithLockExternalInfo?, Problem>.Failure(
-                new Problem(
-                    "noPendingSubmission.com",
-                    "No pending submission",
-                    404,
-                    "The user has no pending submissions")
-            );
-
-
-        return Result<SubmissionWithLockExternalInfo?, Problem>.Success(ConvertToOutputModel(pendingSubmission));
-    }
-
-    private SubmissionHistoryModel ConvertToOutputModel(SubmissionHistoryDto dto)
-    {
-        return new SubmissionHistoryModel
-        {
-            SubmissionId = dto.SubmissionId,
-            SubmissionDate = dto.SubmissionDate,
-            ByUserNic = dto.ByUserNic,
-            Answers = dto.Answers.Select(AnsweredQuestionModel.FromDomain).ToList(),
-            FinalNote = dto.FinalNote,
-            FormVersion = dto.FormVersion,
-            Notes = dto.Notes,
-            ReviewDate = dto.ReviewDate,
-            ReviewStatus = dto.ReviewStatus,
-            DoctorNic = dto.DoctorNic
-        };
-    }
-
-    private SubmissionWithLockExternalInfo ConvertToOutputModel(SubmissionPendingDto dto)
-    {
-        return new SubmissionWithLockExternalInfo(
-            new SubmissionModel(
-                dto.Id, dto.ByUserNic, dto.Answers.Select(AnsweredQuestionModel.FromDomain).ToList(),
-                dto.SubmissionDate.ToShortDateString(), dto.FormVersion
-            ), dto.LockedByDoctorNic);
-    }
-
-    public async Task<Result<SubmissionHistoryOutputModel, Problem>> GetSubmissionHistoryByNic(int nic, int limit,
-        int skip)
-    {
-        var (submissionHistoryDtos, hasMoreSubmissions) = await repository.GetSubmissionHistoryByNic(nic, limit, skip);
-
-        if (submissionHistoryDtos == null || !submissionHistoryDtos.Any())
-        {
-            return Result<SubmissionHistoryOutputModel, Problem>.Failure(
-                new Problem(
-                    "noSubmissionHistory.com",
-                    "No submission history",
-                    404,
-                    "The user has no submission history")
-            );
-        }
-
-        var submissionHistoryModels = submissionHistoryDtos.Select(dto =>
-        {
-            var outputModel = ConvertToOutputModel(dto);
-            return outputModel;
-        }).ToList();
-
-        return Result<SubmissionHistoryOutputModel, Problem>.Success(
-            new SubmissionHistoryOutputModel
+            var formEntity = await repository.GetForm(language);
+            if (formEntity is null)
             {
-                SubmissionHistory = submissionHistoryModels,
-                HasMoreSubmissions = hasMoreSubmissions
-            });
-    }
+                return Result.Fail(new FormErrors.NoFormError());
+            }
 
-    public async Task<Result<Inconsistencies, Problem>> GetInconsistencies()
-    {
-        Inconsistencies? inconsistencies = await repository.GetInconsistencies();
-        if (inconsistencies == null)
-            inconsistencies = new Inconsistencies(new List<Rule>());
-        return Result<Inconsistencies, Problem>.Success(inconsistencies);
-    }
+            var success = await repository.SubmitInconsistencies(
+                new InconsistencyEntity
+                {
+                    Admin = admin,
+                    Date = DateTime.Now.ToUniversalTime(),
+                    Form = formEntity,
+                    Reason = reason,
+                    Rules = ruleEntities
+                }
+            );
 
-    public async Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies)
-    {
-        return Result<bool, Problem>.Success(await repository.EditInconsistencies(inconsistencies));
+            return success ? Result.Ok() : Result.Fail(new FormErrors.UnknownError());
+        });
     }
 }

@@ -15,7 +15,7 @@ public class TermsService(IRepository repository, DbContext context) : ITermsSer
     {
         return await context.WithTransaction(async () =>
         {
-            if (!Enum.TryParse<Languages>(language, out var parsedLanguage))
+            if (!Enum.TryParse<TermsLanguages>(language, out var parsedLanguage))
             {
                 return Result.Fail(new TermsErrors.InvalidLanguageError());
             }
@@ -35,29 +35,29 @@ public class TermsService(IRepository repository, DbContext context) : ITermsSer
             );
         });
     }
-    
+
     public async Task<Result<TermsHistoryExternalInfo>> GetTermsHistory(string language)
     {
         return await context.WithTransaction(async () =>
         {
-            if (!Enum.TryParse<Languages>(language, out var parsedLanguage))
+            if (!Enum.TryParse<TermsLanguages>(language, out var parsedLanguage))
             {
                 return Result.Fail(new TermsErrors.InvalidLanguageError());
             }
 
             var history = await repository.GetTermsHistory(language);
-            
+
             if (history is null) return Result.Fail(new TermsErrors.NoTermsError());
-            
+
             return Result.Ok(
                 new TermsHistoryExternalInfo(
-                    history.Select(info=> new TermsInfo(
+                    history.Select(info => new TermsInfo(
                         info.Content,
                         info.Date.ToString(),
                         info.Reason,
                         info.Admin.Name,
                         info.Admin.Nic
-                        )).ToList())
+                    )).ToList())
             );
         });
     }
@@ -67,13 +67,29 @@ public class TermsService(IRepository repository, DbContext context) : ITermsSer
     {
         return await context.WithTransaction(async () =>
         {
-            if (!Enum.TryParse<Languages>(language, out var parsedLanguage))
+            var userEntity = await repository.GetUserByNic(createdBy);
+            if (userEntity is null)
+            {
+                return Result.Fail(new UserError.UnknownAdminError());
+            }
+            
+            if (!Enum.TryParse<TermsLanguages>(language, out var parsedLanguage))
             {
                 return Result.Fail(new TermsErrors.InvalidLanguageError());
             }
-            
-            
-            var success = await repository.SubmitTerms(content, language, reason);
+
+            var currentTerms = await repository.GetActiveTerms(language);
+            var termsEntity = new TermsEntity
+            {
+                Content = content,
+                Date = DateTime.Now.ToUniversalTime(),
+                Language = language,
+                Reason = reason,
+                PreviousTerms = currentTerms,
+                Admin = userEntity
+            };
+
+            var success = await repository.SubmitTerms(termsEntity);
 
             return success ? Result.Ok() : Result.Fail(new TermsErrors.UnknownTermsError());
         });

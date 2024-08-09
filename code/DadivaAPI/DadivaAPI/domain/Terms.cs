@@ -1,10 +1,10 @@
 namespace DadivaAPI.domain;
 
-public enum Languages
+public enum TermsLanguages
 {
     Pt,
     En
 }
 
-public record Terms(string CreatedBy, string Content, Languages Language, DateTime CreatedAt);
+public record Terms(string CreatedBy, string Content, TermsLanguages Language, DateTime CreatedAt);
 

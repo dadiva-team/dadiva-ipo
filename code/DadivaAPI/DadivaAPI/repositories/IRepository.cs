@@ -17,12 +17,11 @@ public interface IRepository
     public IMedicationsRepository MedicationRepository { get; }
     public IManualRepository ManualRepository { get; }
     
+    /*USER*/
     public Task<UserEntity?> GetUserByNic(string nic);
     public Task<bool> AddUser(UserEntity user);
     public Task<bool> UpdateUser(UserEntity user);
-    
     public Task<List<UserEntity>> GetUsers();
-    
     public Task<bool> DeleteUser(string nic);
 
     public Task<bool> AddSuspension(SuspensionEntity suspension);
@@ -30,13 +29,19 @@ public interface IRepository
     public Task<SuspensionEntity?> GetSuspension(string userNic);
     public Task<bool> DeleteSuspension(string userNic);
 
-    public Task<FormEntity?> GetForm();
-
+    /*FORM*/
+    public Task<FormEntity?> GetForm(string language);
+    public Task<bool> AddForm(FormEntity form);
+    public Task<InconsistencyEntity?> GetInconsistencies();
+    public Task<bool> SubmitInconsistencies(InconsistencyEntity inconsistencies);
+    
+    /*TERMS*/
     public Task<TermsEntity?> GetActiveTerms(string language);
     public Task<List<TermsEntity>?> GetTermsHistory(string language);
     public Task<TermsEntity?> GetTermsById(int id);
-    public Task<bool> SubmitTerms(string content, string language, string? reason);
+    public Task<bool> SubmitTerms(TermsEntity terms);
     
+    /*SUBMISSIONS*/
     public Task<List<SubmissionEntity>?> GetPendingSubmissions();
 
     public Task<SubmissionEntity?> GetSubmissionById(int id);
@@ -45,7 +50,7 @@ public interface IRepository
 
     public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip);
-
+    
     public Task<LockEntity?> GetLock(int submissionId);
 
     public Task<bool> LockSubmission(LockEntity lockEntity);

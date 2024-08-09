@@ -8,7 +8,7 @@ public class QuestionGroupEntity
     public int Id { get; set; }
     [MaxLength(256)] public required string Name { get; set; }
     
-    public required FormEntity Form { get; set; }
+    //public required FormEntity Form { get; set; }
     public required List<QuestionEntity> Questions { get; set; }
 
     public QuestionGroup ToDomain()

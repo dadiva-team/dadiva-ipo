@@ -58,12 +58,29 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return UserRepository.DeleteSuspension(userNic);
     }
-
-    public Task<FormEntity?> GetForm()
+    
+    /*FORMS*/
+    public Task<FormEntity?> GetForm(string language)
     {
-        return FormRepository.GetForm();
+        return FormRepository.GetForm(language);
+    }
+    
+    public Task<bool> AddForm(FormEntity form)
+    {
+        return FormRepository.AddForm(form);
     }
 
+    public Task<InconsistencyEntity?> GetInconsistencies()
+    {
+        return FormRepository.GetInconsistencies();
+    }
+
+    public Task<bool> SubmitInconsistencies(InconsistencyEntity inconsistencies)
+    {
+        return FormRepository.EditInconsistencies(inconsistencies);
+    }
+    
+    /*TERMS*/
     public Task<TermsEntity?> GetActiveTerms(string language)
     {
         return TermsRepository.GetActiveTerms(language);
@@ -79,7 +96,7 @@ public class Repository(DadivaDbContext context) : IRepository
         return TermsRepository.GetTermsById(id);
     }
 
-    public Task<bool> SubmitTerms1(TermsEntity terms)
+    public Task<bool> SubmitTerms(TermsEntity terms)
     {
         return TermsRepository.SubmitTerms(terms);
     }

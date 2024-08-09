@@ -6,5 +6,5 @@ public abstract class NestedConditionEntity
 {
     public int Id { get; set; }
     
-    public abstract Condition ToCondition();
+    public abstract Condition ToDomain();
 }

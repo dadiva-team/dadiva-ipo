@@ -10,6 +10,8 @@ public abstract class UserError : Error
 
     public class UnknownDoctorError() : UserError;
 
+    public class UnknownAdminError() : UserError;
+
     public class SuspendedDonorError() : UserError;
 
     public class InvalidSuspensionTypeError() : UserError;

@@ -40,7 +40,9 @@ public static class TermsRoutes
         );
     }
 
-    private static async Task<IResult> SubmitTerms([FromBody] SubmitTermsInputModel terms, ITermsService service)
+    private static async Task<IResult> SubmitTerms(
+        [FromBody] SubmitTermsInputModel terms,
+        ITermsService service)
     {
         return (await service.SubmitTerms(terms.CreatedBy, terms.Content, terms.Language, terms.Reason)).HandleRequest(
             Results.NoContent

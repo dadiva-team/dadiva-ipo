@@ -10,7 +10,7 @@ public class QuestionEntity
     [MaxLength(256)] public required string Type { get; set; }
     public List<string>? Options { get; set; }
     
-    public required QuestionGroupEntity QuestionGroup { get; set; }
+    public QuestionGroupEntity? QuestionGroup { get; set; }
 
     public Question ToDomain()
     {
