@@ -1,14 +1,19 @@
-using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.utils;
+using FluentResults;
+using Microsoft.EntityFrameworkCore;
 
-namespace DadivaAPI.services.interactions;
+namespace DadivaAPI.services.medications;
 
-public class MedicationsService(IRepository repository) : IMedicationsService
+public class MedicationsService(IRepository repository, DbContext context) : IMedicationsService
 {
-    public async Task<Result<List<string>, Problem>> SearchMedications(string query)
+    public async Task<Result<List<string>>> SearchMedications(string query)
     {
-        List<string> list = await repository.SearchMedications(query);
-        return Result<List<string>, Problem>.Success(list);
+        return await context.WithTransaction(async () =>
+        {
+            List<string> list = await repository.SearchMedications(query);
+            return Result.Ok(list);
+        });
+        
     }
 }

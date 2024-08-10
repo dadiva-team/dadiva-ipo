@@ -9,7 +9,7 @@ public record ExampleOutputModel(
 {
     public static ExampleOutputModel FromDomain(EntryExample domain)
     {
-        return new ExampleOutputModel(domain.Examples, domain.Criteria);
+        return new ExampleOutputModel(domain.Text, domain.Criteria.Select(c => c.Text).ToList());
     }
 }
 
@@ -20,7 +20,7 @@ public record ManualInformationOutputModel(
 {
     public static ManualInformationOutputModel FromDomain(ManualEntry domain)
     {
-        return new ManualInformationOutputModel(domain.GroupName,
+        return new ManualInformationOutputModel(domain.Name,
             domain.Examples.Select(ExampleOutputModel.FromDomain).ToList());
     }
 }

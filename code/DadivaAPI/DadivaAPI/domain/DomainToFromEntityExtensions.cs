@@ -64,7 +64,22 @@ public static class DomainToFromEntityExtensions
     public static Submission ToDomain(this SubmissionEntity entity)
     {
         return new Submission(
-            entity.Id, entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status, 
+            entity.Id, entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status,
             entity.Donor.ToDomain(), entity.Form.ToDomain(), entity.LockedBy.ToDomain());
+    }
+
+    public static ManualEntry ToDomain(this ManualEntryEntity entity)
+    {
+        return new ManualEntry(entity.Name, entity.EntryExamples.Select(e => e.ToDomain()).ToList());
+    }
+
+    public static EntryExample ToDomain(this EntryExampleEntity entity)
+    {
+        return new EntryExample(entity.Text, entity.Criterias.Select(c => c.ToDomain()).ToList());
+    }
+
+    public static Criteria ToDomain(this CriteriaEntity entity)
+    {
+        return new Criteria(entity.Text);
     }
 }

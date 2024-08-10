@@ -1,9 +1,8 @@
-using DadivaAPI.domain;
-using DadivaAPI.utils;
+using FluentResults;
 
-namespace DadivaAPI.services.interactions;
+namespace DadivaAPI.services.medications;
 
 public interface IMedicationsService
 {
-    Task<Result<List<string>, Problem>> SearchMedications(string query);
+    Task<Result<List<string>>> SearchMedications(string query);
 }

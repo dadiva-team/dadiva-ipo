@@ -1,22 +1,19 @@
 using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.utils;
-using Microsoft.IdentityModel.Tokens;
+using FluentResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.manual;
 
-public class ManualService(IRepository repository) : IManualService
+public class ManualService(IRepository repository, DbContext context) : IManualService
 {
-    public async Task<Result<List<ManualEntry>, Problem>> GetManualInformation(string productName)
+    public async Task<Result<List<ManualEntry>>> GetManualInformation(string productName)
     {
-        Console.Out.WriteLine("Service.GetManualInformation product: " + productName);
-        var manualEntries = await repository.GetManualEntriesFromCfts(await repository.GetCfts(productName));
-        Console.Out.WriteLine("Service.GetManualInformation manualEntries: ");
-        if(manualEntries.IsNullOrEmpty()) Console.Out.WriteLine("No manual entries found");
-        foreach (var manualEntry in manualEntries)
+        return await context.WithTransaction(async () =>
         {
-            Console.Out.WriteLine(manualEntry);
-        }
-        return Result<List<ManualEntry>, Problem>.Success(await repository.GetManualInformations(manualEntries));
+            var manualEntries = await repository.GetManualEntries(await repository.GetCfts(productName));
+            return Result.Ok(manualEntries.Select(me => me.ToDomain()).ToList());
+        });
     }
 }

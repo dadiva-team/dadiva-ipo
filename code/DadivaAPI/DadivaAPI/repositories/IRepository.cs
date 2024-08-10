@@ -1,3 +1,4 @@
+using DadivaAPI.domain;
 using DadivaAPI.repositories.Entities;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.manual;
@@ -62,5 +63,11 @@ public interface IRepository
     public Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout);
 
     public Task<bool> SubmissionExists(int id);
+    
+    public Task<List<string>> SearchMedications(string query);
+
+    Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts);
+    
+    public Task<List<string>> GetCfts(string productName);
     
 }

@@ -151,4 +151,19 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return SubmissionRepository.SubmissionExists(id);
     }
+
+    public Task<List<string>> SearchMedications(string query)
+    {
+        return MedicationRepository.SearchMedications(query);
+    }
+
+    public Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts)
+    {
+        return ManualRepository.GetManualEntries(cfts);
+    }
+
+    public Task<List<string>> GetCfts(string productName)
+    {
+        return MedicationRepository.GetCfts(productName);
+    }
 }
