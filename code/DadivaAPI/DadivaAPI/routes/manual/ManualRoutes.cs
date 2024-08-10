@@ -1,4 +1,5 @@
 using DadivaAPI.routes.manual.models;
+using DadivaAPI.routes.utils;
 using DadivaAPI.services.manual;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +15,10 @@ public static class ManualRoutes
     private static async Task<IResult> GetManualInformation([FromRoute] string product, IManualService service)
     {
         return (await service.GetManualInformation(product)).HandleRequest(
-            manualEntries => new GetManualInformationsOutputModel(
+            manualEntries => Results.Ok(new GetManualEntriesOutputModel(
                 manualEntries
-                    .Select(ManualInformationOutputModel.FromDomain)
-                    .ToList()
-            )
+                    .Select(ManualEntryOutputModel.FromDomain).ToList()
+            ))
         );
     }
 }

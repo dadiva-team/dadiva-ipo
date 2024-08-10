@@ -13,18 +13,18 @@ public record ExampleOutputModel(
     }
 }
 
-public record ManualInformationOutputModel(
+public record ManualEntryOutputModel(
     string GroupName,
     List<ExampleOutputModel> Examples
 )
 {
-    public static ManualInformationOutputModel FromDomain(ManualEntry domain)
+    public static ManualEntryOutputModel FromDomain(ManualEntry domain)
     {
-        return new ManualInformationOutputModel(domain.Name,
+        return new ManualEntryOutputModel(domain.Name,
             domain.Examples.Select(ExampleOutputModel.FromDomain).ToList());
     }
 }
 
-public record GetManualInformationsOutputModel(
-    List<ManualInformationOutputModel> ManualInformations
+public record GetManualEntriesOutputModel(
+    List<ManualEntryOutputModel> ManualEntries
 );
