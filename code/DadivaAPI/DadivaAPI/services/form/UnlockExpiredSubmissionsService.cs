@@ -22,8 +22,8 @@ namespace DadivaAPI.services.form
             {
                 using (var scope = _scopeFactory.CreateScope())
                 {
-                    var formService = scope.ServiceProvider.GetRequiredService<IFormService>();
-                    await formService.UnlockExpiredSubmissions(_lockTimeout);
+                    var submissionServices = scope.ServiceProvider.GetRequiredService<ISubmissionService>();
+                    await submissionServices.UnlockExpiredSubmissions(_lockTimeout);
                 }
 
                 await Task.Delay(_unlockInterval, stoppingToken);

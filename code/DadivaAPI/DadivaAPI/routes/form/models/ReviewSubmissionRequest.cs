@@ -1,8 +1,8 @@
 namespace DadivaAPI.routes.form.models
 {
-    public class ReviewFormRequest
+    public class ReviewSubmissionRequest
     {
-        public int DoctorNic { get; set; }
+        public string DoctorNic { get; set; }
         public string Status { get; set; }
         public string? FinalNote { get; set; }
         public List<NoteModel> Notes { get; set; }

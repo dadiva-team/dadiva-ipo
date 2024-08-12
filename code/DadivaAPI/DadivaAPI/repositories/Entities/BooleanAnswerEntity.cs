@@ -2,5 +2,5 @@ namespace DadivaAPI.repositories.Entities;
 
 public class BooleanAnswerEntity : AnswerEntity
 {
-    public required bool Content { get; set; }
+    public required bool BooleanContent { get; set; }
 }

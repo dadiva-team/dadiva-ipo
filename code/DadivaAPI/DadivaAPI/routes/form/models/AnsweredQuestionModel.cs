@@ -1,8 +1,5 @@
-using System.Text.Json;
-using DadivaAPI.domain;
-using Newtonsoft.Json;
 
-namespace DadivaAPI.routes.form.models;
+/*namespace DadivaAPI.routes.form.models;
 
 public record AnsweredQuestionModel(string QuestionId, JsonElement Answer)
 {
@@ -13,4 +10,4 @@ public record AnsweredQuestionModel(string QuestionId, JsonElement Answer)
         JsonElement element = jsonDoc.RootElement.GetProperty("Content").Clone();
         return new AnsweredQuestionModel(answeredQuestion.QuestionId, element);
     }
-};
+};*/

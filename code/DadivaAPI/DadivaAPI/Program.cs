@@ -4,11 +4,15 @@ using DadivaAPI.repositories;
 using DadivaAPI.routes.form;
 using DadivaAPI.routes.manual;
 using DadivaAPI.routes.medications;
+using DadivaAPI.routes.reviews;
+using DadivaAPI.routes.submissions;
 using DadivaAPI.routes.terms;
 using DadivaAPI.routes.users;
 using DadivaAPI.services.form;
 using DadivaAPI.services.manual;
 using DadivaAPI.services.medications;
+using DadivaAPI.services.reviews;
+using DadivaAPI.services.submissions;
 using DadivaAPI.services.terms;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
@@ -132,15 +136,20 @@ var nodePool = new SingleNodePool(new Uri(elasticString));
 var settings = new ElasticsearchClientSettings(nodePool);
 
 builder.Services.AddSingleton(new ElasticsearchClient(settings));
-builder.Services.AddSingleton<INotificationService, NotificationService>();
 
+// SSE
+builder.Services.AddSingleton<INotificationService, NotificationService>();
+builder.Services.AddSingleton<NotificationEndpoint>();
 builder.Services.AddHostedService<UnlockExpiredSubmissionsService>();
+
 
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<ITermsService, TermsService>();
 builder.Services.AddScoped<IMedicationsService, MedicationsService>();
 builder.Services.AddScoped<IManualService, ManualService>();
+builder.Services.AddScoped<ISubmissionService, SubmissionService>();
+builder.Services.AddScoped<IReviewsService, ReviewsService>();
 
 builder.Services.AddScoped<IRepository, Repository>();
 
@@ -177,6 +186,8 @@ group.AddFormRoutes();
 group.AddTermsRoutes();
 group.AddMedicationsRoutes();
 group.AddManualRoutes();
+group.AddReviewRoutes();
+group.AddSubmissionRoutes();
 
 using (var scope = app.Services.CreateScope())
 {

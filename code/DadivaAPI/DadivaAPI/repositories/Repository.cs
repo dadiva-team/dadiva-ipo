@@ -17,6 +17,7 @@ public class Repository(DadivaDbContext context) : IRepository
     public IMedicationsRepository MedicationRepository { get; } = new MedicationsRepository();
     public IManualRepository ManualRepository { get; } = new ManualRepository(context);
 
+    /*USER*/
     public Task<UserEntity?> GetUserByNic(string nic)
     {
         return UserRepository.GetUserByNic(nic);
@@ -101,6 +102,22 @@ public class Repository(DadivaDbContext context) : IRepository
         return TermsRepository.SubmitTerms(terms);
     }
     
+    /*SUBMISSIONS*/
+    
+    public Task<bool> SubmitSubmission(SubmissionEntity submission)
+    {
+        return SubmissionRepository.SubmitSubmission(submission);
+    }
+    
+    public Task<bool> UpdateSubmission(SubmissionEntity submission)
+    {
+        return SubmissionRepository.UpdateSubmission(submission);
+    }
+    
+    public Task<bool> SubmitReview(ReviewEntity review)
+    {
+        return SubmissionRepository.SubmitReview(review);
+    }
     public Task<List<SubmissionEntity>?> GetPendingSubmissions()
     {
         return SubmissionRepository.GetPendingSubmissions();
@@ -151,12 +168,16 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return SubmissionRepository.SubmissionExists(id);
     }
+    
+    /*MEDICATIONS*/
 
     public Task<List<string>> SearchMedications(string query)
     {
         return MedicationRepository.SearchMedications(query);
     }
 
+    
+    /*MANUAL*/
     public Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts)
     {
         return ManualRepository.GetManualEntries(cfts);

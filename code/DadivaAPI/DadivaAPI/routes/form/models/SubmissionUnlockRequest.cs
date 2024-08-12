@@ -2,7 +2,7 @@ namespace DadivaAPI.routes.form.models
 {
    public class SubmissionUnlockRequest
    {
-      public int DoctorId { get; set; }
+      public string DoctorNic { get; set; } = string.Empty;
    }
    
 }

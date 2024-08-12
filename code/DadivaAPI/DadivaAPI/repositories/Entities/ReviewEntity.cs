@@ -13,3 +13,4 @@ public class ReviewEntity
     public required UserEntity Doctor { get; set; }
     public required SubmissionEntity Submission { get; set; }
 }
+

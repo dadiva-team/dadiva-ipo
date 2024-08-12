@@ -14,7 +14,7 @@ public class LockEntity
 {
     [Key] public int Id { get; set; }
     
-    public required int EntityId { get; set; }
+    public required int LockEntityId { get; set; }
     
     public required LockEntityType LockEntityType { get; set; }
     
@@ -24,6 +24,6 @@ public class LockEntity
 
     public Lock ToDomain()
     {
-        return new Lock(Id, EntityId, LockEntityType, Doctor.ToDomain(), LockDate);
+        return new Lock(LockEntityId, LockEntityType, Doctor.ToDomain(), LockDate);
     }
 }

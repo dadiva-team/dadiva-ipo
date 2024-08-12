@@ -9,9 +9,9 @@ namespace DadivaAPI.services.form;
 public interface ISubmissionService
 {
     public Task<Result<List<SubmissionWithLockExternalInfo>>> GetPendingSubmissions();
-    public Task<Result<SubmissionWithLockExternalInfo?>> GetPendingSubmissionsByUser(string userNic);
+    public Task<Result<SubmissionWithLockExternalInfo>> GetPendingSubmissionsByUser(string userNic);
     public Task<Result<SubmissionHistoryOutputModel>> GetSubmissionHistoryByUser(string nic, int limit, int skip);
     public Task<Result<bool>> LockSubmission(int submissionId, string doctorNic);
     public Task<Result<bool>> UnlockSubmission(int submissionId, string doctorNic);
-    public Task UnlockExpiredSubmissions(TimeSpan lockTimeout);
+    public Task<Result<bool>> UnlockExpiredSubmissions(TimeSpan lockTimeout);
 }

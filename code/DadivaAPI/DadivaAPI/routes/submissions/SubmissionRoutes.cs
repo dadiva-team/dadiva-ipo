@@ -1,15 +1,7 @@
-using System.Globalization;
-using System.Security.Claims;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using DadivaAPI.domain;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.routes.utils;
 using DadivaAPI.services.form;
-using DadivaAPI.services.form.dtos;
-using DadivaAPI.utils;
 using Microsoft.AspNetCore.Mvc;
-using User = DadivaAPI.domain.user.User;
 
 namespace DadivaAPI.routes.submissions;
 
@@ -27,28 +19,11 @@ public static class SubmissionRoutes
             .AllowAnonymous(); //RequireAuthorization("doctor");
         group.MapPost("/{submissionId:int}/unlock", UnlockSubmission)
             .AllowAnonymous(); //RequireAuthorization("doctor");
-        //group.MapDelete("/submissions/{nic}", DeleteSubmission).RequireAuthorization("doctor");
-        group.MapPost("{submissionId:int}/review/", ReviewForm).RequireAuthorization("doctor");
-
-        app.MapGet("/notifications", async context =>
-        {
-            context.Response.Headers["Content-Type"] = "text/event-stream";
-            context.Response.Headers["Cache-Control"] = "no-cache";
-            context.Response.Headers["Connection"] = "keep-alive";
-
-            var notificationService = context.RequestServices.GetService<INotificationService>();
-            if (notificationService == null)
+        app.MapGet("/pending/notifications",
+            async (NotificationEndpoint endpoint, HttpContext context) =>
             {
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("Notification service not available");
-                return;
-            }
-
-            var client = new NotificationClient(context);
-            await notificationService.AddClientAsync(client);
-            await client.ProcessAsync();
-            await notificationService.RemoveClientAsync(client);
-        });
+                await endpoint.HandleNotificationsAsync(context);
+            });
     }
 
     private static async Task<IResult> GetPendingSubmissions(ISubmissionService service)
@@ -71,60 +46,18 @@ public static class SubmissionRoutes
             (model => Results.Ok(model)));
     }
 
-/*
-    private static IAnswer ToAnswer(this JsonElement element)
-    {
-        return element.ValueKind switch
-        {
-            JsonValueKind.String => new StringAnswer(element.GetString()),
-            JsonValueKind.True or JsonValueKind.False => new BooleanAnswer(element.GetBoolean()),
-            JsonValueKind.Array => new StringListAnswer(element.EnumerateArray().Select(e => e.GetString()).ToList()),
-            _ => throw new Exception("Invalid answer type")
-        };
-    }
-
-    
     private static async Task<IResult> LockSubmission([FromRoute] int submissionId,
-        [FromBody] SubmissionLockRequest input, IFormService service)
+        [FromBody] SubmissionLockRequest input, ISubmissionService service)
     {
-        var result = await service.LockSubmission(submissionId, input.DoctorId);
-        return result switch
-        {
-            Result<bool, Problem>.SuccessResult => Results.NoContent(),
-            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("Unexpected result")
-        };
+        return (await service.LockSubmission(submissionId, input.DoctorNic)).HandleRequest(
+            submissions => Results.NoContent()
+        );
     }
 
     private static async Task<IResult> UnlockSubmission([FromRoute] int submissionId,
-        [FromBody] SubmissionUnlockRequest input, IFormService service)
+        [FromBody] SubmissionUnlockRequest input, ISubmissionService service)
     {
-        var result = await service.UnlockSubmission(submissionId, input.DoctorId);
-        return result switch
-        {
-            Result<bool, Problem>.SuccessResult => Results.NoContent(),
-            Result<bool, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-            _ => throw new Exception("Unexpected result")
-        };
+        return (await service.UnlockSubmission(submissionId, input.DoctorNic))
+            .HandleRequest(submissions => Results.NoContent());
     }
-
-    private static async Task<IResult> ReviewForm(int submissionId, [FromBody] ReviewFormRequest input,
-        IFormService service)
-    {
-        try
-        {
-            Result<Review, Problem> result = await service.ReviewForm(submissionId, input.DoctorNic, input.Status,
-                input.FinalNote, input.Notes);
-            return result switch
-            {
-                Result<Review, Problem>.SuccessResult success => Results.NoContent(),
-                Result<Review, Problem>.FailureResult failure => Results.BadRequest(failure.Error),
-                _ => throw new Exception("Never gonna happen, c# just doesn't have proper sealed classes")
-            };
-        }
-        catch (Exception ex)
-        {
-            return Results.BadRequest(ex.Message);
-        }
-    }*/
 }

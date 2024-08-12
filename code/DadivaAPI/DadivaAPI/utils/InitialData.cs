@@ -1,4 +1,6 @@
 using DadivaAPI.domain;
+using DadivaAPI.domain.user;
+using DadivaAPI.repositories.Entities;
 using User = DadivaAPI.domain.user.User;
 
 namespace DadivaAPI.utils;
@@ -6,33 +8,46 @@ namespace DadivaAPI.utils;
 public class InitialData
 {
     private static readonly User Admin = new(
-        987654321,
+        "987654321",
         "Eng. Doe",
         "MegaPassword123!hashed",
-        Role.admin
+        new List<Role> { Role.admin },
+        null,
+        true,
+        null, 
+        null
     );
 
     private static readonly User Doctor = new(
-        111111111,
+        "111111111",
         "Dr. Doe",
         "MegaPassword123!hashed",
-        Role.doctor
+        new List<Role> { Role.doctor },
+        null,
+        true,
+        null, 
+        null
     );
 
     private static readonly User Donor = new(
-        123456789,
+        "123456789",
         "John Doe",
         "MegaPassword123!hashed",
-        Role.donor
+        new List<Role> { Role.donor },
+        null,
+        true,
+        null, 
+        null
     );
 
-    public static readonly List<User> Users =
+    public static readonly List<UserEntity> Users =
     [
-        Admin,
-        Doctor,
-        Donor
+        Admin.ToEntity(),
+        Doctor.ToEntity(),
+        Donor.ToEntity()
     ];
 
+    /*
     public static readonly UserAccountStatus DonorStatus = new UserAccountStatus
     (
         Donor.Nic,
@@ -65,40 +80,38 @@ public class InitialData
         DonorStatus,
         AdminStatus,
         DoctorStatus
-    ];
+    ];*/
 
     private static readonly Terms TestTerms1 = new
     (
-        "Test Terms 1",
+        Admin,
         "<p>Test1</p>",
-        Admin.Nic,
-        DateTime.UtcNow,
-        true
+        TermsLanguages.En,
+        DateTime.UtcNow
     );
 
     private static readonly Terms TestTerms2 = new
     (
-        "Test Terms 2",
+        Admin,
         "<p>Test2</p>",
-        Admin.Nic,
-        DateTime.UtcNow,
-        false
+        TermsLanguages.En,
+        DateTime.UtcNow
     );
 
-    public static readonly List<Terms> Terms =
+    public static readonly List<TermsEntity> Terms =
     [
-        TestTerms1,
-        TestTerms2
+        TestTerms1.ToEntity(null, null),
+        TestTerms2.ToEntity(null, null)
     ];
 
-    public static readonly TermsChangeLog TestTermsChangeLog = new
+/*    public static readonly TermsChangeLog TestTermsChangeLog = new
     (
         1,
         Admin.Nic,
         DateTime.UtcNow,
         "<p>OldContent</p>",
         "<p>Test1</p>"
-    );
+    );*/
 
     private static readonly Form testForm = new Form
     (
@@ -129,8 +142,9 @@ public class InitialData
             new Rule(new LogicalCondition([new EvaluationCondition("q3", Operator.notEqual, "")], []),
                 new Event(EventType.showReview, null))
         ],
-        Admin,
-        DateTime.Now.ToUniversalTime()
+        FormLanguages.Pt,
+        Admin
+        //DateTime.Now.ToUniversalTime()
     );
 
     private static readonly Form realForm = new Form
@@ -146,10 +160,10 @@ public class InitialData
                 ),
                 new Question
                 (
-                "q2- medicamente",
-                "Quais os medicamentos que toma?",
-                ResponseType.medications,
-                null
+                    "q2- medicamente",
+                    "Quais os medicamentos que toma?",
+                    ResponseType.medications,
+                    null
                 ),
                 new Question
                 (
@@ -411,11 +425,12 @@ public class InitialData
             ])
         ],
         [],
-        Admin,
-        DateTime.Now.ToUniversalTime()
+        FormLanguages.Pt,
+        Admin
+        //DateTime.Now.ToUniversalTime()
     );
 
-    public static readonly Form Form = realForm;
+    public static readonly FormEntity Form = realForm.ToEntity(null, null);
 
     /*ion sub1 = new Submission(
         new List<AnsweredQuestion>
@@ -441,13 +456,13 @@ public class InitialData
         Donor.Nic,
         1
     );
-    
+
     public static readonly List<Submission> Submissions = new List<Submission>
     {
         sub1,
         sub2
     };
-    
+
     public static readonly Review rev1 = new Review(
         sub1.Id,
         Doctor.Nic,
@@ -455,7 +470,7 @@ public class InitialData
         null,
         DateTime.Now.ToUniversalTime()
         );
-    
+
     public static readonly Review rev2 = new Review(
         sub2.Id,
         Doctor.Nic,
@@ -463,7 +478,7 @@ public class InitialData
         null,
         DateTime.Now.ToUniversalTime()
     );
-    
+
     public static readonly List<Review> Reviews = new List<Review>
     {
         rev1,

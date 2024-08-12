@@ -4,5 +4,5 @@ namespace DadivaAPI.repositories.Entities;
 
 public class StringAnswerEntity : AnswerEntity
 {
-    [MaxLength(256)] public required string Content { get; set; }
+    [MaxLength(256)] public required string StringContent { get; set; }
 }

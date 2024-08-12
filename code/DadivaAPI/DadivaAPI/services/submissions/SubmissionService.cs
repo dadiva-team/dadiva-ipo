@@ -3,112 +3,125 @@ using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.repositories.Entities;
 using DadivaAPI.routes.form.models;
-using DadivaAPI.services.form.dtos;
-using DadivaAPI.services.submissions;
+using DadivaAPI.services.form;
 using DadivaAPI.services.submissions.dtos;
+using DadivaAPI.services.users;
 using DadivaAPI.utils;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
-namespace DadivaAPI.services.form;
+namespace DadivaAPI.services.submissions;
 
 public class SubmissionService(IRepository repository, DbContext context, INotificationService notificationService)
     : ISubmissionService
 {
-    /*public async Task<Result<bool, Problem>> LockSubmission(int submissionId, int doctorId)
+    public async Task<Result<bool>> SubmitSubmission(string donorNic, List<AnsweredQuestion> answeredQuestions)
     {
-        bool isLocked = await repository.LockSubmission(submissionId, doctorId);
-        if (!isLocked)
+        return await context.WithTransaction(async () =>
         {
-            return Result<bool, Problem>.Failure(
-                new Problem("lockSubmissionError", "Unable to lock submission", 400, "Unable to lock submission")
-            );
-        }
+            var donor = await repository.GetUserByNic(donorNic);
+            if (donor is null)
+                return Result.Fail(new UserError.UnknownDonorError());
 
-        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "lock", submissionId }));
-        return Result<bool, Problem>.Success(true);
-    }
+            var form = await repository.GetForm("en"); //TODO: Hardcoded language
+            if (form is null)
+                return Result.Fail(new FormErrors.NoFormError());
 
-    public async Task<Result<bool, Problem>> UnlockSubmission(int submissionId, int doctorId)
-    {
-        bool isUnlocked = await repository.UnlockSubmission(submissionId, doctorId);
-        if (!isUnlocked)
-        {
-            return Result<bool, Problem>.Failure(
-                new Problem("unlockSubmissionError", "Unable to unlock submission", 400, "Unable to unlock submission")
-            );
-        }
-
-        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
-        return Result<bool, Problem>.Success(true);
-    }
-
-    public async Task UnlockExpiredSubmissions(TimeSpan lockTimeout)
-    {
-        var expiredLocks = await repository.GetExpiredLocks(lockTimeout);
-        foreach (var expiredLock in expiredLocks)
-        {
-            await repository.UnlockSubmission(expiredLock.SubmissionId, expiredLock.LockedByDoctorNic);
-            var message = JsonSerializer.Serialize(new
-                { type = "unlock", submissionId = expiredLock.SubmissionId, reason = "timeout" });
-            await notificationService.NotifyAllAsync(message);
-        }
-    }
-
-    /*public async Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status,
-        string? finalNote, List<NoteModel>? noteModels = null)
-    {
-        Submission? submission = await repository.GetSubmissionById(submissionId);
-        if (submission == null)
-            return Result<Review, Problem>.Failure(
-                new Problem(
-                    "errorGettingSubmission.com",
-                    "Error getting submission",
-                    404,
-                    "An error occurred while getting submission") //TODO Create Problems types for form
+            var submission = new Submission(
+                answeredQuestions.ToList(),
+                DateTime.Now,
+                SubmissionStatus.Pending,
+                donor.ToDomain(),
+                form.ToDomain(),
+                null
             );
 
-        var review = new Review(
-            submissionId,
-            doctorNic,
-            status,
-            finalNote,
-            DateTime.UtcNow
-        );
+            var submissionEntity = submission.ToEntity();
+            var submitted = await repository.SubmitSubmission(submissionEntity);
 
-        var addedReview = await repository.AddReview(review);
+            return submitted
+                ? Result.Ok()
+                : Result.Fail(new SubmissionError.SubmissionNotSavedError());
+        });
+    }
 
-        if (noteModels != null && noteModels.Any())
+    public async Task<Result<bool>> LockSubmission(int submissionId, string doctorNic)
+    {
+        return await context.WithTransaction(async () =>
         {
-            foreach (var note in noteModels)
+            var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
+            if (doctorUser is null)
+                return Result.Fail(new UserError.UnknownDoctorError());
+
+            LockEntity? lockEntity = await repository.GetLock(submissionId);
+
+            if (lockEntity != null)
             {
-                var newNote = new Note(
-                    addedReview.Id,
-                    note.QuestionId,
-                    note.NoteText
-                );
-
-                await repository.AddNote(newNote);
+                if (lockEntity.Doctor.Nic == doctorNic) await repository.UpdatedLockedSubmission(lockEntity);
+                else return Result.Fail(new SubmissionError.AlreadyLockedByAnotherDoctor(lockEntity.Doctor.Name));
             }
-        }
+            else
+            {
+                Lock l = new Lock(submissionId, LockEntityType.submission, doctorUser, DateTime.Now);
+                bool locked = await repository.LockSubmission(DomainToFromEntityExtensions.ToEntity(l));
+            }
 
-        // Unlock user account
-        var userAccountStatus = await repository.GetUserAccountStatus(submission.Donor);
-        if (userAccountStatus != null)
+            await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "lock", submissionId }));
+            return Result.Ok();
+        });
+    }
+
+    public async Task<Result<bool>> UnlockSubmission(int submissionId, string doctorNic)
+    {
+        return await context.WithTransaction(async () =>
         {
-            userAccountStatus.Status = AccountStatus.Active;
-            await repository.UpdateUserAccountStatus(userAccountStatus);
-        }
+            var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
+            if (doctorUser is null)
+                return Result.Fail(new UserError.UnknownDoctorError());
 
-        // Remove lock
-        await repository.UnlockSubmission(submissionId, doctorNic);
+            LockEntity? lockEntity = await repository.GetLock(submissionId);
 
-        // Sending notification to all doctors using the /pendingSubmission page that they can delete this submission from the list
-        await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "review", submissionId }));
+            if (lockEntity is null)
+                return Result.Fail(new SubmissionError.SubmissionNotLockedError());
+
+            if (lockEntity.Doctor.Nic != doctorNic)
+                return Result.Fail(new SubmissionError.NotYourSubmissionToUnlock(lockEntity.Doctor.Name));
+
+            var unlocked = await repository.UnlockSubmission(lockEntity);
+            if (!unlocked)
+                return Result.Fail(new SubmissionError.SubmissionNotLockedError());
 
 
-        return Result<Review, Problem>.Success(addedReview);
-    }*/
+            await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
+            return Result.Ok();
+        });
+    }
+
+    public async Task<Result<bool>> UnlockExpiredSubmissions(TimeSpan lockTimeout)
+    {
+        return await context.WithTransaction(async () =>
+        {
+            var expiredLocks = await repository.GetExpiredLocks(lockTimeout);
+            if (expiredLocks.Count == 0)
+                return Result.Ok(true);
+
+            var possibleErrors = new List<string>();
+            foreach (var expiredLock in expiredLocks)
+            {
+                var unlocked = await repository.UnlockSubmission(expiredLock);
+                if (!unlocked)
+                    possibleErrors.Add(expiredLock.LockEntityId.ToString());
+
+                var message = JsonSerializer.Serialize(new
+                    { type = "unlock", submissionId = expiredLock.LockEntityId, reason = "timeout" });
+                await notificationService.NotifyAllAsync(message);
+            }
+
+            return possibleErrors.Any()
+                ? Result.Fail(new SubmissionError.SubmissionNotLockedTimeoutError(possibleErrors))
+                : Result.Ok();
+        });
+    }
 
     public async Task<Result<List<SubmissionWithLockExternalInfo>>> GetPendingSubmissions()
     {
@@ -124,7 +137,7 @@ public class SubmissionService(IRepository repository, DbContext context, INotif
         });
     }
 
-    public async Task<Result<SubmissionWithLockExternalInfo>> GetPendingSubmissionsByUserNic(string userNic)
+    public async Task<Result<SubmissionWithLockExternalInfo>> GetPendingSubmissionsByUser(string userNic)
     {
         return await context.WithTransaction(async () =>
         {
@@ -137,7 +150,7 @@ public class SubmissionService(IRepository repository, DbContext context, INotif
         });
     }
 
-    public async Task<Result<SubmissionHistoryOutputModel>> GetSubmissionHistoryByNic(string nic, int limit,
+    public async Task<Result<SubmissionHistoryOutputModel>> GetSubmissionHistoryByUser(string nic, int limit,
         int skip)
     {
         return await context.WithTransaction(async () =>
@@ -147,10 +160,9 @@ public class SubmissionService(IRepository repository, DbContext context, INotif
             if (submissions == null || !submissions.Any())
                 return Result.Fail(new SubmissionError.NoSubmissionsHistoryError());
 
-            return Result.Ok(new SubmissionHistoryOutputModel(
-                
-                hasMoreSubmissions
-            ));
+            return Result.Ok(
+                new SubmissionHistoryOutputModel(submissions.Select(sub =>
+                    sub.ToDomain().ToSubmissionHistoryExternalInfo()).ToList(), hasMoreSubmissions));
         });
     }
 }

@@ -3,14 +3,12 @@ using DadivaAPI.repositories.Entities;
 
 namespace DadivaAPI.services.submissions.dtos;
 
-public record SubmissionWithLockExternalInfo(
+public record SubmissionExternalInfo(
     int Id,
     DateTime SubmissionDate,
     SubmissionStatus Status,
     List<AnsweredQuestion> AnsweredQuestions,
     string DonorNic,
     string DonorName,
-    List<QuestionGroup> FormQuestions,
-    LockExternalInfo Lock
+    List<QuestionGroup> FormQuestions
 );
-

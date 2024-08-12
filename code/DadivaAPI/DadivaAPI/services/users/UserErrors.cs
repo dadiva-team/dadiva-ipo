@@ -17,6 +17,8 @@ public abstract class UserError : Error
     public class InvalidSuspensionTypeError() : UserError;
 
     public class UserHasNoSuspensionError() : UserError;
+    
+    public class SuspensionNotDeletedError() : UserError;
 
     public class InvalidEndDateTypeError() : UserError;
 

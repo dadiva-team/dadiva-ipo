@@ -13,6 +13,24 @@ namespace DadivaAPI.repositories.submissions
             _context = context;
         }
 
+        public async Task<bool> SubmitSubmission(SubmissionEntity submission)
+        {
+            _context.Submissions.Add(submission);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+         public async Task<bool> UpdateSubmission(SubmissionEntity submission)
+        {
+            _context.Submissions.Update(submission);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> SubmitReview(ReviewEntity review)
+        {
+            _context.Reviews.Add(review);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
         public async Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(string userNic)
         {
             return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Donor.Nic == userNic);
@@ -20,7 +38,9 @@ namespace DadivaAPI.repositories.submissions
 
         public async Task<SubmissionEntity?> GetSubmissionById(int id)
         {
-            return await _context.Submissions.FirstOrDefaultAsync(submission => submission.Id == id);
+            return await _context.Submissions
+                .Include(s => s.AnsweredQuestions)
+                .FirstOrDefaultAsync(submission => submission.Id == id);
         }
 
         public async Task<List<SubmissionEntity>?> GetPendingSubmissions()
@@ -57,11 +77,11 @@ namespace DadivaAPI.repositories.submissions
 
             return (submissions, hasMoreSubmissions);
         }
-        
+
         public async Task<LockEntity?> GetLock(int submissionId)
         {
             return await _context.Locks.FirstOrDefaultAsync(
-                l => l.LockEntityType == LockEntityType.submission && l.EntityId == submissionId);
+                l => l.LockEntityType == LockEntityType.submission && l.LockEntityId == submissionId);
         }
 
         public async Task<bool> LockSubmission(LockEntity lockEntity)
@@ -69,7 +89,7 @@ namespace DadivaAPI.repositories.submissions
             _context.Locks.Add(lockEntity);
             return await _context.SaveChangesAsync() > 0;
         }
-        
+
         public async Task<bool> UpdatedLockedSubmission(LockEntity lockEntity)
         {
             _context.Locks.Update(lockEntity);
@@ -88,8 +108,7 @@ namespace DadivaAPI.repositories.submissions
                 .Where(l => l.LockDate < DateTime.UtcNow - timeout)
                 .ToListAsync();
         }
-
-
+        
         public async Task<bool> SubmissionExists(int id)
         {
             return await _context.Submissions.AnyAsync(e => e.Id == id);

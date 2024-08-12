@@ -15,16 +15,16 @@ public static class PopulateDatabase
         context.Forms.Add(InitialData.Form);
         context.Terms.AddRange(InitialData.Terms);
 
-        context.CftToManual.AddRange(InitialData.CftToManualEntries.Select(entry => new CftToManualEntry
+        /*context.CftToManual.AddRange(InitialData.CftToManualEntries.Select(entry => new CftToManualEntry
         {
             Cft = entry.Key,
             ManualEntry = entry.Value
-        }));
+        }));*/
         
         context.SaveChanges();
         
-        context.TermsChangeLogs.Add(InitialData.TestTermsChangeLog);
-        context.UserAccountStatus.AddRange(InitialData.UserAccountStatuses);
+       /* context.TermsChangeLogs.Add(InitialData.TestTermsChangeLog);
+        context.UserAccountStatus.AddRange(InitialData.UserAccountStatuses); */
         
         context.SaveChanges();
     }

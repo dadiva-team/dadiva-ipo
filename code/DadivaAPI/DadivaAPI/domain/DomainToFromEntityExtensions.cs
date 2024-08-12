@@ -53,8 +53,7 @@ public static class DomainToFromEntityExtensions
     {
         return new LockEntity
         {
-            Id = domain.Id,
-            EntityId = domain.EntityId,
+            LockEntityId = domain.EntityId,
             LockEntityType = domain.LockEntityType,
             Doctor = domain.Doctor.ToEntity(),
             LockDate = domain.LockDate
@@ -63,9 +62,14 @@ public static class DomainToFromEntityExtensions
 
     public static Submission ToDomain(this SubmissionEntity entity)
     {
-        return new Submission(
-            entity.Id, entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status,
-            entity.Donor.ToDomain(), entity.Form.ToDomain(), entity.LockedBy.ToDomain());
+        return new Submission(entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status,
+            entity.Donor.ToDomain(), entity.Form.ToDomain(), entity.LockedBy?.ToDomain());
+    }
+
+    public static Review ToDomain(this ReviewEntity entity)
+    {
+        return new Review(entity.Submission.ToDomain(), entity.Doctor.ToDomain(), entity.Status,
+            entity.FinalNote, entity.Date);
     }
 
     public static ManualEntry ToDomain(this ManualEntryEntity entity)

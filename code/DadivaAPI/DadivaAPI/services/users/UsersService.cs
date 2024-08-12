@@ -118,7 +118,7 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
         });
     }
 
-    public async Task<Result> AddSuspension( 
+    public async Task<Result> AddSuspension(
         string donorNic,
         string doctorNic,
         string type,
@@ -126,7 +126,7 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
         string? endDate,
         string? reason,
         string? note
-        )
+    )
     {
         return await context.WithTransaction(async () =>
         {
@@ -152,7 +152,7 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
             }
 
             var suspension = new Suspension(suspendedUser, doctorUser, suspensionStartDate,
-                parsedType,note, reason, suspensionEndDate);
+                parsedType, note, reason, suspensionEndDate);
 
             bool success = await repository.AddSuspension(suspension.ToEntity());
             return !success
@@ -169,17 +169,16 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
         string? endDate,
         string? note,
         string? reason
-        )
+    )
     {
         return await context.WithTransaction(async () =>
         {
-            
             var suspensionEntity = await repository.GetSuspension(donorNic);
             if (suspensionEntity is null)
             {
                 return Result.Fail(new UserError.UserHasNoSuspensionError());
             }
-            
+
 
             suspensionEntity.StartDate = DateTime.Parse(startDate).ToUniversalTime();
             suspensionEntity.Type = type;
@@ -192,9 +191,9 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
             {
                 return Result.Fail(new UserError.InvalidEndDateTypeError());
             }
-            
+
             var doctorEntity = await repository.GetUserByNic(doctorNic);
-            
+
             if (doctorEntity is null)
             {
                 return Result.Fail(new UserError.UnknownDoctorError());
@@ -203,7 +202,7 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
             suspensionEntity.Doctor = doctorEntity;
             suspensionEntity.Note = note;
             suspensionEntity.Reason = reason;
-            
+
             var success = await repository.UpdateSuspension(suspensionEntity);
             return !success
                 ? Result.Fail(new UserError.UnknownError())
@@ -220,18 +219,18 @@ public class UsersService(IConfiguration config, IRepository repository, DbConte
             {
                 return Result.Fail(new UserError.TokenCreationError());
             }
-            
-            return Result.Ok( new SuspensionWithNamesExternalInfo(
-                    suspensionEntity.Donor.Nic,
-                    suspensionEntity.Donor.Name,
-                    suspensionEntity.Doctor.Nic,
-                    suspensionEntity.Doctor.Name,
-                    suspensionEntity.Type,
-                    suspensionEntity.StartDate.ToString(),
-                    suspensionEntity.EndDate?.ToString(),
-                    suspensionEntity.Reason,
-                    suspensionEntity.Note
-                    ));
+
+            return Result.Ok(new SuspensionWithNamesExternalInfo(
+                suspensionEntity.Donor.Nic,
+                suspensionEntity.Donor.Name,
+                suspensionEntity.Doctor.Nic,
+                suspensionEntity.Doctor.Name,
+                suspensionEntity.Type,
+                suspensionEntity.StartDate.ToString(),
+                suspensionEntity.EndDate?.ToString(),
+                suspensionEntity.Reason,
+                suspensionEntity.Note
+            ));
         });
     }
 

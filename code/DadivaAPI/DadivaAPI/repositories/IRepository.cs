@@ -43,6 +43,10 @@ public interface IRepository
     public Task<bool> SubmitTerms(TermsEntity terms);
     
     /*SUBMISSIONS*/
+    
+    public Task<bool> SubmitSubmission(SubmissionEntity submission);
+    public Task<bool> UpdateSubmission(SubmissionEntity submission);
+    public Task<bool> SubmitReview(ReviewEntity review);
     public Task<List<SubmissionEntity>?> GetPendingSubmissions();
 
     public Task<SubmissionEntity?> GetSubmissionById(int id);
@@ -64,8 +68,12 @@ public interface IRepository
 
     public Task<bool> SubmissionExists(int id);
     
+    
+    /*MEDICATIONS*/
     public Task<List<string>> SearchMedications(string query);
 
+    
+    /*MANUAL*/
     Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts);
     
     public Task<List<string>> GetCfts(string productName);
