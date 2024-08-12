@@ -10,7 +10,7 @@ using DomainToFromEntityExtensions = DadivaAPI.domain.DomainToFromEntityExtensio
 
 namespace DadivaAPI.services.users;
 
-public class UsersService(IConfiguration config, IRepository repository, DbContext context) : IUsersService
+public class UsersService(IConfiguration config, IRepository repository, DadivaDbContext context) : IUsersService
 {
     private readonly string _jwtKey = config["Jwt:Key"] ?? throw new ArgumentNullException("Jwt key is missing");
 

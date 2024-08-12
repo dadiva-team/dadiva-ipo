@@ -67,15 +67,15 @@ public record Submission(
         };
     }
     
-    public SubmissionEntity ToEntity()
+    public SubmissionEntity ToEntity(UserEntity donor, UserEntity doctor)
     {
         return new SubmissionEntity
         {
             Id = Id,
             Date = SubmissionDate,
-            Donor = Donor.ToEntity(),
+            Donor = donor,
             LockedBy = Locked?.ToEntity(),
-            Form = Form.ToEntity(null, null),
+            Form = Form.ToEntity(null, doctor, null),
             Status = Status,
             AnsweredQuestions = AnsweredQuestions.Select(aq => aq.ToEntity()).ToList()
         };

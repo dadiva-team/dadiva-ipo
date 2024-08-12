@@ -14,12 +14,12 @@ public record Review(
 {
     int Id { get; init; }
 
-    public ReviewEntity ToEntity()
+    public ReviewEntity ToEntity(SubmissionEntity submission)
     {
         return new ReviewEntity
         {
             Id = Id,
-            Submission = Submission.ToEntity(),
+            Submission = submission,
             Doctor = Doctor.ToEntity(),
             Status = Status,
             FinalNote = FinalNote,

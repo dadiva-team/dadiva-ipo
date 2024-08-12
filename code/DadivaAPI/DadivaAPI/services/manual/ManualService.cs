@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.manual;
 
-public class ManualService(IRepository repository, DbContext context) : IManualService
+public class ManualService(IRepository repository, DadivaDbContext context) : IManualService
 {
     public async Task<Result<List<ManualEntry>>> GetManualInformation(string productName)
     {

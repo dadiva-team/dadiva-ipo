@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.medications;
 
-public class MedicationsService(IRepository repository, DbContext context) : IMedicationsService
+public class MedicationsService(IRepository repository, DadivaDbContext context) : IMedicationsService
 {
     public async Task<Result<List<string>>> SearchMedications(string query)
     {

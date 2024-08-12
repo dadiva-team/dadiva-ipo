@@ -1,5 +1,6 @@
 using DadivaAPI.repositories.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace DadivaAPI.repositories;
 
@@ -46,4 +47,19 @@ public class DadivaDbContext : DbContext
     public DbSet<LockEntity> Locks { get; set; }
     
     public DbSet<ReviewEntity> Reviews { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SuspensionEntity>()
+            .HasOne(s => s.Donor)
+            .WithMany(u => u.Suspensions)
+            .HasForeignKey("DonorId")
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<SuspensionEntity>()
+            .HasOne(s => s.Doctor)
+            .WithMany()
+            .HasForeignKey("DoctorId")
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }

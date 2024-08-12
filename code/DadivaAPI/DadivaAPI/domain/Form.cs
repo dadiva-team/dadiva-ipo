@@ -17,14 +17,15 @@ public record Form(
 {
     public int Id { get; init; }
 
-    public FormEntity ToEntity(FormEntity? previousForm, string? reason)
+    public FormEntity ToEntity(FormEntity? previousForm, UserEntity? addedBy, string? reason)
     {
-        return new FormEntity
+        addedBy ??= AddedBy.ToEntity();
+        return new FormEntity()
         {
             Date = DateTime.Now.ToUniversalTime(),
             Reason = reason,
             Language = Language.ToString(),
-            Admin = AddedBy.ToEntity(),
+            Admin = addedBy,
             Inconsistencies = null,
             PreviousForm = previousForm,
             QuestionGroups = Groups.Select(g => g.ToEntity()).ToList(), //not ideal, replicates question groups that are already in form

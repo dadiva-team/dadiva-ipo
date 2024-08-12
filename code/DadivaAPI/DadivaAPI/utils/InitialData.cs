@@ -8,7 +8,7 @@ namespace DadivaAPI.utils;
 public class InitialData
 {
     private static readonly User Admin = new(
-        "987654321",
+        "87654321",
         "Eng. Doe",
         "MegaPassword123!hashed",
         new List<Role> { Role.admin },
@@ -19,7 +19,7 @@ public class InitialData
     );
 
     private static readonly User Doctor = new(
-        "111111111",
+        "11111111",
         "Dr. Doe",
         "MegaPassword123!hashed",
         new List<Role> { Role.doctor },
@@ -30,7 +30,7 @@ public class InitialData
     );
 
     private static readonly User Donor = new(
-        "123456789",
+        "12345678",
         "John Doe",
         "MegaPassword123!hashed",
         new List<Role> { Role.donor },
@@ -98,10 +98,13 @@ public class InitialData
         DateTime.UtcNow
     );
 
+    private static readonly TermsEntity TestTerms1Entity = TestTerms1.ToEntity(null, Users[0], null);
+    private static readonly TermsEntity TestTerms2Entity = TestTerms2.ToEntity(TestTerms1Entity, Users[0], "Test2");
+    
     public static readonly List<TermsEntity> Terms =
     [
-        TestTerms1.ToEntity(null, null),
-        TestTerms2.ToEntity(null, null)
+        TestTerms1Entity,
+        TestTerms2Entity
     ];
 
 /*    public static readonly TermsChangeLog TestTermsChangeLog = new
@@ -430,7 +433,7 @@ public class InitialData
         //DateTime.Now.ToUniversalTime()
     );
 
-    public static readonly FormEntity Form = realForm.ToEntity(null, null);
+    public static readonly FormEntity Form = realForm.ToEntity(null,Users[0], null);
 
     /*ion sub1 = new Submission(
         new List<AnsweredQuestion>

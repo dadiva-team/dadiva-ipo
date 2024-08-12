@@ -12,17 +12,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.reviews;
 
-public class ReviewsService(IRepository repository, DbContext context,  INotificationService notificationService) : IReviewsService
+public class ReviewsService(IRepository repository, DadivaDbContext context,  INotificationService notificationService) : IReviewsService
 {
     public async Task<Result<bool>> ReviewSubmission(int submissionId, string doctorNic, string status,
         List<NoteModel>? notes, string? finalNote)
     {
         return await context.WithTransaction(async () =>
         {
-            var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
-            if (doctorUser is null)
+            var doctorEntity = await repository.GetUserByNic(doctorNic);
+            if (doctorEntity is null)
                 return Result.Fail(new UserError.UnknownDoctorError());
-
+            
             var submissionEntity = await repository.GetSubmissionById(submissionId);
             if (submissionEntity is null)
                 return Result.Fail(new SubmissionError.SubmissionNotFoundError());
@@ -43,7 +43,7 @@ public class ReviewsService(IRepository repository, DbContext context,  INotific
             if (notes != null)
                 submissionDomain = submissionDomain.AddNotesToAnsweredQuestions(notes);
 
-
+            var doctorUser = doctorEntity.ToDomain();
             var review = new Review(
                 submissionDomain,
                 doctorUser,
@@ -51,12 +51,12 @@ public class ReviewsService(IRepository repository, DbContext context,  INotific
                 finalNote,
                 DateTime.Now
             );
-
-            var addedReview = await repository.SubmitReview(review.ToEntity());
+            
+            submissionEntity = submissionDomain.ToEntity( submissionEntity.Donor,  doctorEntity);
+            var addedReview = await repository.SubmitReview(review.ToEntity(submissionEntity));
             if (!addedReview)
                 return Result.Fail(new ReviewErrors.ReviewNotSavedError());
-
-            submissionEntity = submissionDomain.ToEntity();
+            
             var updatedSubmission = await repository.UpdateSubmission(submissionEntity);
             if (!updatedSubmission)
                 return Result.Fail(new SubmissionError.SubmissionNotUpdatedError());

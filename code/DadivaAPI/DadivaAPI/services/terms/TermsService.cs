@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.terms;
 
-public class TermsService(IRepository repository, DbContext context) : ITermsService
+public class TermsService(IRepository repository, DadivaDbContext context) : ITermsService
 {
     public async Task<Result<TermsExternalInfo>> GetActiveTerms(string language)
     {

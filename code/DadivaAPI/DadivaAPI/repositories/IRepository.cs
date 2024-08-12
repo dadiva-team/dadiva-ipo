@@ -1,4 +1,3 @@
-using DadivaAPI.domain;
 using DadivaAPI.repositories.Entities;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.manual;
@@ -13,11 +12,11 @@ public interface IRepository
 {
     public IUsersRepository UserRepository { get; }
     public IFormRepository FormRepository { get; }
-    public ISubmissionRepository SubmissionRepository { get; }
     public ITermsRepository TermsRepository { get; }
+    public ISubmissionRepository SubmissionRepository { get; }
     public IMedicationsRepository MedicationRepository { get; }
     public IManualRepository ManualRepository { get; }
-    
+
     /*USER*/
     public Task<UserEntity?> GetUserByNic(string nic);
     public Task<bool> AddUser(UserEntity user);
@@ -35,13 +34,13 @@ public interface IRepository
     public Task<bool> AddForm(FormEntity form);
     public Task<InconsistencyEntity?> GetInconsistencies();
     public Task<bool> SubmitInconsistencies(InconsistencyEntity inconsistencies);
-    
+
     /*TERMS*/
     public Task<TermsEntity?> GetActiveTerms(string language);
     public Task<List<TermsEntity>?> GetTermsHistory(string language);
     public Task<TermsEntity?> GetTermsById(int id);
     public Task<bool> SubmitTerms(TermsEntity terms);
-    
+
     /*SUBMISSIONS*/
     
     public Task<bool> SubmitSubmission(SubmissionEntity submission);
@@ -55,11 +54,11 @@ public interface IRepository
 
     public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip);
-    
+
     public Task<LockEntity?> GetLock(int submissionId);
 
     public Task<bool> LockSubmission(LockEntity lockEntity);
-    
+
     public Task<bool> UpdatedLockedSubmission(LockEntity lockEntity);
 
     public Task<bool> UnlockSubmission(LockEntity lockEntity);

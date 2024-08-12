@@ -5,11 +5,10 @@ using DadivaAPI.routes.form.models;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
 using FluentResults;
-using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.form;
 
-public class FormService(IRepository repository, DbContext context)
+public class FormService(IRepository repository, DadivaDbContext context)
     : IFormService
 {
     public async Task<Result<GetFormOutputModel>> GetForm(string language)
@@ -50,8 +49,8 @@ public class FormService(IRepository repository, DbContext context)
     {
         return await context.WithTransaction(async () =>
         {
-            var userEntity = await repository.GetUserByNic(nic);
-            if (userEntity is null) return Result.Fail(new UserError.UnknownDonorError());
+            var adminEntity = await repository.GetUserByNic(nic);
+            if (adminEntity is null) return Result.Fail(new UserError.UnknownDonorError());
 
             if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
                 return Result.Fail(new FormErrors.InvalidLanguageError());
@@ -60,11 +59,12 @@ public class FormService(IRepository repository, DbContext context)
                 questionGroups.Select(qgm => QuestionGroupModel.ToDomain(qgm)).ToList(),
                 rules.Select(rm => RuleModel.ToDomain(rm)).ToList(),
                 parsedLanguage,
-                userEntity.ToDomain()
+                adminEntity.ToDomain()
             );
 
             var formEntity = formDomain.ToEntity(
                 await repository.GetForm(language),
+                adminEntity,
                 reason
             );
 

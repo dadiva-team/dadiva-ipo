@@ -12,16 +12,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.submissions;
 
-public class SubmissionService(IRepository repository, DbContext context, INotificationService notificationService)
+public class SubmissionService(IRepository repository, DadivaDbContext context, INotificationService notificationService)
     : ISubmissionService
 {
-    public async Task<Result<bool>> SubmitSubmission(string donorNic, List<AnsweredQuestion> answeredQuestions)
+    public async Task<Result<bool>> SubmitSubmission(string donorNic, string doctorNic, List<AnsweredQuestion> answeredQuestions)
     {
         return await context.WithTransaction(async () =>
         {
             var donor = await repository.GetUserByNic(donorNic);
+            var doctor = await repository.GetUserByNic(doctorNic);
+            
             if (donor is null)
                 return Result.Fail(new UserError.UnknownDonorError());
+            
+            if (doctor is null)
+                return Result.Fail(new UserError.UnknownDoctorError());
 
             var form = await repository.GetForm("en"); //TODO: Hardcoded language
             if (form is null)
@@ -36,7 +41,7 @@ public class SubmissionService(IRepository repository, DbContext context, INotif
                 null
             );
 
-            var submissionEntity = submission.ToEntity();
+            var submissionEntity = submission.ToEntity(donor, doctor);
             var submitted = await repository.SubmitSubmission(submissionEntity);
 
             return submitted

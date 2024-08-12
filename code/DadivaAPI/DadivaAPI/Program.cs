@@ -113,7 +113,10 @@ switch (databaseType)
         }
 
         builder.Services.AddDbContext<DadivaDbContext>(options =>
-            options.UseNpgsql(connectionString)
+            {
+                options.UseNpgsql(connectionString);
+                options.EnableSensitiveDataLogging();
+            }
         );
         break;
     case "MEMORY":
@@ -141,7 +144,6 @@ builder.Services.AddSingleton(new ElasticsearchClient(settings));
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 builder.Services.AddSingleton<NotificationEndpoint>();
 builder.Services.AddHostedService<UnlockExpiredSubmissionsService>();
-
 
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();
