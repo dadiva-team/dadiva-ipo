@@ -32,7 +32,7 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return UserRepository.UpdateUser(user);
     }
-    
+
     public Task<List<UserEntity>> GetUsers()
     {
         return UserRepository.GetUsers();
@@ -47,25 +47,33 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return UserRepository.AddSuspension(suspension);
     }
+
     public Task<bool> UpdateSuspension(SuspensionEntity suspension)
     {
         return UserRepository.UpdateSuspension(suspension);
     }
+
     public Task<SuspensionEntity?> GetSuspension(string userNic)
     {
         return UserRepository.GetSuspension(userNic);
     }
+
+    public Task<SuspensionEntity?> GetSuspensionIfActive(string userNic)
+    {
+        return UserRepository.GetSuspensionIfActive(userNic);
+    }
+
     public Task<bool> DeleteSuspension(string userNic)
     {
         return UserRepository.DeleteSuspension(userNic);
     }
-    
+
     /*FORMS*/
     public Task<FormEntity?> GetForm(string language)
     {
         return FormRepository.GetForm(language);
     }
-    
+
     public Task<bool> AddForm(FormEntity form)
     {
         return FormRepository.AddForm(form);
@@ -80,7 +88,7 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return FormRepository.EditInconsistencies(inconsistencies);
     }
-    
+
     /*TERMS*/
     public Task<TermsEntity?> GetActiveTerms(string language)
     {
@@ -101,74 +109,75 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return TermsRepository.SubmitTerms(terms);
     }
-    
+
     /*SUBMISSIONS*/
-    
+
     public Task<bool> SubmitSubmission(SubmissionEntity submission)
     {
         return SubmissionRepository.SubmitSubmission(submission);
     }
-    
+
     public Task<bool> UpdateSubmission(SubmissionEntity submission)
     {
         return SubmissionRepository.UpdateSubmission(submission);
     }
-    
+
     public Task<bool> SubmitReview(ReviewEntity review)
     {
         return SubmissionRepository.SubmitReview(review);
     }
+
     public Task<List<SubmissionEntity>?> GetPendingSubmissions()
     {
         return SubmissionRepository.GetPendingSubmissions();
     }
-    
+
     public Task<SubmissionEntity?> GetSubmissionById(int id)
     {
         return SubmissionRepository.GetSubmissionById(id);
     }
-    
+
     public Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(string userNic)
     {
         return SubmissionRepository.GetLatestPendingSubmissionByUser(userNic);
     }
-    
+
     public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip)
     {
         return SubmissionRepository.GetSubmissionHistoryByUser(nic, limit, skip);
     }
-    
+
     public Task<LockEntity?> GetLock(int submissionId)
     {
         return SubmissionRepository.GetLock(submissionId);
     }
-    
+
     public Task<bool> LockSubmission(LockEntity lockEntity)
     {
         return SubmissionRepository.LockSubmission(lockEntity);
     }
-    
+
     public Task<bool> UpdatedLockedSubmission(LockEntity lockEntity)
     {
         return SubmissionRepository.UpdatedLockedSubmission(lockEntity);
     }
-    
+
     public Task<bool> UnlockSubmission(LockEntity lockEntity)
     {
         return SubmissionRepository.UnlockSubmission(lockEntity);
     }
-    
+
     public Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout)
     {
         return SubmissionRepository.GetExpiredLocks(timeout);
     }
-    
+
     public Task<bool> SubmissionExists(int id)
     {
         return SubmissionRepository.SubmissionExists(id);
     }
-    
+
     /*MEDICATIONS*/
 
     public Task<List<string>> SearchMedications(string query)
@@ -176,7 +185,7 @@ public class Repository(DadivaDbContext context) : IRepository
         return MedicationRepository.SearchMedications(query);
     }
 
-    
+
     /*MANUAL*/
     public Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts)
     {

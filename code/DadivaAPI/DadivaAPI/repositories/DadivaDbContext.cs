@@ -50,6 +50,8 @@ public class DadivaDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("public");
+        
         modelBuilder.Entity<SuspensionEntity>()
             .HasOne(s => s.Donor)
             .WithMany(u => u.Suspensions)

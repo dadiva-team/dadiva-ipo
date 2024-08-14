@@ -37,6 +37,7 @@ public static class DomainToFromEntityExtensions
             Note = domain.Note,
             Reason = domain.Reason,
             StartDate = domain.StartDate,
+            IsActive = domain.IsActive,
             EndDate = domain.EndDate,
             Type = domain.Type.ToString()
         };
@@ -45,7 +46,7 @@ public static class DomainToFromEntityExtensions
     public static Suspension ToDomain(this SuspensionEntity domain)
     {
         return new Suspension(domain.Donor.ToDomain(), domain.Doctor.ToDomain(), domain.StartDate,
-            Enum.Parse<SuspensionType>(domain.Type), domain.Note, domain.Reason, domain.EndDate, domain.Id);
+            Enum.Parse<SuspensionType>(domain.Type), domain.IsActive, domain.Note, domain.Reason, domain.EndDate, domain.Id);
     }
 
 

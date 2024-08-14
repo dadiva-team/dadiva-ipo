@@ -20,7 +20,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
     private readonly string _jwtAudience =
         config["Jwt:Audience"] ?? throw new ArgumentNullException("Jwt audience is missing");
 
-    public async Task<Result<string>> CreateToken(string nic, string password)
+    public async Task<Result<UserLoginExternalInfo>> CreateToken(string nic, string password)
     {
         return await context.WithTransaction(async () =>
         {
@@ -37,9 +37,15 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
 
             var success = await repository.UpdateUser(newUserEntity);
 
-            if (!success) Result.Fail(new UserError.TokenCreationError());
+            if (!success) return Result.Fail(new UserError.TokenCreationError());
 
-            return Result.Ok(newUser.Token);
+            // Podiamos usar a função getUserByNic e incluir a suspensão tbm
+            var suspension = (await repository.GetSuspensionIfActive(nic));
+            var suspensiond = suspension?.ToDomain();
+
+            var ulei = UserLoginExternalInfo.CreateUserLoginExternalInfo(nic, newUser.Token, suspensiond);
+
+            return Result.Ok(ulei);
         });
     }
 
@@ -152,7 +158,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             }
 
             var suspension = new Suspension(suspendedUser, doctorUser, suspensionStartDate,
-                parsedType, note, reason, suspensionEndDate);
+                parsedType, true, note, reason, suspensionEndDate);
 
             bool success = await repository.AddSuspension(suspension.ToEntity());
             return !success
@@ -202,6 +208,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             suspensionEntity.Doctor = doctorEntity;
             suspensionEntity.Note = note;
             suspensionEntity.Reason = reason;
+            suspensionEntity.IsActive = (DateTime.Parse(endDate) > DateTime.UtcNow);
 
             var success = await repository.UpdateSuspension(suspensionEntity);
             return !success

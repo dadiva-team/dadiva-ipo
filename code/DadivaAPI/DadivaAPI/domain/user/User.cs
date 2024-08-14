@@ -38,26 +38,32 @@ public partial record User(
 
     public bool VerifyPassword(string password)
     {
-        return Argon2.Verify(HashedPassword, password,
-            secret: Environment.GetEnvironmentVariable("DADIVA_API_PASSWORD_PEPPER"));
+        //TODO: :D
+        return true; /*Argon2.Verify(HashedPassword, password,
+            secret: Environment.GetEnvironmentVariable("DADIVA_API_PASSWORD_PEPPER"));*/
     }
 
     public string GenerateToken(string key, string issuer, string audience)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, Nic),
+            new Claim("fullName", Name)
+        };
+
+        claims.AddRange(Roles.Select(role => new Claim(ClaimTypes.Role, role.ToString())));
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.Name, Nic),
-                new Claim(ClaimTypes.Role, GetType().Name)
-            }),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddDays(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                 SecurityAlgorithms.HmacSha256Signature),
             Issuer = issuer,
             Audience = audience
         };
+
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }

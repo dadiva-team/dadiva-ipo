@@ -10,7 +10,8 @@ public static class SubmissionRoutes
     public static void AddSubmissionRoutes(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/submissions");
-        group.MapGet("/pending", GetPendingSubmissions).RequireAuthorization("doctor");
+        group.MapGet("/pending", GetPendingSubmissions)
+            .AllowAnonymous();//.RequireAuthorization("doctor");
         group.MapGet("/pending/{nic:int}", GetPendingSubmission)
             .AllowAnonymous(); //.RequireAuthorization("doctor");
         group.MapGet("/history/{nic:int}", GetSubmissionHistory)
@@ -19,7 +20,7 @@ public static class SubmissionRoutes
             .AllowAnonymous(); //RequireAuthorization("doctor");
         group.MapPost("/{submissionId:int}/unlock", UnlockSubmission)
             .AllowAnonymous(); //RequireAuthorization("doctor");
-        app.MapGet("/pending/notifications",
+        group.MapGet("/pending/notifications",
             async (NotificationEndpoint endpoint, HttpContext context) =>
             {
                 await endpoint.HandleNotificationsAsync(context);

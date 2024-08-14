@@ -17,5 +17,6 @@ public interface IUsersRepository
     public Task<bool> AddSuspension(SuspensionEntity suspension);
     public Task<bool> UpdateSuspension(SuspensionEntity suspension);
     public Task<SuspensionEntity?> GetSuspension(string userNic);
+    public Task<SuspensionEntity?> GetSuspensionIfActive(string userNic);
     public Task<bool> DeleteSuspension(string userNic);
 }

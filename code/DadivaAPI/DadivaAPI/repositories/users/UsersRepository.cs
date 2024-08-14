@@ -25,17 +25,16 @@ public class UsersRepository : IUsersRepository
 
     public async Task<UserEntity?> GetUserByNic(string nic)
     {
-        return await _context.Users.FindAsync(nic);
+        return await _context.Users
+                .FirstOrDefaultAsync(u => u.Nic == nic);
     }
 
     public async Task<bool> UpdateUser(UserEntity user)
     {
-        if (await _context.Users.FindAsync(user.Nic) != user)
-        {
-            return false;
-        }
-        
-        _context.Users.Update(user);
+        var u = await _context.Users.FindAsync(user.Nic);
+        if (u == null) return false;
+
+        u.Token = user.Token;
         return await _context.SaveChangesAsync() > 0;
     }
 
@@ -72,7 +71,19 @@ public class UsersRepository : IUsersRepository
     public async Task<SuspensionEntity?> GetSuspension(string userNic)
     {
         return await _context.Suspensions
+            .Include(s => s.Donor)
+            .Include(s => s.Doctor)
             .FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
+    }
+    
+    public async Task<SuspensionEntity?> GetSuspensionIfActive(string userNic)
+    {
+        return await _context.Suspensions
+            .Include(s => s.Donor)
+            .Include(s => s.Doctor)
+            .Where(suspension => suspension.Donor.Nic == userNic && suspension.IsActive)
+            .OrderBy(suspension => suspension.StartDate)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<bool> DeleteSuspension(string userNic)

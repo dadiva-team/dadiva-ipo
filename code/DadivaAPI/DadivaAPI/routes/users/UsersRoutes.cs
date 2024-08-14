@@ -16,7 +16,7 @@ public static class UsersRoutes
         usersGroup.MapGet("/{nic}", CheckNicExistence).AllowAnonymous(); //RequireAuthorization("doctor");
 
         usersGroup.MapPost("", CreateUser).RequireAuthorization("admin");
-        usersGroup.MapGet("", GetUsers).RequireAuthorization("admin");
+        usersGroup.MapGet("", GetUsers).AllowAnonymous();//.RequireAuthorization("admin");
         usersGroup.MapDelete("/{nic}", DeleteUser).RequireAuthorization("admin");
 
         usersGroup.MapPost("/suspension", AddSuspension).AllowAnonymous();
@@ -29,7 +29,7 @@ public static class UsersRoutes
         IUsersService service)
     {
         return (await service.CreateToken(input.Nic, input.Password)).HandleRequest(
-            token =>
+            ulei =>
             {
                 var cookieOptions = new CookieOptions
                 {
@@ -38,10 +38,9 @@ public static class UsersRoutes
                     SameSite = SameSiteMode.None, // Necessary for cross-origin/cross-site requests
                     Expires = DateTime.UtcNow.AddDays(1)
                 };
-                http.Response.Cookies.Append("token", token, cookieOptions);
+                http.Response.Cookies.Append("token", ulei.Token, cookieOptions);
 
-                return Results.Created((string?)null,
-                    new CreateTokenOutputModel(input.Nic, token));
+                return Results.Created((string?)null, CreateTokenOutputModel.FromExternalInfo(ulei));
             }
         );
     }

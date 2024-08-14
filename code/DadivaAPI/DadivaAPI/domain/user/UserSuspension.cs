@@ -12,6 +12,7 @@ public record Suspension(
     User Doctor,
     DateTime StartDate,
     SuspensionType Type,
+    bool IsActive,
     string? Note = null,
     string? Reason = null,
     DateTime? EndDate = null,

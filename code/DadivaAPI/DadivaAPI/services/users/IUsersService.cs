@@ -5,7 +5,7 @@ namespace DadivaAPI.services.users;
 
 public interface IUsersService
 {
-    public Task<Result<string>> CreateToken(string nic, string password);
+    public Task<Result<UserLoginExternalInfo>> CreateToken(string nic, string password);
 
     public Task<Result<UserExternalInfo>> CreateUser(
         string nic,

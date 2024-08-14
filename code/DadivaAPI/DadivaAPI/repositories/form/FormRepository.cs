@@ -5,7 +5,6 @@ namespace DadivaAPI.repositories.form
 {
     public class FormRepository : IFormRepository
     {
-
         private readonly DadivaDbContext _context;
 
         public FormRepository(DadivaDbContext context)
@@ -16,7 +15,11 @@ namespace DadivaAPI.repositories.form
         public async Task<FormEntity?> GetForm(string language)
         {
             return await _context.Forms
-                .Where(form=> form.Language == language)
+                .Include(form => form.QuestionGroups)
+                .ThenInclude(qg => qg.Questions)
+                .Include(form => form.Rules)
+                .Include(form => form.Admin)
+                .Where(form => form.Language == language)
                 .OrderBy(form => form.Date)
                 .LastOrDefaultAsync();
         }
@@ -37,6 +40,5 @@ namespace DadivaAPI.repositories.form
             _context.Inconsistencies.Update(inconsistencies);
             return await _context.SaveChangesAsync() > 0;
         }
-
     }
 }
