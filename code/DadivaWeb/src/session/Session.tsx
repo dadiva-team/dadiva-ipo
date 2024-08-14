@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { AccountStatus, UserAccountStatus } from '../services/users/models/LoginOutputModel';
+import { SuspensionType, UserAccountStatus } from '../services/users/models/LoginOutputModel';
 import { SubmitFormOutputModel } from '../services/from/models/SubmitFormOutputModel';
 
 export enum Role {
@@ -11,7 +11,7 @@ export enum Role {
 export interface Session {
   readonly name: string;
   readonly nic: number;
-  readonly perms: Role;
+  readonly perms: Role[];
   readonly accountStatus: UserAccountStatus;
 }
 
@@ -77,7 +77,7 @@ export function useSessionManager() {
 export function useUpdateSessionStatus() {
   const sessionManager = useSessionManager();
 
-  return function (newStatus: AccountStatus, res: SubmitFormOutputModel) {
+  return function (newStatus: SuspensionType, res: SubmitFormOutputModel) {
     const currentUser = sessionManager.session;
 
     if (currentUser) {
@@ -85,9 +85,9 @@ export function useUpdateSessionStatus() {
         ...currentUser,
         accountStatus: {
           ...currentUser.accountStatus,
-          lastSubmissionDate: res.submissionDate,
-          lastSubmissionId: res.submissionId,
-          status: newStatus,
+          suspensionIsActive: true,
+          suspensionType: newStatus,
+          suspensionStartDate: res.submissionDate,
         },
       };
 
@@ -98,7 +98,8 @@ export function useUpdateSessionStatus() {
 
 export function useAccountStatus() {
   const user = useCurrentSession();
-  return user?.accountStatus
+  console.log(`useAccountStatus: ${JSON.stringify(user)}`);
+  return user?.accountStatus;
 }
 
 export function useLoggedIn() {

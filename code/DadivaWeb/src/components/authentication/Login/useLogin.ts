@@ -39,7 +39,7 @@ export function useLogin(returnTo: string) {
       setError('O NIC só deve conter numeros');
       return;
     }
-    if (state.inputs.nic.length !== 9) {
+    if (state.inputs.nic.length !== 8) {
       dispatch({ type: 'error', message: 'O NIC deve ter 8 dígitos' });
       setError('O NIC deve ter 8 dígitos');
       return;
@@ -62,7 +62,7 @@ export function useLogin(returnTo: string) {
       setLoading(false);
       throw new Error('Response is undefined');
     }
-    console.log(res);
+    console.log('res', res);
 
     const { token, accountStatus } = res;
     if (!token) {
@@ -71,21 +71,28 @@ export function useLogin(returnTo: string) {
       setLoading(false);
       return;
     }
+
+    const decodedPayload = JSON.parse(atob(token.split('.')[1]));
+
     const payload: {
       name: string;
-      nic: number;
-      perms: string;
-    } = JSON.parse(atob(token.split('.')[1]));
+      nic: string;
+      perms: string[];
+    } = {
+      name: decodedPayload.fullName,
+      nic: decodedPayload.unique_name,
+      perms: decodedPayload.role,
+    };
 
-    console.log(atob(token.split('.')[1]));
-    console.log(payload);
+    console.log('Decoded payload', payload);
 
     const session: Session = {
       name: payload.name,
-      nic: payload.nic,
-      perms: payload.perms as Role,
+      nic: Number(payload.nic),
+      perms: payload.perms as Role[],
       accountStatus: accountStatus as UserAccountStatus,
     };
+    console.log(session);
 
     sessionManager.setSession(session);
     dispatch({ type: 'success' });

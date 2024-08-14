@@ -6,7 +6,7 @@ import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
 import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
 import { useCurrentSession, useUpdateSessionStatus } from '../../session/Session';
-import { AccountStatus } from '../../services/users/models/LoginOutputModel';
+import { SuspensionType } from '../../services/users/models/LoginOutputModel';
 
 export function useNewForm(playgroundForm?: Form) {
   const session = useCurrentSession();
@@ -60,7 +60,7 @@ export function useNewForm(playgroundForm?: Form) {
     console.log('Form saved');
     if (res) {
       console.log('res ', res);
-      updateSessionStatus(AccountStatus.PendingReview, res);
+      updateSessionStatus(SuspensionType.PendingReview, res);
       nav('/');
     }
   }

@@ -16,7 +16,6 @@ import { Role, useCurrentSession } from './session/Session';
 import { Doctor } from './pages/doctor/Doctor';
 import { DoctorSearch } from './pages/doctor/search/DoctorSearch';
 import { Terms } from './pages/form/Terms';
-import { AccountStatus } from './services/users/models/LoginOutputModel';
 import HOME = Uris.HOME;
 import FORM = Uris.FORM;
 import REGISTER = Uris.REGISTER;
@@ -51,14 +50,11 @@ export default function App() {
       return <Navigate to={LOGIN + `?returnUrl=${location.pathname}`} />;
     }
 
-    if (!roles.includes(user.perms)) {
+    if (!roles.some(role => user.perms?.includes(role))) {
       return <Navigate to={HOME} />;
     }
 
-    if (
-      user?.accountStatus?.status === AccountStatus.PendingReview ||
-      user?.accountStatus?.status === AccountStatus.Suspended
-    ) {
+    if (user?.accountStatus?.suspensionIsActive) {
       return <Navigate to={HOME} />;
     }
 

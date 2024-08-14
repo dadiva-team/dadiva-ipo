@@ -24,7 +24,7 @@ export function NicField({ value, onChange }: NicFieldProps) {
         name="nic"
         sx={{ mb: 2 }}
       />
-      {value && value.length == 9 ? (
+      {value && value.length == 8 ? (
         <CheckCircleIcon sx={{ fontSize: 20, ml: 1 }} />
       ) : (
         <CancelIcon sx={{ fontSize: 20, ml: 1 }} />
