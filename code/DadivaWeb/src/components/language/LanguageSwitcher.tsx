@@ -5,14 +5,18 @@ const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
-    console.log(lng);
+    console.log('LanguageSwitcher setting language: ' + lng);
     i18n.changeLanguage(lng);
   };
 
   return (
     <div>
-      <button onClick={() => changeLanguage('en')}>English</button>
-      <button onClick={() => changeLanguage('pt')}>Português</button>
+      <button disabled={i18n.language == 'En'} onClick={() => changeLanguage('En')}>
+        English
+      </button>
+      <button disabled={i18n.language == 'Pt'} onClick={() => changeLanguage('Pt')}>
+        Português
+      </button>
     </div>
   );
 };

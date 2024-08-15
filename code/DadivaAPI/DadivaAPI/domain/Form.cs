@@ -28,8 +28,8 @@ public record Form(
             Admin = addedBy,
             Inconsistencies = null,
             PreviousForm = previousForm,
-            QuestionGroups = Groups.Select(g => g.ToEntity()).ToList(), //not ideal, replicates question groups that are already in form
-            Rules = Rules.Select(r => r.ToEntity()).ToList(), //not ideal, replicates rules that are already in form
+            QuestionGroups = Groups.Select(g => g.ToEntity()).ToList(), //TODO : not ideal, replicates question groups that are already in form
+            Rules = Rules.Select(r => r.ToEntity()).ToList(), //TODO : not ideal, replicates rules that are already in form
             Submissions = null
         };
     }

@@ -8,7 +8,7 @@ export const getUserByNicUri = (nic: number) => `${API_URL}/users/${nic}`;
 export const suspendUserUri = `${API_URL}/users/suspension`;
 export const getUserSuspensionByNicUri = (nic: number) => `${API_URL}/users/suspension/${nic}`;
 export const deleteUserUri = `${API_URL}/users/`;
-export const getFormUri = `${API_URL}/forms/structure`;
+export const getFormUri = (language: string) => `${API_URL}/forms/structure/${language}`;
 export const getDrugsAndDiseases = `${API_URL}/dnd`;
 export const editFormUri = `${API_URL}/forms/structure`;
 
@@ -26,7 +26,7 @@ export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
 export const getTermsUri = `${API_URL}/terms`;
-export const getActiveTermsUri = `${API_URL}/terms/active`;
+export const getActiveTermsUri = (language: string) => `${API_URL}/terms/${language}`;
 export const updateTermsUri = (termsId: number) => `${API_URL}/terms/${termsId}`;
 
 export const searchMedicationsUri = `${API_URL}/medications/search?q=`;

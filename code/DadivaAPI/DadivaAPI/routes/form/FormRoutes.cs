@@ -20,28 +20,37 @@ public static class FormRoutes
 
     private static async Task<IResult> GetForm([FromRoute] string language, IFormService service)
     {
+        Console.WriteLine("Getting form for language " + language);
         return (await service.GetForm(language)).HandleRequest(form =>
         {
-            return Results.Ok(new GetFormOutputModel(form.Groups, form.Rules));
+            return Results.Ok(new GetFormOutputModel(form.Language,form.Groups, form.Rules));
         });
     }
 
     private static async Task<IResult> AddForm(HttpContext context, [FromBody] EditFormRequest input,
         IFormService service)
     {
-        return (await service.AddForm(input.Groups, input.Rules, input.Language, input.Reason, input.Nic))
+        var nic = context.User.Claims.First(claim => claim.Type == "nic").Value.ToString();
+        return (await service.AddForm(input.Groups, input.Rules, input.Language, input.Reason, nic))
             .HandleRequest(Results.NoContent);
     }
 
-    private static async Task<IResult> GetInconsistencies(IFormService service)
+    private static async Task<IResult> GetInconsistencies( IFormService service)
     {
         return (await service.GetInconsistencies()).HandleRequest(Results.Ok);
     }
 
-    private static async Task<IResult> EditInconsistencies([FromBody] EditInconsistenciesRequest input,
+    private static async Task<IResult> EditInconsistencies(
+        HttpContext context,
+        [FromBody] EditInconsistenciesRequest input,
         IFormService service)
     {
-        return (await service.EditInconsistencies(input.Inconsistencies, input.Nic, input.Language, input.Reason))
+        var nic = context.User.Claims.First(claim => claim.Type == "nic").Value.ToString();
+        return (await service.EditInconsistencies(
+                input.Inconsistencies,
+                nic,
+                input.Language,
+                input.Reason))
             .HandleRequest(Results.NoContent);
     }
 }

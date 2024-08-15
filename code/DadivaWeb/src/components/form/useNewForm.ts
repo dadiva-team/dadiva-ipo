@@ -7,6 +7,7 @@ import { FormServices } from '../../services/from/FormServices';
 import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
 import { useCurrentSession, useUpdateSessionStatus } from '../../session/Session';
 import { SuspensionType } from '../../services/users/models/LoginOutputModel';
+import { useTranslation } from 'react-i18next';
 
 export function useNewForm(playgroundForm?: Form) {
   const session = useCurrentSession();
@@ -15,6 +16,7 @@ export function useNewForm(playgroundForm?: Form) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
+  const { i18n } = useTranslation();
 
   const [formRawFetchData, setFormRawFetchData] = useState<Form>();
   const [formAnswers, setFormAnswers] = useState<Record<string, string>[]>([]);
@@ -52,7 +54,7 @@ export function useNewForm(playgroundForm?: Form) {
     }
     // TODO: Filter answers
 
-    const [error, res] = await handleRequest(FormServices.submitForm(nic, formAnswers, formRawFetchData.formVersion));
+    const [error, res] = await handleRequest(FormServices.submitForm(nic, formAnswers, formRawFetchData.language));
     if (error) {
       handleError(error, setError, nav);
       return;
@@ -70,11 +72,13 @@ export function useNewForm(playgroundForm?: Form) {
       if (playgroundForm) {
         return playgroundForm;
       }
-      const [error, res] = await handleRequest(FormServices.getForm());
+      const [error, res] = await handleRequest(FormServices.getForm(i18n.language));
       if (error) {
+        console.log('Error fetching form');
         handleError(error, setError, nav);
         return;
       }
+      console.log('fetched form: ' + res);
       // Mock form for tests
       //res = form;
       return res;
@@ -119,7 +123,7 @@ export function useNewForm(playgroundForm?: Form) {
         setIsLoading(false);
       });
     }
-  }, [engine, formRawFetchData, isLoading, nav, playgroundForm]);
+  }, [engine, formRawFetchData, isLoading, nav, playgroundForm, i18n.language]);
 
   useEffect(() => {
     if (!formRawFetchData) return;

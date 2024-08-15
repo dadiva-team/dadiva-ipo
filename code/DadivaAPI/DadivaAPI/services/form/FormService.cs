@@ -34,6 +34,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
             var formDomain = formEntity.ToDomain();
 
             return Result.Ok(new GetFormOutputModel(
+                formEntity.Language,
                 formDomain.Groups.Select(QuestionGroupModel.FromDomain).ToList(),
                 formDomain.Rules.Select(RuleModel.FromDomain).ToList()
             ));

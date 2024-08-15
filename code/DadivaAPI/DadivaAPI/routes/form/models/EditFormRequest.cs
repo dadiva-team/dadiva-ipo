@@ -7,6 +7,5 @@ public record EditFormRequest(
     string Language,
     List<QuestionGroupModel> Groups,
     List<RuleModel> Rules,
-    string? Reason,
-    string Nic
+    string? Reason
     );

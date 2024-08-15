@@ -70,14 +70,16 @@ function transformFormAnswers(formAnswers: Record<string, string>[]): AnsweredQu
 }
 
 export namespace FormServices {
-  export async function getForm(): Promise<Form> {
+  export async function getForm(language: string): Promise<Form> {
+    console.log('getForm with language: ' + language);
     console.log('GET FORM |||||||||||||||');
-    const res = await get<FormOutputModel>(getFormUri);
+    const res = await get<FormOutputModel>(getFormUri(language));
+    console.log('fetched form ' + res);
     const convertedRes = convertKeysToCamelCase(res);
 
     const formOutput: FormOutputModel = {
       ...convertedRes,
-      formVersion: convertedRes.formversion,
+      language: convertedRes.language,
     };
     console.log(ModelToDomain(formOutput));
     return ModelToDomain(formOutput);
@@ -119,7 +121,7 @@ export namespace FormServices {
   export async function submitForm(
     nic: number,
     formAnswers: Record<string, string>[],
-    formVersion: number
+    formLanguage: string
   ): Promise<SubmitFormOutputModel> {
     try {
       const answeredQuestions = transformFormAnswers(formAnswers);
@@ -127,7 +129,7 @@ export namespace FormServices {
 
       const body: SubmitFormRequest = {
         answeredQuestions,
-        formVersion,
+        formLanguage,
       };
       return await post(submitFormUri(nic), JSON.stringify(body));
     } catch (e) {
