@@ -1,25 +1,25 @@
-import {RuleProperties} from 'json-rules-engine';
+import { RuleProperties } from 'json-rules-engine';
 
 export interface Form {
-    groups: Group[];
-    rules: RuleProperties[];
-    formVersion: number;
+  groups: Group[];
+  rules: RuleProperties[];
+  language: string;
 }
 
 export interface Group {
-    name: string;
-    questions: Question[];
+  name: string;
+  questions: Question[];
 }
 
 export interface ShowCondition {
-    after?: string[];
-    if?: Record<string, string>;
+  after?: string[];
+  if?: Record<string, string>;
 }
 
 export class Question {
-    id: string;
-    text: string;
-    type: string;
-    options: string[] | null;
-    showCondition?: ShowCondition;
+  id: string;
+  text: string;
+  type: string;
+  options: string[] | null;
+  showCondition?: ShowCondition;
 }

@@ -4,7 +4,7 @@ import { RuleProperties, TopLevelCondition, Event } from 'json-rules-engine';
 export interface FormOutputModel {
   groups: { name: string; questions: QuestionModel[] }[];
   rules: Rule[];
-  formVersion: number;
+  language: string;
 }
 
 export class QuestionModel {
@@ -78,7 +78,7 @@ export function DomainToModel(form: Form): FormOutputModel {
   return {
     groups: form.groups,
     rules: DomainToRules(form.rules),
-    formVersion: form.formVersion,
+    language: form.language,
   };
 }
 
@@ -88,26 +88,26 @@ function findRuleForQuestion(rules: Rule[], questionId: string): Rule | undefine
 
 function convertConditionsToShowCondition(conditions: Condition): ShowCondition | undefined {
   const showCondition: ShowCondition = {
-    if: {}
+    if: {},
   };
 
   let hasCondition = false;
 
-  if ("all" in conditions && conditions.all) {
+  if ('all' in conditions && conditions.all) {
     conditions.all.forEach(condition => {
-      if ("fact" in condition && condition.fact && condition.operator === 'equal') {
+      if ('fact' in condition && condition.fact && condition.operator === 'equal') {
         showCondition.if[condition.fact] = condition.value;
         hasCondition = true;
       }
     });
   }
 
-  if ("any" in conditions && conditions.any) {
+  if ('any' in conditions && conditions.any) {
     conditions.any.forEach(condition => {
-      if ("fact" in condition && condition.fact && condition.operator === 'equal') {
+      if ('fact' in condition && condition.fact && condition.operator === 'equal') {
         showCondition.if[condition.fact] = condition.value;
         hasCondition = true;
-      } else if ("all" in condition && condition.all) {
+      } else if ('all' in condition && condition.all) {
         // Handle nested conditions
         const nestedShowCondition = convertConditionsToShowCondition(condition);
         if (nestedShowCondition && nestedShowCondition.if) {
@@ -131,7 +131,6 @@ function buildShowCondition(model: FormOutputModel, questionId: string): ShowCon
   return convertConditionsToShowCondition(rule.conditions as Condition);
 }
 
-
 export function ModelToDomain(model: FormOutputModel): Form {
   const groups = model.groups.map(group => {
     return {
@@ -150,6 +149,6 @@ export function ModelToDomain(model: FormOutputModel): Form {
   return {
     groups: groups,
     rules: RulesToDomain(model.rules),
-    formVersion: model.formVersion,
+    language: model.language,
   };
 }

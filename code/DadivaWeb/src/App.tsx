@@ -54,7 +54,7 @@ export default function App() {
       return <Navigate to={HOME} />;
     }
 
-    if (user?.accountStatus?.suspensionIsActive) {
+    if (user?.accountStatus?.isActive) {
       return <Navigate to={HOME} />;
     }
 

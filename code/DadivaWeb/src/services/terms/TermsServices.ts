@@ -15,9 +15,9 @@ export namespace TermsServices {
     }
   }
 
-  export async function getActiveTerms(): Promise<Terms> {
+  export async function getActiveTerms(language: string): Promise<Terms> {
     try {
-      const res = await get<Terms>(getActiveTermsUri);
+      const res = await get<Terms>(getActiveTermsUri(language));
       console.log('TermServices getActiveTerms res: ' + res.content);
       return res;
     } catch (e) {

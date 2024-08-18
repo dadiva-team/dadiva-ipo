@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { SuspensionType, UserAccountStatus } from '../services/users/models/LoginOutputModel';
+import { SuspensionType, UserSuspensionAccountStatus } from '../services/users/models/LoginOutputModel';
 import { SubmitFormOutputModel } from '../services/from/models/SubmitFormOutputModel';
 
 export enum Role {
@@ -12,7 +12,7 @@ export interface Session {
   readonly name: string;
   readonly nic: number;
   readonly perms: Role[];
-  readonly accountStatus: UserAccountStatus;
+  readonly accountStatus: UserSuspensionAccountStatus;
 }
 
 type SessionManager = {

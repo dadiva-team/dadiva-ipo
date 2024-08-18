@@ -200,7 +200,7 @@ export function EditFormPage() {
                   return {
                     groups: newGroups,
                     rules: calculateRules(newGroups),
-                    formVersion: oldForm.formVersion,
+                    language: oldForm.language,
                   };
                 });
               }}
@@ -214,7 +214,7 @@ export function EditFormPage() {
                   return {
                     groups: newGroups,
                     rules: calculateRules(newGroups),
-                    formVersion: oldForm.formVersion,
+                    language: oldForm.language,
                   };
                 });
               }}

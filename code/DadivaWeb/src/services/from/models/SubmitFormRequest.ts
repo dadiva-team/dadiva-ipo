@@ -1,6 +1,6 @@
-import {AnsweredQuestionModel} from "./AnsweredQuestionModel";
+import { AnsweredQuestionModel } from './AnsweredQuestionModel';
 
 export interface SubmitFormRequest {
-    answeredQuestions: AnsweredQuestionModel[];
-    formVersion: number;
+  answeredQuestions: AnsweredQuestionModel[];
+  formLanguage: string;
 }

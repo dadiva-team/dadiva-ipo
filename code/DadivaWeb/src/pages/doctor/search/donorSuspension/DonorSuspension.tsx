@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { SuspensionType, UserSuspension } from '../../../../domain/User/UserSuspension';
+import { UserSuspension } from '../../../../domain/User/UserSuspension';
 import { handleError, handleRequest } from '../../../../services/utils/fetch';
 import { DoctorServices } from '../../../../services/doctors/DoctorServices';
 import { SuspendUserRequestModel } from '../../../../services/doctors/models/SuspendeUserRequestModel';
@@ -21,14 +21,15 @@ import { useCurrentSession } from '../../../../session/Session';
 import { useNavigate } from 'react-router-dom';
 import { ErrorAlert } from '../../../../components/shared/ErrorAlert';
 import { DonorSuspensionCard } from './DonorSuspensionCard';
+import { SuspensionType } from '../../../../services/users/models/LoginOutputModel';
 
 interface DonorSuspensionProps {
   nic: string;
   fetchedSuspension?: UserSuspension;
-  onSubmitedSuccessfully: () => void;
+  onSubmittedSuccessfully: () => void;
 }
 
-export function DonorSuspension({ nic, fetchedSuspension, onSubmitedSuccessfully }: DonorSuspensionProps) {
+export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfully }: DonorSuspensionProps) {
   const doctor = useCurrentSession();
   const nav = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +59,7 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmitedSuccessfully
       handleError(error, setError, nav);
     } else {
       console.log(res);
-      onSubmitedSuccessfully();
+      onSubmittedSuccessfully();
     }
   };
 
@@ -107,15 +108,19 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmitedSuccessfully
                 setDuration(0);
                 setSuspensionStartDate(today.split('T')[0]);
                 setSuspensionEndDate('');
-                setSuspensionType(Number(e.target.value) as SuspensionType);
+                setSuspensionType(e.target.value as SuspensionType);
               }}
             >
-              <FormControlLabel value={SuspensionType.BetweenDonations} control={<Radio />} label="Entre Dadivas" />
+              <FormControlLabel
+                value={SuspensionType.BetweenBloodDonations}
+                control={<Radio />}
+                label="Entre Dadivas"
+              />
               <FormControlLabel value={SuspensionType.Other} control={<Radio />} label="Outro" />
               <FormControlLabel value={SuspensionType.Permanent} control={<Radio color="error" />} label="Permanente" />
             </RadioGroup>
           </FormControl>
-          {suspensionType === SuspensionType.BetweenDonations && (
+          {suspensionType === SuspensionType.BetweenBloodDonations && (
             <FormControl sx={{ width: '50%' }}>
               <InputLabel>Duração</InputLabel>
               <Select
@@ -207,7 +212,7 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmitedSuccessfully
               !suspensionStartDate ||
               (suspensionType !== SuspensionType.Permanent && !suspensionEndDate) ||
               (suspensionType !== SuspensionType.Permanent && duration <= 0) ||
-              (suspensionType !== SuspensionType.BetweenDonations && reason.length === 0)
+              (suspensionType !== SuspensionType.BetweenBloodDonations && reason.length === 0)
             }
             onClick={submitSuspension}
             sx={{ color: 'error' }}

@@ -5,5 +5,16 @@
   "Login Card Text": "Start session with you NIC and password to fill out the pre-donation form.",
   "Pre Donation Card Title": "Read and accept the pre-donation terms",
   "Pre Donation Card Text" : "It's necessary to read and accept the donation conditions before filling out the pre-donation form.",
-  "Pre Donation Card Button" : "Begin"
+  "Pre Donation Card Button" : "Begin",
+  "Suspension Card Title Pending Review": "You have a submission pending review.",
+  "Suspension Card Body Pending Review": "Please wait for the review of your form.",
+  "Suspension Card Date Pending Review": "Submission date: ",
+  "Suspension Card Title BetweenBloodDonations": "Account temporarily suspended between blood donations",
+  "Suspension Card Body BetweenBloodDonations": "Please wait until the suspension is lifted to submit a new form.",
+  "Suspension Card Date BetweenBloodDonations": "You can donate blood again from: ",
+  "Suspension Card Title Permanent": "Account permanently suspended",
+  "Suspension Card Body Permanent": "Please contact support for more information.",
+  "Suspension Card Title Other": "Account temporarily suspended",
+  "Suspension Card Body-Reason Other": "Reason: ",
+  "Suspension Card Body-Contact Other": "Please contact support for more information."
 }

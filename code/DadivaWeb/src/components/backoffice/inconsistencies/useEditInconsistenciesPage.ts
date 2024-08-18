@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { FormServices } from '../../../services/from/FormServices';
 import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
+import { useTranslation } from 'react-i18next';
 
 export function useEditInconsistenciesPage() {
+  const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formFetchData, setFormFetchData] = useState<Form>();
@@ -19,7 +21,7 @@ export function useEditInconsistenciesPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [formError, formRes] = await handleRequest(FormServices.getForm());
+      const [formError, formRes] = await handleRequest(FormServices.getForm(i18n.language));
       if (formError) {
         handleError(formError, setError, nav);
         return;
@@ -32,13 +34,13 @@ export function useEditInconsistenciesPage() {
         return;
       }
 
-      console.log(inconsistenciesRes)
+      console.log(inconsistenciesRes);
       setInconsistencies(inconsistenciesRes);
       setIsLoading(false);
     };
 
     if (isLoading) fetch();
-  }, [isLoading, nav]);
+  }, [i18n.language, isLoading, nav]);
 
   function onAddInconsistency() {
     setInconsistencies(old => {

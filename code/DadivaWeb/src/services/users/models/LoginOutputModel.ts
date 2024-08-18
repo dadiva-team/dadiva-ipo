@@ -1,13 +1,14 @@
 export interface LoginOutputModel {
   readonly token: string;
-  readonly accountStatus: UserAccountStatus;
+  readonly accountStatus: UserSuspensionAccountStatus;
 }
 
-export interface UserAccountStatus {
-  suspensionIsActive: boolean;
-  suspensionType?: SuspensionType;
-  suspensionStartDate?: Date;
-  suspensionEndDate?: Date;
+export interface UserSuspensionAccountStatus {
+  isActive: boolean;
+  type?: SuspensionType;
+  startDate?: Date;
+  endDate?: Date;
+  reason?: string;
 }
 
 export enum SuspensionType {

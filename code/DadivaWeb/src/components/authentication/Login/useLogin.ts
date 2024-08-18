@@ -4,7 +4,7 @@ import * as React from 'react';
 import reduce from '../utils/Reduce';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { loginNIC } from '../../../services/users/UserServices';
-import { UserAccountStatus } from '../../../services/users/models/LoginOutputModel';
+import { UserSuspensionAccountStatus } from '../../../services/users/models/LoginOutputModel';
 
 export function useLogin(returnTo: string) {
   const navigate = useNavigate();
@@ -90,7 +90,7 @@ export function useLogin(returnTo: string) {
       name: payload.name,
       nic: Number(payload.nic),
       perms: payload.perms as Role[],
-      accountStatus: accountStatus as UserAccountStatus,
+      accountStatus: accountStatus as UserSuspensionAccountStatus,
     };
     console.log(session);
 

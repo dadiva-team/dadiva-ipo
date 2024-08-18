@@ -1,9 +1,9 @@
 export interface SuspendUserRequestModel {
-    userNic: number;
-    suspensionType: number;
-    suspensionStartDate: string;
-    suspensionEndDate?: string;
-    reason?: string;
-    suspensionNote?: string;
-    suspendedBy: number;
+  userNic: number;
+  suspensionType: string;
+  suspensionStartDate: string;
+  suspensionEndDate?: string;
+  reason?: string;
+  suspensionNote?: string;
+  suspendedBy: number;
 }

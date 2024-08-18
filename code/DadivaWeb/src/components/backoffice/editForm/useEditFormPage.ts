@@ -6,8 +6,10 @@ import { FormServices } from '../../../services/from/FormServices';
 import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { Uris } from '../../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
+import { useTranslation } from 'react-i18next';
 
 export function useEditFormPage() {
+  const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState<Question>(null);
   const [editingSubQuestion, setEditingSubQuestion] = useState<Question>(null);
@@ -34,7 +36,7 @@ export function useEditFormPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [error, res] = await handleRequest(FormServices.getForm());
+      const [error, res] = await handleRequest(FormServices.getForm(i18n.language));
       if (error) {
         handleError(error, setError, nav);
         return;
@@ -44,7 +46,7 @@ export function useEditFormPage() {
     };
 
     if (isLoading) fetch();
-  }, [isLoading, nav]);
+  }, [i18n.language, isLoading, nav]);
 
   function calculateFromShowConditions(showCondition: ShowCondition): TopLevelCondition {
     const condition: TopLevelCondition = { all: [] };
@@ -269,7 +271,7 @@ export function useEditFormPage() {
       return {
         groups: updatedGroups,
         rules: newRules,
-        formVersion: oldForm.formVersion,
+        language: oldForm.language,
       };
     });
   }
@@ -347,7 +349,7 @@ export function useEditFormPage() {
       return {
         groups: newGroups,
         rules: calculateRules(newGroups),
-        formVersion: oldForm.formVersion,
+        language: oldForm.language,
       };
     });
   }
@@ -398,7 +400,7 @@ export function useEditFormPage() {
         return {
           groups: reorderedGroups,
           rules: calculateRules(reorderedGroups),
-          formVersion: oldForm.formVersion,
+          language: oldForm.language,
         };
       });
     }
@@ -424,7 +426,7 @@ export function useEditFormPage() {
         ...oldForm,
         groups: reorderedGroups,
         rules: newRules,
-        formVersion: oldForm.formVersion,
+        language: oldForm.language,
       };
     });
   }
@@ -449,7 +451,7 @@ export function useEditFormPage() {
 
       if (groups.length !== 0) groups[insertIndex].questions.push(...oldForm.groups[index].questions);
       const reorderedGroups = updateQuestionOrder(groups);
-      return { groups: reorderedGroups, rules: calculateRules(reorderedGroups), formVersion: oldForm.formVersion };
+      return { groups: reorderedGroups, rules: calculateRules(reorderedGroups), language: oldForm.language };
     });
   }
 
