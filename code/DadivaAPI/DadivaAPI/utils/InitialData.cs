@@ -122,7 +122,7 @@ public class InitialData
             new QuestionGroup("Dádivas Anteriores", [
                 new Question
                 (
-                    "q2",
+                    "1",
                     "Quais os medicamentos que toma?",
                     ResponseType.medications,
                     null
@@ -130,7 +130,7 @@ public class InitialData
             ]),
             new QuestionGroup("Dádivas Anteriores 2", [
                 new Question(
-                    "q3",
+                    "2",
                     "Alguma vez deu sangue ou componentes sanguíneos?",
                     ResponseType.boolean,
                     null
@@ -155,42 +155,35 @@ public class InitialData
         new QuestionGroup("Dádivas Anteriores", [
             new Question
             (
-                "Q2",
+                "1",
                 "Sente-se bem de saúde e em condições de dar sangue?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "q2- medicamente",
-                "Quais os medicamentos que toma?",
-                ResponseType.medications,
-                null
-            ),
-            new Question
-            (
-                "Q3",
+                "2",
                 "Alguma vez deu sangue ou componentes sanguíneos?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q4",
+                "2_3",
                 "Deu sangue há menos de 2 meses?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q5",
+                "2_4",
                 "Alguma vez lhe foi aplicada uma suspensão para a dádiva de sangue?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q6",
+                "2_5",
                 "Ocorreu alguma reação ou incidente nas dádivas anteriores?",
                 ResponseType.boolean,
                 null
@@ -199,42 +192,42 @@ public class InitialData
         new QuestionGroup("Viagens", [
             new Question
             (
-                "Q7",
+                "6",
                 "Os seus pais biológicos nasceram e viveram sempre em Portugal?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q8",
+                "7",
                 "Nasceu e viveu sempre em Portugal?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q9",
+                "8",
                 "Alguma vez viajou para fora do país?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q9_1",
+                "8_9",
                 "Para onde viajou?",
                 ResponseType.countries,
                 null
             ),
             new Question
             (
-                "Q10",
+                "10",
                 "Nos últimos 4 meses viajou (mesmo que em trânsito), residiu ou trabalhou em alguma zona com foco de transmissão ativa/surto ou endémica para doença infeciosa?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q11",
+                "11",
                 "Viveu no Reino Unido mais de 12 meses cumulativos, entre janeiro de 1980 e dezembro de 1996?",
                 ResponseType.boolean,
                 null
@@ -243,49 +236,49 @@ public class InitialData
         new QuestionGroup("Saúde Geral", [
             new Question
             (
-                "Q12",
+                "12",
                 "Tem sido sempre saudável?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q13",
+                "13",
                 "Teve alguma doença crónica ou acidente grave?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q14",
+                "14",
                 "Já esteve internado(a) num hospital ou maternidade?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q15",
+                "15",
                 "Alguma vez fez uma cirurgia (incluindo cesariana)?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q16",
+                "16",
                 "Já teve convulsões e/ou ataques epiléticos?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q17",
+                "17",
                 "Foi submetido a um transplante de tecidos (ex.: córnea), células ou à administração de outros produtos biológicos?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q18",
+                "18",
                 "Recebeu alguma transfusão depois de 1980?",
                 ResponseType.boolean,
                 null
@@ -294,14 +287,14 @@ public class InitialData
         new QuestionGroup("Sintomas", [
             new Question
             (
-                "Q19",
+                "19",
                 "Nos últimos 3 meses perdeu peso por motivos de saúde ou desconhecidos?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q20",
+                "20",
                 "No último mês teve algum problema de saúde (ex.: tosse, febre, dores musculares, dores de cabeça, cansaço fácil, dificuldade em respirar, falta de paladar, falta de olfato, diarreia, vómitos, alterações cutâneas ou outros)?",
                 ResponseType.boolean,
                 null
@@ -310,56 +303,56 @@ public class InitialData
         new QuestionGroup("Possíveis Pontos de Entrada", [
             new Question
             (
-                "Q21",
+                "21",
                 "Nos últimos 3 meses esteve em contacto próximo com caso suspeito ou positivo de doença infecciosa?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q22",
+                "22",
                 "Tomou ou está a tomar medicamentos?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q22_1",
+                "22_23",
                 "Quais os medicamentos que tomou ou está a tomar?",
                 ResponseType.medications,
                 null
             ),
             new Question
             (
-                "Q23",
+                "24",
                 "Fez ou está a fazer profilaxia ou tratamento para doença infeciosa?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q24",
+                "25",
                 "Nos últimos 7 dias fez tratamento ou extração dentária?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q25",
+                "26",
                 "No último mês tomou alguma vacina?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q26",
+                "27",
                 "Fez ou está a fazer algum tratamento para a infertilidade?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q27",
+                "28",
                 "Está ou esteve grávida?",
                 ResponseType.boolean,
                 null
@@ -368,14 +361,14 @@ public class InitialData
         new QuestionGroup("Mais Pontos de Entrada", [
             new Question
             (
-                "Q28",
+                "29",
                 "Nos últimos 4 meses fez alguma tatuagem, colocou piercing ou fez tratamento de acupuntura ou de mesoterapia?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q29",
+                "30",
                 "Nos últimos 4 meses fez alguna endoscopia (ex.: gastroscópia, colonoscopia, citostopia)?",
                 ResponseType.boolean,
                 null
@@ -384,65 +377,79 @@ public class InitialData
         new QuestionGroup("Comportamentos de Risco", [
             new Question
             (
-                "Q30",
+                "31",
                 "Nos últimos 3 meses teve contacto sexual com uma nova pessoa",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q31",
+                "32",
                 "Nos últimos 3 meses teve contacto sexual com mais do que uma pessoa",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q32",
+                "33",
                 "Nos últimos 12 meses teve contacto sexual com uma pessoa infetada ou em tratamento para o Vírus da SIDA (VIH), Hepatite B, C ou Sífilis?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q33",
+                "34",
                 "Alguma vez teve contactos sexuais mediante recebimento de contrapartidas financeiras ou equivalentes (dinheiro, drogas ou outras)?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q34",
+                "35",
                 "Alguma vez consumiu drogas (injetáveis, inaláveis, ingeridas ou outras)?",
                 ResponseType.boolean,
                 null
             ),
             new Question
             (
-                "Q35",
+                "36",
                 "A pessoa com quem tem contacto sexual tem algum dos comportamentos referidos nas questões 31, 33 e 34?",
                 ResponseType.boolean,
                 null
             )
         ])
     ];
-
-    private static readonly List<Rule> Rules = Questions[0].Questions
-        .Where(q => !q.Id.Contains('_')).ToList()
+    
+    private static readonly List<Rule> Rules = Questions
+        .SelectMany(qg => qg.Questions)
         .Select(q =>
-            new Rule(
-                new LogicalCondition(null, []),
+        {
+            if (!q.Id.Contains('_'))
+                return new Rule(
+                    new LogicalCondition(
+                        null,
+                        []
+                    ),
+                    new Event(EventType.showQuestion, new EventParams(q.Id))
+                );
+            var parentId = q.Id.Split('_')[0];
+            return new Rule(
+                new LogicalCondition(
+                    new List<Condition> { new EvaluationCondition(parentId, Operator.equal, "yes") },
+                    null
+                ),
                 new Event(EventType.showQuestion, new EventParams(q.Id))
-            )
-        ).ToList();
+            );
 
+        })
+        .ToList();
+    
     private static readonly Form realForm = new Form
     (
         Questions,
         Rules,
         FormLanguages.Pt,
         Admin
-        //DateTime.Now.ToUniversalTime()
     );
 
     public static readonly FormEntity Form = realForm.ToEntity(null, Users[0], null);

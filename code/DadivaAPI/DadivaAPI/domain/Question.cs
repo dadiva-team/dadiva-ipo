@@ -18,6 +18,7 @@ public record Question(string Id, string Text, ResponseType Type, List<string>? 
     {
         return new QuestionEntity
         {
+            Id=Id,
             Options = Options,
             Text = Text,
             Type = Type.ToString()

@@ -11,7 +11,7 @@ i18n
     backend: {
       loadPath: '../translations/{{lng}}.json',
     },
-    fallbackLng: 'pt',
+    fallbackLng: 'Pt',
     interpolation: {
       escapeValue: false,
     },

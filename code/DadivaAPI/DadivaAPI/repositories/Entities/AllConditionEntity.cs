@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices.JavaScript;
 using DadivaAPI.domain;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DadivaAPI.repositories.Entities;
 
@@ -8,12 +10,8 @@ public class AllConditionEntity : TopLevelConditionEntity
 
     public override Condition ToDomain()
     {
-        if (All[0] is TopLevelConditionEntity)
-        {
-            return new LogicalCondition( 
-                All.Select(condition=> condition.ToDomain()).ToList(), 
-                null);
-        }
-        return All[0].ToDomain();
+        return All.IsNullOrEmpty() ? 
+            new LogicalCondition(null , []) : 
+            new LogicalCondition(null , All.Select(e=>e.ToDomain()).ToList());
     }
 }

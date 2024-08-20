@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.routes.utils;
 using DadivaAPI.services.form;
@@ -29,8 +30,13 @@ public static class FormRoutes
 
     private static async Task<IResult> AddForm(HttpContext context, [FromBody] EditFormRequest input,
         IFormService service)
-    {
-        var nic = context.User.Claims.First(claim => claim.Type == "nic").Value.ToString();
+    {   
+        foreach (var userClaim in context.User.Claims)
+        {
+            Console.WriteLine(userClaim);
+        }
+        
+        var nic = context.User.Claims.First(claim => claim.Type==ClaimTypes.Name).Value.ToString();
         return (await service.AddForm(input.Groups, input.Rules, input.Language, input.Reason, nic))
             .HandleRequest(Results.NoContent);
     }

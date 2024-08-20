@@ -11,7 +11,9 @@ public class ConditionPropertiesEntity : NestedConditionEntity
     
     public override Condition ToDomain()
     {
-        Enum.TryParse<Operator>(Operator, out var parsedOperator);
+        if (!Enum.TryParse<Operator>(Operator, out var parsedOperator))
+            throw new Exception("Invalid operator");
+        
         return new EvaluationCondition(Fact, parsedOperator, Value);
     }
 }

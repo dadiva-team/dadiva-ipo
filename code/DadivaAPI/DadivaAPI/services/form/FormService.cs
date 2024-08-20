@@ -25,7 +25,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
             var formEntity = await repository.GetForm(language);
             if (formEntity is null && parsedLanguage != FormLanguages.En)
             {
-                formEntity = await repository.GetForm("en");
+                formEntity = await repository.GetForm("En");
             }
 
             if (formEntity is null) return new FormErrors.NoFormError();

@@ -14,6 +14,10 @@ public class RuleEntity
 
     public Rule ToDomain()
     {
+        
+        Console.WriteLine("RuleEntity To Domain, TopLevelCondition " + TopLevelCondition);
+        Console.WriteLine("RuleEntity To Domain, Id " + Id);
+        
         return new Rule(
             TopLevelCondition.ToDomain() as LogicalCondition, 
             Event.ToDomain()

@@ -9,7 +9,7 @@ public record Rule(LogicalCondition Conditions, Event Event)
         return new RuleEntity
         {
             Event = Event.ToEntity(),
-            TopLevelCondition = Conditions.ToEntity() as TopLevelConditionEntity
+            TopLevelCondition = (TopLevelConditionEntity)Conditions.ToEntity()
         };
     }
 };
@@ -21,7 +21,7 @@ public abstract record Condition
 
 public record LogicalCondition(List<Condition>? All, List<Condition>? Any)
     : Condition
-{ 
+{
     public override NestedConditionEntity ToEntity()
     {
         if (All is not null)
@@ -70,7 +70,7 @@ public record Event(EventType Type, EventParams? Params)
         return new EventEntity
         {
             EventType = Type.ToString(),
-            Target = Params.Id,
+            Target = Params?.Id,
         };
     }
 };

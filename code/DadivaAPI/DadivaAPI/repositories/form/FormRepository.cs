@@ -18,12 +18,18 @@ namespace DadivaAPI.repositories.form
                 .Include(form => form.QuestionGroups)
                 .ThenInclude(qg => qg.Questions)
                 .Include(form => form.Rules)
+                .ThenInclude(rule=> rule.Event)
+                .Include(form => form.Rules)
+                .ThenInclude(rule => rule.TopLevelCondition)
+                .ThenInclude(topLevelCondition => (topLevelCondition as AllConditionEntity).All)
+                .Include(form => form.Rules)
+                .ThenInclude(rule => rule.TopLevelCondition)
+                .ThenInclude(topLevelCondition => (topLevelCondition as AnyConditionEntity).Any)
                 .Include(form => form.Admin)
                 .Where(form => form.Language == language)
                 .OrderBy(form => form.Date)
                 .LastOrDefaultAsync();
         }
-
         public async Task<bool> AddForm(FormEntity form)
         {
             await _context.Forms.AddAsync(form);
