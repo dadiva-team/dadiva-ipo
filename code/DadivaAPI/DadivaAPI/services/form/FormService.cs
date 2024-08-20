@@ -21,8 +21,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
 
             if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
                 return Result.Fail(new FormErrors.InvalidLanguageError());
-
-
+            
             var formEntity = await repository.GetForm(language);
             if (formEntity is null && parsedLanguage != FormLanguages.En)
             {

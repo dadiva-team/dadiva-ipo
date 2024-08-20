@@ -86,7 +86,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             var success = await repository.UpdateUser(user.ToEntity());
 
             return !success
-                ? Result.Fail(new UserError.TokenCreationError()) //TODO: Unknown Error
+                ? Result.Fail(new UserError.UnknownError())
                 : Result.Ok(new UserExternalInfo(nic));
         });
     }
@@ -189,7 +189,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             suspensionEntity.StartDate = DateTime.Parse(startDate).ToUniversalTime();
             suspensionEntity.Type = type;
 
-            if (endDate is not null && type != "permanent")
+            if (endDate is not null && type != "permanent") //TODO: wtf is this, if endDate is null it always fails
             {
                 suspensionEntity.EndDate = DateTime.Parse(endDate).ToUniversalTime();
             }
@@ -224,7 +224,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             var suspensionEntity = await repository.GetSuspension(userNic);
             if (suspensionEntity is null)
             {
-                return Result.Fail(new UserError.TokenCreationError());
+                return Result.Fail(new UserError.TokenCreationError()); //TODO: Custom Error
             }
 
             return Result.Ok(new SuspensionWithNamesExternalInfo(

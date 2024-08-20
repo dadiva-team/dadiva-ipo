@@ -88,7 +88,13 @@ public class UsersRepository : IUsersRepository
 
     public async Task<bool> DeleteSuspension(string userNic)
     {
-        var suspension = await _context.Suspensions.FindAsync(userNic);
+        var user = await _context.Users.FindAsync(userNic);
+        if (user == null)
+        {
+            return false;
+        }
+        
+        var suspension = await _context.Suspensions.FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
         if (suspension == null)
         {
             return false;

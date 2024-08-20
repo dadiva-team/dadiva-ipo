@@ -33,14 +33,12 @@ public partial record User(
     public static string HashPassword(string password)
     {
         if (!IsValidPassword(password)) throw new ArgumentException("Invalid password");
-        return Argon2.Hash(password, secret: Environment.GetEnvironmentVariable("DADIVA_API_PASSWORD_PEPPER"));
+        return Argon2.Hash(password);
     }
 
     public bool VerifyPassword(string password)
     {
-        //TODO: :D
-        return true; /*Argon2.Verify(HashedPassword, password,
-            secret: Environment.GetEnvironmentVariable("DADIVA_API_PASSWORD_PEPPER"));*/
+        return Argon2.Verify(HashedPassword, password);
     }
 
     public string GenerateToken(string key, string issuer, string audience)
