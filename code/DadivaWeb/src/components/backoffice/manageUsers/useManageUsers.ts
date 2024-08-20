@@ -22,7 +22,7 @@ export function useManageUsers() {
         return;
       }
       console.log(res);
-      setNics(res.map(u => u.nic));
+      setNics(res.nics);
       setIsLoading(false);
     };
 

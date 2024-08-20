@@ -21,6 +21,8 @@ public abstract class UserError : Error
     public class SuspensionNotDeletedError() : UserError;
 
     public class InvalidEndDateTypeError() : UserError;
+    
+    public class InvalidRoleError() : UserError;
 
     public class UnknownError() : UserError;
 }

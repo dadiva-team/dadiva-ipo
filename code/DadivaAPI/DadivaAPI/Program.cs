@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using DadivaAPI.repositories;
@@ -91,9 +92,10 @@ builder.Services.AddAuthentication(x =>
 // Adds authorization such that the jwt bearer token must contain a claim with the key "perms" and the value "admin"
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("donor", policy => policy.RequireClaim("perms", "donor", "doctor", "admin"));
-    options.AddPolicy("doctor", policy => policy.RequireClaim("perms", "doctor", "admin"));
-    options.AddPolicy("admin", policy => policy.RequireClaim("perms", "admin"));
+    
+    options.AddPolicy("donor", policy => policy.RequireClaim(ClaimTypes.Role, "donor"));
+    options.AddPolicy("doctor", policy => policy.RequireClaim(ClaimTypes.Role, "doctor"));
+    options.AddPolicy("admin", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
 });
 
 // Add services to the container.

@@ -19,6 +19,7 @@ public static class HttpExtensions
     
     private static ProblemDetails ErrorToProblem(IError error)
     {
+        Console.Out.WriteLine("Error:" + error);
         return new ProblemDetails();
     }
 }

@@ -74,7 +74,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             {
                 if (!Enum.TryParse<Role>(role, out var parsedRole))
                 {
-                    return Result.Fail(new UserError.TokenCreationError()); //TODO: Bad Role Error
+                    return Result.Fail(new UserError.InvalidRoleError());
                 }
 
                 parsedRoles.Add(parsedRole);
@@ -83,7 +83,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             var user = new User(nic, name, User.HashPassword(password), parsedRoles, null, isVerified, dateOfBirth,
                 placeOfBirth);
 
-            var success = await repository.UpdateUser(user.ToEntity());
+            var success = await repository.AddUser(user.ToEntity());
 
             return !success
                 ? Result.Fail(new UserError.UnknownError())

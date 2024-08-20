@@ -13,10 +13,14 @@ export async function register(
   name: string,
   role: string
 ): Promise<RegisterResponseModel> {
-  return await post(createUserUri, JSON.stringify({ nic: nic, password: password, name: name, role: role }));
+  console.log(role);
+  return await post(
+    createUserUri,
+    JSON.stringify({ nic: nic, password: password, name: name, roles: [role.toLowerCase()] })
+  );
 }
 
-export async function getUsers(): Promise<{ nic: number }[]> {
+export async function getUsers(): Promise<{ nics: number[] }> {
   return await get(getUsersUri);
 }
 

@@ -47,7 +47,7 @@ public partial record User(
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, Nic),
-            new Claim("fullName", Name)
+            new Claim("fullName", Name),
         };
 
         claims.AddRange(Roles.Select(role => new Claim(ClaimTypes.Role, role.ToString())));

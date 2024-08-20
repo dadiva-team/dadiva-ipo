@@ -10,7 +10,7 @@ public class InitialData
     private static readonly User Admin = new(
         "87654321",
         "Eng. Doe",
-        User.HashPassword("MegaPassword123!hashed"),
+        User.HashPassword("MegaPassword123!"),
         [Role.admin, Role.doctor, Role.donor],
         null,
         true,
@@ -21,8 +21,8 @@ public class InitialData
     private static readonly User Doctor = new(
         "11111111",
         "Dr. Doe",
-        User.HashPassword("MegaPassword123!hashed"),
-        new List<Role> { Role.doctor, Role.donor },
+        User.HashPassword("MegaPassword123!"),
+        [Role.doctor, Role.donor],
         null,
         true,
         null,
@@ -32,8 +32,8 @@ public class InitialData
     private static readonly User Donor = new(
         "12345678",
         "John Doe",
-        User.HashPassword("MegaPassword123!hashed"),
-        new List<Role> { Role.donor },
+        User.HashPassword("MegaPassword123!"),
+        [Role.donor],
         null,
         true,
         null,
