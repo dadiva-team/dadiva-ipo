@@ -2,9 +2,9 @@ import { Form, Question, ShowCondition } from '../../../domain/Form/Form';
 import { RuleProperties, TopLevelCondition, Event } from 'json-rules-engine';
 
 export interface FormOutputModel {
+  language: string;
   groups: { name: string; questions: QuestionModel[] }[];
   rules: Rule[];
-  language: string;
 }
 
 export class QuestionModel {

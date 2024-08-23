@@ -40,10 +40,9 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             if (!success) return Result.Fail(new UserError.TokenCreationError());
 
             // Podiamos usar a função getUserByNic e incluir a suspensão tbm
-            var suspension = (await repository.GetSuspensionIfActive(nic));
-            var suspensiond = suspension?.ToDomain();
+            var suspension = (await repository.GetSuspensionIfActive(nic))?.ToDomain();
 
-            var ulei = UserLoginExternalInfo.CreateUserLoginExternalInfo(nic, newUser.Token, suspensiond);
+            var ulei = UserLoginExternalInfo.CreateUserLoginExternalInfo(nic, newUser.Token, suspension);
 
             return Result.Ok(ulei);
         });

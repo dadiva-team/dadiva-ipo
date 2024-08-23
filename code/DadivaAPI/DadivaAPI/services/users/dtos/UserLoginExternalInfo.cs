@@ -8,7 +8,8 @@ public record UserLoginExternalInfo(
     bool SuspensionIsActive,
     string? SuspensionType,
     string? SuspensionStartDate,
-    string? SuspensionEndDate
+    string? SuspensionEndDate,
+    string? SuspensionReason
 )
 {
     public static UserLoginExternalInfo CreateUserLoginExternalInfo(string nic, string token, Suspension? suspension)
@@ -19,7 +20,8 @@ public record UserLoginExternalInfo(
             suspension?.IsActive ?? false,
             suspension?.Type.ToString(),
             suspension?.StartDate.ToString(),
-            suspension?.EndDate?.ToString()
+            suspension?.EndDate?.ToString(),
+            suspension?.Reason
         );
     }
 }

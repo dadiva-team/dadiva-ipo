@@ -3,25 +3,27 @@ using DadivaAPI.services.users.dtos;
 
 namespace DadivaAPI.routes.users.models;
 
-public record UserAccountStatus(
+public record UserSuspensionAccountStatus(
     bool IsActive,
     string? Type,
     string? StartDate,
-    string? EndDate
+    string? EndDate,
+    string? Reason = null
 );
 public record CreateTokenOutputModel(
     string Nic,
     string Token,
-    UserAccountStatus AccountStatus
+    UserSuspensionAccountStatus SuspensionAccountStatus
 )
 {
     public static CreateTokenOutputModel FromExternalInfo(UserLoginExternalInfo info)
     {
-        var accountStatus =  new UserAccountStatus(
+        var accountStatus =  new UserSuspensionAccountStatus(
             info.SuspensionIsActive,
             info.SuspensionType,
             info.SuspensionStartDate,
-            info.SuspensionEndDate
+            info.SuspensionEndDate,
+            info.SuspensionReason
         );
 
         return new CreateTokenOutputModel(
