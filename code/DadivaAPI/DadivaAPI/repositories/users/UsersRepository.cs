@@ -26,7 +26,8 @@ public class UsersRepository : IUsersRepository
     public async Task<UserEntity?> GetUserByNic(string nic)
     {
         return await _context.Users
-                .FirstOrDefaultAsync(u => u.Nic == nic);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Nic == nic);
     }
 
     public async Task<bool> UpdateUser(UserEntity user)
@@ -75,7 +76,7 @@ public class UsersRepository : IUsersRepository
             .Include(s => s.Doctor)
             .FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
     }
-    
+
     public async Task<SuspensionEntity?> GetSuspensionIfActive(string userNic)
     {
         return await _context.Suspensions
@@ -93,7 +94,7 @@ public class UsersRepository : IUsersRepository
         {
             return false;
         }
-        
+
         var suspension = await _context.Suspensions.FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
         if (suspension == null)
         {

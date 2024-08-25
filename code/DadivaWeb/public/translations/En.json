@@ -16,5 +16,15 @@
   "Suspension Card Body Permanent": "Please contact support for more information.",
   "Suspension Card Title Other": "Account temporarily suspended",
   "Suspension Card Body-Reason Other": "Reason: ",
-  "Suspension Card Body-Contact Other": "Please contact support for more information."
+  "Suspension Card Body-Contact Other": "Please contact support for more information.",
+  "Added question: {{question}}": "Added question: {{question}}",
+  "Modified question: {{question}}": "Modified question: {{question}}",
+  "Moved question: {{question}} from position {{from}} to {{to}}": "Moved question: {{question}} from position {{from}} to {{to}}",
+  "Question \"{{question}}\" is now a subordinate question.": "Question \"{{question}}\" is now a subordinate question.",
+  "Question \"{{question}}\" is no longer a subordinate question.": "Question \"{{question}}\" is no longer a subordinate question.",
+  "Question \"{{question}}\" has had its condition changed.": "Question \"{{question}}\" has had its condition changed.",
+  "Removed question: {{question}}": "Removed question: {{question}}",
+  "Added Groups": "Added Groups",
+  "Removed Groups": "Removed Groups",
+  "Modified Groups": "Modified Groups"
 }

@@ -7,6 +7,7 @@ import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { Uris } from '../../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
 import { useTranslation } from 'react-i18next';
+import { compareForms, FormChanges } from './utils';
 
 export function useEditFormPage() {
   const { i18n } = useTranslation();
@@ -22,17 +23,22 @@ export function useEditFormPage() {
 
   const [deletingQuestion, setDeletingQuestion] = useState<DeletingQuestionState>(null);
   const [formPlaygroundModalOpen, setFormPlaygroundModalOpen] = useState(false);
+  const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [creatingQuestion, setCreatingQuestion] = useState(false);
 
   const [editingGroup, setEditingGroup] = useState<GroupDomain>(null);
   const [deletingGroup, setDeletingGroup] = useState<GroupDomain>(null);
   const [creatingGroup, setCreatingGroup] = useState(false);
-  const [creatingQuestionInGroup, setCreatingQuestionInGroup] = useState<GroupDomain>(null);
+  const [creatingQuestionInGroup, setCreatingQuestionInGroup] = useState<string>(null);
+  const [formChanges, setFormChanges] = useState<FormChanges>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const nav = useNavigate();
   const [dropError, setDropError] = useState<{ id: string; msg: string }>(null);
   const [error, setError] = useState<string | null>(null);
-  const [formFetchData, setFormFetchData] = useState<Form>();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [form, setForm] = useState<Form>();
+  const [originalForm, setOriginalForm] = useState<Form | null>(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -41,7 +47,8 @@ export function useEditFormPage() {
         handleError(error, setError, nav);
         return;
       }
-      setFormFetchData(res as Form);
+      setForm(res as Form);
+      setOriginalForm(res as Form);
       setIsLoading(false);
     };
 
@@ -216,7 +223,7 @@ export function useEditFormPage() {
   }
 
   function handleAddQuestion(question: Question, groupName: string) {
-    setFormFetchData(oldForm => {
+    setForm(oldForm => {
       const updatedGroups = oldForm.groups.map(group => {
         if (group.name === groupName) {
           group.questions.push(question);
@@ -244,7 +251,7 @@ export function useEditFormPage() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     parentQuestionId?: string | null
   ) {
-    setFormFetchData(oldForm => {
+    setForm(oldForm => {
       const newQuestion: Question = { id, text, type, options, showCondition };
       console.log('handleUpdateQuestion:', newQuestion);
 
@@ -277,15 +284,16 @@ export function useEditFormPage() {
   }
 
   function handleDrop(questionID: string, groupName: string, index: number) {
-    setFormFetchData(oldForm => {
+    setForm(oldForm => {
       console.log('handleDrop:', questionID, groupName, index);
       const subQuestionsIds = oldForm.groups
         .flatMap(group => group.questions)
         .filter(q => q?.showCondition?.if !== null && q?.showCondition?.if !== undefined)
         .map(q => q.id);
       console.log('subQuestionsIds:', subQuestionsIds);
-      if (questionID in subQuestionsIds) {
+      if (subQuestionsIds.includes(questionID)) {
         // Shouldn't happen, but just in case
+        console.log('Cannot move a sub-question');
         setDropError({ id: questionID, msg: 'Não pode mover uma sub-questão' });
         return;
       }
@@ -355,7 +363,7 @@ export function useEditFormPage() {
   }
 
   function handleRemoveCondition(parentQuestionId: string, subQuestionId: string) {
-    setFormFetchData(oldForm => {
+    setForm(oldForm => {
       const updatedGroups = oldForm.groups.map(group => {
         const newQuestions = [...group.questions];
         const questionIndex = newQuestions.findIndex(q => q.id === subQuestionId);
@@ -389,7 +397,7 @@ export function useEditFormPage() {
     if (isSubQuestion && parentQuestionId) {
       handleReassignSubQuestion(question, parentQuestionId);
     } else {
-      setFormFetchData(oldForm => {
+      setForm(oldForm => {
         const updatedGroups = oldForm.groups.map(group => {
           const newQuestions = group.questions.filter(q => q.id !== question.id);
           return { ...group, questions: newQuestions };
@@ -407,7 +415,7 @@ export function useEditFormPage() {
   }
 
   function handleReassignSubQuestion(subQuestion: Question, parentQuestionId: string) {
-    setFormFetchData(oldForm => {
+    setForm(oldForm => {
       const updatedGroups = oldForm.groups.map(group => {
         if (group.questions.some(q => q.id === parentQuestionId)) {
           const newQuestions = [...group.questions].filter(q => q.id !== subQuestion.id);
@@ -432,7 +440,7 @@ export function useEditFormPage() {
   }
 
   function moveGroup(oldIndex: number, newIndex: number) {
-    setFormFetchData(oldForm => {
+    setForm(oldForm => {
       const groups = [...oldForm.groups];
       const [movedGroup] = groups.splice(oldIndex, 1);
       groups.splice(newIndex, 0, movedGroup);
@@ -443,7 +451,7 @@ export function useEditFormPage() {
   }
 
   function deleteGroup(group: GroupDomain) {
-    setFormFetchData(oldForm => {
+    setForm(oldForm => {
       const groups = oldForm.groups.slice();
       const index = groups.indexOf(group);
       groups.splice(index, 1);
@@ -463,11 +471,28 @@ export function useEditFormPage() {
     setFormPlaygroundModalOpen(true);
   };
 
-  async function saveForm() {
-    const [error, res] = await handleRequest(FormServices.saveForm(formFetchData));
+  const handleOpenSubmitDialog = () => {
+    const changes = compareForms(originalForm!, form, i18n.t);
+    console.log(changes);
+    setFormChanges(changes);
+    setSubmitDialogOpen(true);
+  };
+
+  const handleCloseSubmitDialog = () => {
+    setFormChanges(null);
+    setSubmitDialogOpen(false);
+  };
+
+  function handleSaveForm(reason: string) {
+    setIsSubmitting(true);
+    saveForm(reason).then(() => setIsSubmitting(false));
+  }
+
+  async function saveForm(reason: string) {
+    const [error, res] = await handleRequest(FormServices.editForm(form, reason)); // TODO: Add submit Modal
 
     if (error) {
-      handleError(error, setError, nav);
+      handleError(error, setSubmitError, nav);
       return;
     }
 
@@ -476,6 +501,7 @@ export function useEditFormPage() {
 
   return {
     isLoading,
+    isSubmitting,
     editingQuestion,
     editingSubQuestion,
     deletingQuestion,
@@ -486,9 +512,10 @@ export function useEditFormPage() {
     creatingQuestionInGroup,
     error,
     dropError,
-    formFetchData,
+    submitError,
+    form,
     calculateRules,
-    setFormFetchData,
+    setFormFetchData: setForm,
     setEditingQuestion,
     setEditingSubQuestion,
     setDeletingQuestion,
@@ -509,6 +536,10 @@ export function useEditFormPage() {
     formPlaygroundModalOpen,
     closeModalPlayground,
     openModalPlayground,
-    saveForm,
+    submitDialogOpen,
+    handleOpenSubmitDialog,
+    handleCloseSubmitDialog,
+    formChanges,
+    handleSaveForm,
   };
 }

@@ -50,7 +50,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
         return await context.WithTransaction(async () =>
         {
             var adminEntity = await repository.GetUserByNic(nic);
-            if (adminEntity is null) return Result.Fail(new UserError.UnknownDonorError());
+            if (adminEntity is null) return Result.Fail(new UserError.UnknownAdminError());
 
             if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
                 return Result.Fail(new FormErrors.InvalidLanguageError());

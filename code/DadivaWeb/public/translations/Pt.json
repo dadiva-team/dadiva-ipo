@@ -16,5 +16,15 @@
   "Suspension Card Body Permanent": "Por favor contacte o suporte para mais informações.",
   "Suspension Card Title Other": "Conta temporariamente suspensa",
   "Suspension Card Body-Reason Other": "Motivo: ",
-  "Suspension Card Body-Contact Other": "Por favor contacte o suporte para mais informações."
+  "Suspension Card Body-Contact Other": "Por favor contacte o suporte para mais informações.",
+  "Added question: {{question}}": "Pergunta adicionada: {{question}}",
+  "Modified question: {{question}}": "Pergunta modificada: {{question}}",
+  "Moved question: {{question}} from position {{from}} to {{to}}": "Pergunta movida: {{question}} da posição {{from}} para {{to}}",
+  "Question \"{{question}}\" is now a subordinate question.": "A pergunta \"{{question}}\" é agora uma pergunta subordinada.",
+  "Question \"{{question}}\" is no longer a subordinate question.": "A pergunta \"{{question}}\" já não é uma pergunta subordinada.",
+  "Question \"{{question}}\" has had its condition changed.": "A pergunta \"{{question}}\" teve sua condição alterada.",
+  "Removed question: {{question}}": "Pergunta removida: {{question}}",
+  "Added Groups": "Grupos Adicionados",
+  "Removed Groups": "Grupos Removidos",
+  "Modified Groups": "Alterações nos Grupos"
 }

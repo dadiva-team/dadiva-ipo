@@ -11,7 +11,7 @@ public class AllConditionEntity : TopLevelConditionEntity
     public override Condition ToDomain()
     {
         return All.IsNullOrEmpty() ? 
-            new LogicalCondition(null , []) : 
-            new LogicalCondition(null , All.Select(e=>e.ToDomain()).ToList());
+            new LogicalCondition([] , null) : 
+            new LogicalCondition(All.Select(e=>e.ToDomain()).ToList() , null);
     }
 }

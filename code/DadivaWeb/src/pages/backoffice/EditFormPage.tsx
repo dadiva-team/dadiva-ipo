@@ -13,10 +13,13 @@ import { DeleteGroupDialog } from '../../components/backoffice/editForm/dialogs/
 import { GroupEditDialog } from '../../components/backoffice/editForm/dialogs/GroupEditDialog';
 import { SubQuestionEditDialog } from '../../components/backoffice/editForm/dialogs/SubQuestionEditDialog';
 import { EditFormPlaygroundModal } from './EditFormPlaygroundModal';
+import { SubmitDialog } from '../../components/backoffice/editForm/dialogs/SubmitDialog';
+import { SubmitFormButton } from '../../components/form/Inputs';
 
 export function EditFormPage() {
   const {
     isLoading,
+    isSubmitting,
     editingQuestion,
     editingSubQuestion,
     deletingQuestion,
@@ -27,7 +30,8 @@ export function EditFormPage() {
     creatingQuestionInGroup,
     error,
     dropError,
-    formFetchData,
+    submitError,
+    form,
     calculateRules,
     setFormFetchData,
     setEditingQuestion,
@@ -48,9 +52,13 @@ export function EditFormPage() {
     moveGroup,
     deleteGroup,
     formPlaygroundModalOpen,
+    submitDialogOpen,
     closeModalPlayground,
     openModalPlayground,
-    saveForm,
+    handleOpenSubmitDialog,
+    handleCloseSubmitDialog,
+    formChanges,
+    handleSaveForm,
   } = useEditFormPage();
 
   return (
@@ -65,7 +73,7 @@ export function EditFormPage() {
           <div>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pl: 1, pr: 2 }}>
               <Box>
-                <Button disabled={formFetchData.groups.length === 0} onClick={() => setCreatingQuestion(true)}>
+                <Button disabled={form.groups.length === 0} onClick={() => setCreatingQuestion(true)}>
                   Criar Questão
                 </Button>
                 <Button onClick={() => setCreatingGroup(true)}>Criar Grupo</Button>
@@ -74,13 +82,13 @@ export function EditFormPage() {
                 Testar fomulario
               </Button>
             </Box>
-            {formFetchData.groups.map((group, index) => (
+            {form.groups.map((group, index) => (
               <Group
                 group={group}
                 onDrop={handleDrop}
                 onAddQuestion={() => {
+                  setCreatingQuestionInGroup(group.name);
                   setCreatingQuestion(true);
-                  setCreatingQuestionInGroup(group);
                 }}
                 onEditRequest={question => setEditingQuestion(question)}
                 onSubEditRequest={question => setEditingSubQuestion(question)}
@@ -92,23 +100,23 @@ export function EditFormPage() {
                   })
                 }
                 onMoveUp={index === 0 ? null : () => moveGroup(index, index - 1)}
-                onMoveDown={index === formFetchData.groups.length - 1 ? null : () => moveGroup(index, index + 1)}
+                onMoveDown={index === form.groups.length - 1 ? null : () => moveGroup(index, index + 1)}
                 onDropError={dropError}
                 onDropErrorClear={() => setDropError(null)}
                 onRename={() => setEditingGroup(group)}
-                onDelete={formFetchData.groups.length === 1 ? null : () => setDeletingGroup(group)}
+                onDelete={form.groups.length === 1 ? null : () => setDeletingGroup(group)}
                 key={group.name}
               />
             ))}
             <EditFormPlaygroundModal
-              form={formFetchData}
+              form={form}
               openModal={formPlaygroundModalOpen}
               handleCloseModal={closeModalPlayground}
             />
             <QuestionEditDialog
               open={editingQuestion !== null}
               question={editingQuestion}
-              questions={formFetchData.groups
+              questions={form.groups
                 .find(group => group.questions.includes(editingQuestion))
                 ?.questions.filter(q => q.id !== editingQuestion.id)}
               onAnswer={(id, text, type, options, showCondition, parentQuestionId) =>
@@ -116,7 +124,7 @@ export function EditFormPage() {
               }
               subQuestions={Array.from(
                 new Set(
-                  formFetchData.groups
+                  form.groups
                     .find(group => group.questions.includes(editingQuestion))
                     ?.questions.filter(q => q.showCondition?.if?.[editingQuestion?.id])
                 )
@@ -127,12 +135,12 @@ export function EditFormPage() {
                 setEditingSubQuestion(question);
               }}
               onClose={() => setEditingQuestion(null)}
-              isFirst={formFetchData.groups.some(group => group.questions.indexOf(editingQuestion) > 0)}
+              isFirst={form.groups.some(group => group.questions.indexOf(editingQuestion) > 0)}
             />
             <SubQuestionEditDialog
               open={editingSubQuestion !== null}
               question={editingSubQuestion}
-              questions={formFetchData.groups
+              questions={form.groups
                 .find(group => group.questions.includes(editingSubQuestion))
                 ?.questions.filter(q => q.id !== editingSubQuestion?.id)}
               //formFetchData.groups.flatMap(group => group.questions)}
@@ -144,11 +152,7 @@ export function EditFormPage() {
 
             <QuestionAddDialog
               open={creatingQuestion}
-              groups={
-                creatingQuestionInGroup == null
-                  ? formFetchData.groups.map(group => group.name)
-                  : [creatingQuestionInGroup.name]
-              }
+              groups={creatingQuestionInGroup ? [creatingQuestionInGroup] : form.groups.map(group => group.name)}
               onAnswer={(question, groupName) => {
                 handleAddQuestion(question, groupName);
                 setCreatingQuestionInGroup(null);
@@ -165,7 +169,7 @@ export function EditFormPage() {
                 if (!del) return;
                 const subQuestions = Array.from(
                   new Set(
-                    formFetchData.groups
+                    form.groups
                       .find(group => group.questions.includes(deletingQuestion.question))
                       ?.questions.filter(q => q.showCondition?.if?.[deletingQuestion?.question?.id])
                   )
@@ -229,9 +233,15 @@ export function EditFormPage() {
               }}
               onClose={() => setDeletingGroup(null)}
             />
-            <Button disabled={!formFetchData.groups.some(g => g.questions.length !== 0)} onClick={saveForm}>
-              Guardar Formulário
-            </Button>
+            <SubmitDialog
+              open={submitDialogOpen}
+              onClose={handleCloseSubmitDialog}
+              onSubmit={handleSaveForm}
+              onError={submitError}
+              isLoading={isSubmitting}
+              changes={formChanges}
+            />
+            <SubmitFormButton onSubmit={handleOpenSubmitDialog} />
           </div>
         )}
       </div>

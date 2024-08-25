@@ -6,7 +6,7 @@ import {
   getInconsistenciesUri,
   submitFormUri,
 } from '../utils/WebApiUris';
-import { DomainToModel, DomainToRules, FormOutputModel, ModelToDomain, RulesToDomain } from './models/FormOutputModel';
+import { DomainToRules, FormOutputModel, ModelToDomain, RulesToDomain } from './models/FormOutputModel';
 import { Form } from '../../domain/Form/Form';
 import { RuleProperties } from 'json-rules-engine';
 import { InconsistenciesOutputModel } from './models/InconsistenciesOutputModel';
@@ -18,6 +18,7 @@ import {
   FormWithVersionModelToDomain,
   FormWithVersionOutputModel,
 } from './models/FormWithVersionOutputModel';
+import { EditFormRequest } from './models/EditFormRequest';
 
 function toCamelCase(s: string): string {
   return s.replace(/([A-Z])/g, (c, first) => (first ? c.toLowerCase() : c));
@@ -74,12 +75,11 @@ export namespace FormServices {
     console.log('getForm with language: ' + language);
     console.log('GET FORM |||||||||||||||');
     const res = await get<FormOutputModel>(getFormUri(language));
-    console.log('fetched form ' + res);
     const convertedRes = convertKeysToCamelCase(res);
+    console.log('converted ', convertedRes);
 
     const formOutput: FormOutputModel = {
       ...convertedRes,
-      language: convertedRes.language,
     };
     console.log(ModelToDomain(formOutput));
     return ModelToDomain(formOutput);
@@ -93,11 +93,20 @@ export namespace FormServices {
     return FormWithVersionModelToDomain(res);
   }
 
-  export async function saveForm(form: Form): Promise<boolean> {
+  export async function editForm(form: Form, reason: string): Promise<boolean> {
     console.log('SAVE FORM |||||||||||||||');
-    console.log(DomainToModel(form));
-    console.log(JSON.stringify(DomainToModel(form)));
-    await put(editFormUri, JSON.stringify(DomainToModel(form)));
+    console.log(form);
+    const convertedForm = convertKeysToCamelCase<Form>(form);
+
+    const request = {
+      language: form.language,
+      groups: convertedForm.groups,
+      rules: convertedForm.rules,
+      reason: reason,
+    } as EditFormRequest;
+    console.log(request);
+
+    await put(editFormUri, JSON.stringify(request));
     return true;
   }
 

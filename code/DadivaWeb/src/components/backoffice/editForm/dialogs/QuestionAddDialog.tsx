@@ -59,7 +59,7 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionA
         id: crypto.randomUUID(),
         text: questionText,
         type: questionType,
-        options: questionOptions,
+        options: questionOptions.length > 0 ? questionOptions : null,
       },
       questionGroup
     );
@@ -136,6 +136,8 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionA
               <MenuItem value={'boolean'}>Sim ou Não</MenuItem>
               <MenuItem value={'text'}>Texto</MenuItem>
               <MenuItem value={'dropdown'}>Escolha Múltipla</MenuItem>
+              <MenuItem value={'countries'}>Países</MenuItem>
+              <MenuItem value={'medications'}>Medicamentos</MenuItem>
             </Select>
           </FormControl>
           {questionType === 'dropdown' && (

@@ -3,7 +3,7 @@ import { useState } from 'react';
 export function useDialog() {
   const [questionId, setQuestionId] = useState<string | null>(null);
   const [questionText, setQuestionText] = useState('');
-  const [questionType, setQuestionType] = useState('boolean');
+  const [questionType, setQuestionType] = useState<string>('boolean');
   const [questionOptions, setQuestionOptions] = useState<string[]>([]);
   const [optionInput, setOptionInput] = useState('');
   const [error, setError] = useState<string | null>(null);

@@ -244,7 +244,7 @@ const mockContinents: CountryList = {
   Oceania: ['Austrália', 'Nova Zelândia', 'Fiji'],
 };
 
-const mockCountries: string[] = Object.keys(mockContinents)
+export const mockCountries: string[] = Object.keys(mockContinents)
   .map(continent => {
     return mockContinents[continent];
   })
