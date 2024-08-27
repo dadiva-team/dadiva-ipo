@@ -7,13 +7,15 @@ import React from 'react';
 type QuestionProps = {
   text: string;
   color: string;
-  answer: string | null;
+  answer: string | string[] | null;
   type: string;
   isEditing: boolean;
 };
 export function Question({ text, color, answer, isEditing, type }: QuestionProps) {
   const isAnswerYes = answer === 'yes';
   const isAnswerNo = answer === 'no';
+
+  const formattedAnswer = Array.isArray(answer) ? answer.join(', ') : answer;
 
   return (
     <Paper
@@ -60,7 +62,7 @@ export function Question({ text, color, answer, isEditing, type }: QuestionProps
                 variant="body1"
                 sx={{ maxWidth: '100%', whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-all' }}
               >
-                Resposta: {answer}
+                Resposta: {formattedAnswer}
               </Typography>
             </Box>
           )}
