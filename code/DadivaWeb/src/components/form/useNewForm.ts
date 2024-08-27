@@ -4,7 +4,7 @@ import { Form } from '../../domain/Form/Form';
 import { Engine } from 'json-rules-engine';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
-import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/FormUtils';
+import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/formUtils';
 import { useCurrentSession, useUpdateSessionStatus } from '../../session/Session';
 import { SuspensionType } from '../../services/users/models/LoginOutputModel';
 import { useTranslation } from 'react-i18next';

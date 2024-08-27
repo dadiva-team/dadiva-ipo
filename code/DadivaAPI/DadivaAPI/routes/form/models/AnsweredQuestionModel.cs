@@ -44,6 +44,9 @@ public class AnsweredQuestionModel
             throw new KeyNotFoundException($"Question with ID {model.QuestionId} not found in the form.");
         }
 
-        return new AnsweredQuestion(question.ToDomain(), model.Answer, null);
+        // Sanitize the answer before converting to domain
+        var sanitizedAnswer = model.Answer.Sanitize();
+
+        return new AnsweredQuestion(question.ToDomain(), sanitizedAnswer, null);
     }
 }

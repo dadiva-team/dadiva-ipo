@@ -11,6 +11,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Save } from '@mui/icons-material';
 import { MedicationsServices } from '../../services/medications/MedicationsServices';
 import { handleRequest } from '../../services/utils/fetch';
+import { sanitizeInput } from './utils/sanitizeUtils';
 
 interface BooleanButtonsProps {
   onChangeAnswer: (answer: boolean) => void;
@@ -118,7 +119,7 @@ export function ReviewFormButton({ onReview }: ReviewFormButtonProps) {
 }
 
 interface TextInputProps {
-  onChangeAnswer: (answer: string) => void;
+  onChangeAnswer: (sanitizedValue: string) => void;
 }
 
 export function TextInput({ onChangeAnswer }: TextInputProps) {
@@ -126,6 +127,12 @@ export function TextInput({ onChangeAnswer }: TextInputProps) {
   const handleChange = (value: React.ChangeEvent<HTMLInputElement>) => {
     setValue(value.target.value);
   };
+
+  const handleSave = () => {
+    const sanitizedValue = sanitizeInput(value);
+    onChangeAnswer(sanitizedValue);
+  };
+
   return (
     <Box
       sx={{
@@ -140,13 +147,15 @@ export function TextInput({ onChangeAnswer }: TextInputProps) {
         variant="outlined"
         required
         rows={2}
+        value={value}
         onChange={handleChange}
         label="Responda Aqui"
+        inputProps={{ maxLength: 128 }}
         sx={{ mr: 2, width: '80%' }}
       />
       <Button
         variant="outlined"
-        onClick={() => onChangeAnswer(value)}
+        onClick={handleSave}
         startIcon={<Save />}
         disabled={value.length === 0}
         sx={{ borderRadius: 50 }}
@@ -160,11 +169,6 @@ export function TextInput({ onChangeAnswer }: TextInputProps) {
 export function WrongQuestionType() {
   return <div>Wrong Question Type detected. Please, do not proceed</div>;
 }
-
-type DropdownProps = {
-  options: string[];
-  onChangeAnswer: (answer: string) => void;
-};
 
 type MedicationsInput = {
   onChangeAnswer: (answer: string[]) => void;
@@ -302,11 +306,15 @@ export function CountriesInput({ onChangeAnswer }: CountriesInput) {
   );
 }
 
-export function CheckboxesTags({ options, onChangeAnswer }: DropdownProps) {
-  const [selectedOptions, setSelectedOptions] = useState<string>('');
+type DropdownProps = {
+  options: string[];
+  onChangeAnswer: (answer: string[]) => void;
+};
+
+export function DropdownInput({ options, onChangeAnswer }: DropdownProps) {
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const handleChange = (value: string[]) => {
-    const joinedValue = value.join(', ');
-    setSelectedOptions(joinedValue);
+    setSelectedOptions(value);
   };
   return (
     <div

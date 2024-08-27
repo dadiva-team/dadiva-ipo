@@ -7,6 +7,7 @@ import { FormEditDialog } from './FormEditDialog';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { useTranslation } from 'react-i18next';
 
 interface ReviewFormProps {
   formData: Form;
@@ -34,6 +35,7 @@ export function ReviewForm({
 }: ReviewFormProps) {
   const [open, setOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<Question>(null);
+  const { t } = useTranslation();
 
   const Item = styled(Paper)<ItemProps>(({ theme, questionid }) => ({
     backgroundColor: questionColors[questionid],
@@ -184,7 +186,7 @@ export function ReviewForm({
           color="primary"
           sx={{ width: '50%', borderRadius: 5, justifyContent: 'bottom' }}
         >
-          Submit form
+          {t('Submit Form')}
         </Button>
       )}
     </Container>

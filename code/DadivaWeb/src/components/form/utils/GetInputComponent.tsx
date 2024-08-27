@@ -1,6 +1,6 @@
 import {
   BooleanButtons,
-  CheckboxesTags,
+  DropdownInput,
   CountriesInput,
   MedicationsInput,
   TextInput,
@@ -28,7 +28,7 @@ export function getInputComponent(
       break;
     case 'dropdown':
       input = (
-        <CheckboxesTags
+        <DropdownInput
           options={question.options}
           onChangeAnswer={answer => {
             onChangeAnswer(question.id, question.type, answer);

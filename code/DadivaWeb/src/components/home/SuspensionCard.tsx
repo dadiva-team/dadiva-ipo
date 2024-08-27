@@ -26,7 +26,10 @@ export function SuspensionCard({ suspensionStartDate, suspensionEndDate, suspens
     >
       {suspensionType === SuspensionType.PendingReview && (
         <>
-          <Typography variant="h6"> {t('Suspension Card Title Pending Review')} </Typography>
+          <Typography variant="h6" sx={{ pb: 2 }}>
+            {' '}
+            {t('Suspension Card Title Pending Review')}{' '}
+          </Typography>
           <Typography variant="subtitle1">
             {t('Suspension Card Date Pending Review')}
             {suspensionStartDate}

@@ -27,5 +27,6 @@
   "Removed question: {{question}}": "Pergunta removida: {{question}}",
   "Added Groups": "Grupos Adicionados",
   "Removed Groups": "Grupos Removidos",
-  "Modified Groups": "Alterações nos Grupos"
+  "Modified Groups": "Alterações nos Grupos",
+  "Submit Form": "Submeter Formulário"
 }
