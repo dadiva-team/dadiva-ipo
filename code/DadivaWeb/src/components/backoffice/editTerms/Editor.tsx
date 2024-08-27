@@ -9,6 +9,18 @@ interface EditorProps {
 
 const Editor = forwardRef(
   ({ initialState, setContent, setIsSubmitted }: EditorProps, ref: React.ForwardedRef<Jodit>) => {
+    /*Jodit.defaultOptions.controls.language = {
+      name: 'Select Language',
+      list: {
+        En: 'English',
+        Pt: 'Português',
+      },
+      exec: (editor, _, { control }) => {
+        const selectedLanguage = ;
+        setLanguage(selectedLanguage);
+      },
+    };*/
+
     const config = {
       readonly: false,
       height: 500,
@@ -53,6 +65,8 @@ const Editor = forwardRef(
         '|',
         'eraser',
         'hr',
+        '|',
+        'language',
       ],
       textIcons: false,
     };

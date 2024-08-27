@@ -13,6 +13,7 @@ export function useTerms() {
 
   useEffect(() => {
     const fetch = async () => {
+      console.log('useTerms useEffect language ' + i18n.language);
       const [termsError, termsRes] = await handleRequest(TermsServices.getActiveTerms(i18n.language));
       if (termsError) {
         handleError(termsError, setError, nav);
@@ -26,6 +27,10 @@ export function useTerms() {
 
     if (isLoading) fetch();
   }, [i18n.language, isLoading, nav]);
+
+  i18n.on('languageChanged', () => {
+    setIsLoading(true);
+  });
 
   return {
     isLoading,

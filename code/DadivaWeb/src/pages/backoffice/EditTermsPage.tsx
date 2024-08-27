@@ -7,18 +7,16 @@ import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
 import Editor from '../../components/backoffice/editTerms/Editor';
 import { Jodit } from 'jodit-react';
-import { useCurrentSession } from '../../session/Session';
 import Sidebar from '../../components/backoffice/editTerms/Sidebar';
 import './EditTermsPage.css';
 
 export function EditTermsPage() {
-  const user = useCurrentSession();
   const {
     isLoading,
     error,
     setError,
     termsFetchData,
-    selectedTermId,
+    selectedTermIdx,
     content,
     setContent,
     isSubmitted,
@@ -60,7 +58,7 @@ export function EditTermsPage() {
 
             <div style={{ padding: '10px' }}>
               <Editor ref={editorRef} initialState={content} setContent={setContent} setIsSubmitted={setIsSubmitted} />
-              <Button disabled={isSubmitted} onClick={() => handleUpdateTermRequest(selectedTermId, content, user.nic)}>
+              <Button disabled={isSubmitted} onClick={() => handleUpdateTermRequest(content)}>
                 {isSubmitted ? 'Submitted' : 'Submit Terms'}
               </Button>
             </div>
@@ -70,7 +68,7 @@ export function EditTermsPage() {
             terms={termsFetchData}
             open={sidebarOpen}
             onTermClick={handleTermClick}
-            selectedTermId={selectedTermId}
+            selectedTermIdx={selectedTermIdx}
           />
         </div>
       )}

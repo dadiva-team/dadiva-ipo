@@ -5,7 +5,7 @@ namespace DadivaAPI.repositories.manual;
 
 public interface IManualRepository
 {
-    Task<List<ManualEntryEntity>> GetManualEntries(List<string> manualEntries);
+    Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts);
     
     //TODO: Add Cft methods
 }

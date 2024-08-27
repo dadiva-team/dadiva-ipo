@@ -15,14 +15,15 @@ public class TermsRepository : ITermsRepository
     
     public async Task<TermsEntity?> GetActiveTerms(string language)
     {
-        return await _context.Terms.OrderBy(term => term.Date).LastOrDefaultAsync();
+        return await _context.Terms.OrderBy(term => term.Date).LastOrDefaultAsync(t=>t.Language==language);
     }
 
     public async Task<List<TermsEntity>?> GetTermsHistory(string language)
     {
         return await _context.Terms
             .Where(term => term.Language == language)
-            .OrderBy(term => term.Date)
+            .Include(t=> t.Admin)
+            .OrderByDescending(term => term.Date)
             .ToListAsync();
     }
 
@@ -33,6 +34,7 @@ public class TermsRepository : ITermsRepository
 
     public async Task<bool> SubmitTerms(TermsEntity terms)
     {
+        _context.Entry(terms.Admin).State = EntityState.Unchanged;
         await _context.Terms.AddAsync(terms);
         return await _context.SaveChangesAsync() > 0;
     }

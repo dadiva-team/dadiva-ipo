@@ -47,7 +47,7 @@ public class TermsService(IRepository repository, DadivaDbContext context) : ITe
 
             var history = await repository.GetTermsHistory(language);
 
-            if (history is null) return Result.Fail(new TermsErrors.NoTermsError());
+            if (history is null || history.Count==0) return Result.Fail(new TermsErrors.NoTermsError());
 
             return Result.Ok(
                 new TermsHistoryExternalInfo(

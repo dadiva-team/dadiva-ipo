@@ -27,9 +27,10 @@ export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 export const getSubmissionsStatsUri = `${API_URL}/submissions/stats`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
-export const getTermsUri = `${API_URL}/terms`;
+//export const getTermsUri = `${API_URL}/terms`;
+export const getTermsHistoryUri = (language: string) => `${API_URL}/terms/history/${language}`;
 export const getActiveTermsUri = (language: string) => `${API_URL}/terms/${language}`;
-export const updateTermsUri = (termsId: number) => `${API_URL}/terms/${termsId}`;
+export const updateTermsUri = `${API_URL}/terms`;
 
 export const searchMedicationsUri = `${API_URL}/medications/search?q=`;
 

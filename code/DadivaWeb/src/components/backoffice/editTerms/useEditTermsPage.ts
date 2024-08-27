@@ -2,17 +2,19 @@ import { useEffect, useState } from 'react';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { TermsServices } from '../../../services/terms/TermsServices';
 import { useNavigate } from 'react-router-dom';
-import { Terms } from '../../../domain/Terms/Terms';
 import { UpdateTermsOutputModel } from '../../../services/terms/models/UpdateTermsOutputModel';
+import { TermsHistoryItem } from '../../../services/terms/models/TermsHistoryOutputModel';
+import { useTranslation } from 'react-i18next';
 
 export function useEditTermsPage() {
+  const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [termsFetchData, setTermsFetchData] = useState<Terms[]>();
-  const [selectedTermId, setSelectedTermId] = useState<number>();
+  const [termsFetchData, setTermsFetchData] = useState<TermsHistoryItem[]>();
+  const [selectedTermIdx, setSelectedTermIdx] = useState<number>(0);
   const [content, setContent] = useState('');
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -20,36 +22,42 @@ export function useEditTermsPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [termError, termsRes] = await handleRequest(TermsServices.getTerms());
+      const [termError, termsRes] = await handleRequest(TermsServices.getTerms(i18n.language));
       if (termError) {
         handleError(termError, setError, nav);
         return;
       }
       console.log('fetched new terms');
-      setTermsFetchData(termsRes);
-      const activeTerm = termsRes.find(term => term.isActive === true);
-      setSelectedTermId(activeTerm.id);
-      setContent(activeTerm.content);
+      console.log(termsRes);
+      setTermsFetchData(termsRes.history);
+      console.log(termsRes.history[0]);
+      setContent(termsRes.history[0].content);
       setIsLoading(false);
     };
 
     if (isLoading) fetch();
-  }, [isLoading, nav]);
+  }, [isLoading, nav, i18n.language]);
 
-  function handleTermClick(termId: number) {
-    setSelectedTermId(termId);
-    const selectedTerm = termsFetchData.find(term => term.id === termId);
+  i18n.on('languageChanged', () => {
+    setIsLoading(true);
+  });
+
+  function handleTermClick(termIdx: number) {
+    setSelectedTermIdx(termIdx);
+    const selectedTerm = termsFetchData[termIdx];
     if (selectedTerm) {
       setContent(selectedTerm.content);
     }
   }
 
-  async function handleUpdateTermRequest(termId: number, content: string, author: number) {
+  async function handleUpdateTermRequest(content: string, reason: string = null) {
     const termUpdate: UpdateTermsOutputModel = {
-      updatedBy: author,
-      newContent: content,
+      content: content,
+      language: i18n.language,
+      reason: reason,
     };
-    TermsServices.updateTerms(termId, termUpdate).then(res => {
+    console.log('useEditTermsPage - handleUpdateTermRequest');
+    TermsServices.updateTerms(termUpdate).then(res => {
       if (res == true) {
         setIsLoading(true);
       }
@@ -63,7 +71,7 @@ export function useEditTermsPage() {
     error,
     setError,
     termsFetchData,
-    selectedTermId,
+    selectedTermIdx,
     content,
     setContent,
     isSubmitted,

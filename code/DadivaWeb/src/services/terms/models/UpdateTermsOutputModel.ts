@@ -1,4 +1,5 @@
 export interface UpdateTermsOutputModel {
-  updatedBy: number;
-  newContent: string;
+  content: string;
+  language: string;
+  reason: string | null;
 }

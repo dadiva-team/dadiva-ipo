@@ -1,28 +1,28 @@
 import React from 'react';
 import { Accordion, AccordionSummary, Typography } from '@mui/material';
-import { Terms } from '../../../domain/Terms/Terms';
+import { TermsHistoryItem } from '../../../services/terms/models/TermsHistoryOutputModel';
 
 interface SidebarProps {
-  terms: Terms[];
+  terms: TermsHistoryItem[];
   open: boolean;
   onTermClick: (termId: number) => void;
-  selectedTermId: number;
+  selectedTermIdx: number;
 }
 
-const Sidebar = ({ terms, open, onTermClick, selectedTermId }: SidebarProps) => {
+const Sidebar = ({ terms, open, onTermClick, selectedTermIdx }: SidebarProps) => {
   return (
     <div className={`sidebar ${open ? 'open' : ''}`}>
       <Typography variant="h6"> All terms </Typography>
-      {terms.map(term => (
+      {terms.map((term, index) => (
         <Accordion
-          key={term.id}
-          expanded={selectedTermId === term.id}
-          onClick={() => onTermClick(term.id)}
-          className={selectedTermId === term.id ? 'accordion-selected' : ''}
+          key={index}
+          expanded={selectedTermIdx === index}
+          onClick={() => onTermClick(index)}
+          className={selectedTermIdx === index ? 'accordion-selected' : ''}
         >
           <AccordionSummary>
             <Typography>
-              Title: {term.title} - Created by: {term.createdBy} on {new Date(term.createdAt).toLocaleString()}
+              Created by: {term.authorName} - {term.authorNic} on {term.date}
             </Typography>
           </AccordionSummary>
         </Accordion>

@@ -179,7 +179,7 @@ export function useNewForm(playgroundForm?: Form) {
 
   function onChangeAnswer(questionId: string, questionType: string, answer: string) {
     const updatedFormAnswers = updateFormAnswers(formAnswers, currentGroup, questionId, answer);
-
+    
     setFormAnswers(updatedFormAnswers);
     setQuestionColors({
       ...questionColors,
