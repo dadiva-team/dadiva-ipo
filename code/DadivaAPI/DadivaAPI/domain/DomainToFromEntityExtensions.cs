@@ -33,7 +33,7 @@ public static class DomainToFromEntityExtensions
         return new SuspensionEntity
         {
             Donor = domain.Donor.ToEntity(),
-            Doctor = domain.Doctor.ToEntity(),
+            Doctor = domain.Doctor?.ToEntity(),
             Note = domain.Note,
             Reason = domain.Reason,
             StartDate = domain.StartDate,
@@ -63,7 +63,7 @@ public static class DomainToFromEntityExtensions
 
     public static Submission ToDomain(this SubmissionEntity entity)
     {
-        return new Submission(entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status,
+        return new Submission(entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status, entity.Language,
             entity.Donor.ToDomain(), entity.Form.ToDomain(), entity.LockedBy?.ToDomain());
     }
 

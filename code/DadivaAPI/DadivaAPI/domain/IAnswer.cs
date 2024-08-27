@@ -6,29 +6,7 @@ namespace DadivaAPI.domain;
 public interface IAnswer
 {
     bool ValidateAnswer();
-    
-    public static AnswerEntity ToEntity(IAnswer answer)
-    {
-        return answer switch
-        {
-            StringAnswer sa => new AnswerEntity
-            {
-                AnswerType = AnswerType.String,
-                Content = sa.Content.Substring(0, Math.Min(sa.Content.Length, 1024))
-            },
-            BooleanAnswer ba => new AnswerEntity
-            {
-                AnswerType = AnswerType.Boolean,
-                Content = ba.Content.ToString()
-            },
-            StringListAnswer sla => new AnswerEntity
-            {
-                AnswerType = AnswerType.StringList,
-                Content = JsonSerializer.Serialize(sla.Content).Substring(0, Math.Min(JsonSerializer.Serialize(sla.Content).Length, 4096))
-            },
-            _ => throw new InvalidOperationException("Unknown answer type")
-        };
-    }
+    AnswerEntity ToEntity();
 }
 
 public record StringAnswer(string Content) : IAnswer
@@ -36,6 +14,13 @@ public record StringAnswer(string Content) : IAnswer
     public bool ValidateAnswer()
     {
         return Content.Length > 0;
+    }
+    public AnswerEntity ToEntity()
+    {
+        return new StringAnswerEntity
+        {
+            Content = this.Content
+        };
     }
 }
 
@@ -45,12 +30,27 @@ public record BooleanAnswer(bool Content) : IAnswer
     {
         return true;
     }
+    public AnswerEntity ToEntity()
+    {
+        return new BooleanAnswerEntity
+        {
+            Content = this.Content
+        };
+    }
 }
 
 public record StringListAnswer(List<string> Content) : IAnswer
 {
     public bool ValidateAnswer()
     {
-        return Content.All(s => s.Length > 0);
+        return Content != null && Content.Count > 0 && Content.All(s => !string.IsNullOrEmpty(s));
+    }
+
+    public AnswerEntity ToEntity()
+    {
+        return new StringListAnswerEntity
+        {
+            Content = this.Content.Select(s => new StringAnswerEntity { Content = s }).ToList()
+        };
     }
 }

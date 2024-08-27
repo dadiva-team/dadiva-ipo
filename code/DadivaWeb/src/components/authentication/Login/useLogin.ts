@@ -62,7 +62,7 @@ export function useLogin(returnTo: string) {
       setLoading(false);
       throw new Error('Response is undefined');
     }
-    console.log('res', res);
+    console.log('res before', res);
 
     const { token, accountStatus } = res;
     if (!token) {
@@ -85,6 +85,7 @@ export function useLogin(returnTo: string) {
     };
 
     console.log('Decoded payload', payload);
+    console.log('Account status', accountStatus);
 
     const session: Session = {
       name: payload.name,

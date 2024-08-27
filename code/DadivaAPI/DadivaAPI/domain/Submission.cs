@@ -5,10 +5,17 @@ using DadivaAPI.services.submissions.dtos;
 
 namespace DadivaAPI.domain;
 
+public enum SubmissionLanguages
+{
+    Pt,
+    En
+}
+
 public record Submission(
     List<AnsweredQuestion> AnsweredQuestions,
     DateTime SubmissionDate,
     SubmissionStatus Status,
+    SubmissionLanguages Language,
     User Donor,
     Form Form,
     Lock? Locked
@@ -67,7 +74,7 @@ public record Submission(
         };
     }
     
-    public SubmissionEntity ToEntity(UserEntity donor, UserEntity doctor)
+    public SubmissionEntity ToEntity(UserEntity donor, FormEntity form)
     {
         return new SubmissionEntity
         {
@@ -75,8 +82,9 @@ public record Submission(
             Date = SubmissionDate,
             Donor = donor,
             LockedBy = Locked?.ToEntity(),
-            Form = Form.ToEntity(null, doctor, null),
+            Form = form,
             Status = Status,
+            Language = Language,
             AnsweredQuestions = AnsweredQuestions.Select(aq => aq.ToEntity()).ToList()
         };
     }

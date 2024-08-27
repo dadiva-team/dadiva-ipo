@@ -1,4 +1,7 @@
+using System.Text.Json;
 using DadivaAPI.domain;
+using DadivaAPI.routes.form.models;
+using DadivaAPI.utils;
 
 namespace DadivaTests.Unit;
 
@@ -53,5 +56,26 @@ public class AnswerTests
         var valid = answer.ValidateAnswer();
         
         Assert.True(valid);
+    }
+    
+    [Fact]
+    public void TestAnswerConverter()
+    {
+        var jsonString = @"{
+            ""questionId"": ""1"",
+            ""answer"": ""yes""
+        }";
+
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new AnswerConverter() }
+        };
+
+        var result = JsonSerializer.Deserialize<AnsweredQuestionModel>(jsonString, options);
+
+        Assert.NotNull(result);
+        Assert.Equal("1", result.QuestionId);
+        Assert.IsType<StringAnswer>(result.Answer);
+        Assert.Equal("yes", ((StringAnswer)result.Answer).Content);
     }
 }

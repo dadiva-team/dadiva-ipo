@@ -1,3 +1,5 @@
+using DadivaAPI.domain;
+
 namespace DadivaAPI.repositories.Entities;
 
 public enum SubmissionStatus
@@ -15,5 +17,7 @@ public class SubmissionEntity
     public LockEntity? LockedBy { get; set; }
     public required FormEntity Form { get; set; }
     public required SubmissionStatus Status { get; set; }
+    
+    public required SubmissionLanguages Language { get; set; }
     public required List<AnsweredQuestionEntity> AnsweredQuestions { get; set; }
 }

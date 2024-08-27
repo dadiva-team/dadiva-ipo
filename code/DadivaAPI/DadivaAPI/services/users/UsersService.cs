@@ -141,7 +141,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             if (suspendedUser == null)
                 return Result.Fail(new UserError.UnknownDonorError());
 
-            if (doctorUser == null)
+            if (doctorUser == null && type != "pendingReview")
                 return Result.Fail(new UserError.UnknownDoctorError());
 
             DateTime? suspensionEndDate = null;
@@ -158,6 +158,27 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
 
             var suspension = new Suspension(suspendedUser, doctorUser, suspensionStartDate,
                 parsedType, true, note, reason, suspensionEndDate);
+
+            bool success = await repository.AddSuspension(suspension.ToEntity());
+            return !success
+                ? Result.Fail(new UserError.UnknownError())
+                : Result.Ok();
+        });
+    }
+    
+    public async Task<Result> AddPendingReviewSuspension(string donorNic, string startDate)
+    {
+        return await context.WithTransaction(async () =>
+        {
+            var suspendedUser = (await repository.GetUserByNic(donorNic))?.ToDomain();
+
+            if (suspendedUser == null)
+                return Result.Fail(new UserError.UnknownDonorError());
+
+            var suspensionStartDate = DateTime.Parse(startDate).ToUniversalTime();
+
+            var suspension = new Suspension(suspendedUser, null, suspensionStartDate,
+                SuspensionType.pendingReview, true, null, "A submissão está em revisão", null);
 
             bool success = await repository.AddSuspension(suspension.ToEntity());
             return !success

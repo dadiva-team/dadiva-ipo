@@ -52,7 +52,7 @@ public class ReviewsService(IRepository repository, DadivaDbContext context,  IN
                 DateTime.Now
             );
             
-            submissionEntity = submissionDomain.ToEntity( submissionEntity.Donor,  doctorEntity);
+            submissionEntity = submissionDomain.ToEntity( submissionEntity.Donor,  null);
             var addedReview = await repository.SubmitReview(review.ToEntity(submissionEntity));
             if (!addedReview)
                 return Result.Fail(new ReviewErrors.ReviewNotSavedError());

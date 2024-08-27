@@ -10,7 +10,7 @@ public record AnsweredQuestion(Question Question, IAnswer Answer, string? NoteTe
         return new AnsweredQuestionEntity
         {
             Question = Question.ToEntity(),
-            Answer = IAnswer.ToEntity(Answer),
+            Answer = Answer.ToEntity(),
             NoteText = NoteText
         };
     }

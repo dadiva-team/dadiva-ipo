@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { SuspensionType, UserSuspensionAccountStatus } from '../services/users/models/LoginOutputModel';
-import { SubmitFormOutputModel } from '../services/from/models/SubmitFormOutputModel';
 
 export enum Role {
   DONOR = 'donor',
@@ -77,17 +76,18 @@ export function useSessionManager() {
 export function useUpdateSessionStatus() {
   const sessionManager = useSessionManager();
 
-  return function (newStatus: SuspensionType, res: SubmitFormOutputModel) {
+  return function (newStatus: SuspensionType, date: Date) {
     const currentUser = sessionManager.session;
+    console.log(`useUpdateSessionStatus: ${JSON.stringify(currentUser)}`);
 
     if (currentUser) {
       const updatedUser = {
         ...currentUser,
         accountStatus: {
           ...currentUser.accountStatus,
-          suspensionIsActive: true,
-          suspensionType: newStatus,
-          suspensionStartDate: res.submissionDate,
+          isActive: true,
+          type: newStatus,
+          startDate: date,
         },
       };
 

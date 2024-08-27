@@ -16,6 +16,9 @@ export default function Home() {
   const sessionManager = useSessionManager();
   const { t } = useTranslation();
 
+  console.log('User:', user);
+  console.log('Account Status:', user?.accountStatus);
+
   return (
     <div>
       <h1>DEMO</h1>

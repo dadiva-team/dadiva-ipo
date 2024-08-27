@@ -53,6 +53,14 @@ public class UsersRepository : IUsersRepository
 
     public async Task<bool> AddSuspension(SuspensionEntity suspension)
     {
+        _context.ChangeTracker.Clear();
+        _context.Entry(suspension.Donor).State = EntityState.Unchanged;
+
+        if (suspension.Doctor != null)
+        {
+            _context.Entry(suspension.Doctor).State = EntityState.Unchanged;
+        }
+
         await _context.Suspensions.AddAsync(suspension);
         return await _context.SaveChangesAsync() > 0;
     }

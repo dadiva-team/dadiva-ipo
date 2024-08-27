@@ -54,15 +54,16 @@ export function useNewForm(playgroundForm?: Form) {
     }
     // TODO: Filter answers
 
-    const [error, res] = await handleRequest(FormServices.submitForm(nic, formAnswers, formRawFetchData.language));
+    const [error, res] = await handleRequest(FormServices.submitForm(formAnswers, formRawFetchData.language));
     if (error) {
       handleError(error, setError, nav);
       return;
     }
     console.log('Form saved');
+    console.log('res ', res);
     if (res) {
       console.log('res ', res);
-      updateSessionStatus(SuspensionType.PendingReview, res);
+      updateSessionStatus(SuspensionType.PendingReview, res.submissionDate);
       nav('/');
     }
   }

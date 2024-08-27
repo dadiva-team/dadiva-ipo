@@ -12,7 +12,7 @@ public abstract class UserError : Error
 
     public class UnknownAdminError() : UserError;
 
-    public class SuspendedDonorError() : UserError;
+    public class SuspendedDonorError(string?  Reason) : UserError;
 
     public class InvalidSuspensionTypeError() : UserError;
 

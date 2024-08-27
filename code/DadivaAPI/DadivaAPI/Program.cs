@@ -155,6 +155,13 @@ builder.Services.AddScoped<IManualService, ManualService>();
 builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 builder.Services.AddScoped<IReviewsService, ReviewsService>();
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new AnswerConverter());
+});
+
+
+
 builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddCors(options =>

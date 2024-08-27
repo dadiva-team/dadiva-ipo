@@ -4,6 +4,7 @@ namespace DadivaAPI.services.submissions;
 
 public abstract class SubmissionError : Error
 {
+    public class InvalidLanguageError() : SubmissionError;
     public class SubmissionNotSavedError() : SubmissionError;
     public class SubmissionNotUpdatedError() : SubmissionError;
     public class NoPendingSubmissionsError() : SubmissionError;

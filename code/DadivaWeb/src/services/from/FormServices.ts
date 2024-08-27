@@ -128,7 +128,6 @@ export namespace FormServices {
   }
 
   export async function submitForm(
-    nic: number,
     formAnswers: Record<string, string>[],
     formLanguage: string
   ): Promise<SubmitFormOutputModel> {
@@ -137,10 +136,11 @@ export namespace FormServices {
       console.log('SUBMIT FORM |||||||||||||||');
 
       const body: SubmitFormRequest = {
-        answeredQuestions,
         formLanguage,
+        answeredQuestions,
       };
-      return await post(submitFormUri(nic), JSON.stringify(body));
+      console.log(JSON.stringify(body));
+      return await post(submitFormUri, JSON.stringify(body));
     } catch (e) {
       console.error(e);
     }

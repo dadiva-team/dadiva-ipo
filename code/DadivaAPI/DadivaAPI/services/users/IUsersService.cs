@@ -33,6 +33,8 @@ public interface IUsersService
         string? note
     );
 
+    public Task<Result> AddPendingReviewSuspension(string donorNic, string startDate);
+
     public Task<Result> UpdateSuspension(
         string donorNic,
         string doctorNic,

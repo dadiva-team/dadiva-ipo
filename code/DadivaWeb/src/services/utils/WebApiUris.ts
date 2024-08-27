@@ -12,10 +12,10 @@ export const getFormUri = (language: string) => `${API_URL}/forms/structure/${la
 export const getDrugsAndDiseases = `${API_URL}/dnd`;
 export const editFormUri = `${API_URL}/forms/structure`;
 
-export const submitFormUri = (nic: number) => `${API_URL}/forms/submissions/${nic}`;
-export const getSubmissionByUserUri = (nic: number) => `${API_URL}/forms/submissions/${nic}`;
+export const submitFormUri = `${API_URL}/submissions`;
+export const getSubmissionByUserUri = (nic: number) => `${API_URL}/submissions/${nic}`;
 export const getSubmissionHistoryByUserUri = (nic: number, skip: number, limit: number) =>
-  `${API_URL}/forms/submissions/history/${nic}?skip=${skip}&limit=${limit}`;
+  `${API_URL}/submissions/history/${nic}?skip=${skip}&limit=${limit}`;
 
 export const lockSubmissionUri = (submissionId: number) => `${API_URL}/forms/submissions/${submissionId}/lock`;
 export const unlockSubmissionUri = (submissionId: number) => `${API_URL}/forms/submissions/${submissionId}/unlock`;

@@ -15,13 +15,13 @@ public class SuspensionEntity
     public bool IsActive { get; set; }
 
     public required UserEntity Donor { get; set; }
-    public required UserEntity Doctor { get; set; }
+    public required UserEntity? Doctor { get; set; }
     
     public Suspension ToDomain()
     {
         return new Suspension(
             Donor.ToDomain(),
-            Doctor.ToDomain(),
+            Doctor?.ToDomain(),
             StartDate,
             Enum.Parse<SuspensionType>(Type),
             IsActive,

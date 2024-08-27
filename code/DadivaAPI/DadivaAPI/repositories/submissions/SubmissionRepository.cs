@@ -15,7 +15,17 @@ namespace DadivaAPI.repositories.submissions
 
         public async Task<bool> SubmitSubmission(SubmissionEntity submission)
         {
-            _context.Submissions.Add(submission);
+            if (submission.Donor != null)
+            {
+                _context.Entry(submission.Donor).State = EntityState.Unchanged;
+            }
+
+            if (submission.Form != null)
+            {
+                _context.Entry(submission.Form).State = EntityState.Unchanged;
+            }
+            
+            await _context.Submissions.AddAsync(submission);
             return await _context.SaveChangesAsync() > 0;
         }
 
