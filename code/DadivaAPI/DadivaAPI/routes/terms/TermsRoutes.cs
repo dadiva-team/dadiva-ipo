@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DadivaAPI.services.terms;
 using DadivaAPI.routes.terms.models;
 using DadivaAPI.routes.utils;
@@ -41,10 +42,12 @@ public static class TermsRoutes
     }
 
     private static async Task<IResult> SubmitTerms(
+        HttpContext context,
         [FromBody] SubmitTermsInputModel terms,
         ITermsService service)
     {
-        return (await service.SubmitTerms(terms.CreatedBy, terms.Content, terms.Language, terms.Reason)).HandleRequest(
+        var nic = context.User.Claims.First(claim => claim.Type==ClaimTypes.Name).Value.ToString();
+        return (await service.SubmitTerms(nic, terms.Content, terms.Language, terms.Reason)).HandleRequest(
             Results.NoContent
         );
     }
