@@ -7,7 +7,6 @@ import Home from './pages/home/Home';
 import { Header } from './components/home/Header';
 import { FormPage } from './pages/form/FormPage';
 import { Backoffice } from './pages/backoffice/Backoffice';
-import { BackofficeMockChart } from './components/backoffice/BackofficeMockChart';
 import { EditTermsPage } from './pages/backoffice/EditTermsPage';
 import { ManageUsersPage } from './components/backoffice/manageUsers/ManageUsersPage';
 import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesPage';
@@ -34,6 +33,7 @@ import DOCTOR_MEDICATION_SEARCH = Uris.DOCTOR_MEDICATION_SEARCH;
 import { MedicationSearch } from './pages/doctor/medications/MedicationSearch';
 import { MedicationInformation } from './pages/doctor/medications/MedicationInformation';
 import { PendingSubmissions } from './pages/doctor/PendingSubmissions';
+import { StatsPage } from './components/backoffice/statistics/StatsPage';
 
 export default function App() {
   const user = useCurrentSession();
@@ -107,7 +107,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="" element={<BackofficeMockChart />} />
+            <Route path="" element={<StatsPage />} />
             <Route path={TERMS_CONDITIONS} element={<EditTermsPage />} />
             <Route path={EDIT_FORM} element={<EditFormPage />} />
             <Route path={MANAGE_USERS} element={<ManageUsersPage />} />

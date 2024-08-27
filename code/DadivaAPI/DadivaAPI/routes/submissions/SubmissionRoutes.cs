@@ -29,7 +29,7 @@ public static class SubmissionRoutes
             {
                 await endpoint.HandleNotificationsAsync(context);
             });
-        group.MapGet("/stats", GetStats);
+        group.MapGet("/stats", GetStats).RequireAuthorization("admin");;
     }
 
     private static async Task<IResult> GetStats(ISubmissionService service, [FromQuery] long? unixStart,
