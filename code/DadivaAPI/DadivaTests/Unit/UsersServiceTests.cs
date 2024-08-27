@@ -11,7 +11,7 @@ namespace DadivaTests.Unit;
 public class UsersServiceTests
 {
     private static readonly DbContextOptions<DadivaDbContext> Options =
-        new DbContextOptionsBuilder<DadivaDbContext>().UseInMemoryDatabase("tests")
+        new DbContextOptionsBuilder<DadivaDbContext>().UseInMemoryDatabase("userTests")
             .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
 
     private static readonly DadivaDbContext Context = new(Options);
@@ -138,7 +138,7 @@ public class UsersServiceTests
         var user = await UsersService.CreateUser("12345678", "Test", "Password123!", ["invalid"], null, null, null);
         
         Assert.True(user.IsFailed);
-        Assert.IsType<UserError.TokenCreationError>(user.Errors.First()); //TODO: Bad Role Error
+        Assert.IsType<UserError.InvalidRoleError>(user.Errors.First());
     }
 
     /* TODO: Fix this test

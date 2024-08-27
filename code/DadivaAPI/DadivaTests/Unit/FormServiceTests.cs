@@ -9,7 +9,7 @@ using DadivaAPI.services.form;
 public class FormServiceTests
 {
     private static readonly DbContextOptions<DadivaDbContext> Options =
-        new DbContextOptionsBuilder<DadivaDbContext>().UseInMemoryDatabase("tests").ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
+        new DbContextOptionsBuilder<DadivaDbContext>().UseInMemoryDatabase("formTests").ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
     private static readonly DadivaDbContext Context = new(Options);
     private static readonly FormService FormService = new(new Repository(Context), Context);
     
@@ -48,7 +48,7 @@ public class FormServiceTests
     {
         var form = await FormService.AddForm([], [], ".", null, "123456789V");
         Assert.True(form.IsFailed);
-        Assert.IsType<UserError.UnknownDonorError>(form.Errors.First());
+        Assert.IsType<UserError.UnknownAdminError>(form.Errors.First());
     }
     
     [Fact]
@@ -112,10 +112,10 @@ public class FormServiceTests
     [Fact]
     public async Task EditInconsistenciesReturnsErrorIfNoFormIsFound()
     {
-        var admin = new UserEntity { Nic = "12345678", HashedPassword = "", Name = "Test", Roles = ["admin"] };
+        var admin = new UserEntity { Nic = "23456781", HashedPassword = "", Name = "Test", Roles = ["admin"] };
         await Context.Users.AddAsync(admin);
         await Context.SaveChangesAsync();
-        var inconsistencies = await FormService.EditInconsistencies([], "12345678", "En", null);
+        var inconsistencies = await FormService.EditInconsistencies([], "23456781", "En", null);
         Assert.True(inconsistencies.IsFailed);
         Assert.IsType<FormErrors.NoFormError>(inconsistencies.Errors.First());
         Context.Users.Remove(admin);
@@ -125,7 +125,7 @@ public class FormServiceTests
     [Fact]
     public async Task EditInconsistenciesReturnsSuccessIfInconsistenciesAreEdited()
     {
-        var admin = new UserEntity { Nic = "12345678", HashedPassword = "", Name = "Test", Roles = ["admin"] };
+        var admin = new UserEntity { Nic = "34567812", HashedPassword = "", Name = "Test", Roles = ["admin"] };
         var form = new FormEntity
         {
             Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = [],
@@ -133,7 +133,7 @@ public class FormServiceTests
         };
         await Context.Forms.AddAsync(form);
         await Context.SaveChangesAsync();
-        var inconsistencies = await FormService.EditInconsistencies([], "12345678", "En", null);
+        var inconsistencies = await FormService.EditInconsistencies([], "34567812", "En", null);
         Assert.True(inconsistencies.IsSuccess);
         Context.Forms.Remove(form);
         Context.Users.Remove(admin);

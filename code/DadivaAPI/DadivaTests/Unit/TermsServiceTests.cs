@@ -10,7 +10,7 @@ namespace DadivaTests.Unit;
 public class TermsServiceTests
 {
     private static readonly DbContextOptions<DadivaDbContext> Options =
-        new DbContextOptionsBuilder<DadivaDbContext>().UseInMemoryDatabase("tests").ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
+        new DbContextOptionsBuilder<DadivaDbContext>().UseInMemoryDatabase("termsTests").ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
     private static readonly DadivaDbContext Context = new(Options);
     private static readonly TermsService TermsService = new(new Repository(Context), Context);
     
