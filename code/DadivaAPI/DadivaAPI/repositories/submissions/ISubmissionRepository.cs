@@ -27,4 +27,6 @@ public interface ISubmissionRepository
     public Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout);
 
     public Task<bool> SubmissionExists(int id);
+
+    public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate);
 }

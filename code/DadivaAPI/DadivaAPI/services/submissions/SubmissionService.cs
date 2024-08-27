@@ -194,4 +194,13 @@ public class SubmissionService(IRepository repository, DadivaDbContext context, 
                     sub.ToDomain().ToSubmissionHistoryExternalInfo()).ToList(), hasMoreSubmissions));
         });
     }
+
+    public async Task<Result<SubmissionStatsExternalInfo>> GetStats(DateTime? startDate, DateTime? endDate)
+    {
+        return await context.WithTransaction(async () =>
+        {
+            var (total, approved, denied) = await repository.GetStats(startDate ?? DateTime.Now.AddDays(-7), endDate ?? DateTime.Now);
+            return Result.Ok(new SubmissionStatsExternalInfo(total, approved, denied));
+        });
+    }
 }

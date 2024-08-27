@@ -77,5 +77,6 @@ public interface IRepository
     Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts);
     
     public Task<List<string>> GetCfts(string productName);
-    
+
+    public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate);
 }

@@ -454,6 +454,15 @@ public class InitialData
 
     public static readonly FormEntity Form = realForm.ToEntity(null, Users[0], null);
 
+    public static readonly InconsistencyEntity Inconsistencies = new InconsistencyEntity
+    {
+        Date=DateTime.UtcNow,
+        Admin = Users[0],
+        Reason = null,
+        Rules = [],
+        Form = Form
+    };
+
     /*ion sub1 = new Submission(
         new List<AnsweredQuestion>
         {

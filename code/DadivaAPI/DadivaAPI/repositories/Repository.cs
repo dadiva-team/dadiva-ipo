@@ -196,4 +196,9 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return MedicationRepository.GetCfts(productName);
     }
+    
+    public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate)
+    {
+        return SubmissionRepository.GetStats(startDate, endDate);
+    }
 }

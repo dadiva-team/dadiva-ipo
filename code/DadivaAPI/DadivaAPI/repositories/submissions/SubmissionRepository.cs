@@ -13,6 +13,17 @@ namespace DadivaAPI.repositories.submissions
             _context = context;
         }
 
+        public async Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate)
+        {
+            var total = await _context.Submissions.CountAsync(s => s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime());
+            var approved = await _context.Submissions.CountAsync(s =>
+                s.Status == SubmissionStatus.Approved && s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime());
+            var denied = await _context.Submissions.CountAsync(s =>
+                s.Status == SubmissionStatus.Rejected && s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime());
+
+            return (total, approved, denied);
+        }
+
         public async Task<bool> SubmitSubmission(SubmissionEntity submission)
         {
             if (submission.Donor != null)
@@ -24,12 +35,12 @@ namespace DadivaAPI.repositories.submissions
             {
                 _context.Entry(submission.Form).State = EntityState.Unchanged;
             }
-            
+
             await _context.Submissions.AddAsync(submission);
             return await _context.SaveChangesAsync() > 0;
         }
 
-         public async Task<bool> UpdateSubmission(SubmissionEntity submission)
+        public async Task<bool> UpdateSubmission(SubmissionEntity submission)
         {
             _context.Submissions.Update(submission);
             return await _context.SaveChangesAsync() > 0;
@@ -118,7 +129,7 @@ namespace DadivaAPI.repositories.submissions
                 .Where(l => l.LockDate < DateTime.UtcNow - timeout)
                 .ToListAsync();
         }
-        
+
         public async Task<bool> SubmissionExists(int id)
         {
             return await _context.Submissions.AnyAsync(e => e.Id == id);

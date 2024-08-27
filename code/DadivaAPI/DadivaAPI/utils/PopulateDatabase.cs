@@ -14,6 +14,7 @@ public static class PopulateDatabase
         context.Users.AddRange(InitialData.Users);
         context.Forms.Add(InitialData.Form);
         context.Terms.AddRange(InitialData.Terms);
+        context.Inconsistencies.Add(InitialData.Inconsistencies);
 
         /*context.CftToManual.AddRange(InitialData.CftToManualEntries.Select(entry => new CftToManualEntry
         {

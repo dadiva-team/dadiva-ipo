@@ -23,6 +23,8 @@ export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/forms/r
 export const notificationsUri = `${API_URL}/notifications`;
 export const notesFromReviewUri = (reviewId: number) => `${API_URL}/forms/review/${reviewId}/notes`;
 export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
+
+export const getSubmissionsStatsUri = `${API_URL}/submissions/stats`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
 export const getTermsUri = `${API_URL}/terms`;

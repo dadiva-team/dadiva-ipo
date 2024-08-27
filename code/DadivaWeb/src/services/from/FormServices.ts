@@ -4,6 +4,7 @@ import {
   editInconsistenciesUri,
   getFormUri,
   getInconsistenciesUri,
+  getSubmissionsStatsUri,
   submitFormUri,
 } from '../utils/WebApiUris';
 import { DomainToRules, FormOutputModel, ModelToDomain, RulesToDomain } from './models/FormOutputModel';
@@ -19,6 +20,7 @@ import {
   FormWithVersionOutputModel,
 } from './models/FormWithVersionOutputModel';
 import { EditFormRequest } from './models/EditFormRequest';
+import { SubmissionStats } from '../../components/backoffice/statistics/StatsPage';
 
 function toCamelCase(s: string): string {
   return s.replace(/([A-Z])/g, (c, first) => (first ? c.toLowerCase() : c));
@@ -71,6 +73,13 @@ function transformFormAnswers(formAnswers: Record<string, string>[]): AnsweredQu
 }
 
 export namespace FormServices {
+  export async function getSubmissionsStats(start?: number, end?: number): Promise<SubmissionStats> {
+    const queries = !start && !end ? '' : '?' + (start ? `unixStart=${start}&` : '') + (end ? `unixEnd=${end}` : '');
+    const res = await get<SubmissionStats>(getSubmissionsStatsUri + queries);
+    console.log(res);
+    return res;
+  }
+
   export async function getForm(language: string): Promise<Form> {
     console.log('getForm with language: ' + language);
     console.log('GET FORM |||||||||||||||');

@@ -29,6 +29,22 @@ public static class SubmissionRoutes
             {
                 await endpoint.HandleNotificationsAsync(context);
             });
+        group.MapGet("/stats", GetStats);
+    }
+
+    private static async Task<IResult> GetStats(ISubmissionService service, [FromQuery] long? unixStart,
+        [FromQuery] long? unixEnd)
+    {
+        DateTime? startDate =
+            unixStart != null ? DateTimeOffset.FromUnixTimeMilliseconds(unixStart.Value).DateTime : null;
+        DateTime? endDate =
+            unixEnd != null ? DateTimeOffset.FromUnixTimeMilliseconds(unixEnd.Value).DateTime : null;
+
+        if (startDate == null && endDate != null)
+            startDate = DateTime.MinValue;
+
+        return (await service.GetStats(startDate, endDate)).HandleRequest(stats =>
+            Results.Ok(new GetStatsOutputModel(stats.Total, stats.Approved, stats.Denied)));
     }
 
     private static async Task<IResult> SubmitSubmission(HttpContext context, [FromBody] SubmitSubmissionRequest input,
@@ -39,7 +55,7 @@ public static class SubmissionRoutes
             .HandleRequest(submitted => Results.Ok(submitted));
     }
 
-    private static async Task<IResult> GetPendingSubmissions(HttpContext context,ISubmissionService service)
+    private static async Task<IResult> GetPendingSubmissions(HttpContext context, ISubmissionService service)
     {
         var doctorNic = context.User.Claims.First(claim => claim.Type == ClaimTypes.Name).Value.ToString();
         return (await service.GetPendingSubmissions(doctorNic)).HandleRequest(
@@ -47,14 +63,16 @@ public static class SubmissionRoutes
         );
     }
 
-    private static async Task<IResult> GetPendingSubmission(HttpContext context, [FromRoute] int donorNic, ISubmissionService service)
+    private static async Task<IResult> GetPendingSubmission(HttpContext context, [FromRoute] int donorNic,
+        ISubmissionService service)
     {
         var doctorNic = context.User.Claims.First(claim => claim.Type == ClaimTypes.Name).Value.ToString();
         return (await service.GetPendingSubmissionsByUser(doctorNic, donorNic.ToString()))
             .HandleRequest(submission => Results.Ok(submission));
     }
 
-    private static async Task<IResult> GetSubmissionHistory(HttpContext context,[FromRoute] int nic, [FromQuery] int limit,
+    private static async Task<IResult> GetSubmissionHistory(HttpContext context, [FromRoute] int nic,
+        [FromQuery] int limit,
         [FromQuery] int skip, ISubmissionService service)
     {
         var doctorNic = context.User.Claims.First(claim => claim.Type == ClaimTypes.Name).Value.ToString();
@@ -62,7 +80,8 @@ public static class SubmissionRoutes
             (model => Results.Ok(model)));
     }
 
-    private static async Task<IResult> LockSubmission(HttpContext context, [FromRoute] int submissionId, ISubmissionService service)
+    private static async Task<IResult> LockSubmission(HttpContext context, [FromRoute] int submissionId,
+        ISubmissionService service)
     {
         var doctorNic = context.User.Claims.First(claim => claim.Type == ClaimTypes.Name).Value.ToString();
         return (await service.LockSubmission(submissionId, doctorNic)).HandleRequest(
@@ -70,7 +89,8 @@ public static class SubmissionRoutes
         );
     }
 
-    private static async Task<IResult> UnlockSubmission(HttpContext context, [FromRoute] int submissionId, ISubmissionService service)
+    private static async Task<IResult> UnlockSubmission(HttpContext context, [FromRoute] int submissionId,
+        ISubmissionService service)
     {
         var doctorNic = context.User.Claims.First(claim => claim.Type == ClaimTypes.Name).Value.ToString();
         return (await service.UnlockSubmission(submissionId, doctorNic))

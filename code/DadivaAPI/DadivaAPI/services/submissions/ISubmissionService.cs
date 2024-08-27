@@ -15,4 +15,6 @@ public interface ISubmissionService
     public Task<Result<bool>> LockSubmission(int submissionId, string doctorNic);
     public Task<Result<bool>> UnlockSubmission(int submissionId, string doctorNic);
     public Task<Result<bool>> UnlockExpiredSubmissions(TimeSpan lockTimeout);
+    
+    public Task<Result<SubmissionStatsExternalInfo>> GetStats(DateTime? startDate, DateTime? endDate);
 }

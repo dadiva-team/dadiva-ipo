@@ -124,7 +124,7 @@ namespace DadivaAPI.repositories.form
 
         public async Task<InconsistencyEntity?> GetInconsistencies()
         {
-            return await _context.Inconsistencies.OrderBy(inconsistencies => inconsistencies.Id).LastOrDefaultAsync();
+            return await _context.Inconsistencies.OrderBy(inconsistencies => inconsistencies.Id).Include(i => i.Form).Include(i => i.Rules).Include(i => i.Admin).LastOrDefaultAsync();
         }
 
         public async Task<bool> EditInconsistencies(InconsistencyEntity inconsistencies)
