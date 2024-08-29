@@ -27,8 +27,7 @@ export function useEditTermsPage() {
         handleError(termError, setError, nav);
         return;
       }
-      console.log('fetched new terms');
-      console.log(termsRes);
+      console.log('fetched new terms', termsRes);
       setTermsFetchData(termsRes.history);
       console.log(termsRes.history[0]);
       setContent(termsRes.history[0].content);

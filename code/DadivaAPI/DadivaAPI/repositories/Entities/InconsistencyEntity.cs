@@ -17,7 +17,12 @@ public class InconsistencyEntity
 
     public Inconsistencies ToDomain()
     {
-        return new Inconsistencies( Rules.Select(r=> r.ToDomain()).ToList());
+        return new Inconsistencies(
+            Rules.Select(r => r.ToDomain()).ToList(), 
+            Reason,
+            Date,
+            Admin.ToDomain(),
+            Form.ToDomain()
+        );
     }
-    
 }

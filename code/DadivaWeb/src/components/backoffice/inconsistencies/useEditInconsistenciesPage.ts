@@ -66,7 +66,7 @@ export function useEditInconsistenciesPage() {
     const filteredInconsistencies = inconsistencies.filter(
       inc => 'all' in inc.conditions && inc.conditions.all.length !== 0
     );
-    FormServices.saveInconsistencies(filteredInconsistencies).then(res => {
+    FormServices.saveInconsistencies(filteredInconsistencies, i18n.language, 'TODO').then(res => {
       if (res) nav('/');
     });
   }

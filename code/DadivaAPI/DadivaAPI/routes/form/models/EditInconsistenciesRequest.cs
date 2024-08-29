@@ -5,7 +5,6 @@ namespace DadivaAPI.routes.form.models;
 
 public record EditInconsistenciesRequest(
     List<RuleModel> Inconsistencies,
-    string Nic,
     string Language,
     string? Reason
     );
