@@ -46,7 +46,8 @@ public static class DomainToFromEntityExtensions
     public static Suspension ToDomain(this SuspensionEntity domain)
     {
         return new Suspension(domain.Donor.ToDomain(), domain.Doctor.ToDomain(), domain.StartDate,
-            Enum.Parse<SuspensionType>(domain.Type), domain.IsActive, domain.Note, domain.Reason, domain.EndDate, domain.Id);
+            Enum.Parse<SuspensionType>(domain.Type), domain.IsActive, domain.Note, domain.Reason, domain.EndDate,
+            domain.Id);
     }
 
 
@@ -63,8 +64,18 @@ public static class DomainToFromEntityExtensions
 
     public static Submission ToDomain(this SubmissionEntity entity)
     {
-        return new Submission(entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(), entity.Date, entity.Status, entity.Language,
-            entity.Donor.ToDomain(), entity.Form.ToDomain(), entity.LockedBy?.ToDomain());
+        return new Submission(
+            entity.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(),
+            entity.Date,
+            entity.Status,
+            entity.Language,
+            entity.Donor.ToDomain(),
+            entity.Form.ToDomain(),
+            entity.LockedBy?.ToDomain()
+        )
+        {
+            Id = entity.Id
+        };
     }
 
     public static Review ToDomain(this ReviewEntity entity)

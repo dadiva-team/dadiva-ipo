@@ -63,5 +63,11 @@ public class DadivaDbContext : DbContext
             .WithMany()
             .HasForeignKey("DoctorId")
             .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<FormEntity>()
+            .HasOne(f => f.Inconsistencies)
+            .WithOne(i => i.Form)
+            .HasForeignKey<InconsistencyEntity>("FormId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

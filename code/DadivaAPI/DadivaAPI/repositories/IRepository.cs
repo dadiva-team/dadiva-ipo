@@ -32,8 +32,10 @@ public interface IRepository
 
     /*FORM*/
     public Task<FormEntity?> GetForm(string language);
+    
+    public Task<FormEntity?> GetFormById(int id);
     public Task<bool> AddForm(FormEntity form);
-    public Task<InconsistencyEntity?> GetInconsistencies();
+    public Task<InconsistencyEntity?> GetInconsistencies(int? formId = null);
     public Task<bool> SubmitInconsistencies(InconsistencyEntity inconsistencies);
 
     /*TERMS*/

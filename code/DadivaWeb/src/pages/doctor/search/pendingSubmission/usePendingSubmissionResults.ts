@@ -1,33 +1,29 @@
 import { useState, useEffect } from 'react';
-import { Group } from '../../../../domain/Form/Form';
-import { Note, Submission } from '../../../../domain/Submission/Submission';
+import { Note } from '../../../../domain/Submission/Submission';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { buildFormWithAnswers, checkFormValidity, Inconsistency, QuestionWithAnswer } from '../utils/DoctorSearchAux';
 import { handleRequest, handleError } from '../../../../services/utils/fetch';
 import { useCurrentSession } from '../../../../session/Session';
 import { ReviewFormRequestModel } from '../../../../services/doctors/models/ReviewFormRequestModel';
 import { DoctorServices } from '../../../../services/doctors/DoctorServices';
+import {
+  SubmissionAnsweredQuestionModel,
+  SubmissionModel,
+} from '../../../../services/doctors/models/SubmissionOutputModel';
+import { checkInconsistencies } from '../utils/DoctorSearchUtils';
 
 interface UsePendingSubmissionCheckProps {
-  formGroups: Group[];
-  inconsistencies: Inconsistency[];
-  submission: Submission;
-  onSubmitedSuccessfully: () => void;
+  submission: SubmissionModel;
+  onSubmittedSuccessfully: () => void;
 }
 
-export function usePendingSubmissionResults({
-  formGroups,
-  submission,
-  inconsistencies,
-  onSubmitedSuccessfully,
-}: UsePendingSubmissionCheckProps) {
+export function usePendingSubmissionResults({ submission, onSubmittedSuccessfully }: UsePendingSubmissionCheckProps) {
   const nav = useNavigate();
   const location = useLocation();
 
   const [error, setError] = useState<string | null>(null);
 
-  const [formWithAnswers, setFormWithAnswers] = useState<QuestionWithAnswer[]>(null);
-  const [invalidQuestions, setInvalidQuestions] = useState<string[]>(null);
+  const [formWithAnswers, setFormWithAnswers] = useState<SubmissionAnsweredQuestionModel[]>(null);
+  const [inconsistencies, setInconsistencies] = useState<string[][]>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
@@ -39,16 +35,13 @@ export function usePendingSubmissionResults({
   const doctor = useCurrentSession();
 
   useEffect(() => {
-    if (formWithAnswers == null) {
-      setFormWithAnswers(buildFormWithAnswers({ formGroups, donorAnswers: submission.answers }));
+    console.log('submission', submission);
+    console.log('inconsistencies', submission.inconsistencies);
+    setFormWithAnswers(submission.answeredQuestions);
+    if (submission?.inconsistencies) {
+      setInconsistencies(checkInconsistencies(submission.answeredQuestions, submission?.inconsistencies));
     }
-  }, [formWithAnswers, formGroups, submission]);
-
-  useEffect(() => {
-    if (formWithAnswers != null && inconsistencies != null) {
-      setInvalidQuestions(checkFormValidity(formWithAnswers, inconsistencies));
-    }
-  }, [formWithAnswers, inconsistencies]);
+  }, [submission]);
 
   const handleSaveNote = (questionId: string, noteContent: string) => {
     setNotes(prevNotes => {
@@ -99,15 +92,14 @@ export function usePendingSubmissionResults({
     console.log(res);
     if (res) {
       console.log('Review submitted successfully');
-      onSubmitedSuccessfully();
+      onSubmittedSuccessfully();
     }
   };
 
   return {
     error,
-    inconsistencies,
     formWithAnswers,
-    invalidQuestions,
+    inconsistencies,
     notes,
     showDetails,
     dialogOpen,

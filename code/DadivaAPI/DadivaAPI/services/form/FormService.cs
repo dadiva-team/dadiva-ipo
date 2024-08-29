@@ -58,6 +58,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
             var formDomain = new Form(
                 questionGroups.Select(qgm => QuestionGroupModel.ToDomain(qgm)).ToList(),
                 rules.Select(rm => RuleModel.ToDomain(rm)).ToList(),
+                null,
                 parsedLanguage,
                 adminEntity.ToDomain()
             );
@@ -89,7 +90,8 @@ public class FormService(IRepository repository, DadivaDbContext context)
                 return Result.Fail(new FormErrors.NoInconsistenciesError());
             }
 
-            var inconsistencyDomain = inconsistencyEntity.ToDomain().InconsistencyList;
+            inconsistencyEntity.Form = await repository.GetFormById(inconsistencyEntity.Form.Id);
+            
 
             return Result.Ok(new GetInconsistenciesOutputModel(
                 inconsistencyEntity
@@ -112,18 +114,13 @@ public class FormService(IRepository repository, DadivaDbContext context)
         {
             var admin = await repository.GetUserByNic(nic);
 
-            if (admin is null)
-            {
-                return Result.Fail(new UserError.UnknownAdminError());
-            }
+            if (admin is null) return Result.Fail(new UserError.UnknownAdminError());
+            
 
             if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
                 return Result.Fail(new FormErrors.InvalidLanguageError());
-
-            var ruleEntities = inconsistencies
-                .Select(RuleModel.ToDomain)
-                .Select(r => r.ToEntity())
-                .ToList();
+            
+             List<Rule> rules = inconsistencies.Select(rm => RuleModel.ToDomain(rm)).ToList();
 
             var formEntity = await repository.GetForm(language);
             if (formEntity is null)
@@ -138,7 +135,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
                     Date = DateTime.Now.ToUniversalTime(),
                     Form = formEntity,
                     Reason = reason,
-                    Rules = ruleEntities
+                    Rules = rules.Select(r => r.ToEntity()).ToList()
                 }
             );
 

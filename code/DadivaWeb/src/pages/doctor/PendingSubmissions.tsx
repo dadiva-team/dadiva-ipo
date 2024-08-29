@@ -1,18 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { handleError, handleRequest } from '../../services/utils/fetch';
-import { FormServices } from '../../services/from/FormServices';
 import { DoctorServices } from '../../services/doctors/DoctorServices';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
-import { Group } from '../../domain/Form/Form';
-import { SubmissionOutputModel } from '../../services/doctors/models/SubmissionOutputModel';
+//import { Group } from '../../domain/Form/Form';
+import { SubmissionModel } from '../../services/doctors/models/SubmissionOutputModel';
 import { Box, Divider, Paper, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
-import { extractInconsistencies, Inconsistency } from './search/utils/DoctorSearchAux';
 import { PendingSubmissionCard } from './PendingSubmissionCard';
 import { useCurrentSession } from '../../session/Session';
 import { notificationsUri } from '../../services/utils/WebApiUris';
-import { Submission } from '../../domain/Submission/Submission';
+//import { Submission } from '../../domain/Submission/Submission';
 
 export function PendingSubmissions() {
   const nav = useNavigate();
@@ -21,15 +19,12 @@ export function PendingSubmissions() {
   const [error, setError] = useState<string>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [pendingSubmissions, setPendingSubmissions] = useState<SubmissionOutputModel[]>([]);
-  const [submissionMap, setSubmissionMap] = useState<Map<Submission, Group[]>>(new Map());
-  const [formGroupsCache, setFormGroupsCache] = useState<Map<number, Group[]> | null>(new Map());
-  const [inconsistencies, setInconsistencies] = useState<Inconsistency[] | null>(null);
+  const [pendingSubmissions, setPendingSubmissions] = useState<SubmissionModel[]>([]);
   const [lockedSubmissions, setLockedSubmissions] = useState<Set<number>>(new Set());
 
   const [currentReviewSubmission, setCurrentReviewSubmission] = useState<number | null>(null);
   const [forceCloseModal, setForceCloseModal] = useState(false);
-  const [lockedByCurrentDoctor, setLockedByCurrentDoctor] = useState<SubmissionOutputModel | null>(null);
+  const [lockedByCurrentDoctor, setLockedByCurrentDoctor] = useState<SubmissionModel | null>(null);
 
   const currentReviewSubmissionRef = useRef(currentReviewSubmission);
 
@@ -38,41 +33,6 @@ export function PendingSubmissions() {
   }, [currentReviewSubmission]);
 
   useEffect(() => {
-    async function fetchFormGroups(formVersion: number): Promise<Group[]> {
-      console.log('Fetching form groups for version:', formVersion);
-      console.log('Cache:', formGroupsCache);
-
-      if (formGroupsCache.has(formVersion)) {
-        return formGroupsCache.get(formVersion)!;
-      } else {
-        const [error, res] = await handleRequest(FormServices.getFormByVersion(formVersion));
-        if (error) {
-          handleError(error, setError, nav);
-          return [];
-        }
-        const formGroups = res.groups as Group[];
-        setFormGroupsCache(prevCache => {
-          const newCache = new Map(prevCache);
-          newCache.set(formVersion, formGroups);
-          return newCache;
-        });
-
-        return formGroups;
-      }
-    }
-
-    const fetchInconsistencies = async () => {
-      if (inconsistencies) return;
-      const [error, res] = await handleRequest(FormServices.getInconsistencies());
-      if (error) {
-        handleError(error, setError, nav);
-        setIsLoading(false);
-        return;
-      }
-      const inc = res.length > 0 ? extractInconsistencies(res[0]) : [];
-      setInconsistencies(inc.length == 0 ? null : inc);
-    };
-
     const fetch = async () => {
       const [err, res] = await handleRequest(DoctorServices.getPendingSubmissions());
       if (err) {
@@ -80,23 +40,17 @@ export function PendingSubmissions() {
         handleError(err, setError, nav);
         return;
       }
-      await fetchInconsistencies();
-      setPendingSubmissions(res.submissions as SubmissionOutputModel[]);
+      setPendingSubmissions(res.submissions as SubmissionModel[]);
 
-      const newSubmissionsMap: Map<Submission, Group[]> = new Map([]);
       const newLockedSubmissions: Set<number> = new Set();
       for (const submission of res.submissions) {
-        const formGroups = await fetchFormGroups(submission.submission.formVersion);
-        newSubmissionsMap.set(submission.submission, formGroups);
-        console.log('Submission:', submission.lockedByDoctorNic, doc.nic);
-        if (submission.lockedByDoctorNic != null && submission.lockedByDoctorNic != doc.nic) {
-          newLockedSubmissions.add(submission.submission.id);
-        } else if (submission.lockedByDoctorNic == doc.nic) {
+        if (submission.lock != null && submission?.lock?.doctor.nic != doc?.nic.toString()) {
+          newLockedSubmissions.add(submission.id);
+        } else if (submission?.lock?.doctor.nic == doc?.nic.toString()) {
           setLockedByCurrentDoctor(submission);
         }
       }
 
-      setSubmissionMap(newSubmissionsMap);
       setLockedSubmissions(newLockedSubmissions);
       setIsLoading(false);
       console.log('Submissions:', res.submissions);
@@ -104,7 +58,7 @@ export function PendingSubmissions() {
     if (pendingSubmissions.length === 0) {
       fetch();
     }
-  }, [doc.nic, formGroupsCache, inconsistencies, nav, pendingSubmissions.length]);
+  }, [doc.nic, nav, pendingSubmissions.length]);
 
   useEffect(() => {
     console.log('Opening connection to SSE. ', notificationsUri);
@@ -135,7 +89,7 @@ export function PendingSubmissions() {
         });
       }
       if (data.type === 'review') {
-        setPendingSubmissions(prev => prev.filter(submission => submission.submission.id !== data.submissionId));
+        setPendingSubmissions(prev => prev.filter(submission => submission.id !== data.submissionId));
       }
     };
 
@@ -172,16 +126,14 @@ export function PendingSubmissions() {
               </Typography>
               <Box>
                 <PendingSubmissionCard
-                  formGroups={submissionMap.get(lockedByCurrentDoctor.submission)}
-                  inconsistencies={inconsistencies}
-                  submission={lockedByCurrentDoctor.submission}
+                  submission={lockedByCurrentDoctor}
                   locked={false}
                   doctorNic={doc.nic}
-                  isReviewing={currentReviewSubmission === lockedByCurrentDoctor.submission.id}
+                  isReviewing={currentReviewSubmission === lockedByCurrentDoctor.id}
                   onSubmitedSuccessfully={() => {
                     setLockedByCurrentDoctor(null);
                   }}
-                  onOpenReview={() => handleOpenReview(lockedByCurrentDoctor.submission.id)}
+                  onOpenReview={() => handleOpenReview(lockedByCurrentDoctor.id)}
                   onCloseReview={() => {
                     handleCloseReview();
                     setLockedByCurrentDoctor(null);
@@ -197,11 +149,9 @@ export function PendingSubmissions() {
                 Submissões Pendentes{' '}
               </Typography>
               {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
-              {pendingSubmissions.map(({ submission }) => (
+              {pendingSubmissions.map(submission => (
                 <Box key={submission.id}>
                   <PendingSubmissionCard
-                    formGroups={submissionMap.get(submission)}
-                    inconsistencies={inconsistencies}
                     submission={submission}
                     locked={lockedSubmissions.has(submission.id)}
                     onSubmitedSuccessfully={() => {}}

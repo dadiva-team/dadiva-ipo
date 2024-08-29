@@ -94,7 +94,7 @@ public class InitialData
     (
         Admin,
         "<p>Test2</p>",
-        TermsLanguages.En,
+        TermsLanguages.Pt,
         DateTime.UtcNow
     );
 
@@ -145,6 +145,7 @@ public class InitialData
             new Rule(new LogicalCondition([new EvaluationCondition("q3", Operator.notEqual, "")], []),
                 new Event(EventType.showReview, null))
         ],
+        null,
         FormLanguages.Pt,
         Admin
         //DateTime.Now.ToUniversalTime()
@@ -419,7 +420,7 @@ public class InitialData
             )
         ])
     ];
-    
+
     private static readonly List<Rule> Rules = Questions
         .SelectMany(qg => qg.Questions)
         .Select(q =>
@@ -440,14 +441,14 @@ public class InitialData
                 ),
                 new Event(EventType.showQuestion, new EventParams(q.Id))
             );
-
         })
         .ToList();
-    
+
     private static readonly Form realForm = new Form
     (
         Questions,
         Rules,
+        null,
         FormLanguages.Pt,
         Admin
     );
@@ -456,7 +457,7 @@ public class InitialData
 
     public static readonly InconsistencyEntity Inconsistencies = new InconsistencyEntity
     {
-        Date=DateTime.UtcNow,
+        Date = DateTime.UtcNow,
         Admin = Users[0],
         Reason = null,
         Rules = [],

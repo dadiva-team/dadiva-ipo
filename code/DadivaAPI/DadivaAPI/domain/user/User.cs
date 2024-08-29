@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using DadivaAPI.services.users.dtos;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.IdentityModel.Tokens;
 
@@ -64,5 +65,10 @@ public partial record User(
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+    
+    public UserWithNameExternalInfo ToUserWithNameExternalInfo()
+    {
+        return new UserWithNameExternalInfo(Name, Nic);
     }
 }

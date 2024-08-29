@@ -17,15 +17,15 @@ export const getSubmissionByUserUri = (nic: number) => `${API_URL}/submissions/$
 export const getSubmissionHistoryByUserUri = (nic: number, skip: number, limit: number) =>
   `${API_URL}/submissions/history/${nic}?skip=${skip}&limit=${limit}`;
 
-export const lockSubmissionUri = (submissionId: number) => `${API_URL}/forms/submissions/${submissionId}/lock`;
-export const unlockSubmissionUri = (submissionId: number) => `${API_URL}/forms/submissions/${submissionId}/unlock`;
+export const lockSubmissionUri = (submissionId: number) => `${API_URL}/submissions/${submissionId}/lock`;
+export const unlockSubmissionUri = (submissionId: number) => `${API_URL}/submissions/${submissionId}/unlock`;
 export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/forms/review/${submissionId}`;
-export const notificationsUri = `${API_URL}/notifications`;
+export const notificationsUri = `${API_URL}/submissions/pending/notifications`;
 export const notesFromReviewUri = (reviewId: number) => `${API_URL}/forms/review/${reviewId}/notes`;
 export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
+export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
 export const getSubmissionsStatsUri = `${API_URL}/submissions/stats`;
-export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
 //export const getTermsUri = `${API_URL}/terms`;
 export const getTermsHistoryUri = (language: string) => `${API_URL}/terms/history/${language}`;
@@ -36,4 +36,4 @@ export const searchMedicationsUri = `${API_URL}/medications/search?q=`;
 
 export const getManualInformationUri = (product: string) => `${API_URL}/manual/${product}`;
 
-export const getPendingSubmissionsUri = `${API_URL}/forms/submissions`;
+export const getPendingSubmissionsUri = `${API_URL}/submissions/pending`;

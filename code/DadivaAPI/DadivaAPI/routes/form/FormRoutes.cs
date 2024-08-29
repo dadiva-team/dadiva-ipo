@@ -51,7 +51,7 @@ public static class FormRoutes
         [FromBody] EditInconsistenciesRequest input,
         IFormService service)
     {
-        var nic = context.User.Claims.First(claim => claim.Type == "nic").Value.ToString();
+        var nic = context.User.Claims.First(claim => claim.Type==ClaimTypes.Name).Value.ToString();
         return (await service.EditInconsistencies(
                 input.Inconsistencies,
                 nic,

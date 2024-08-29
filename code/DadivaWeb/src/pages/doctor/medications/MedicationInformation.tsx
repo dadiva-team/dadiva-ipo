@@ -47,7 +47,7 @@ export function MedicationInformation() {
         <>Loading</>
       ) : (
         <>
-          {productInformation.map(information => (
+          {productInformation?.map(information => (
             <>
               <h1 key={information.groupName}>{information.groupName}</h1>
               {information.examples.map(example => (

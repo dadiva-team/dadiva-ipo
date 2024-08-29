@@ -1,5 +1,6 @@
 using DadivaAPI.domain;
 using DadivaAPI.repositories.Entities;
+using DadivaAPI.repositories.form;
 using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.repositories.submissions
@@ -15,11 +16,14 @@ namespace DadivaAPI.repositories.submissions
 
         public async Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate)
         {
-            var total = await _context.Submissions.CountAsync(s => s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime());
+            var total = await _context.Submissions.CountAsync(s =>
+                s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime());
             var approved = await _context.Submissions.CountAsync(s =>
-                s.Status == SubmissionStatus.Approved && s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime());
+                s.Status == SubmissionStatus.Approved && s.Date >= startDate.ToUniversalTime() &&
+                s.Date <= endDate.ToUniversalTime());
             var denied = await _context.Submissions.CountAsync(s =>
-                s.Status == SubmissionStatus.Rejected && s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime());
+                s.Status == SubmissionStatus.Rejected && s.Date >= startDate.ToUniversalTime() &&
+                s.Date <= endDate.ToUniversalTime());
 
             return (total, approved, denied);
         }
@@ -68,13 +72,39 @@ namespace DadivaAPI.repositories.submissions
         {
             Console.Out.WriteLine("Getting pending submissions in repository");
 
-            return _context.Submissions
+            var submissions = await _context.Submissions
                 .Include(s => s.Donor)
                 .Include(s => s.Form)
                 .Include(s => s.AnsweredQuestions)
+                .ThenInclude(aq => aq.Answer)
+                .Include(s => s.AnsweredQuestions)
+                .ThenInclude(aq => aq.Question)
                 .Where(s => s.Status == SubmissionStatus.Pending)
-                .ToList();
+                .ToListAsync();
+
+            foreach (var submission in submissions)
+            {
+                // Load the lock specific to this submission, if it exists
+                submission.LockedBy = await _context.Set<LockEntity>()
+                    .Include(l => l.Doctor)
+                    .FirstOrDefaultAsync(l =>
+                        l.LockEntityType == LockEntityType.submission && l.LockEntityId == submission.Id);
+
+                // Load related content for StringListAnswerEntity, if applicable
+                foreach (var answeredQuestion in submission.AnsweredQuestions)
+                {
+                    if (answeredQuestion.Answer is StringListAnswerEntity stringListAnswer)
+                    {
+                        await _context.Entry(stringListAnswer)
+                            .Collection(sla => sla.Content)
+                            .LoadAsync();
+                    }
+                }
+            }
+
+            return submissions;
         }
+
 
         public async Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(
             string nic, int limit, int skip)
@@ -101,12 +131,18 @@ namespace DadivaAPI.repositories.submissions
 
         public async Task<LockEntity?> GetLock(int submissionId)
         {
-            return await _context.Locks.FirstOrDefaultAsync(
+            return await _context.Locks.Include(l => l.Doctor).FirstOrDefaultAsync(
                 l => l.LockEntityType == LockEntityType.submission && l.LockEntityId == submissionId);
         }
 
         public async Task<bool> LockSubmission(LockEntity lockEntity)
         {
+            if (lockEntity.Doctor != null)
+            {
+                _context.Entry(lockEntity.Doctor).State = EntityState.Unchanged;
+            }
+
+
             _context.Locks.Add(lockEntity);
             return await _context.SaveChangesAsync() > 0;
         }
@@ -119,6 +155,11 @@ namespace DadivaAPI.repositories.submissions
 
         public async Task<bool> UnlockSubmission(LockEntity lockEntity)
         {
+            if (lockEntity.Doctor != null)
+            {
+                _context.Entry(lockEntity.Doctor).State = EntityState.Unchanged;
+            }
+            
             _context.Locks.Remove(lockEntity);
             return await _context.SaveChangesAsync() > 0;
         }

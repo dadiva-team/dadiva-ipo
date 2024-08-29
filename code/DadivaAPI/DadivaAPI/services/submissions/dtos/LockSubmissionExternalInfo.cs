@@ -3,10 +3,9 @@ using DadivaAPI.services.users.dtos;
 
 namespace DadivaAPI.services.submissions.dtos;
 
-public record LockExternalInfo(
+public record LockSubmissionExternalInfo(
     int EntityId,
-    LockEntityType LockEntityType,
-    string DoctorNic,
-    string DoctorName,
+    UserWithNameExternalInfo Doctor,
     DateTime LockDate
 );
+

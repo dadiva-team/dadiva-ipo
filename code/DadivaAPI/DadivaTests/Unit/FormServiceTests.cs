@@ -33,7 +33,7 @@ public class FormServiceTests
     public async Task GetFormReturnsFormIfFormIsFound()
     {
         var admin = new UserEntity { Nic = "12345678", HashedPassword = "", Name="Test", Roles = ["admin"]};
-        var formEntity = new FormEntity { Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = [], QuestionGroups = []};
+        var formEntity = new FormEntity { Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = null, QuestionGroups = []};
         await Context.Forms.AddAsync(formEntity);
         await Context.SaveChangesAsync();
         var form = await FormService.GetForm("En");
@@ -76,7 +76,7 @@ public class FormServiceTests
     public async Task GetInconsistenciesReturnsInconsistenciesIfInconsistenciesAreFound()
     {
         var admin = new UserEntity { Nic = "12345678", HashedPassword = "", Name="Test", Roles = ["admin"]};
-        var form = new FormEntity { Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = [], QuestionGroups = []};
+        var form = new FormEntity { Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = null, QuestionGroups = []};
         var inconsistencyEntity = new InconsistencyEntity { Admin = admin, Date = DateTime.Now, Form = form, Reason = "Reason", Rules = []};
         await Context.Inconsistencies.AddAsync(inconsistencyEntity);
         await Context.SaveChangesAsync();
@@ -128,7 +128,7 @@ public class FormServiceTests
         var admin = new UserEntity { Nic = "34567812", HashedPassword = "", Name = "Test", Roles = ["admin"] };
         var form = new FormEntity
         {
-            Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = [],
+            Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = null,
             QuestionGroups = []
         };
         await Context.Forms.AddAsync(form);

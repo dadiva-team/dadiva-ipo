@@ -12,29 +12,33 @@ using FluentResults;
 
 namespace DadivaAPI.services.submissions;
 
-public class SubmissionService(IRepository repository, DadivaDbContext context, INotificationService notificationService)
+public class SubmissionService(
+    IRepository repository,
+    DadivaDbContext context,
+    INotificationService notificationService)
     : ISubmissionService
 {
-    public async Task<Result<SubmitSubmissionExternalInfo>> SubmitSubmission(string donorNic,string language, List<AnsweredQuestionModel> answeredQuestions)
+    public async Task<Result<SubmitSubmissionExternalInfo>> SubmitSubmission(string donorNic, string language,
+        List<AnsweredQuestionModel> answeredQuestions)
     {
         return await context.WithTransaction(async () =>
         {
             var donor = await repository.GetUserByNic(donorNic);
             if (donor is null)
                 return Result.Fail(new UserError.UnknownDonorError());
-            if(donor.Suspensions?.FindLast(s => s.IsActive) != null)
+            if (donor.Suspensions?.FindLast(s => s.IsActive) != null)
                 return Result.Fail(new UserError.SuspendedDonorError(donor.Suspensions.Last().Reason));
-            
+
             if (!Enum.TryParse<SubmissionLanguages>(language, out var parsedLanguage))
                 return Result.Fail(new SubmissionError.InvalidLanguageError());
 
             var form = await repository.GetForm(language);
             if (form is null)
                 return Result.Fail(new FormErrors.NoFormError());
-            
+
             var submissionDate = DateTime.UtcNow;
             var donorDomain = donor.ToDomain();
-            
+
             var submission = new Submission(
                 answeredQuestions.Select(aq => aq.ToDomain(aq, form)).ToList(),
                 submissionDate,
@@ -44,18 +48,18 @@ public class SubmissionService(IRepository repository, DadivaDbContext context, 
                 form.ToDomain(),
                 null
             );
-            
+
             // Atualizar a AccountStatus do dador
             /*var suspension = new Suspension(donorDomain, null, submissionDate,
                 SuspensionType.pendingReview, true, null, "A submissão está em revisão", null);
             var success = await repository.AddSuspension(suspension.ToEntity());
             if (!success)
-                return Result.Fail(new UserError.UnknownError());*/ 
+                return Result.Fail(new UserError.UnknownError());*/
             // TODO: Fix this
 
             var submissionEntity = submission.ToEntity(donor, form);
             var submitted = await repository.SubmitSubmission(submissionEntity);
-            
+
             return submitted
                 ? Result.Ok(new SubmitSubmissionExternalInfo(submissionDate))
                 : Result.Fail(new SubmissionError.SubmissionNotSavedError());
@@ -79,7 +83,7 @@ public class SubmissionService(IRepository repository, DadivaDbContext context, 
             }
             else
             {
-                Lock l = new Lock(submissionId, LockEntityType.submission, doctorUser, DateTime.Now);
+                Lock l = new Lock(submissionId, LockEntityType.submission, doctorUser, DateTime.UtcNow);
                 bool locked = await repository.LockSubmission(DomainToFromEntityExtensions.ToEntity(l));
             }
 
@@ -147,35 +151,66 @@ public class SubmissionService(IRepository repository, DadivaDbContext context, 
             var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
             if (doctorUser is null)
                 return Result.Fail(new UserError.UnknownDoctorError());
-            
-            var pendingSubmissions = await repository.GetPendingSubmissions();
 
+            var pendingSubmissions = await repository.GetPendingSubmissions();
             if (pendingSubmissions == null || !pendingSubmissions.Any())
                 return Result.Fail(new SubmissionError.NoPendingSubmissionsError());
 
+            var formCache = new Dictionary<int, FormEntity>();
+            var submissionResults = new List<SubmissionWithLockExternalInfo>();
 
-            return Result.Ok(pendingSubmissions.Select(subs => subs.ToDomain().ToExternalInfo()).ToList());
+            foreach (var submission in pendingSubmissions)
+            {
+                if (!formCache.TryGetValue(submission.Form.Id, out var form))
+                {
+                    form = await repository.GetFormById(submission.Form.Id);
+                    if (form != null) formCache[submission.Form.Id] = form;
+                }
+
+                if (form != null) 
+                {
+                    submission.Form = form;
+
+                    // Fetch the inconsistencies for the form and convert them to domain models
+                    InconsistencyEntity? inconsistenciesEntity = await repository.GetInconsistencies(submission.Form.Id);
+                    inconsistenciesEntity.Form = form;
+                    List<RuleModel> inconsistencies = inconsistenciesEntity?
+                        .ToDomain()
+                        .InconsistencyList
+                        .Select(RuleModel.FromDomain)
+                        .ToList();
+
+                    // Pass the inconsistencies when converting submission to external info
+                    var externalInfo = submission.ToDomain().ToExternalInfo(inconsistencies);
+                    submissionResults.Add(externalInfo);
+                }
+            }
+
+            return Result.Ok(submissionResults);
         });
     }
 
-    public async Task<Result<SubmissionWithLockExternalInfo>> GetPendingSubmissionsByUser(string doctorNic, string userNic)
+
+    public async Task<Result<SubmissionWithLockExternalInfo>> GetPendingSubmissionsByUser(string doctorNic,
+        string userNic)
     {
         return await context.WithTransaction(async () =>
         {
             var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
             if (doctorUser is null)
                 return Result.Fail(new UserError.UnknownDoctorError());
-            
+
             var submission = await repository.GetLatestPendingSubmissionByUser(userNic);
 
             if (submission == null)
                 return Result.Fail(new SubmissionError.NoPendingSubmissionsError());
 
-            return Result.Ok(submission.ToDomain().ToExternalInfo());
+            return Result.Ok(submission.ToDomain().ToExternalInfo(null));
         });
     }
 
-    public async Task<Result<SubmissionHistoryOutputModel>> GetSubmissionHistoryByUser(string nic, string doctorNic, int limit,
+    public async Task<Result<SubmissionHistoryOutputModel>> GetSubmissionHistoryByUser(string nic, string doctorNic,
+        int limit,
         int skip)
     {
         return await context.WithTransaction(async () =>
@@ -183,7 +218,7 @@ public class SubmissionService(IRepository repository, DadivaDbContext context, 
             var doctorUser = (await repository.GetUserByNic(doctorNic))?.ToDomain();
             if (doctorUser is null)
                 return Result.Fail(new UserError.UnknownDoctorError());
-            
+
             var (submissions, hasMoreSubmissions) = await repository.GetSubmissionHistoryByUser(nic, limit, skip);
 
             if (submissions == null || !submissions.Any())
@@ -199,7 +234,8 @@ public class SubmissionService(IRepository repository, DadivaDbContext context, 
     {
         return await context.WithTransaction(async () =>
         {
-            var (total, approved, denied) = await repository.GetStats(startDate ?? DateTime.Now.AddDays(-7), endDate ?? DateTime.Now);
+            var (total, approved, denied) =
+                await repository.GetStats(startDate ?? DateTime.Now.AddDays(-7), endDate ?? DateTime.Now);
             return Result.Ok(new SubmissionStatsExternalInfo(total, approved, denied));
         });
     }

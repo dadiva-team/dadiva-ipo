@@ -14,13 +14,14 @@ public class FormEntity
     public FormEntity? PreviousForm { get; set; }
     public required List<RuleEntity> Rules { get; set; }
     public required List<QuestionGroupEntity> QuestionGroups { get; set; }
-    public required List<InconsistencyEntity>? Inconsistencies { get; set; }
+    public required InconsistencyEntity? Inconsistencies { get; set; }
 
     public Form ToDomain()
     {
         return new Form(
             QuestionGroups.Select(qg=>qg.ToDomain()).ToList(),
             Rules.Select(r=>r.ToDomain()).ToList(),
+            Inconsistencies?.ToDomain(),
             Enum.Parse<FormLanguages>(Language),
             Admin.ToDomain()
         );

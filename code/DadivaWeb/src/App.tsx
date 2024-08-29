@@ -13,7 +13,7 @@ import { EditInconsistenciesPage } from './pages/backoffice/EditInconsistenciesP
 import { EditFormPage } from './pages/backoffice/EditFormPage';
 import { Role, useCurrentSession } from './session/Session';
 import { Doctor } from './pages/doctor/Doctor';
-import { DoctorSearch } from './pages/doctor/search/DoctorSearch';
+//import { DoctorSearch } from './pages/doctor/search/DoctorSearch';
 import { Terms } from './pages/form/Terms';
 import HOME = Uris.HOME;
 import FORM = Uris.FORM;
@@ -25,8 +25,8 @@ import BACKOFFICE = Uris.BACKOFFICE;
 import MANAGE_USERS = Uris.MANAGE_USERS;
 import EDIT_INCONSISTENCIES = Uris.EDIT_INCONSISTENCIES;
 import DOCTOR = Uris.DOCTOR;
-import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
-import DOCTOR_SEARCH_NAME = Uris.DOCTOR_SEARCH_NAME;
+//import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
+//import DOCTOR_SEARCH_NAME = Uris.DOCTOR_SEARCH_NAME;
 import LOGIN = Uris.LOGIN;
 import DOCTOR_MEDICATION_INFORMATION = Uris.DOCTOR_MEDICATION_INFORMATION;
 import DOCTOR_MEDICATION_SEARCH = Uris.DOCTOR_MEDICATION_SEARCH;
@@ -78,8 +78,8 @@ export default function App() {
             }
           >
             <Route path="" element={<PendingSubmissions />} />
-            <Route path={DOCTOR_SEARCH_NIC} element={<DoctorSearch mode="nic" />} />
-            <Route path={DOCTOR_SEARCH_NAME} element={<DoctorSearch mode="name" />} />
+            {/*<Route path={DOCTOR_SEARCH_NIC} element={<DoctorSearch mode="nic" />} />
+            <Route path={DOCTOR_SEARCH_NAME} element={<DoctorSearch mode="name" />} /> */}
             <Route path={DOCTOR_MEDICATION_INFORMATION} element={<MedicationInformation />} />
             <Route path={DOCTOR_MEDICATION_SEARCH} element={<MedicationSearch />} />
           </Route>

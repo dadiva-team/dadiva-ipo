@@ -1,5 +1,5 @@
-import { SubmissionOutputModel } from './SubmissionOutputModel';
+import { SubmissionModel } from './SubmissionOutputModel';
 
 export interface GetSubmissionsOutputModel {
-  submissions: SubmissionOutputModel[];
+  submissions: SubmissionModel[];
 }

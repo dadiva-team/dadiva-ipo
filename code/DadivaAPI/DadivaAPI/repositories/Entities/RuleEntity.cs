@@ -8,7 +8,6 @@ public class RuleEntity
     
     public FormEntity? Form { get; set; }
     public InconsistencyEntity? Inconsistency { get; set; }
-    
     public required EventEntity Event { get; set; }
     public required TopLevelConditionEntity TopLevelCondition { get; set; }
 

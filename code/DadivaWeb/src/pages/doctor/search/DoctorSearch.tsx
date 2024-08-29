@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { Box, Paper } from '@mui/material';
 import { DonorSearchName } from './DoctorSearchName';
 import { DonorSearchNic } from './DoctorSearchNic';
@@ -81,7 +81,7 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
                 formGroups={formGroupsCache?.get(pendingSubmission.formVersion) || []}
                 inconsistencies={inconsistencies || []}
                 submission={pendingSubmission}
-                onSubmitedSuccessfully={onSubmitedSuccessfully}
+                onSubmittedSuccessfully={onSubmitedSuccessfully}
               />
             )}
             {oldView && oldSubmissions && (
@@ -104,4 +104,4 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
       )}
     </Box>
   );
-}
+}*/

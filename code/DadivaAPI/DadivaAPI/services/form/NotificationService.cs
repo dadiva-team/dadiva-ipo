@@ -18,12 +18,14 @@ namespace DadivaAPI.services.form
         public Task AddClientAsync(NotificationClient client)
         {
             _clients.TryAdd(client.Id, client);
+            Console.WriteLine("Client added");
             return Task.CompletedTask;
         }
 
         public Task RemoveClientAsync(NotificationClient client)
         {
             _clients.TryRemove(client.Id, out _);
+            Console.WriteLine("Client removed");
             return Task.CompletedTask;
         }
 

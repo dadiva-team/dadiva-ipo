@@ -26,4 +26,9 @@ public record Lock(
     {
         return new LockExternalInfo(EntityId, LockEntityType, Doctor.Nic, Doctor.Name, LockDate);
     }
+    
+    public LockSubmissionExternalInfo ToSubmissionExternalInfo()
+    {
+        return new LockSubmissionExternalInfo(EntityId, Doctor.ToUserWithNameExternalInfo(), LockDate);
+    }
 }

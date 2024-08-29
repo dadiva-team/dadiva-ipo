@@ -89,12 +89,12 @@ public record Submission(
         };
     }
 
-    public SubmissionWithLockExternalInfo ToExternalInfo()
+    public SubmissionWithLockExternalInfo ToExternalInfo(List<RuleModel> inconsistencies)
     {
-        return new SubmissionWithLockExternalInfo(Id, SubmissionDate, Status, AnsweredQuestions, Donor.Nic, Donor.Name,
-            Form.Groups, Locked.ToExternalInfo()
+        return new SubmissionWithLockExternalInfo(Id, SubmissionDate, Status, AnsweredQuestions, Donor.ToUserWithNameExternalInfo(), inconsistencies, Locked?.ToSubmissionExternalInfo()
         );
     }
+  
 
     public SubmissionExternalInfo ToSubmissionExternalInfo()
     {

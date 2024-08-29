@@ -73,15 +73,20 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return FormRepository.GetForm(language);
     }
+    
+    public Task<FormEntity?> GetFormById(int formId)
+    {
+        return FormRepository.GetFormWithId(formId);
+    }
 
     public Task<bool> AddForm(FormEntity form)
     {
         return FormRepository.AddForm(form);
     }
 
-    public Task<InconsistencyEntity?> GetInconsistencies()
+    public Task<InconsistencyEntity?> GetInconsistencies(int? formId = null)
     {
-        return FormRepository.GetInconsistencies();
+        return FormRepository.GetInconsistencies(formId);
     }
 
     public Task<bool> SubmitInconsistencies(InconsistencyEntity inconsistencies)
