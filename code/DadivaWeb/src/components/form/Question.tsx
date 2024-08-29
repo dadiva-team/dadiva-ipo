@@ -3,19 +3,21 @@ import Typography from '@mui/material/Typography';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import React from 'react';
+import { Answer, EMPTY_ANSWER } from './utils/formUtils';
 
 type QuestionProps = {
   text: string;
   color: string;
-  answer: string | string[] | null;
-  type: string;
+  answer: Answer;
   isEditing: boolean;
 };
-export function Question({ text, color, answer, isEditing, type }: QuestionProps) {
-  const isAnswerYes = answer === 'yes';
-  const isAnswerNo = answer === 'no';
 
-  const formattedAnswer = Array.isArray(answer) ? answer.join(', ') : answer;
+export function Question({ text, color, answer, isEditing }: QuestionProps) {
+  const isAnswerYes = answer?.type === 'boolean' && answer.value === true;
+  const isAnswerNo = answer?.type === 'boolean' && answer.value === false;
+
+  // Format the answer depending on its type
+  const formattedAnswer = answer?.type === 'array' ? (answer?.value as string[]).join(', ') : (answer?.value as string);
 
   return (
     <Paper
@@ -47,7 +49,7 @@ export function Question({ text, color, answer, isEditing, type }: QuestionProps
           <Typography variant="h6" sx={{ mb: 1 }}>
             {text}
           </Typography>
-          {type != 'boolean' && answer && (
+          {answer?.type !== 'boolean' && answer?.value != EMPTY_ANSWER.value && !isEditing && (
             <Box
               sx={{
                 justifyContent: 'left',

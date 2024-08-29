@@ -14,13 +14,10 @@ import { InconsistenciesOutputModel } from './models/InconsistenciesOutputModel'
 import { SubmitFormOutputModel } from './models/SubmitFormOutputModel';
 import { AnsweredQuestionModel } from './models/AnsweredQuestionModel';
 import { SubmitFormRequest } from './models/SubmitFormRequest';
-import {
-  FormWithVersionDomainModel,
-  FormWithVersionModelToDomain,
-  FormWithVersionOutputModel,
-} from './models/FormWithVersionOutputModel';
 import { EditFormRequest } from './models/EditFormRequest';
 import { SubmissionStats } from '../../components/backoffice/statistics/StatsPage';
+import { Answer } from '../../components/form/utils/formUtils';
+import { EditInconsistenciesRequest } from './models/EditInconsistenciesRequest';
 
 function toCamelCase(s: string): string {
   return s.replace(/([A-Z])/g, (c, first) => (first ? c.toLowerCase() : c));
@@ -56,19 +53,21 @@ function convertKeysToCamelCase<T>(obj: T): ConvertKeysToCamelCase<T> {
   return newObj as ConvertKeysToCamelCase<T>;
 }
 
-function transformFormAnswers(formAnswers: Record<string, string>[]): AnsweredQuestionModel[] {
+function transformFormAnswers(formAnswers: Record<string, Answer>[]): AnsweredQuestionModel[] {
   console.log('TRANSFORM FORM ANSWERS |||||||||||||||');
   const answeredQuestions: AnsweredQuestionModel[] = [];
 
   formAnswers.forEach(answer => {
     Object.keys(answer).forEach(questionId => {
-      answeredQuestions.push({
+      const answerValue = answer[questionId].value;
+      const transformedAnswer = {
         questionId,
-        answer: answer[questionId],
-      });
+        answer: answerValue,
+      };
+
+      answeredQuestions.push(transformedAnswer);
     });
   });
-
   return answeredQuestions;
 }
 
@@ -94,14 +93,6 @@ export namespace FormServices {
     return ModelToDomain(formOutput);
   }
 
-  export async function getFormByVersion(formVersion: number): Promise<FormWithVersionDomainModel> {
-    console.log('GET FORM BY VERSION |||||||||||||||');
-    const res = await get<FormWithVersionOutputModel>(getFormUri + `/${formVersion}`);
-
-    console.log(FormWithVersionModelToDomain(res));
-    return FormWithVersionModelToDomain(res);
-  }
-
   export async function editForm(form: Form, reason: string): Promise<boolean> {
     console.log('SAVE FORM |||||||||||||||');
     console.log(form);
@@ -124,20 +115,27 @@ export namespace FormServices {
     return RulesToDomain(convertKeysToCamelCase(res.inconsistencies));
   }
 
-  export async function saveInconsistencies(inconsistencies: RuleProperties[]): Promise<boolean> {
-    try {
-      console.log(JSON.stringify({ inconsistencies: DomainToRules(inconsistencies) }));
-      console.log('WEWWEWEWEWEWEWEWWWWWWWWWWWWWWWWWWWWWWWWWww');
-      await put(editInconsistenciesUri, JSON.stringify({ inconsistencies: DomainToRules(inconsistencies) }));
-      return true;
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
+  export async function saveInconsistencies(
+    inconsistencies: RuleProperties[],
+    language: string,
+    reason: string
+  ): Promise<boolean> {
+    console.log(JSON.stringify({ inconsistencies: DomainToRules(inconsistencies) }));
+
+    const request = {
+      language: language,
+      inconsistencies: DomainToRules(inconsistencies),
+      reason: reason,
+    } as EditInconsistenciesRequest;
+
+    console.log('request', request);
+
+    await put(editInconsistenciesUri, JSON.stringify(request));
+    return true;
   }
 
   export async function submitForm(
-    formAnswers: Record<string, string>[],
+    formAnswers: Record<string, Answer>[],
     formLanguage: string
   ): Promise<SubmitFormOutputModel> {
     try {

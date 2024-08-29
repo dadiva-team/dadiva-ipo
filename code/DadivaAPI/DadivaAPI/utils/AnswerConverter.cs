@@ -13,7 +13,7 @@ public class AnswerConverter : JsonConverter<IAnswer>
 
         return rootElement.ValueKind switch
         {
-            JsonValueKind.String => DetectAndConvertString(rootElement.GetString()),
+            JsonValueKind.String => new StringAnswer(rootElement.GetString()),
             JsonValueKind.True or JsonValueKind.False => new BooleanAnswer(rootElement.GetBoolean()),
             JsonValueKind.Array => new StringListAnswer(rootElement.EnumerateArray().Select(e => e.GetString()).ToList()),
             JsonValueKind.Null or JsonValueKind.Undefined => new StringAnswer("No answer"),
@@ -21,20 +21,28 @@ public class AnswerConverter : JsonConverter<IAnswer>
         };
     }
 
-    private IAnswer DetectAndConvertString(string answer)
-    {
-        if (bool.TryParse(answer, out bool boolResult))
-        {
-            return new BooleanAnswer(boolResult);
-        }
-
-        return new StringAnswer(answer);
-    }
-
     public override void Write(Utf8JsonWriter writer, IAnswer value, JsonSerializerOptions options)
     {
-        JsonSerializer.Serialize(writer, (object)value, value.GetType(), options);
+        Console.WriteLine($"Serializing: {value.GetType().Name} with value: {value}");
+        switch (value)
+        {
+            case StringAnswer stringAnswer:
+                JsonSerializer.Serialize(writer, stringAnswer.Content, options);
+                break;
+
+            case BooleanAnswer booleanAnswer:
+                JsonSerializer.Serialize(writer, booleanAnswer.Content, options);
+                break;
+
+            case StringListAnswer stringListAnswer:
+                JsonSerializer.Serialize(writer, stringListAnswer.Content, options);
+                break;
+
+            default:
+                throw new JsonException($"Unsupported answer type: {value.GetType().Name}");
+        }
     }
+
 }
 
 

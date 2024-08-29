@@ -14,13 +14,13 @@ interface Question {
 export interface SimpleDialogProps {
   open: boolean;
   question: Question | null;
-  onAnswer: (id: string, type: string, answer: string) => void;
+  onAnswer: (id: string, type: 'string' | 'boolean' | 'array', answer: string | boolean | string[]) => void;
   onClose: () => void;
 }
 
 export function FormEditDialog({ open, question, onAnswer, onClose }: SimpleDialogProps) {
   const handleCloseAndAnswer = React.useCallback(
-    (id: string, type: string, answer: string) => {
+    (id: string, type: 'string' | 'boolean' | 'array', answer: string | boolean | string[]) => {
       onAnswer(id, type, answer);
       onClose();
     },
@@ -76,7 +76,7 @@ export function FormEditDialog({ open, question, onAnswer, onClose }: SimpleDial
             alignItems: 'center',
           }}
         >
-          <Question text={question.text} color={''} answer={null} type={question.type} isEditing={true} />
+          <Question text={question.text} color={''} answer={null} isEditing={true} />
           <Box sx={{ pt: 1.5, width: '100%' }}>{input}</Box>
         </Box>
       </DialogContent>

@@ -10,7 +10,7 @@ import React from 'react';
 
 export function getInputComponent(
   question: { id: string; type: string; options: string[] },
-  onChangeAnswer: (id: string, type: string, answer: string | string[]) => void
+  onChangeAnswer: (id: string, type: string, answer: string | string[] | boolean) => void
 ) {
   let input;
   switch (question.type) {
@@ -18,7 +18,7 @@ export function getInputComponent(
       input = (
         <BooleanButtons
           onChangeAnswer={answer => {
-            onChangeAnswer(question.id, question.type, answer ? 'yes' : 'no');
+            onChangeAnswer(question.id, question.type, answer);
           }}
         />
       );

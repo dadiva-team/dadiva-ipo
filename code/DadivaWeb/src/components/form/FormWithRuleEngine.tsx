@@ -8,13 +8,14 @@ import LoadingSpinner from '../shared/LoadingSpinner';
 import { ErrorAlert } from '../shared/ErrorAlert';
 import { Form } from '../../domain/Form/Form';
 import { getInputComponent } from './utils/GetInputComponent';
+import { Answer } from './utils/formUtils';
 
 interface FormWithRuleEngineProps {
   isLoading: boolean;
   error: string | null;
   cleanError: () => void;
   formRawFetchData: Form;
-  formAnswers: Record<string, string>[];
+  formAnswers: Record<string, Answer>[];
   answeredQuestions: Record<string, boolean>;
   showQuestions: Record<string, boolean>[];
   currentGroup: number;
@@ -22,7 +23,7 @@ interface FormWithRuleEngineProps {
   canGoReview: boolean;
   editingQuestion: string | null;
   questionColors: Record<string, string>;
-  onChangeAnswer: (id: string, type: string, answer: string) => void;
+  onChangeAnswer: (id: string, type: 'string' | 'boolean' | 'array', answer: string | boolean | string[]) => void;
   onEditRequest: (id: string, type: string) => void;
   onNextQuestion: () => void;
   onPrevQuestion: () => void;
@@ -108,7 +109,6 @@ export default function FormWithRuleEngine({
                           color={questionColors[question.id]}
                           answer={formAnswers[currentGroup][question.id]}
                           isEditing={editingQuestion === question.id}
-                          type={question.type}
                         />
                         {!answeredQuestions[question.id] && <Box sx={{ pt: 1.5, width: '75%' }}> {input} </Box>}
                       </Box>

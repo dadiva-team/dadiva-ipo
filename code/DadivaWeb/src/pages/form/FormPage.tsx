@@ -1,5 +1,5 @@
 import { useNewForm } from '../../components/form/useNewForm';
-import React, { useState } from 'react';
+import React from 'react';
 import FormWithRuleEngine from '../../components/form/FormWithRuleEngine';
 import { ReviewForm } from '../../components/form/ReviewForm';
 import { Box, Button } from '@mui/material';
@@ -8,6 +8,7 @@ import { Form } from '../../domain/Form/Form';
 interface FormProps {
   formPlayground?: Form;
 }
+
 export function FormPage({ formPlayground }: FormProps) {
   const {
     isLoading,
@@ -27,11 +28,11 @@ export function FormPage({ formPlayground }: FormProps) {
     onNextQuestion,
     onPrevQuestion,
     submitForm,
+    reviewMode,
+    onReviewMode,
   } = useNewForm(formPlayground);
 
-  const [reviewMode, setReviewMode] = useState(true);
-
-  return reviewMode ? (
+  return (
     <Box
       sx={{
         display: 'flex',
@@ -40,39 +41,38 @@ export function FormPage({ formPlayground }: FormProps) {
         alignItems: 'center',
       }}
     >
-      <FormWithRuleEngine
-        isLoading={isLoading}
-        error={error}
-        cleanError={cleanError}
-        formRawFetchData={formRawFetchData}
-        formAnswers={formAnswers}
-        answeredQuestions={answeredQuestions}
-        showQuestions={showQuestions}
-        currentGroup={currentGroup}
-        canGoNext={canGoNext}
-        canGoReview={canGoReview}
-        editingQuestion={editingQuestion}
-        questionColors={questionColors}
-        onChangeAnswer={onChangeAnswer}
-        onEditRequest={onEditRequest}
-        onNextQuestion={onNextQuestion}
-        onPrevQuestion={onPrevQuestion}
-        onReviewMode={() => setReviewMode(!reviewMode)}
-      />
-      <Button onClick={() => setReviewMode(!reviewMode)}>Review</Button>
-    </Box>
-  ) : (
-    <Box>
-      <ReviewForm
-        formData={formRawFetchData}
-        formAnswers={formAnswers}
-        questionColors={questionColors}
-        showQuestions={showQuestions}
-        onEditRequest={(questionId, type, answer) => onChangeAnswer(questionId, type, answer)}
-        onSubmitRequest={() => submitForm()}
-        isPlaygroundTest={formPlayground != undefined}
-      />
-      <Button onClick={() => setReviewMode(!reviewMode)}>Review</Button>
+      {!reviewMode ? (
+        <FormWithRuleEngine
+          isLoading={isLoading}
+          error={error}
+          cleanError={cleanError}
+          formRawFetchData={formRawFetchData}
+          formAnswers={formAnswers}
+          answeredQuestions={answeredQuestions}
+          showQuestions={showQuestions}
+          currentGroup={currentGroup}
+          canGoNext={canGoNext}
+          canGoReview={canGoReview}
+          editingQuestion={editingQuestion}
+          questionColors={questionColors}
+          onChangeAnswer={(questionId, _type, answer) => onChangeAnswer(questionId, answer)}
+          onEditRequest={onEditRequest}
+          onNextQuestion={onNextQuestion}
+          onPrevQuestion={onPrevQuestion}
+          onReviewMode={onReviewMode}
+        />
+      ) : (
+        <ReviewForm
+          formData={formRawFetchData}
+          formAnswers={formAnswers}
+          questionColors={questionColors}
+          showQuestions={showQuestions}
+          onEditRequest={(questionId, _type, answer) => onChangeAnswer(questionId, answer)}
+          onSubmitRequest={() => submitForm()}
+          isPlaygroundTest={formPlayground != undefined}
+        />
+      )}
+      <Button onClick={onReviewMode}>Review</Button>
     </Box>
   );
 }

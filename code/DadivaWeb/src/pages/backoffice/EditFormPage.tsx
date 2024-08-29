@@ -12,9 +12,9 @@ import { DeleteQuestionDialog } from '../../components/backoffice/editForm/dialo
 import { DeleteGroupDialog } from '../../components/backoffice/editForm/dialogs/DeleteGroupDialog';
 import { GroupEditDialog } from '../../components/backoffice/editForm/dialogs/GroupEditDialog';
 import { SubQuestionEditDialog } from '../../components/backoffice/editForm/dialogs/SubQuestionEditDialog';
-import { EditFormPlaygroundModal } from './EditFormPlaygroundModal';
 import { SubmitDialog } from '../../components/backoffice/editForm/dialogs/SubmitDialog';
 import { SubmitFormButton } from '../../components/form/Inputs';
+import { EditFormPlaygroundModal } from './EditFormPlaygroundModal';
 
 export function EditFormPage() {
   const {

@@ -4,22 +4,27 @@ import { Form } from '../../domain/Form/Form';
 import { Engine } from 'json-rules-engine';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { FormServices } from '../../services/from/FormServices';
-import { updateFormAnswers, updateQuestionColors, updateShowQuestions } from './utils/formUtils';
-import { useCurrentSession, useUpdateSessionStatus } from '../../session/Session';
+import {
+  Answer,
+  EMPTY_ANSWER,
+  simplifyAnswers,
+  updateFormAnswers,
+  updateQuestionColors,
+  updateShowQuestions,
+} from './utils/formUtils';
+import { useUpdateSessionStatus } from '../../session/Session';
 import { SuspensionType } from '../../services/users/models/LoginOutputModel';
 import { useTranslation } from 'react-i18next';
 
 export function useNewForm(playgroundForm?: Form) {
-  const session = useCurrentSession();
+  const { i18n } = useTranslation();
+  const nav = useNavigate();
   const updateSessionStatus = useUpdateSessionStatus();
-  const nic = session?.nic;
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const nav = useNavigate();
-  const { i18n } = useTranslation();
-
   const [formRawFetchData, setFormRawFetchData] = useState<Form>();
-  const [formAnswers, setFormAnswers] = useState<Record<string, string>[]>([]);
+  const [formAnswers, setFormAnswers] = useState<Record<string, Answer>[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, boolean>>({});
   const [showQuestions, setShowQuestions] = useState<Record<string, boolean>[]>();
   const [questionColors, setQuestionColors] = useState<Record<string, string>>({});
@@ -30,31 +35,34 @@ export function useNewForm(playgroundForm?: Form) {
   const [editingQuestion, setEditingQuestion] = useState<string>(null);
 
   const [engine] = useState(new Engine());
+  const [reviewMode, setReviewMode] = useState(false);
 
   // Monitors
   /*useEffect(() => {
     //console.log('Form Data: ' + JSON.stringify(formRawFetchData));
-    console.log('formRawFetchData: ' + JSON.stringify(formRawFetchData));
     console.log('Show Questions: ' + JSON.stringify(showQuestions));
     console.log('Answered Questions: ' + JSON.stringify(answeredQuestions));
+    console.log('Question Colors: ' + JSON.stringify(questionColors));
     console.log('Form answers: ' + JSON.stringify(formAnswers));
-    console.log('Current Group: ' + currentGroup);
+    //console.log('Current Group: ' + currentGroup);
   }, [formAnswers, showQuestions, currentGroup]);*/
 
   async function submitForm() {
-    if (!nic) {
-      setError('No NIC found in session');
-      return;
-    }
+    const filteredFormAnswers = formAnswers.map((groupAnswers, groupIndex) => {
+      const filteredGroupAnswers: Record<string, Answer> = {};
 
-    const nicNumber = Number(nic);
-    if (isNaN(nicNumber)) {
-      setError('NIC is not a valid number');
-      return;
-    }
-    // TODO: Filter answers
+      Object.keys(groupAnswers).forEach(questionId => {
+        if (showQuestions[groupIndex]?.[questionId]) {
+          filteredGroupAnswers[questionId] = groupAnswers[questionId];
+        }
+      });
 
-    const [error, res] = await handleRequest(FormServices.submitForm(formAnswers, formRawFetchData.language));
+      return filteredGroupAnswers;
+    });
+
+    console.log('Filtered Form Answers: ' + JSON.stringify(filteredFormAnswers));
+
+    const [error, res] = await handleRequest(FormServices.submitForm(filteredFormAnswers, formRawFetchData.language));
     if (error) {
       handleError(error, setError, nav);
       return;
@@ -80,8 +88,6 @@ export function useNewForm(playgroundForm?: Form) {
         return;
       }
       console.log('fetched form: ' + res);
-      // Mock form for tests
-      //res = form;
       return res;
     };
 
@@ -91,9 +97,9 @@ export function useNewForm(playgroundForm?: Form) {
 
         setFormAnswers(
           res.groups.map(group => {
-            const groupAnswers: Record<string, string> = {};
+            const groupAnswers: Record<string, Answer> = {};
             group.questions.forEach(question => {
-              groupAnswers[question.id] = '';
+              groupAnswers[question.id] = EMPTY_ANSWER;
             });
             return groupAnswers;
           })
@@ -143,7 +149,7 @@ export function useNewForm(playgroundForm?: Form) {
       })
     );
 
-    engine.run(formAnswers[currentGroup]).then(result => {
+    engine.run(simplifyAnswers(formAnswers, currentGroup)).then(result => {
       setCanGoNext(false);
       setCanGoReview(false);
       setShowQuestions(prevShowQuestions =>
@@ -177,14 +183,16 @@ export function useNewForm(playgroundForm?: Form) {
     });
   }, [currentGroup, editingQuestion, engine, formAnswers, formRawFetchData]);
 
-  function onChangeAnswer(questionId: string, questionType: string, answer: string) {
+  function onChangeAnswer(questionId: string, answer: string | boolean | string[]) {
     const updatedFormAnswers = updateFormAnswers(formAnswers, currentGroup, questionId, answer);
-    
+
     setFormAnswers(updatedFormAnswers);
+
     setQuestionColors({
       ...questionColors,
-      [questionId]: updateQuestionColors(questionId, questionType, answer),
+      [questionId]: updateQuestionColors(updatedFormAnswers[currentGroup][questionId]),
     });
+
     setAnsweredQuestions({
       ...answeredQuestions,
       [questionId]: true,
@@ -194,11 +202,7 @@ export function useNewForm(playgroundForm?: Form) {
       return;
     }
 
-    if (editingQuestion !== 'boolean' || answer == formAnswers[currentGroup][questionId]) {
-      setEditingQuestion(null);
-    } else {
-      setEditingQuestion(null);
-    }
+    setEditingQuestion(null);
   }
 
   function onEditRequest(questionId: string) {
@@ -224,6 +228,33 @@ export function useNewForm(playgroundForm?: Form) {
   function onPrevQuestion() {
     setCurrentGroup(() => currentGroup - 1);
   }
+// Tentativa de meter a reviewPage a dar a 100%
+  function onReviewMode() {
+    const review = !reviewMode;
+    setReviewMode(review);
+
+    if (review) {
+      console.log('Review Mode');
+      const simplifiedAnswers = formAnswers.reduce<Record<string, string | boolean | string[]>>((acc, group) => {
+        Object.keys(group).forEach(key => {
+          acc[key] = group[key].value;
+        });
+        return acc;
+      }, {});
+
+      engine.run(simplifiedAnswers).then(result => {
+        setShowQuestions(prevShowQuestions => {
+          let updatedShowQuestions = [...prevShowQuestions];
+          result.results.forEach(result => {
+            if (result.event.type === 'showQuestion') {
+              updatedShowQuestions = updateShowQuestions(updatedShowQuestions, -1, result.event.params.id, true);
+            }
+          });
+          return updatedShowQuestions;
+        });
+      });
+    }
+  }
 
   return {
     isLoading,
@@ -243,5 +274,7 @@ export function useNewForm(playgroundForm?: Form) {
     onEditRequest,
     onNextQuestion,
     onPrevQuestion,
+    reviewMode,
+    onReviewMode,
   };
 }

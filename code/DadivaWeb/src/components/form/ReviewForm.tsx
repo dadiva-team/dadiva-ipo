@@ -8,13 +8,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useTranslation } from 'react-i18next';
+import { Answer } from './utils/formUtils';
 
 interface ReviewFormProps {
   formData: Form;
-  formAnswers: Record<string, string>[];
+  formAnswers: Record<string, Answer>[];
   questionColors: Record<string, string>;
   showQuestions: Record<string, boolean>[];
-  onEditRequest: (questionId: string, type: string, answer: string) => void;
+  onEditRequest: (
+    questionId: string,
+    type: 'string' | 'boolean' | 'array',
+    answer: string | boolean | string[]
+  ) => void;
   onSubmitRequest: () => void;
   isPlaygroundTest: boolean;
 }
@@ -23,7 +28,6 @@ interface ItemProps {
   questionid: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function ReviewForm({
   formData,
   formAnswers,
@@ -123,13 +127,16 @@ export function ReviewForm({
                               alignItems: 'center',
                             }}
                           >
-                            {question.type === 'boolean' && formAnswers[groupIndex][question.id] === 'yes' ? (
+                            {formAnswers[groupIndex][question.id]?.type === 'boolean' &&
+                            formAnswers[groupIndex][question.id]?.value === true ? (
                               <CheckCircleIcon sx={{ fontSize: 40, marginRight: 1 }} />
-                            ) : question.type === 'boolean' && formAnswers[groupIndex][question.id] === 'no' ? (
+                            ) : formAnswers[groupIndex][question.id]?.type === 'boolean' &&
+                              formAnswers[groupIndex][question.id]?.value === false ? (
                               <CancelIcon sx={{ fontSize: 40, marginRight: 1 }} />
                             ) : null}
-                            {formAnswers[groupIndex][question.id] &&
-                              !['yes', 'no'].includes(formAnswers[groupIndex][question.id]) && (
+
+                            {formAnswers[groupIndex][question.id]?.type === 'string' &&
+                              formAnswers[groupIndex][question.id]?.value && (
                                 <Box
                                   sx={{
                                     justifyContent: 'left',
@@ -150,7 +157,34 @@ export function ReviewForm({
                                       wordBreak: 'break-all',
                                     }}
                                   >
-                                    Resposta: {formAnswers[groupIndex][question.id]}
+                                    Resposta: {formAnswers[groupIndex][question.id].value as string}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                            {formAnswers[groupIndex][question.id]?.type === 'array' &&
+                              formAnswers[groupIndex][question.id]?.value && (
+                                <Box
+                                  sx={{
+                                    justifyContent: 'left',
+                                    border: 2,
+                                    borderColor: 'darkgreen',
+                                    borderRadius: 1,
+                                    bgcolor: 'grey.200',
+                                    p: 1,
+                                  }}
+                                >
+                                  <Typography
+                                    variant="body1"
+                                    sx={{
+                                      textAlign: 'left',
+                                      maxWidth: '100%',
+                                      whiteSpace: 'pre-wrap',
+                                      overflowWrap: 'break-word',
+                                      wordBreak: 'break-all',
+                                    }}
+                                  >
+                                    Resposta: {(formAnswers[groupIndex][question.id].value as string[]).join(', ')}
                                   </Typography>
                                 </Box>
                               )}
