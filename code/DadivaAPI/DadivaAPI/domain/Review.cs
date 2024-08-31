@@ -7,7 +7,7 @@ namespace DadivaAPI.domain;
 public record Review(
     Submission Submission,
     User Doctor,
-    string Status,
+    ReviewStatus Status,
     string? FinalNote,
     DateTime ReviewDate
 )

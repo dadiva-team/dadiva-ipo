@@ -1,3 +1,5 @@
+using DadivaAPI.repositories.Entities;
+
 namespace DadivaAPI.services.submissions.dtos;
 
 public record SubmissionHistoryFromReviewExternalInfo(
@@ -5,7 +7,7 @@ public record SubmissionHistoryFromReviewExternalInfo(
     SubmissionExternalInfo Submission,
     string DoctorNic,
     string DoctorName,
-    string Status,
+    ReviewStatus Status,
     string? FinalNote,
     DateTime ReviewDate
 );

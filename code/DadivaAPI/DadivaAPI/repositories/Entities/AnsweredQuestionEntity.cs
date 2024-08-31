@@ -18,6 +18,9 @@ public class AnsweredQuestionEntity
             Question.ToDomain(),
             Answer.ToDomain(),
             NoteText
-        );
+        )
+        {
+            Id = Id
+        };
     }
 }

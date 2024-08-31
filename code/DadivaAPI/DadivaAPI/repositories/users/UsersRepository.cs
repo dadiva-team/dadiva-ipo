@@ -60,6 +60,7 @@ public class UsersRepository : IUsersRepository
         {
             _context.Entry(suspension.Doctor).State = EntityState.Unchanged;
         }
+        _context.Entry(suspension.Donor).State = EntityState.Unchanged;
 
         await _context.Suspensions.AddAsync(suspension);
         return await _context.SaveChangesAsync() > 0;

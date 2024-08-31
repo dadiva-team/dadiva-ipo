@@ -5,6 +5,6 @@ namespace DadivaAPI.services.reviews;
 
 public interface IReviewsService
 {
-    public Task<Result<bool>> ReviewSubmission(int submissionId, string doctorNic, string status,
+    public Task<Result<bool>> ReviewSubmission(int submissionId, string doctorNic, bool status,
         List<NoteModel>? notes, string? finalNote);
 }

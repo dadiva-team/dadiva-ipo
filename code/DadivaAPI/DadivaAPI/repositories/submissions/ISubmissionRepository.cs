@@ -1,4 +1,5 @@
 using DadivaAPI.repositories.Entities;
+using DadivaAPI.services.submissions.dtos;
 
 namespace DadivaAPI.repositories.submissions;
 
@@ -9,9 +10,9 @@ public interface ISubmissionRepository
     public Task<bool> SubmitReview(ReviewEntity review);
     public Task<List<SubmissionEntity>?> GetPendingSubmissions();
 
-    public Task<SubmissionEntity?> GetSubmissionById(int id);
+    public Task<MinimalSubmissionDto?> GetSubmissionById(int id);
 
-    public Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(string userNic);
+    public Task<MinimalSubmissionDto?> GetLatestPendingSubmissionByUser(string userNic);
 
     public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip);

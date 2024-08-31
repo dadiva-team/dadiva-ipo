@@ -11,6 +11,7 @@ public record AnsweredQuestion(Question Question, [property: JsonConverter(typeo
     {
         return new AnsweredQuestionEntity
         {
+            Id = Id,
             Question = Question.ToEntity(),
             Answer = Answer.ToEntity(),
             NoteText = NoteText
