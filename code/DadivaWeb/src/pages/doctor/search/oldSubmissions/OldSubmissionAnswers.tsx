@@ -1,27 +1,23 @@
-/*import { Box, Grid, Typography, Divider, Tooltip } from '@mui/material';
-import { QuestionWithAnswer } from '../utils/DoctorSearchUtils';
-import React, { useEffect } from 'react';
+import { Box, Grid, Typography, Divider, Tooltip } from '@mui/material';
+import React from 'react';
 import { renderAnswer } from '../pendingSubmission/FormDetails';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import NotesIcon from '@mui/icons-material/Notes';
-import { Note } from '../../../../domain/Submission/Submission';
+import { SubmissionModel } from '../../../../services/doctors/models/SubmissionOutputModel';
+import { checkInconsistencies } from '../utils/DoctorSearchUtils';
 
 interface OldSubmissionsAnswersProps {
-  formWithAnswers: QuestionWithAnswer[];
-  invalidQuestions: string[] | null;
-  notes: Note[] | null;
+  submission: SubmissionModel;
+  isLastSubmission: boolean;
 }
 
-export function OldSubmissionsAnswers({ formWithAnswers, invalidQuestions, notes }: OldSubmissionsAnswersProps) {
-  useEffect(() => {
-    console.log('notes', notes);
-  }, [notes]);
+export function OldSubmissionsAnswers({ submission, isLastSubmission }: OldSubmissionsAnswersProps) {
+  const inconsistencies = checkInconsistencies(submission.answeredQuestions, submission?.inconsistencies);
 
   return (
     <Box sx={{ border: 0.5, maxHeight: 300, overflowY: 'auto' }}>
-      {formWithAnswers.map((item, index) => {
-        const isInvalid = invalidQuestions?.some(invalid => invalid === item.id);
-        const note = notes?.find(note => note.id === item.id);
+      {submission.answeredQuestions.map((item, index) => {
+        const isInvalid = inconsistencies?.flat().includes(item.question.id);
 
         return (
           <Box
@@ -32,16 +28,16 @@ export function OldSubmissionsAnswers({ formWithAnswers, invalidQuestions, notes
             }}
           >
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={note ? 8 : 9}>
+              <Grid item xs={item.noteText ? 8 : 9}>
                 <Box p={2} display="flex" alignItems="center">
                   {isInvalid && <ErrorOutlineIcon color={'error'} sx={{ marginRight: 1 }} />}
-                  <Typography variant="body1">{item.question}</Typography>
+                  <Typography variant="body1">{item.question.text}</Typography>
                 </Box>
               </Grid>
-              {isInvalid && note && (
+              {isInvalid && item.noteText && (
                 <Grid item xs={1}>
                   <Box display="flex" alignItems="center">
-                    <Tooltip title={notes?.find(note => note.id === item.id)?.note || 'No note found'} arrow>
+                    <Tooltip title={item.noteText || 'No note found'} arrow>
                       <NotesIcon />
                     </Tooltip>
                   </Box>
@@ -53,10 +49,10 @@ export function OldSubmissionsAnswers({ formWithAnswers, invalidQuestions, notes
                 </Box>
               </Grid>
             </Grid>
-            {index < formWithAnswers.length - 1 && <Divider />}
+            {isLastSubmission && <Divider />}
           </Box>
         );
       })}
     </Box>
   );
-}*/
+}

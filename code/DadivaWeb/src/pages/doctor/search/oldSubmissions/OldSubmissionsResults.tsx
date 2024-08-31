@@ -1,4 +1,4 @@
-/*import React, { useState } from 'react';
+import React, { useState } from 'react';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -16,11 +16,18 @@ import {
   SelectChangeEvent,
   IconButton,
 } from '@mui/material';
-import { SubmissionHistoryModel } from '../../../../services/doctors/models/SubmissionHistoryOutputModel';
+import { ReviewStatus, ReviewHistoryModel } from '../../../../services/doctors/models/SubmissionHistoryOutputModel';
 import { OldSubmissionCard } from './OldSubmissionCard';
 
+type FilterStatus = ReviewStatus | 'all';
+
+export enum ViewMode {
+  List = 'list',
+  Grid = 'grid',
+}
+
 interface OldSubmissionsPendingProps {
-  submissions: SubmissionHistoryModel[];
+  submissions: ReviewHistoryModel[];
   loadMoreSubmissions: () => void;
   hasMoreSubmissions: boolean;
 }
@@ -30,17 +37,19 @@ export function OldSubmissionsResults({
   loadMoreSubmissions,
   hasMoreSubmissions,
 }: OldSubmissionsPendingProps) {
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
-  const [statusFilter, setStatusFilter] = useState<'approved' | 'rejected' | 'all'>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.Grid);
+  const [statusFilter, setStatusFilter] = useState<FilterStatus>('all');
   const [yearFilter, setYearFilter] = useState<string>('all');
   const [filtersVisible, setFiltersVisible] = useState<boolean>(true);
 
-  const handleViewModeChange = (event: React.MouseEvent<HTMLElement>, newViewMode: 'list' | 'grid') => {
-    setViewMode(newViewMode);
+  const handleViewModeChange = (event: React.MouseEvent<HTMLElement>, newViewMode: ViewMode) => {
+    if (newViewMode !== null) {
+      setViewMode(newViewMode);
+    }
   };
 
-  const handleStatusFilterChange = (event: SelectChangeEvent<'approved' | 'rejected' | 'all'>) => {
-    setStatusFilter(event.target.value as 'approved' | 'rejected' | 'all');
+  const handleStatusFilterChange = (event: SelectChangeEvent<FilterStatus>) => {
+    setStatusFilter(event.target.value as FilterStatus);
   };
 
   const handleYearFilterChange = (event: SelectChangeEvent<string>) => {
@@ -53,8 +62,7 @@ export function OldSubmissionsResults({
 
   const filteredSubmissions = Array.from(submissions.values()).filter(submission => {
     const statusMatches = statusFilter === 'all' || submission.status === statusFilter;
-    const yearMatches =
-      yearFilter === 'all' || new Date(submission.submissionDate).getFullYear().toString() === yearFilter;
+    const yearMatches = yearFilter === 'all' || new Date(submission.reviewDate).getFullYear().toString() === yearFilter;
     return statusMatches && yearMatches;
   });
 
@@ -77,8 +85,8 @@ export function OldSubmissionsResults({
               label="Status"
             >
               <MenuItem value="all">Todos</MenuItem>
-              <MenuItem value="approved">Aprovado ✅</MenuItem>
-              <MenuItem value="rejected">Rejeitado ❌</MenuItem>
+              <MenuItem value={ReviewStatus.Approved}>Aprovado ✅</MenuItem>
+              <MenuItem value={ReviewStatus.Rejected}>Rejeitado ❌</MenuItem>
             </Select>
           </FormControl>
           <FormControl variant="outlined" size="small" sx={{ minWidth: 120, mr: 2 }}>
@@ -86,9 +94,7 @@ export function OldSubmissionsResults({
             <Select labelId="year-filter-label" value={yearFilter} onChange={handleYearFilterChange} label="Ano">
               <MenuItem value="all">-</MenuItem>
               {Array.from(
-                new Set(
-                  Array.from(submissions.values()).map(sub => new Date(sub.submissionDate).getFullYear().toString())
-                )
+                new Set(Array.from(submissions.values()).map(sub => new Date(sub.reviewDate).getFullYear().toString()))
               ).map(year => (
                 <MenuItem key={year} value={year}>
                   {year}
@@ -99,15 +105,15 @@ export function OldSubmissionsResults({
           <ToggleButtonGroup
             value={viewMode}
             exclusive
-            onChange={handleViewModeChange}
+            onChange={(event, newViewMode) => handleViewModeChange(event, newViewMode)}
             aria-label="view mode"
             sx={{ ml: 'auto' }}
             size="small"
           >
-            <ToggleButton value="list" aria-label="list view">
+            <ToggleButton value={ViewMode.List} aria-label="list view">
               <ViewListIcon />
             </ToggleButton>
-            <ToggleButton value="grid" aria-label="grid view">
+            <ToggleButton value={ViewMode.Grid} aria-label="grid view">
               <GridViewIcon />
             </ToggleButton>
           </ToggleButtonGroup>
@@ -115,18 +121,14 @@ export function OldSubmissionsResults({
       )}
       <Box
         sx={{
-          display: viewMode === 'grid' ? 'grid' : 'block',
-          gridTemplateColumns: viewMode === 'grid' ? 'repeat(2, 1fr)' : 'none',
+          display: viewMode === ViewMode.Grid ? 'grid' : 'block',
+          gridTemplateColumns: viewMode === ViewMode.Grid ? 'repeat(2, 1fr)' : 'none',
           gap: 2,
         }}
       >
         {filteredSubmissions.map((submission, index) => (
           <Box key={index}>
-            <OldSubmissionCard
-              submission={submission}
-              group={submissions.get(submission)!}
-              inconsistencies={inconsistencies}
-            />
+            <OldSubmissionCard review={submission} isLastSubmission={index === filteredSubmissions.length - 1} />
           </Box>
         ))}
       </Box>
@@ -135,4 +137,4 @@ export function OldSubmissionsResults({
       </Button>
     </Box>
   );
-}*/
+}

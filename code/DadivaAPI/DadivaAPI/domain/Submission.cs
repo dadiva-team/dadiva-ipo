@@ -101,12 +101,12 @@ public record Submission(
 
         return new Submission(
             submissionDto.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(),
-            DateTime.Now, // Adjust if necessary to match DTO date
+            submissionDto.SubmissionDate,
             submissionDto.Status,
-            SubmissionLanguages.En, // Adjust according to your logic
-            donorUser, // Use factory method to create minimal user
-            form, // Use factory method to create minimal form
-            submissionDto.LockedBy?.ToDomain() // Convert LockedBy to domain model
+            SubmissionLanguages.En, 
+            donorUser,
+            form, 
+            submissionDto.LockedBy?.ToDomain() 
         )
         {
             Id = submissionDto.Id

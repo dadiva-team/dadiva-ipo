@@ -1,4 +1,4 @@
-/*import {
+import {
   Box,
   Card,
   CardActions,
@@ -14,9 +14,8 @@
 } from '@mui/material';
 import React from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { SubmissionHistoryModel } from '../../../../services/doctors/models/SubmissionHistoryOutputModel';
+import { ReviewHistoryModel, ReviewStatus } from '../../../../services/doctors/models/SubmissionHistoryOutputModel';
 import { OldSubmissionsAnswers } from './OldSubmissionAnswers';
-import { Group } from '../../../../domain/Form/Form';
 import { lightGreen, lightRed } from '../../../../components/shared/uiColors';
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -36,22 +35,15 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 interface OldSubmissionCardProps {
-  submission: SubmissionHistoryModel;
-  group: Group[];
-  inconsistencies: Inconsistency[];
+  review: ReviewHistoryModel;
+  isLastSubmission: boolean;
 }
 
-export function OldSubmissionCard({ submission, group, inconsistencies }: OldSubmissionCardProps) {
+export function OldSubmissionCard({ review, isLastSubmission }: OldSubmissionCardProps) {
   const [expanded, setExpanded] = React.useState(false);
   const [notesVisible, setNotesVisible] = React.useState(true);
-  const cardBorder = submission.reviewStatus === 'approved' ? lightGreen : lightRed;
+  const cardBorder = review.status === ReviewStatus.Approved ? lightGreen : lightRed;
 
-  const formWithAnswers = buildFormWithAnswers({
-    formGroups: group,
-    donorAnswers: submission.answers,
-  });
-
-  const invalidQuestions = checkFormValidity(formWithAnswers, inconsistencies);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -59,17 +51,17 @@ export function OldSubmissionCard({ submission, group, inconsistencies }: OldSub
   return (
     <Card sx={{ margin: 1, border: 2, borderColor: cardBorder }}>
       <CardHeader
-        title={`Data da Submissão: ${new Date(submission.submissionDate).toLocaleDateString()}`}
-        subheader={`Estado: ${submission.reviewStatus}`}
+        title={`Data da Submissão: ${new Date(review.submission.submissionDate).toLocaleDateString()}`}
+        subheader={`Estado: ${review.status === ReviewStatus.Approved ? 'Aprovado' : 'Rejeitado'}`}
       />
       <CardActions disableSpacing>
         <Box sx={{ flexDirection: 'row' }}>
           <Typography sx={{ pl: 1 }}>
-            <strong>Medico:</strong> {submission.doctorNic}
+            <strong>Medico:</strong> {review.doctor.name}
           </Typography>
-          {submission.finalNote.length != 0 && (
+          {review.finalNote.length != 0 && (
             <Typography paragraph sx={{ pl: 1 }}>
-              <strong> Nota Final:</strong> {submission.finalNote}
+              <strong> Nota Final:</strong> {review.finalNote}
             </Typography>
           )}
         </Box>
@@ -81,7 +73,7 @@ export function OldSubmissionCard({ submission, group, inconsistencies }: OldSub
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
             <Typography variant="h6">Respostas</Typography>
-            {submission.notes.length > 0 && (
+            {review.submission && (
               <FormControlLabel
                 value="top"
                 control={
@@ -92,13 +84,9 @@ export function OldSubmissionCard({ submission, group, inconsistencies }: OldSub
               />
             )}
           </Box>
-          <OldSubmissionsAnswers
-            formWithAnswers={formWithAnswers}
-            invalidQuestions={invalidQuestions}
-            notes={notesVisible ? submission.notes : null}
-          />
+          <OldSubmissionsAnswers submission={review.submission} isLastSubmission={isLastSubmission} />
         </CardContent>
       </Collapse>
     </Card>
   );
-}*/
+}

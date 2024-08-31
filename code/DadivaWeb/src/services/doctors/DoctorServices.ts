@@ -12,7 +12,7 @@ import {
   suspendUserUri,
   unlockSubmissionUri,
 } from '../utils/WebApiUris';
-import { SubmissionOutputModel } from './models/SubmissionOutputModel';
+import { SubmissionModel } from './models/SubmissionOutputModel';
 import { ReviewFormRequestModel } from './models/ReviewFormRequestModel';
 import { GetUserByNicOutputModel } from './models/GetUserByNicOutputModel';
 import { SubmissionHistoryOutputModel } from './models/SubmissionHistoryOutputModel';
@@ -31,11 +31,11 @@ export namespace DoctorServices {
     return await get(getUserByNicUri(nic));
   }
 
-  export async function getPendingSubmissionByNic(nic: number): Promise<SubmissionOutputModel> {
+  export async function getPendingSubmissionByNic(nic: string): Promise<SubmissionModel> {
     return await get(getSubmissionByUserUri(nic));
   }
 
-  export async function getSubmissionHistoryByNic(
+  export async function getReviewsHistoryByUserNIC(
     nic: number,
     limit: number,
     skip: number

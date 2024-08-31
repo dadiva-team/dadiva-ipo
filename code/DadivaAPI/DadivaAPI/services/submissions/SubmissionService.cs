@@ -170,27 +170,13 @@ public class SubmissionService(
                 if (form != null)
                 {
                     submission.Form = form;
+                    MinimalInconsistencyDto? inconsistenciesEntity = await repository.GetInconsistencies(submission.Form.Id);
 
-                    InconsistencyEntity? inconsistenciesEntity =
-                        await repository.GetInconsistencies(submission.Form.Id);
-
-                    if (inconsistenciesEntity != null)
-                    {
-                        inconsistenciesEntity.Form = form;
-                        List<RuleModel> inconsistencies = inconsistenciesEntity
-                            .ToDomain()
-                            .InconsistencyList
-                            .Select(RuleModel.FromDomain)
-                            .ToList();
-
-                        var externalInfo = submission.ToDomain().ToExternalInfo(inconsistencies);
-                        submissionResults.Add(externalInfo);
-                    }
-                    else
-                    {
-                        var externalInfo = submission.ToDomain().ToExternalInfo(null);
-                        submissionResults.Add(externalInfo);
-                    }
+                    List<RuleModel>? inconsistencies = Inconsistencies.CreateMinimalSubmissionDomain(inconsistenciesEntity)?.InconsistencyList
+                        .Select(RuleModel.FromDomain)
+                        .ToList();
+                    
+                    submissionResults.Add(submission.ToDomain().ToExternalInfo(inconsistencies));
                 }
             }
 
@@ -213,14 +199,13 @@ public class SubmissionService(
                 return Result.Fail(new SubmissionError.SubmissionNotFoundError());
 
             var submissionDomain = Submission.CreateMinimalSubmissionDomain(submissionDto);
-            var form = await repository.GetFormById(submissionDomain.Form.Id);
-            if (form is null)
-                return Result.Fail(new FormErrors.NoFormError());
-            
-            var updatedSubmission = submissionDomain with { Form = form.ToDomain() };
+            var inconsistenciesDomain = await repository.GetInconsistencies(submissionDomain.Form.Id);
+            List<RuleModel>? inconsistencies = Inconsistencies.CreateMinimalSubmissionDomain(inconsistenciesDomain)?.InconsistencyList
+                .Select(RuleModel.FromDomain)
+                .ToList();
 
 
-            return Result.Ok(updatedSubmission.ToExternalInfo(null));
+            return Result.Ok(submissionDomain.ToExternalInfo(inconsistencies));
         });
     }
 
@@ -234,14 +219,45 @@ public class SubmissionService(
             if (doctorUser is null)
                 return Result.Fail(new UserError.UnknownDoctorError());
 
-            var (submissions, hasMoreSubmissions) = await repository.GetSubmissionHistoryByUser(nic, limit, skip);
+            var (reviewsDto, hasMoreSubmissions) = await repository.GetSubmissionHistoryByUser(nic, limit, skip);
 
-            if (submissions == null || !submissions.Any())
+            if (reviewsDto == null || !reviewsDto.Any())
                 return Result.Fail(new SubmissionError.NoSubmissionsHistoryError());
 
+            var inconsistenciesCache = new Dictionary<int, List<RuleModel>?>();
+            var reviewsResults = new List<ReviewHistoryFromReviewExternalInfo>();
+
+            foreach (var reviewDto in reviewsDto)
+            {
+                var reviewDomain = Review.CreateMinimalReviewDomain(reviewDto);
+                List<RuleModel>? inconsistencies = null;
+
+                if (reviewDomain.Submission?.Form?.Id != null)
+                {
+                    int formId = reviewDomain.Submission.Form.Id;
+
+                    if (!inconsistenciesCache.TryGetValue(formId, out inconsistencies))
+                    {
+                        var inconsistenciesDomain = await repository.GetInconsistencies(formId);
+                        inconsistencies = Inconsistencies
+                            .CreateMinimalSubmissionDomain(inconsistenciesDomain)?
+                            .InconsistencyList
+                            .Select(RuleModel.FromDomain)
+                            .ToList();
+
+                        inconsistenciesCache[formId] = inconsistencies;
+                    }
+                }
+                
+                reviewsResults.Add(reviewDomain.ToSubmissionHistoryExternalInfo(inconsistencies));
+            }
+
             return Result.Ok(
-                new SubmissionHistoryOutputModel(submissions.Select(sub =>
-                    sub.ToDomain().ToSubmissionHistoryExternalInfo()).ToList(), hasMoreSubmissions));
+                new SubmissionHistoryOutputModel(
+                    reviewsResults,
+                    hasMoreSubmissions
+                )
+            );
         });
     }
 

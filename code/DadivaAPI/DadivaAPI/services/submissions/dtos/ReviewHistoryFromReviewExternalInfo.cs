@@ -1,12 +1,12 @@
 using DadivaAPI.repositories.Entities;
+using DadivaAPI.services.users.dtos;
 
 namespace DadivaAPI.services.submissions.dtos;
 
-public record SubmissionHistoryFromReviewExternalInfo(
+public record ReviewHistoryFromReviewExternalInfo(
     int Id,
-    SubmissionExternalInfo Submission,
-    string DoctorNic,
-    string DoctorName,
+    SubmissionWithLockExternalInfo Submission,
+    UserWithNameExternalInfo Doctor,
     ReviewStatus Status,
     string? FinalNote,
     DateTime ReviewDate

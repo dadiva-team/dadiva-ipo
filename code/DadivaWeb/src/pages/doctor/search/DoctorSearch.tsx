@@ -8,6 +8,7 @@ import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import { PendingSubmissionResults } from './pendingSubmission/PendingSubmissionResults';
 import { useDoctorSearch } from './useDoctorSearch';
 import { DonorSuspension } from './donorSuspension/DonorSuspension';
+import { OldSubmissionsResults } from './oldSubmissions/OldSubmissionsResults';
 
 export interface DoctorSearchProps {
   mode: string;
@@ -21,21 +22,21 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
     isLoading,
     nic,
     pendingSubmission,
-    //oldSubmissions,
+    reviewsHistory,
     user,
     fetchedSuspension,
     pendingView,
-    oldView,
-    //hasMoreSubmissions,
+    reviewHistoryView,
+    hasMoreSubmissions,
     suspensionView,
     setNic,
     setError,
     setErrorForm,
     setErrorSubmission,
     fetchPendingSubmission,
-    fetchSubmissionHistory,
+    fetchReviewHistory,
     fetchSuspension,
-    //loadMoreSubmissions,
+    loadMoreReviews,
     togglePendingView,
     toggleOldView,
     toggleSuspensionView,
@@ -62,11 +63,11 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
           <DoctorSearchButtons
             user={user}
             pendingView={pendingView}
-            historyView={oldView}
+            historyView={reviewHistoryView}
             onCheckPendingSubmission={fetchPendingSubmission}
-            onCheckOldSubmissions={reset => fetchSubmissionHistory(2, 0, reset)} //TODO: Tirar o hardcode do limit e skip
+            onCheckOldSubmissions={reset => fetchReviewHistory(2, 0, reset)} //TODO: Tirar o hardcode do limit e skip
             onCheckSuspension={fetchSuspension}
-            pendingAndOldView={!!pendingSubmission /*&& oldSubmissions?.size > 0*/} // TODO: Tirar o comment
+            pendingAndOldView={pendingSubmission && reviewsHistory?.length > 0}
             onTogglePendingView={togglePendingView}
             onToggleHistoryView={toggleOldView}
             onToggleSuspensionView={toggleSuspensionView}
@@ -79,14 +80,13 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
                 onSubmittedSuccessfully={onSubmitedSuccessfully}
               />
             )}
-            {/*oldView && oldSubmissions && (
+            {reviewHistoryView && reviewsHistory && (
               <OldSubmissionsResults
-                submissions={oldSubmissions}
-                inconsistencies={inconsistencies || []}
-                loadMoreSubmissions={loadMoreSubmissions}
+                submissions={reviewsHistory}
+                loadMoreSubmissions={loadMoreReviews}
                 hasMoreSubmissions={hasMoreSubmissions}
               />
-            )*/}
+            )}
             {suspensionView && (
               <DonorSuspension
                 nic={user.nic}

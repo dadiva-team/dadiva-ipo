@@ -85,7 +85,7 @@ public class Repository(DadivaDbContext context) : IRepository
         return FormRepository.AddForm(form);
     }
 
-    public Task<InconsistencyEntity?> GetInconsistencies(int? formId = null)
+    public Task<MinimalInconsistencyDto?> GetInconsistencies(int? formId = null)
     {
         return FormRepository.GetInconsistencies(formId);
     }
@@ -148,7 +148,7 @@ public class Repository(DadivaDbContext context) : IRepository
         return SubmissionRepository.GetLatestPendingSubmissionByUser(userNic);
     }
 
-    public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
+    public Task<(List<MinimalReviewDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip)
     {
         return SubmissionRepository.GetSubmissionHistoryByUser(nic, limit, skip);

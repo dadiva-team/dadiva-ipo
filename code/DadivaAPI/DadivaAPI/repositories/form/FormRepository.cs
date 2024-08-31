@@ -1,4 +1,5 @@
 using DadivaAPI.repositories.Entities;
+using DadivaAPI.services.submissions.dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.repositories.form
@@ -161,7 +162,7 @@ namespace DadivaAPI.repositories.form
         }
 
 
-        public async Task<InconsistencyEntity?> GetInconsistencies(int? formId = null)
+        public async Task<MinimalInconsistencyDto?> GetInconsistencies(int? formId = null)
         {
             IQueryable<InconsistencyEntity> query = _context.Inconsistencies
                 .Include(i => i.Form)
@@ -202,7 +203,14 @@ namespace DadivaAPI.repositories.form
                 }
             }
 
-            return inconsistency;
+             return new MinimalInconsistencyDto(
+                 inconsistency.Id,
+                    inconsistency.Date,
+                    inconsistency.Reason,
+                    inconsistency.Rules,
+                    new MinimalUserDto(inconsistency.Admin.Nic, inconsistency.Admin.Name),
+                    new MinimalFormDto(inconsistency.Form.Id)
+            );
         }
 
 

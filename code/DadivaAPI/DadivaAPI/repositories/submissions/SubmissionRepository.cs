@@ -85,7 +85,7 @@ namespace DadivaAPI.repositories.submissions
             return await GetSubmissionInternalAsync(id);
         }
 
-        
+
         // Aux Function to either get a submission by id or by user nic
         private async Task<MinimalSubmissionDto?> GetSubmissionInternalAsync(int? id = null, string? userNic = null)
         {
@@ -106,8 +106,8 @@ namespace DadivaAPI.repositories.submissions
             else if (!string.IsNullOrEmpty(userNic))
             {
                 submissionEntity = await _context.Submissions
-                    .Where(s => s.Donor.Nic == userNic)
-                    .OrderByDescending(s => s.Date) // Assuming 'Date' is a property representing the submission date
+                    .Where(s => s.Donor.Nic == userNic && s.Status == SubmissionStatus.Pending)
+                    .OrderByDescending(s => s.Date)
                     .Include(s => s.Donor)
                     .Include(s => s.Form)
                     .Include(s => s.AnsweredQuestions)
@@ -141,6 +141,7 @@ namespace DadivaAPI.repositories.submissions
             var submissionDto = new MinimalSubmissionDto(
                 submissionEntity.Id,
                 submissionEntity.Status,
+                submissionEntity.Date,
                 submissionEntity.LockedBy,
                 submissionEntity
                     .AnsweredQuestions, // The AnsweredQuestions include the related Answer and Question entities
@@ -190,27 +191,64 @@ namespace DadivaAPI.repositories.submissions
         }
 
 
-        public async Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(
-            string nic, int limit, int skip)
+        public async Task<(List<MinimalReviewDto>? Submissions, bool HasMoreSubmissions)>
+            GetSubmissionHistoryByUser(
+                string nic, int limit, int skip)
         {
-            var submissions = await _context.Reviews
+            var reviews = await _context.Reviews
                 .Include(r => r.Submission)
-                .Include(r => r.Submission.Donor)
-                .Include(r => r.Submission.Form)
-                .Include(r => r.Submission.AnsweredQuestions)
+                .ThenInclude(s => s.Donor)
+                .Include(r => r.Submission)
+                .ThenInclude(s => s.Form)
+                .Include(r => r.Submission)
+                .ThenInclude(s => s.AnsweredQuestions)
+                .ThenInclude(aq => aq.Answer)
+                .Include(r => r.Submission)
+                .ThenInclude(s => s.AnsweredQuestions)
+                .ThenInclude(aq => aq.Question)
+                .Include(r => r.Doctor)
                 .Where(r => r.Submission.Donor.Nic == nic)
-                .OrderByDescending(r => r.Submission.Date)
                 .Skip(skip)
                 .Take(limit + 1)
                 .ToListAsync();
 
-            var hasMoreSubmissions = submissions.Count > limit;
-            if (hasMoreSubmissions)
+            foreach (var review in reviews)
             {
-                submissions.RemoveAt(submissions.Count - 1);
+                foreach (var answeredQuestion in review.Submission.AnsweredQuestions)
+                {
+                    if (answeredQuestion.Answer is StringListAnswerEntity stringListAnswer)
+                    {
+                        await _context.Entry(stringListAnswer)
+                            .Collection(sla => sla.Content)
+                            .LoadAsync();
+                    }
+                }
             }
 
-            return (submissions, hasMoreSubmissions);
+            var hasMoreSubmissions = reviews.Count > limit;
+            if (hasMoreSubmissions)
+            {
+                reviews.RemoveAt(reviews.Count - 1);
+            }
+
+            var submissionDtos = reviews.Select(reviewEntity => new MinimalReviewDto(
+                reviewEntity.Id,
+                reviewEntity.Status,
+                reviewEntity.Date,
+                reviewEntity.FinalNote,
+                new MinimalUserDto(reviewEntity.Doctor.Nic, reviewEntity.Doctor.Name),
+                new MinimalSubmissionDto(
+                    reviewEntity.Submission.Id,
+                    reviewEntity.Submission.Status,
+                    reviewEntity.Submission.Date,
+                    reviewEntity.Submission.LockedBy,
+                    reviewEntity.Submission.AnsweredQuestions,
+                    new MinimalUserDto(reviewEntity.Submission.Donor.Nic, reviewEntity.Submission.Donor.Name),
+                    new MinimalFormDto(reviewEntity.Submission.Form.Id)
+                )
+            )).ToList();
+
+            return (submissionDtos, hasMoreSubmissions);
         }
 
         public async Task<LockEntity?> GetLock(int submissionId)
@@ -222,10 +260,7 @@ namespace DadivaAPI.repositories.submissions
         public async Task<bool> LockSubmission(LockEntity lockEntity)
         {
             _context.ChangeTracker.Clear();
-            if (lockEntity.Doctor != null)
-            {
-                _context.Entry(lockEntity.Doctor).State = EntityState.Unchanged;
-            }
+            _context.Entry(lockEntity.Doctor).State = EntityState.Unchanged;
 
 
             _context.Locks.Add(lockEntity);
@@ -242,10 +277,8 @@ namespace DadivaAPI.repositories.submissions
         public async Task<bool> UnlockSubmission(LockEntity lockEntity)
         {
             _context.ChangeTracker.Clear();
-            if (lockEntity.Doctor != null)
-            {
+            if( lockEntity.Doctor != null)
                 _context.Entry(lockEntity.Doctor).State = EntityState.Unchanged;
-            }
 
             _context.Locks.Remove(lockEntity);
             return await _context.SaveChangesAsync() > 0;
@@ -253,7 +286,7 @@ namespace DadivaAPI.repositories.submissions
 
         public async Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout)
         {
-            return await _context.Locks
+            return await _context.Locks.Include(l => l.Doctor)
                 .Where(l => l.LockDate < DateTime.UtcNow - timeout)
                 .ToListAsync();
         }

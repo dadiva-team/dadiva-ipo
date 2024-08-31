@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { handleError, handleRequest } from '../../services/utils/fetch';
 import { DoctorServices } from '../../services/doctors/DoctorServices';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
-//import { Group } from '../../domain/Form/Form';
 import { SubmissionModel } from '../../services/doctors/models/SubmissionOutputModel';
 import { Box, Divider, Paper, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,6 @@ import { ErrorAlert } from '../../components/shared/ErrorAlert';
 import { PendingSubmissionCard } from './PendingSubmissionCard';
 import { useCurrentSession } from '../../session/Session';
 import { notificationsUri } from '../../services/utils/WebApiUris';
-//import { Submission } from '../../domain/Submission/Submission';
 
 export function PendingSubmissions() {
   const nav = useNavigate();

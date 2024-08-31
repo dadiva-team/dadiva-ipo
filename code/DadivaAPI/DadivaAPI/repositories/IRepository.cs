@@ -36,7 +36,7 @@ public interface IRepository
     
     public Task<FormEntity?> GetFormById(int id);
     public Task<bool> AddForm(FormEntity form);
-    public Task<InconsistencyEntity?> GetInconsistencies(int? formId = null);
+    public Task<MinimalInconsistencyDto?> GetInconsistencies(int? formId = null);
     public Task<bool> SubmitInconsistencies(InconsistencyEntity inconsistencies);
 
     /*TERMS*/
@@ -56,7 +56,7 @@ public interface IRepository
 
     public Task<MinimalSubmissionDto?> GetLatestPendingSubmissionByUser(string userNic);
 
-    public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
+    public Task<(List<MinimalReviewDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip);
 
     public Task<LockEntity?> GetLock(int submissionId);

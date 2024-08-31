@@ -79,27 +79,18 @@ public class FormService(IRepository repository, DadivaDbContext context)
     {
         return await context.WithTransaction(async () =>
         {
-            var inconsistencyEntity = await repository.GetInconsistencies();
-            Console.Out.WriteLine("||||||||||||||||||||||");
-            Console.Out.WriteLine("||||||||||||||||||||||");
-            Console.Out.WriteLine("||||||||||||||||||||||");
-            Console.Out.WriteLine("||||||||||||||||||||||");
-            Console.Out.WriteLine(inconsistencyEntity);
-            if (inconsistencyEntity is null)
+            var inconsistencyDto = await repository.GetInconsistencies();
+            if (inconsistencyDto is null)
             {
                 return Result.Fail(new FormErrors.NoInconsistenciesError());
             }
-
-            inconsistencyEntity.Form = await repository.GetFormById(inconsistencyEntity.Form.Id);
+            List<RuleModel>? inconsistencies = Inconsistencies.CreateMinimalSubmissionDomain(inconsistencyDto)?.InconsistencyList
+                .Select(RuleModel.FromDomain)
+                .ToList();
             
-
-            return Result.Ok(new GetInconsistenciesOutputModel(
-                inconsistencyEntity
-                    .ToDomain()
-                    .InconsistencyList
-                    .Select(RuleModel.FromDomain)
-                    .ToList()
-            ));
+            if (inconsistencies is null) return Result.Fail(new FormErrors.UnknownError());
+            
+            return Result.Ok(new GetInconsistenciesOutputModel(inconsistencies));
         });
     }
 

@@ -13,7 +13,7 @@ export const getDrugsAndDiseases = `${API_URL}/dnd`;
 export const editFormUri = `${API_URL}/forms/structure`;
 
 export const submitFormUri = `${API_URL}/submissions`;
-export const getSubmissionByUserUri = (nic: number) => `${API_URL}/submissions/${nic}`;
+export const getSubmissionByUserUri = (nic: string) => `${API_URL}/submissions/pending/${nic}`;
 export const getSubmissionHistoryByUserUri = (nic: number, skip: number, limit: number) =>
   `${API_URL}/submissions/history/${nic}?skip=${skip}&limit=${limit}`;
 

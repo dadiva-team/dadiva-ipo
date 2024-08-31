@@ -1,5 +1,6 @@
 using DadivaAPI.domain.user;
 using DadivaAPI.repositories.Entities;
+using DadivaAPI.routes.form.models;
 using DadivaAPI.services.submissions.dtos;
 
 namespace DadivaAPI.domain;
@@ -27,9 +28,18 @@ public record Review(
         };
     }
 
-    public SubmissionHistoryFromReviewExternalInfo ToSubmissionHistoryExternalInfo()
+    public ReviewHistoryFromReviewExternalInfo ToSubmissionHistoryExternalInfo(List<RuleModel>? inconsistencies)
     {
-        return new SubmissionHistoryFromReviewExternalInfo(
-            Id, Submission.ToSubmissionExternalInfo(), Doctor.Nic, Doctor.Name, Status, FinalNote, ReviewDate);
+        return new ReviewHistoryFromReviewExternalInfo(
+            Id, Submission.ToExternalInfo(inconsistencies), Doctor.ToUserWithNameExternalInfo(), Status, FinalNote, ReviewDate);
+    }
+
+    public static Review CreateMinimalReviewDomain(MinimalReviewDto minimalReviewDto)
+    {
+        var submission = Submission.CreateMinimalSubmissionDomain(minimalReviewDto.Submission);
+        var donorUser = User.CreateMinimalUser(minimalReviewDto.Doctor);
+
+        return new Review(submission, donorUser, minimalReviewDto.Status, minimalReviewDto.FinalNote,
+            minimalReviewDto.Date);
     }
 }

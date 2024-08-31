@@ -27,9 +27,7 @@ public class ReviewsService(IRepository repository, DadivaDbContext context,  IN
                 return Result.Fail(new SubmissionError.SubmissionNotFoundError());
             if (submissionDto.Status != SubmissionStatus.Pending)
                 return Result.Fail(new SubmissionError.SubmissionNotPendingStatusError());
-            if(submissionDto.LockedBy is null)
-                return Result.Fail(new SubmissionError.SubmissionNotLockedError());
-            if (submissionDto.LockedBy.Doctor.Nic != doctorNic)
+            if (submissionDto.LockedBy != null && submissionDto.LockedBy.Doctor.Nic != doctorNic)
                 return Result.Fail(new SubmissionError.AlreadyLockedByAnotherDoctor(submissionDto.LockedBy?.Doctor.Name!));
             
             var submissionDomain = Submission.CreateMinimalSubmissionDomain(submissionDto);
@@ -56,8 +54,8 @@ public class ReviewsService(IRepository repository, DadivaDbContext context,  IN
             if (!addedReview)
                 return Result.Fail(new ReviewErrors.ReviewNotSavedError());
 
-            // Unlock submission
-            await repository.UnlockSubmission(submissionDto.LockedBy!);
+            // Unlock submission if needed
+            if(submissionDto.LockedBy != null) await repository.UnlockSubmission(submissionDto.LockedBy);
 
             // Sending notification to all doctors using the /pendingSubmission page that they can delete this submission from the list
             await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "review", submissionId }));

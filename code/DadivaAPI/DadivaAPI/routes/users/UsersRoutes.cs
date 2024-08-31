@@ -71,7 +71,7 @@ public static class UsersRoutes
     {
         return (await service.CheckNicExistence(nic)).HandleRequest(
             uwnei =>
-                Results.Ok(new CheckNicExistenceOutputModel(uwnei.Nic, uwnei.Name))
+                Results.Ok(new CheckNicExistenceOutputModel(uwnei.Name, uwnei.Nic))
         );
     }
 

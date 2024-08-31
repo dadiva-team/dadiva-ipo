@@ -14,7 +14,7 @@ public interface ISubmissionRepository
 
     public Task<MinimalSubmissionDto?> GetLatestPendingSubmissionByUser(string userNic);
 
-    public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
+    public Task<(List<MinimalReviewDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip);
 
     public Task<LockEntity?> GetLock(int submissionId);

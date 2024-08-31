@@ -1,16 +1,20 @@
-import { DonorModel, Status, SubmissionAnsweredQuestionModel } from './SubmissionOutputModel';
+import { DonorModel, SubmissionModel } from './SubmissionOutputModel';
 
-export interface SubmissionHistoryModel {
+export interface ReviewHistoryModel {
   id: number;
-  submissionDate: string;
-  status: Status;
-  answeredQuestions: SubmissionAnsweredQuestionModel[];
-  finalNote: string;
-  reviewDate: Date;
-  doctorNic: DonorModel;
+  submission: SubmissionModel;
+  doctor: DonorModel;
+  status: ReviewStatus;
+  finalNote?: string;
+  reviewDate: string;
 }
 
 export interface SubmissionHistoryOutputModel {
-  submissionHistory: SubmissionHistoryModel[];
+  submissionHistory: ReviewHistoryModel[];
   hasMoreSubmissions: boolean;
+}
+
+export enum ReviewStatus {
+  Approved = 0,
+  Rejected = 1,
 }

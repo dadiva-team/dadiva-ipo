@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { DoctorServices } from '../../../services/doctors/DoctorServices';
 import { User } from '../../../domain/User/User';
-import { SubmissionHistoryModel } from '../../../services/doctors/models/SubmissionHistoryOutputModel';
+import { ReviewHistoryModel } from '../../../services/doctors/models/SubmissionHistoryOutputModel';
 import { Problem } from '../../../services/utils/Problem';
 import { UserSuspension } from '../../../domain/User/UserSuspension';
 import { useCurrentSession } from '../../../session/Session';
@@ -22,13 +22,13 @@ export function useDoctorSearch() {
   const [nic, setNic] = useState<string>('');
   const [pendingSubmission, setPendingSubmission] = useState<SubmissionModel | null>(null);
 
-  const [oldSubmissions, setOldSubmissions] = useState<SubmissionHistoryModel[]>(null);
+  const [reviewsHistory, setReviewsHistory] = useState<ReviewHistoryModel[]>(null);
   const [user, setUser] = useState<User | null>(null);
 
   const [fetchedSuspension, setFetchedSuspension] = useState<UserSuspension | null>(null);
 
   const [pendingView, setPendingView] = useState<boolean | null>(null);
-  const [oldView, setOldView] = useState<boolean | null>(null);
+  const [reviewHistoryView, setReviewHistoryView] = useState<boolean | null>(null);
   const [suspensionView, setSuspensionView] = useState<boolean | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,10 +47,10 @@ export function useDoctorSearch() {
   };
   const resetState = () => {
     setPendingSubmission(null);
-    setOldSubmissions(null);
+    setReviewsHistory(null);
     setUser(null);
     setPendingView(false);
-    setOldView(false);
+    setReviewHistoryView(false);
     resetErrors();
   };
 
@@ -77,6 +77,8 @@ export function useDoctorSearch() {
         return;
       }
 
+      console.log('res!!!', res);
+
       setUser({ name: res.name, nic: res.nic.toString() });
       setIsLoading(false);
     },
@@ -87,25 +89,26 @@ export function useDoctorSearch() {
     if (!user) return;
     if (errorSubmission) setErrorSubmission(null);
 
-    const [error, res] = await handleRequest(DoctorServices.getPendingSubmissionByNic(Number(user.nic)));
+    const [error, res] = await handleRequest(DoctorServices.getPendingSubmissionByNic(user.nic));
     if (error) {
       handleError(error, setErrorSubmission, nav, location.pathname);
       setPendingSubmission(null);
       return;
     }
-    if (res.submission.lock != null && res?.submission.lock?.doctor.nic != doc?.nic.toString()) {
+    console.log('Pending submission:', res);
+    if (res.lock != null && res?.lock?.doctor.nic != doc?.nic.toString()) {
       setPendingSubmission(null);
       setErrorSubmission('A submissão pendente está a ser vista por outro médico.\nPor favor, tente mais tarde.');
       return;
     }
 
-    setPendingSubmission(res.submission as SubmissionModel);
+    setPendingSubmission(res as SubmissionModel);
     setPendingView(true);
-    setOldView(false);
+    setReviewHistoryView(false);
     setSuspensionView(false);
   };
 
-  const fetchSubmissionHistory = async (limit: number, skip: number, reset: boolean) => {
+  const fetchReviewHistory = async (limit: number, skip: number, reset: boolean) => {
     if (!user) return;
     if (errorSubmission) setErrorSubmission(null);
     if (reset) {
@@ -113,18 +116,20 @@ export function useDoctorSearch() {
       setSubmissionSkip(0);
     }
 
-    const [error, res] = await handleRequest(DoctorServices.getSubmissionHistoryByNic(Number(user.nic), limit, skip));
+    const [error, res] = await handleRequest(DoctorServices.getReviewsHistoryByUserNIC(Number(user.nic), limit, skip));
     if (error) {
       handleError(error, setErrorSubmission, nav, location.pathname);
-      setOldSubmissions(null);
+      setReviewsHistory(null);
       return;
     }
+    console.log('Old submissions:', res);
+
     const { submissionHistory, hasMoreSubmissions } = res;
 
-    setOldSubmissions(submissionHistory);
+    setReviewsHistory(submissionHistory);
     setHasMoreSubmissions(hasMoreSubmissions);
 
-    setOldView(true);
+    setReviewHistoryView(true);
     setPendingView(false);
     setSuspensionView(false);
   };
@@ -134,7 +139,7 @@ export function useDoctorSearch() {
     if (error) {
       if (error instanceof Problem && (error.status === 404 || error.status === 400)) {
         setSuspensionView(true);
-        setOldView(false);
+        setReviewHistoryView(false);
         setPendingView(false);
         return;
       }
@@ -144,21 +149,36 @@ export function useDoctorSearch() {
       setFetchedSuspension(res);
 
       setSuspensionView(true);
-      setOldView(false);
+      setReviewHistoryView(false);
       setPendingView(false);
     }
   };
 
-  const loadMoreSubmissions = () => {
+  const loadMoreReviews = async () => {
     const newSkip = submissionSkip + submissionLimit;
     console.log('Loading more submissions');
     console.log('Skip: ' + newSkip);
+
+    // Fetch more submissions
+    const [error, res] = await handleRequest(
+      DoctorServices.getReviewsHistoryByUserNIC(Number(user.nic), submissionLimit, newSkip)
+    );
+    if (error) {
+      handleError(error, setErrorSubmission, nav, location.pathname);
+      return;
+    }
+
+    const { submissionHistory, hasMoreSubmissions } = res;
+
+    // Append the new submissions to the existing ones
+    setReviewsHistory(prevReviewsHistory => [...(prevReviewsHistory || []), ...submissionHistory]);
+
     setSubmissionSkip(newSkip);
-    fetchSubmissionHistory(submissionLimit, newSkip, false);
+    setHasMoreSubmissions(hasMoreSubmissions);
   };
 
   const togglePendingView = () => {
-    setOldView(false);
+    setReviewHistoryView(false);
     setSuspensionView(false);
     setPendingView(true);
   };
@@ -166,12 +186,12 @@ export function useDoctorSearch() {
   const toggleOldView = () => {
     setPendingView(false);
     setSuspensionView(false);
-    setOldView(true);
+    setReviewHistoryView(true);
   };
 
   const toggleSuspensionView = () => {
     setPendingView(false);
-    setOldView(false);
+    setReviewHistoryView(false);
     setSuspensionView(true);
   };
 
@@ -199,11 +219,11 @@ export function useDoctorSearch() {
     isLoading,
     nic,
     pendingSubmission,
-    oldSubmissions,
+    reviewsHistory,
     user,
     fetchedSuspension,
     pendingView,
-    oldView,
+    reviewHistoryView,
     suspensionView,
     submissionLimit,
     submissionSkip,
@@ -213,9 +233,9 @@ export function useDoctorSearch() {
     setErrorForm,
     setErrorSubmission,
     fetchPendingSubmission,
-    fetchSubmissionHistory,
+    fetchReviewHistory,
     fetchSuspension,
-    loadMoreSubmissions,
+    loadMoreReviews,
     togglePendingView,
     toggleOldView,
     toggleSuspensionView,

@@ -1,4 +1,6 @@
+using DadivaAPI.domain.user;
 using DadivaAPI.repositories.Entities;
+using DadivaAPI.services.submissions.dtos;
 
 namespace DadivaAPI.domain;
 
@@ -10,6 +12,7 @@ public record Inconsistencies(
     Form Form
 )
 {
+    public int Id { get; init; }
     public InconsistencyEntity ToEntity()
     {
         // Convert the Inconsistencies to a list of RuleEntity objects
@@ -24,9 +27,22 @@ public record Inconsistencies(
             Form = this.Form.ToEntity(null, Form.AddedBy.ToEntity(), Reason)
         };
     }
+    
+    public static Inconsistencies? CreateMinimalSubmissionDomain(MinimalInconsistencyDto? inconsistencyDto)
+    {
+        if (inconsistencyDto is null) return null;
+        var donorUser = User.CreateMinimalUser(inconsistencyDto.Admin);
+        var form = Form.CreateMinimalForm(inconsistencyDto.Form, donorUser);
+
+        return new Inconsistencies(
+            inconsistencyDto.Rules.Select(r => r.ToDomain()).ToList(),
+            inconsistencyDto.Reason,
+            inconsistencyDto.Date,
+            donorUser,
+            form
+        )
+        {
+            Id = inconsistencyDto.Id
+        };
+    }
 }
-
-
-/*public record Inconsistencies(
-    List<Rule> InconsistencyList
-);*/
