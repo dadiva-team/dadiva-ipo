@@ -1,19 +1,16 @@
-import {Note} from "../../../domain/Submission/Submission";
+import { DonorModel, Status, SubmissionAnsweredQuestionModel } from './SubmissionOutputModel';
 
 export interface SubmissionHistoryModel {
-    submissionId: number;
-    submissionDate: Date;
-    byUserNic: number;
-    answers: { questionId: string; answer: string }[];
-    finalNote: string;
-    formVersion: number;
-    notes: Note[];
-    reviewDate: Date;
-    reviewStatus: string;
-    doctorNic: number;
+  id: number;
+  submissionDate: string;
+  status: Status;
+  answeredQuestions: SubmissionAnsweredQuestionModel[];
+  finalNote: string;
+  reviewDate: Date;
+  doctorNic: DonorModel;
 }
 
 export interface SubmissionHistoryOutputModel {
-    submissionHistory: SubmissionHistoryModel[];
-    hasMoreSubmissions: boolean;
+  submissionHistory: SubmissionHistoryModel[];
+  hasMoreSubmissions: boolean;
 }

@@ -28,7 +28,7 @@ export function usePendingSubmissionResults({ submission, onSubmittedSuccessfull
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState<'approved' | 'rejected' | null>(null);
+  const [dialogType, setDialogType] = useState<boolean | null>(null);
   const [finalNote, setFinalNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,7 +55,7 @@ export function usePendingSubmissionResults({ submission, onSubmittedSuccessfull
     });
   };
 
-  const handleDialogOpen = (type: 'approved' | 'rejected') => {
+  const handleDialogOpen = (type: boolean) => {
     setDialogType(type);
     setDialogOpen(true);
   };
@@ -73,7 +73,7 @@ export function usePendingSubmissionResults({ submission, onSubmittedSuccessfull
     setIsSubmitting(false);
   };
 
-  const submitReview = async (status: string, finalNote?: string) => {
+  const submitReview = async (status: boolean, finalNote?: string) => {
     const reviewData = {
       doctorNic: doctor.nic,
       status,

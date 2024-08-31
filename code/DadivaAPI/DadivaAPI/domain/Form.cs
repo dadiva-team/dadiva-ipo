@@ -1,4 +1,6 @@
+using DadivaAPI.domain.user;
 using DadivaAPI.repositories.Entities;
+using DadivaAPI.services.submissions.dtos;
 
 namespace DadivaAPI.domain;
 
@@ -33,6 +35,20 @@ public record Form(
             QuestionGroups = Groups.Select(g => g.ToEntity()).ToList(),
             Rules = Rules.Select(r => r.ToEntity()).ToList(),
             Submissions = null
+        };
+    }
+    
+    public static Form CreateMinimalForm(MinimalFormDto minimalFormDto, User addedBy)
+    {
+        return new Form(
+           new List<QuestionGroup>(),
+           new List<Rule>(),
+            null,
+            FormLanguages.En,
+            addedBy
+        )
+        {
+            Id = minimalFormDto.Id
         };
     }
 

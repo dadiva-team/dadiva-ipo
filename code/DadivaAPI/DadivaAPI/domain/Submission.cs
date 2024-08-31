@@ -47,20 +47,12 @@ public record Submission(
 
         return this with { AnsweredQuestions = updatedAnsweredQuestions };
     }
-    
-    public Submission UpdateStatus(SubmissionStatus status)
-    {
-        return this with { Status = status };
-    }
-    
-    public Submission UpdateStatusFromString(string status)
+    public Submission UpdateStatusFromBoolean(bool status)
     {
         return this with { Status = status switch
         {
-            "Pending" => SubmissionStatus.Pending,
-            "Approved" => SubmissionStatus.Approved,
-            "Rejected" => SubmissionStatus.Rejected,
-            _ => throw new ArgumentException("Invalid status")
+            true => SubmissionStatus.Approved,
+            false => SubmissionStatus.Rejected
         }};
     }
     
@@ -74,22 +66,22 @@ public record Submission(
         };
     }
     
-    public SubmissionEntity ToEntity(UserEntity donor, FormEntity form)
+    public SubmissionEntity ToEntity(FormEntity? form = null)
     {
         return new SubmissionEntity
         {
             Id = Id,
             Date = SubmissionDate,
-            Donor = donor,
+            Donor = Donor.ToEntity(),
             LockedBy = Locked?.ToEntity(),
-            Form = form,
+            Form = form ?? Form.ToEntity(null, null, null),
             Status = Status,
             Language = Language,
             AnsweredQuestions = AnsweredQuestions.Select(aq => aq.ToEntity()).ToList()
         };
     }
 
-    public SubmissionWithLockExternalInfo ToExternalInfo(List<RuleModel> inconsistencies)
+    public SubmissionWithLockExternalInfo ToExternalInfo(List<RuleModel>? inconsistencies)
     {
         return new SubmissionWithLockExternalInfo(Id, SubmissionDate, Status, AnsweredQuestions, Donor.ToUserWithNameExternalInfo(), inconsistencies, Locked?.ToSubmissionExternalInfo()
         );
@@ -101,4 +93,24 @@ public record Submission(
         return new SubmissionExternalInfo(Id, SubmissionDate, Status, AnsweredQuestions, Donor.Nic, Donor.Name,
             Form.Groups);
     }
+    
+    public static Submission CreateMinimalSubmissionDomain(MinimalSubmissionDto submissionDto)
+    {
+        var donorUser = User.CreateMinimalUser(submissionDto.Donor);
+        var form = Form.CreateMinimalForm(submissionDto.Form, donorUser);
+
+        return new Submission(
+            submissionDto.AnsweredQuestions.Select(aq => aq.ToDomain()).ToList(),
+            DateTime.Now, // Adjust if necessary to match DTO date
+            submissionDto.Status,
+            SubmissionLanguages.En, // Adjust according to your logic
+            donorUser, // Use factory method to create minimal user
+            form, // Use factory method to create minimal form
+            submissionDto.LockedBy?.ToDomain() // Convert LockedBy to domain model
+        )
+        {
+            Id = submissionDto.Id
+        };
+    }
+
 }

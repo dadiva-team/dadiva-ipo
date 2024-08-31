@@ -69,8 +69,8 @@ public static class DomainToFromEntityExtensions
             entity.Date,
             entity.Status,
             entity.Language,
-            entity.Donor.ToDomain(),
-            entity.Form.ToDomain(),
+            entity.Donor?.ToDomain(), 
+            entity.Form?.ToDomain(), 
             entity.LockedBy?.ToDomain()
         )
         {

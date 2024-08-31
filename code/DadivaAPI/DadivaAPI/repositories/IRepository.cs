@@ -5,6 +5,7 @@ using DadivaAPI.repositories.medications;
 using DadivaAPI.repositories.submissions;
 using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
+using DadivaAPI.services.submissions.dtos;
 
 namespace DadivaAPI.repositories;
 
@@ -51,9 +52,9 @@ public interface IRepository
     public Task<bool> SubmitReview(ReviewEntity review);
     public Task<List<SubmissionEntity>?> GetPendingSubmissions();
 
-    public Task<SubmissionEntity?> GetSubmissionById(int id);
+    public Task<MinimalSubmissionDto?> GetSubmissionById(int id);
 
-    public Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(string userNic);
+    public Task<MinimalSubmissionDto?> GetLatestPendingSubmissionByUser(string userNic);
 
     public Task<(List<ReviewEntity>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByUser(string nic,
         int limit, int skip);

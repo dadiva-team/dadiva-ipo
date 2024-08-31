@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DadivaAPI.routes.form.models;
 using DadivaAPI.routes.utils;
 using DadivaAPI.services.reviews;
@@ -12,10 +13,11 @@ public static class ReviewRoutes
         app.MapPost("/review/{submissionId:int}", ReviewSubmission).RequireAuthorization("doctor");
     }
 
-    private static async Task<IResult> ReviewSubmission(int submissionId, [FromBody] ReviewSubmissionRequest input,
+    private static async Task<IResult> ReviewSubmission(HttpContext context,int submissionId, [FromBody] ReviewSubmissionRequest input,
         IReviewsService service)
     {
-        return (await service.ReviewSubmission(submissionId, input.DoctorNic, input.Status, input.Notes, input.FinalNote))
+        var nic = context.User.Claims.First(claim => claim.Type==ClaimTypes.Name).Value.ToString();
+        return (await service.ReviewSubmission(submissionId, nic, input.Status, input.Notes, input.FinalNote))
             .HandleRequest(submission => Results.Ok());
     }
 }

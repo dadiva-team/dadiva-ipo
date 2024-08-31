@@ -50,14 +50,14 @@ public class SubmissionService(
             );
 
             // Atualizar a AccountStatus do dador
-            /*var suspension = new Suspension(donorDomain, null, submissionDate,
+            var suspension = new Suspension(donorDomain, null, submissionDate,
                 SuspensionType.pendingReview, true, null, "A submissão está em revisão", null);
             var success = await repository.AddSuspension(suspension.ToEntity());
             if (!success)
-                return Result.Fail(new UserError.UnknownError());*/
+                return Result.Fail(new UserError.UnknownError());
             // TODO: Fix this
 
-            var submissionEntity = submission.ToEntity(donor, form);
+            var submissionEntity = submission.ToEntity(form);
             var submitted = await repository.SubmitSubmission(submissionEntity);
 
             return submitted
@@ -167,22 +167,30 @@ public class SubmissionService(
                     if (form != null) formCache[submission.Form.Id] = form;
                 }
 
-                if (form != null) 
+                if (form != null)
                 {
                     submission.Form = form;
 
-                    // Fetch the inconsistencies for the form and convert them to domain models
-                    InconsistencyEntity? inconsistenciesEntity = await repository.GetInconsistencies(submission.Form.Id);
-                    inconsistenciesEntity.Form = form;
-                    List<RuleModel> inconsistencies = inconsistenciesEntity?
-                        .ToDomain()
-                        .InconsistencyList
-                        .Select(RuleModel.FromDomain)
-                        .ToList();
+                    InconsistencyEntity? inconsistenciesEntity =
+                        await repository.GetInconsistencies(submission.Form.Id);
 
-                    // Pass the inconsistencies when converting submission to external info
-                    var externalInfo = submission.ToDomain().ToExternalInfo(inconsistencies);
-                    submissionResults.Add(externalInfo);
+                    if (inconsistenciesEntity != null)
+                    {
+                        inconsistenciesEntity.Form = form;
+                        List<RuleModel> inconsistencies = inconsistenciesEntity
+                            .ToDomain()
+                            .InconsistencyList
+                            .Select(RuleModel.FromDomain)
+                            .ToList();
+
+                        var externalInfo = submission.ToDomain().ToExternalInfo(inconsistencies);
+                        submissionResults.Add(externalInfo);
+                    }
+                    else
+                    {
+                        var externalInfo = submission.ToDomain().ToExternalInfo(null);
+                        submissionResults.Add(externalInfo);
+                    }
                 }
             }
 
@@ -200,12 +208,19 @@ public class SubmissionService(
             if (doctorUser is null)
                 return Result.Fail(new UserError.UnknownDoctorError());
 
-            var submission = await repository.GetLatestPendingSubmissionByUser(userNic);
+            var submissionDto = await repository.GetLatestPendingSubmissionByUser(userNic);
+            if (submissionDto is null)
+                return Result.Fail(new SubmissionError.SubmissionNotFoundError());
 
-            if (submission == null)
-                return Result.Fail(new SubmissionError.NoPendingSubmissionsError());
+            var submissionDomain = Submission.CreateMinimalSubmissionDomain(submissionDto);
+            var form = await repository.GetFormById(submissionDomain.Form.Id);
+            if (form is null)
+                return Result.Fail(new FormErrors.NoFormError());
+            
+            var updatedSubmission = submissionDomain with { Form = form.ToDomain() };
 
-            return Result.Ok(submission.ToDomain().ToExternalInfo(null));
+
+            return Result.Ok(updatedSubmission.ToExternalInfo(null));
         });
     }
 

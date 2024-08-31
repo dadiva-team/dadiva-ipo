@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { QuestionWithAnswer } from '../utils/DoctorSearchUtils';
 import { Note } from '../../../../domain/Submission/Submission';
+import { QuestionModel } from '../../../../services/doctors/models/SubmissionOutputModel';
 
 interface UseFormDetailsProps {
   notes: Note[];
@@ -9,10 +9,10 @@ interface UseFormDetailsProps {
 
 export function useFormDetails({ notes, handleSaveNote }: UseFormDetailsProps) {
   const [open, setOpen] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState<QuestionWithAnswer | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<QuestionModel | null>(null);
 
-  const handleClickOpen = () => {
-    //setSelectedQuestion(question);
+  const handleClickOpen = (question: QuestionModel) => {
+    setSelectedQuestion(question);
     setOpen(true);
   };
 

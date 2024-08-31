@@ -44,8 +44,8 @@ export function PendingSubmissionResults({ submission, onSubmittedSuccessfully }
             Existem inconsistências no formulário. Por favor, reveja as seguintes questões:
           </Typography>
           <Divider sx={{ p: 0.5 }} />
-          {/*formWithAnswers
-            .filter(item => inconsistencies.includes(item.id))
+          {formWithAnswers
+            .filter(item => inconsistencies?.flat().includes(item.question.id))
             .map(item => (
               <Box
                 key={item.id}
@@ -60,7 +60,7 @@ export function PendingSubmissionResults({ submission, onSubmittedSuccessfully }
                 <Typography sx={{ width: '70%' }}>{item.question.text}</Typography>
                 <Typography sx={{ width: '30%' }}>Resposta: {item.answer.toString()}</Typography>
               </Box>
-            ))*/}
+            ))}
         </Box>
       ) : (
         <InfoAlert actionMessage={'Formulario parcialmente validado'} type={'info'} />
@@ -89,7 +89,7 @@ export function PendingSubmissionResults({ submission, onSubmittedSuccessfully }
           variant="contained"
           startIcon={<ThumbDownIcon />}
           sx={{ textTransform: 'none' }}
-          onClick={() => handleDialogOpen('rejected')}
+          onClick={() => handleDialogOpen(false)} // Open Rejection Dialog
         >
           Rejeitar
         </Button>
@@ -97,7 +97,7 @@ export function PendingSubmissionResults({ submission, onSubmittedSuccessfully }
           variant="contained"
           startIcon={<ThumbUpIcon />}
           sx={{ textTransform: 'none' }}
-          onClick={() => handleDialogOpen('approved')}
+          onClick={() => handleDialogOpen(true)} // Open Approval Dialog
         >
           Aprovar
         </Button>

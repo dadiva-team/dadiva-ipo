@@ -57,7 +57,7 @@ export function FormDetails({ formWithAnswers, inconsistencies, notes, handleSav
                 <Grid item xs={1}>
                   <Box display="flex" alignItems="center">
                     <Tooltip title={getNoteContent(item.question.id) ?? 'Sem Nota'} arrow>
-                      <IconButton onClick={() => handleClickOpen()}>
+                      <IconButton onClick={() => handleClickOpen(item.question)}>
                         {' '}
                         {/* TODO !!!! correct this*/}
                         {notes?.some(note => note.id === item.question.id) ? <EditNoteIcon /> : <NoteAddIcon />}
@@ -75,13 +75,7 @@ export function FormDetails({ formWithAnswers, inconsistencies, notes, handleSav
         );
       })}
       {selectedQuestion && (
-        <NoteDialog
-          question={selectedQuestion.question}
-          note={getNoteContent(selectedQuestion.id)}
-          open={open}
-          onAnswer={saveNote}
-          onClose={handleClose}
-        />
+        <NoteDialog note={getNoteContent(selectedQuestion.id)} open={open} onAnswer={saveNote} onClose={handleClose} />
       )}
     </Box>
   );

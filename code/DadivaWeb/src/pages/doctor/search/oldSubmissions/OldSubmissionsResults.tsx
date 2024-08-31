@@ -16,21 +16,17 @@ import {
   SelectChangeEvent,
   IconButton,
 } from '@mui/material';
-import { OldSubmissionCard } from './OldSubmissionCard';
-import { Inconsistency } from '../utils/DoctorSearchUtils';
-import { Group } from '../../../../domain/Form/Form';
 import { SubmissionHistoryModel } from '../../../../services/doctors/models/SubmissionHistoryOutputModel';
+import { OldSubmissionCard } from './OldSubmissionCard';
 
 interface OldSubmissionsPendingProps {
-  submissions: Map<SubmissionHistoryModel, Group[]>;
-  inconsistencies: Inconsistency[];
+  submissions: SubmissionHistoryModel[];
   loadMoreSubmissions: () => void;
   hasMoreSubmissions: boolean;
 }
 
 export function OldSubmissionsResults({
   submissions,
-  inconsistencies,
   loadMoreSubmissions,
   hasMoreSubmissions,
 }: OldSubmissionsPendingProps) {
@@ -55,8 +51,8 @@ export function OldSubmissionsResults({
     setFiltersVisible(!filtersVisible);
   };
 
-  const filteredSubmissions = Array.from(submissions.keys()).filter(submission => {
-    const statusMatches = statusFilter === 'all' || submission.reviewStatus === statusFilter;
+  const filteredSubmissions = Array.from(submissions.values()).filter(submission => {
+    const statusMatches = statusFilter === 'all' || submission.status === statusFilter;
     const yearMatches =
       yearFilter === 'all' || new Date(submission.submissionDate).getFullYear().toString() === yearFilter;
     return statusMatches && yearMatches;
@@ -91,7 +87,7 @@ export function OldSubmissionsResults({
               <MenuItem value="all">-</MenuItem>
               {Array.from(
                 new Set(
-                  Array.from(submissions.keys()).map(sub => new Date(sub.submissionDate).getFullYear().toString())
+                  Array.from(submissions.values()).map(sub => new Date(sub.submissionDate).getFullYear().toString())
                 )
               ).map(year => (
                 <MenuItem key={year} value={year}>

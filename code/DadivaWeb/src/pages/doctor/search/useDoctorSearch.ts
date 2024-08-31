@@ -1,16 +1,13 @@
-/*import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { DoctorServices } from '../../../services/doctors/DoctorServices';
-import { FormServices } from '../../../services/from/FormServices';
-import { Submission } from '../../../domain/Submission/Submission';
 import { User } from '../../../domain/User/User';
-import { Group } from '../../../domain/Form/Form';
-import { Inconsistency, extractInconsistencies } from './utils/DoctorSearchUtils';
 import { SubmissionHistoryModel } from '../../../services/doctors/models/SubmissionHistoryOutputModel';
 import { Problem } from '../../../services/utils/Problem';
 import { UserSuspension } from '../../../domain/User/UserSuspension';
 import { useCurrentSession } from '../../../session/Session';
+import { SubmissionModel } from '../../../services/doctors/models/SubmissionOutputModel';
 
 export function useDoctorSearch() {
   const nav = useNavigate();
@@ -23,13 +20,11 @@ export function useDoctorSearch() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [nic, setNic] = useState<string>('');
-  const [pendingSubmission, setPendingSubmission] = useState<Submission | null>(null);
+  const [pendingSubmission, setPendingSubmission] = useState<SubmissionModel | null>(null);
 
-  const [oldSubmissions, setOldSubmissions] = useState<Map<SubmissionHistoryModel, Group[]>>(new Map());
+  const [oldSubmissions, setOldSubmissions] = useState<SubmissionHistoryModel[]>(null);
   const [user, setUser] = useState<User | null>(null);
 
-  const [formGroupsCache, setFormGroupsCache] = useState<Map<number, Group[]> | null>(null);
-  const [inconsistencies, setInconsistencies] = useState<Inconsistency[] | null>(null);
   const [fetchedSuspension, setFetchedSuspension] = useState<UserSuspension | null>(null);
 
   const [pendingView, setPendingView] = useState<boolean | null>(null);
@@ -52,7 +47,7 @@ export function useDoctorSearch() {
   };
   const resetState = () => {
     setPendingSubmission(null);
-    setOldSubmissions(new Map());
+    setOldSubmissions(null);
     setUser(null);
     setPendingView(false);
     setOldView(false);
@@ -66,37 +61,6 @@ export function useDoctorSearch() {
 
     resetState();
     fetchUser(nic);
-  };
-
-  const fetchFormGroups = async (formVersion: number): Promise<Group[]> => {
-    if (formGroupsCache?.has(formVersion)) {
-      return formGroupsCache.get(formVersion)!;
-    } else {
-      const [error, res] = await handleRequest(FormServices.getFormByVersion(formVersion));
-      if (error) {
-        handleError(error, setErrorForm, nav, location.pathname);
-        return [];
-      }
-      const formGroups = res.groups as Group[];
-      if (formGroupsCache) {
-        setFormGroupsCache(new Map(formGroupsCache.set(formVersion, formGroups)));
-      } else {
-        setFormGroupsCache(new Map([[formVersion, formGroups]]));
-      }
-      return formGroups;
-    }
-  };
-
-  const fetchInconsistencies = async () => {
-    if (inconsistencies) return;
-    const [error, res] = await handleRequest(FormServices.getInconsistencies());
-    if (error) {
-      handleError(error, setError, nav, location.pathname);
-      setIsLoading(false);
-      return;
-    }
-    const inc = res.length > 0 ? extractInconsistencies(res[0]) : [];
-    setInconsistencies(inc.length == 0 ? null : inc);
   };
 
   const fetchUser = useCallback(
@@ -129,15 +93,13 @@ export function useDoctorSearch() {
       setPendingSubmission(null);
       return;
     }
-    if (res.lockedByDoctorNic !== null && res.lockedByDoctorNic != doc.nic) {
+    if (res.submission.lock != null && res?.submission.lock?.doctor.nic != doc?.nic.toString()) {
       setPendingSubmission(null);
       setErrorSubmission('A submissão pendente está a ser vista por outro médico.\nPor favor, tente mais tarde.');
       return;
     }
-    await fetchFormGroups(res.submission.formVersion);
-    await fetchInconsistencies();
 
-    //setPendingSubmission(res.submission as Submission);
+    setPendingSubmission(res.submission as SubmissionModel);
     setPendingView(true);
     setOldView(false);
     setSuspensionView(false);
@@ -154,20 +116,12 @@ export function useDoctorSearch() {
     const [error, res] = await handleRequest(DoctorServices.getSubmissionHistoryByNic(Number(user.nic), limit, skip));
     if (error) {
       handleError(error, setErrorSubmission, nav, location.pathname);
-      setOldSubmissions(new Map());
+      setOldSubmissions(null);
       return;
     }
-    await fetchInconsistencies();
     const { submissionHistory, hasMoreSubmissions } = res;
 
-    // Don't use oldSubmissions here! It's a state variable! TODO:
-    const newOldSubmissionsMap = new Map(reset ? [] : oldSubmissions);
-    for (const submission of submissionHistory) {
-      const formGroups = await fetchFormGroups(submission.formVersion);
-      newOldSubmissionsMap.set(submission, formGroups);
-    }
-
-    setOldSubmissions(newOldSubmissionsMap);
+    setOldSubmissions(submissionHistory);
     setHasMoreSubmissions(hasMoreSubmissions);
 
     setOldView(true);
@@ -247,8 +201,6 @@ export function useDoctorSearch() {
     pendingSubmission,
     oldSubmissions,
     user,
-    formGroupsCache,
-    inconsistencies,
     fetchedSuspension,
     pendingView,
     oldView,
@@ -270,4 +222,4 @@ export function useDoctorSearch() {
     handleSearchAndUpdateQuery,
     onSubmitedSuccessfully,
   };
-}*/
+}

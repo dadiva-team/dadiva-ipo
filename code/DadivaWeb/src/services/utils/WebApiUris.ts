@@ -19,7 +19,7 @@ export const getSubmissionHistoryByUserUri = (nic: number, skip: number, limit: 
 
 export const lockSubmissionUri = (submissionId: number) => `${API_URL}/submissions/${submissionId}/lock`;
 export const unlockSubmissionUri = (submissionId: number) => `${API_URL}/submissions/${submissionId}/unlock`;
-export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/forms/review/${submissionId}`;
+export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/review/${submissionId}`;
 export const notificationsUri = `${API_URL}/submissions/pending/notifications`;
 export const notesFromReviewUri = (reviewId: number) => `${API_URL}/forms/review/${reviewId}/notes`;
 export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;

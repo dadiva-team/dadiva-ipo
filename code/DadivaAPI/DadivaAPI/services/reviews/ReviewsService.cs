@@ -8,13 +8,12 @@ using DadivaAPI.services.submissions;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
 using FluentResults;
-using Microsoft.EntityFrameworkCore;
 
 namespace DadivaAPI.services.reviews;
 
 public class ReviewsService(IRepository repository, DadivaDbContext context,  INotificationService notificationService) : IReviewsService
 {
-    public async Task<Result<bool>> ReviewSubmission(int submissionId, string doctorNic, string status,
+    public async Task<Result<bool>> ReviewSubmission(int submissionId, string doctorNic, bool status,
         List<NoteModel>? notes, string? finalNote)
     {
         return await context.WithTransaction(async () =>
@@ -23,19 +22,18 @@ public class ReviewsService(IRepository repository, DadivaDbContext context,  IN
             if (doctorEntity is null)
                 return Result.Fail(new UserError.UnknownDoctorError());
             
-            var submissionEntity = await repository.GetSubmissionById(submissionId);
-            if (submissionEntity is null)
+            var submissionDto = await repository.GetSubmissionById(submissionId);
+            if (submissionDto is null)
                 return Result.Fail(new SubmissionError.SubmissionNotFoundError());
-            if (submissionEntity.Status != SubmissionStatus.Pending)
+            if (submissionDto.Status != SubmissionStatus.Pending)
                 return Result.Fail(new SubmissionError.SubmissionNotPendingStatusError());
-            if (submissionEntity.LockedBy?.Doctor.Nic != doctorNic)
-                return Result.Fail(new SubmissionError.AlreadyLockedByAnotherDoctor(submissionEntity.LockedBy?.Doctor.Name!));
+            if(submissionDto.LockedBy is null)
+                return Result.Fail(new SubmissionError.SubmissionNotLockedError());
+            if (submissionDto.LockedBy.Doctor.Nic != doctorNic)
+                return Result.Fail(new SubmissionError.AlreadyLockedByAnotherDoctor(submissionDto.LockedBy?.Doctor.Name!));
             
-            var submissionDomain = submissionEntity.ToDomain();
-            
-            if(submissionDomain.ValidateStatus(status))
-                return Result.Fail(new SubmissionError.InvalidStatusError());
-            submissionDomain = submissionDomain.UpdateStatusFromString(status);
+            var submissionDomain = Submission.CreateMinimalSubmissionDomain(submissionDto);
+            submissionDomain = submissionDomain.UpdateStatusFromBoolean(status);
             
             if (!submissionDomain.ValidateDoctorNotes())
                 return Result.Fail(new SubmissionError.InvalidDoctorNotesError());
@@ -47,28 +45,25 @@ public class ReviewsService(IRepository repository, DadivaDbContext context,  IN
             var review = new Review(
                 submissionDomain,
                 doctorUser,
-                status,
+                status ? ReviewStatus.Approved : ReviewStatus.Rejected,
                 finalNote,
-                DateTime.Now
+                DateTime.UtcNow
             );
             
-            submissionEntity = submissionDomain.ToEntity( submissionEntity.Donor,  null);
-            var addedReview = await repository.SubmitReview(review.ToEntity(submissionEntity));
+            var submissionEntity = submissionDomain.ToEntity();
+            var reviewEntity = review.ToEntity(submissionEntity);
+            var addedReview = await repository.SubmitReview(reviewEntity);
             if (!addedReview)
                 return Result.Fail(new ReviewErrors.ReviewNotSavedError());
-            
-            var updatedSubmission = await repository.UpdateSubmission(submissionEntity);
-            if (!updatedSubmission)
-                return Result.Fail(new SubmissionError.SubmissionNotUpdatedError());
 
             // Unlock submission
-            await repository.UnlockSubmission(submissionEntity.LockedBy!);
+            await repository.UnlockSubmission(submissionDto.LockedBy!);
 
             // Sending notification to all doctors using the /pendingSubmission page that they can delete this submission from the list
             await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "review", submissionId }));
 
             // Remove user suspension
-            var userSuspension = await repository.DeleteSuspension(submissionEntity.Donor.Nic);
+            var userSuspension = await repository.DeleteSuspension(submissionDto.Donor.Nic);
             if (!userSuspension)
                 return Result.Fail(new UserError.SuspensionNotDeletedError());
 

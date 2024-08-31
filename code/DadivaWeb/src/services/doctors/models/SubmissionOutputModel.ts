@@ -15,7 +15,7 @@ export interface SubmissionModel {
   lock: LockModel;
 }
 
-interface DonorModel {
+export interface DonorModel {
   name: string;
   nic: string;
 }
@@ -50,8 +50,21 @@ export enum QuestionType {
   countries = 4,
 }
 
-enum Status {
+export enum Status {
   PENDING = 0,
   APPROVED = 1,
   REJECTED = 2,
 }
+
+/*function ToStausFilter(status: Status) {
+  switch (status) {
+    case Status.PENDING:
+      return 'approved';
+    case Status.APPROVED:
+      return 'Aprovado';
+    case Status.REJECTED:
+      return 'Rejeitado';
+    default:
+      return '';
+  }
+}*/

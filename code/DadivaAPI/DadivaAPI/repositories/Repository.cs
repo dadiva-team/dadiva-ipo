@@ -5,6 +5,7 @@ using DadivaAPI.repositories.medications;
 using DadivaAPI.repositories.submissions;
 using DadivaAPI.repositories.terms;
 using DadivaAPI.repositories.users;
+using DadivaAPI.services.submissions.dtos;
 
 namespace DadivaAPI.repositories;
 
@@ -137,12 +138,12 @@ public class Repository(DadivaDbContext context) : IRepository
         return SubmissionRepository.GetPendingSubmissions();
     }
 
-    public Task<SubmissionEntity?> GetSubmissionById(int id)
+    public Task<MinimalSubmissionDto?> GetSubmissionById(int id)
     {
         return SubmissionRepository.GetSubmissionById(id);
     }
 
-    public Task<SubmissionEntity?> GetLatestPendingSubmissionByUser(string userNic)
+    public Task<MinimalSubmissionDto?> GetLatestPendingSubmissionByUser(string userNic)
     {
         return SubmissionRepository.GetLatestPendingSubmissionByUser(userNic);
     }
