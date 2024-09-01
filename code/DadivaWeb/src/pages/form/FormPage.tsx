@@ -1,7 +1,7 @@
 import { useNewForm } from '../../components/form/useNewForm';
 import React from 'react';
 import FormWithRuleEngine from '../../components/form/FormWithRuleEngine';
-import { ReviewForm } from '../../components/form/ReviewForm';
+import { ReviewForm } from '../../components/form/reviewForm/ReviewForm';
 import { Box, Button } from '@mui/material';
 import { Form } from '../../domain/Form/Form';
 

@@ -4,8 +4,8 @@
   "Backoffice": "Área administrativa",
   "Login Card Text": "Inicie sessão com o seu NIC e password para poder preencher o questionario pre-dádiva.",
   "Pre Donation Card Title": "Ler e aceitar os termos pre-dadiva.",
-  "Pre Donation Card Text" : "Antes de preencher o questionário é necessario ler e aceitar os termos da dadiva.",
-  "Pre Donation Card Button" : "Começar",
+  "Pre Donation Card Text": "Antes de preencher o questionário é necessario ler e aceitar os termos da dadiva.",
+  "Pre Donation Card Button": "Começar",
   "Suspension Pending Review": "Tem uma submissão pendente de revisão.",
   "Suspension Card Title Pending Review": "Revisão pendente",
   "Suspension Card Body Pending Review": "Por favor aguarde a revisão do seu formulário.",
@@ -28,5 +28,6 @@
   "Added Groups": "Grupos Adicionados",
   "Removed Groups": "Grupos Removidos",
   "Modified Groups": "Alterações nos Grupos",
-  "Submit Form": "Submeter Formulário"
+  "Submit Form": "Submeter Formulário",
+  "Form submitted successfully": "Formulário submetido com sucesso"
 }

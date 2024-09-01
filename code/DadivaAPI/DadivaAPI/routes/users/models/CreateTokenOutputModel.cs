@@ -11,7 +11,6 @@ public record UserSuspensionAccountStatus(
     string? Reason = null
 );
 public record CreateTokenOutputModel(
-    string Nic,
     string Token,
     UserSuspensionAccountStatus SuspensionAccountStatus
 )
@@ -27,7 +26,6 @@ public record CreateTokenOutputModel(
         );
 
         return new CreateTokenOutputModel(
-            info.Nic,
             info.Token,
             accountStatus
         );

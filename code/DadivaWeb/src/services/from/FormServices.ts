@@ -35,7 +35,7 @@ type ConvertKeysToCamelCase<T> = T extends object
     : { [K in keyof T as CamelCase<string & K>]: ConvertKeysToCamelCase<T[K]> }
   : T;
 
-function convertKeysToCamelCase<T>(obj: T): ConvertKeysToCamelCase<T> {
+export function convertKeysToCamelCase<T>(obj: T): ConvertKeysToCamelCase<T> {
   if (typeof obj !== 'object' || obj === null) {
     return obj as ConvertKeysToCamelCase<T>;
   }

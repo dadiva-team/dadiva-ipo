@@ -1,9 +1,9 @@
 export interface LoginOutputModel {
   readonly token: string;
-  readonly accountStatus: UserSuspensionAccountStatus;
+  readonly suspensionAccountStatus: SuspensionAccountStatus;
 }
 
-export interface UserSuspensionAccountStatus {
+export interface SuspensionAccountStatus {
   isActive: boolean;
   type?: SuspensionType;
   startDate?: Date;

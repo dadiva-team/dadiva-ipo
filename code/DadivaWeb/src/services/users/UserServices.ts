@@ -4,7 +4,7 @@ import { LoginOutputModel } from './models/LoginOutputModel';
 import { RegisterResponseModel } from './models/RegisterResponseModel';
 
 export async function loginNIC(nic: string, password: string): Promise<LoginOutputModel> {
-  return await post(createTokenUri, JSON.stringify({ nic: nic, password: password }));
+  return await post<LoginOutputModel>(createTokenUri, JSON.stringify({ nic, password }));
 }
 
 export async function register(

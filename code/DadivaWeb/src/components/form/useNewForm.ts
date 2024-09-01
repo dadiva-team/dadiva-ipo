@@ -8,18 +8,16 @@ import {
   Answer,
   EMPTY_ANSWER,
   simplifyAnswers,
+  SubmitFormResponse,
   updateFormAnswers,
   updateQuestionColors,
   updateShowQuestions,
 } from './utils/formUtils';
-import { useUpdateSessionStatus } from '../../session/Session';
-import { SuspensionType } from '../../services/users/models/LoginOutputModel';
 import { useTranslation } from 'react-i18next';
 
 export function useNewForm(playgroundForm?: Form) {
   const { i18n } = useTranslation();
   const nav = useNavigate();
-  const updateSessionStatus = useUpdateSessionStatus();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +45,7 @@ export function useNewForm(playgroundForm?: Form) {
     //console.log('Current Group: ' + currentGroup);
   }, [formAnswers, showQuestions, currentGroup]);*/
 
-  async function submitForm() {
+  async function submitForm(): Promise<SubmitFormResponse> {
     const filteredFormAnswers = formAnswers.map((groupAnswers, groupIndex) => {
       const filteredGroupAnswers: Record<string, Answer> = {};
 
@@ -60,20 +58,18 @@ export function useNewForm(playgroundForm?: Form) {
       return filteredGroupAnswers;
     });
 
-    console.log('Filtered Form Answers: ' + JSON.stringify(filteredFormAnswers));
-
     const [error, res] = await handleRequest(FormServices.submitForm(filteredFormAnswers, formRawFetchData.language));
     if (error) {
       handleError(error, setError, nav);
-      return;
+      return { success: false };
     }
+
     console.log('Form saved');
-    console.log('res ', res);
-    if (res) {
-      console.log('res ', res);
-      updateSessionStatus(SuspensionType.PendingReview, res.submissionDate);
-      nav('/');
+    if (res != null && res.submissionDate != null) {
+      return { success: true, submissionDate: res.submissionDate };
     }
+
+    return { success: false };
   }
 
   useEffect(() => {
@@ -228,7 +224,7 @@ export function useNewForm(playgroundForm?: Form) {
   function onPrevQuestion() {
     setCurrentGroup(() => currentGroup - 1);
   }
-// Tentativa de meter a reviewPage a dar a 100%
+  // Tentativa de meter a reviewPage a dar a 100%
   function onReviewMode() {
     const review = !reviewMode;
     setReviewMode(review);

@@ -4,7 +4,7 @@ import * as React from 'react';
 import reduce from '../utils/Reduce';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { loginNIC } from '../../../services/users/UserServices';
-import { UserSuspensionAccountStatus } from '../../../services/users/models/LoginOutputModel';
+import { SuspensionAccountStatus } from '../../../services/users/models/LoginOutputModel';
 
 export function useLogin(returnTo: string) {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export function useLogin(returnTo: string) {
     }
     console.log('res before', res);
 
-    const { token, accountStatus } = res;
+    const { token, suspensionAccountStatus } = res;
     if (!token) {
       dispatch({ type: 'error', message: 'Token não encontrado' });
       setError('Token não encontrado');
@@ -85,13 +85,13 @@ export function useLogin(returnTo: string) {
     };
 
     console.log('Decoded payload', payload);
-    console.log('Account status', accountStatus);
+    console.log('Account status', suspensionAccountStatus);
 
     const session: Session = {
       name: payload.name,
       nic: Number(payload.nic),
       perms: payload.perms as Role[],
-      accountStatus: accountStatus as UserSuspensionAccountStatus,
+      accountStatus: suspensionAccountStatus as SuspensionAccountStatus,
     };
     console.log(session);
 

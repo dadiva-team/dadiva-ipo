@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { SuspensionType, UserSuspensionAccountStatus } from '../services/users/models/LoginOutputModel';
+import { SuspensionType, SuspensionAccountStatus } from '../services/users/models/LoginOutputModel';
 
 export enum Role {
   DONOR = 'donor',
@@ -11,7 +11,7 @@ export interface Session {
   readonly name: string;
   readonly nic: number;
   readonly perms: Role[];
-  readonly accountStatus: UserSuspensionAccountStatus;
+  readonly accountStatus: SuspensionAccountStatus;
 }
 
 type SessionManager = {
@@ -78,8 +78,6 @@ export function useUpdateSessionStatus() {
 
   return function (newStatus: SuspensionType, date: Date) {
     const currentUser = sessionManager.session;
-    console.log(`useUpdateSessionStatus: ${JSON.stringify(currentUser)}`);
-
     if (currentUser) {
       const updatedUser = {
         ...currentUser,

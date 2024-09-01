@@ -79,3 +79,8 @@ export function simplifyAnswers(
     return acc;
   }, {});
 }
+
+export interface SubmitFormResponse {
+  success: boolean;
+  submissionDate?: Date;
+}

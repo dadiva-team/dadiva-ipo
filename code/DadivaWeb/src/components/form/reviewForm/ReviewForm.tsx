@@ -1,14 +1,15 @@
-import { Box, Button, Container, Paper, styled } from '@mui/material';
-import { Grid } from '@mui/material';
-import React, { useState } from 'react';
-import { Form, Question } from '../../domain/Form/Form';
+import React from 'react';
+import { Alert, Backdrop, Box, Button, Container, Grid, Paper, Snackbar, styled } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import { Form } from '../../../domain/Form/Form';
 import Typography from '@mui/material/Typography';
-import { FormEditDialog } from './FormEditDialog';
+import { FormEditDialog } from '../FormEditDialog';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useTranslation } from 'react-i18next';
-import { Answer } from './utils/formUtils';
+import { Answer, SubmitFormResponse } from '../utils/formUtils';
+import { useReviewForm } from './useReviewForm';
 
 interface ReviewFormProps {
   formData: Form;
@@ -20,7 +21,7 @@ interface ReviewFormProps {
     type: 'string' | 'boolean' | 'array',
     answer: string | boolean | string[]
   ) => void;
-  onSubmitRequest: () => void;
+  onSubmitRequest: () => Promise<SubmitFormResponse>;
   isPlaygroundTest: boolean;
 }
 
@@ -37,9 +38,19 @@ export function ReviewForm({
   onSubmitRequest,
   isPlaygroundTest,
 }: ReviewFormProps) {
-  const [open, setOpen] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState<Question>(null);
   const { t } = useTranslation();
+
+  const {
+    handleOpen,
+    handleClose,
+    handleSubmit,
+    open,
+    selectedQuestion,
+    snackbarOpen,
+    backdropOpen,
+    submitDisabled,
+    setSnackbarOpen,
+  } = useReviewForm(onSubmitRequest);
 
   const Item = styled(Paper)<ItemProps>(({ theme, questionid }) => ({
     backgroundColor: questionColors[questionid],
@@ -52,16 +63,6 @@ export function ReviewForm({
     justifyContent: 'space-between',
     border: 2,
   }));
-
-  const handleOpen = (question: Question) => {
-    setSelectedQuestion(question);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setSelectedQuestion(null);
-    setOpen(false);
-  };
 
   return (
     <Container
@@ -194,6 +195,7 @@ export function ReviewForm({
                               startIcon={<EditIcon />}
                               variant="contained"
                               color="primary"
+                              disabled={submitDisabled}
                               sx={{ borderRadius: 5, marginRight: 1 }}
                             >
                               Editar
@@ -213,16 +215,42 @@ export function ReviewForm({
             </Grid>
           </Box>
         ))}
-      {formData && !isPlaygroundTest && (
+      {formData && !isPlaygroundTest && !snackbarOpen && (
         <Button
-          onClick={onSubmitRequest}
+          onClick={handleSubmit}
           variant="contained"
           color="primary"
           sx={{ width: '50%', borderRadius: 5, justifyContent: 'bottom' }}
+          disabled={submitDisabled}
         >
           {t('Submit Form')}
         </Button>
       )}
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={10000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
+          sx={{
+            width: '100%',
+            fontSize: '1.25rem',
+            padding: '16px',
+            maxWidth: '600px',
+            margin: '0 auto',
+            boxShadow: 3,
+          }}
+        >
+          {t('Form submitted successfully')}
+        </Alert>
+      </Snackbar>
+      <Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={backdropOpen}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Container>
   );
 }
