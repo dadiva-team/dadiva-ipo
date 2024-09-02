@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Note } from '../../../../domain/Submission/Submission';
 import { QuestionModel } from '../../../../services/doctors/models/SubmissionOutputModel';
 
-interface UseFormDetailsProps {
+interface UsePendingSubmissionAnswersProps {
   notes: Note[];
   handleSaveNote: (questionId: string, noteContent: string) => void;
 }
 
-export function useFormDetails({ notes, handleSaveNote }: UseFormDetailsProps) {
+export function usePendingSubmissionAnswers({ notes, handleSaveNote }: UsePendingSubmissionAnswersProps) {
   const [open, setOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<QuestionModel | null>(null);
 

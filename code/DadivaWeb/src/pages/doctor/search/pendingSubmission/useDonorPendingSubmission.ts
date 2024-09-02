@@ -11,12 +11,12 @@ import {
 } from '../../../../services/doctors/models/SubmissionOutputModel';
 import { checkInconsistencies } from '../utils/DoctorSearchUtils';
 
-interface UsePendingSubmissionCheckProps {
+interface useDonorPendingSubmissionProps {
   submission: SubmissionModel;
   onSubmittedSuccessfully: () => void;
 }
 
-export function usePendingSubmissionResults({ submission, onSubmittedSuccessfully }: UsePendingSubmissionCheckProps) {
+export function useDonorPendingSubmission({ submission, onSubmittedSuccessfully }: useDonorPendingSubmissionProps) {
   const nav = useNavigate();
   const location = useLocation();
 

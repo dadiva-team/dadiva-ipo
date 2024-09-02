@@ -5,10 +5,10 @@ import { DonorSearchNic } from './DoctorSearchNic';
 import { DoctorSearchButtons } from './DoctorSearchButtons';
 import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
-import { PendingSubmissionResults } from './pendingSubmission/PendingSubmissionResults';
+import { DonorPendingSubmission } from './pendingSubmission/DonorPendingSubmission';
 import { useDoctorSearch } from './useDoctorSearch';
 import { DonorSuspension } from './donorSuspension/DonorSuspension';
-import { OldSubmissionsResults } from './oldSubmissions/OldSubmissionsResults';
+import { DonorReviews } from './donorReviews/DonorReviews';
 
 export interface DoctorSearchProps {
   mode: string;
@@ -75,16 +75,13 @@ export function DoctorSearch({ mode }: DoctorSearchProps) {
           <Box sx={{ marginLeft: 2, width: '80%', borderLeft: '6px solid #1976d2', pl: 2 }}>
             {errorSubmission && <ErrorAlert error={errorSubmission} clearError={() => setErrorSubmission(null)} />}
             {pendingView && pendingSubmission && (
-              <PendingSubmissionResults
-                submission={pendingSubmission}
-                onSubmittedSuccessfully={onSubmitedSuccessfully}
-              />
+              <DonorPendingSubmission submission={pendingSubmission} onSubmittedSuccessfully={onSubmitedSuccessfully} />
             )}
             {reviewHistoryView && reviewsHistory && (
-              <OldSubmissionsResults
-                submissions={reviewsHistory}
-                loadMoreSubmissions={loadMoreReviews}
-                hasMoreSubmissions={hasMoreSubmissions}
+              <DonorReviews
+                reviews={reviewsHistory}
+                loadMoreReviews={loadMoreReviews}
+                hasMoreReviews={hasMoreSubmissions}
               />
             )}
             {suspensionView && (

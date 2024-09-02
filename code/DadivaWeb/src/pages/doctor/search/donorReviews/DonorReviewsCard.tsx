@@ -15,7 +15,7 @@ import {
 import React from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ReviewHistoryModel, ReviewStatus } from '../../../../services/doctors/models/SubmissionHistoryOutputModel';
-import { OldSubmissionsAnswers } from './OldSubmissionAnswers';
+import { DonorReviewsAnswers } from './DonorReviewsAnswers';
 import { lightGreen, lightRed } from '../../../../components/shared/uiColors';
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -34,12 +34,12 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-interface OldSubmissionCardProps {
+interface DonorReviewsCardProps {
   review: ReviewHistoryModel;
   isLastSubmission: boolean;
 }
 
-export function OldSubmissionCard({ review, isLastSubmission }: OldSubmissionCardProps) {
+export function DonorReviewsCard({ review, isLastSubmission }: DonorReviewsCardProps) {
   const [expanded, setExpanded] = React.useState(false);
   const [notesVisible, setNotesVisible] = React.useState(true);
   const cardBorder = review.status === ReviewStatus.Approved ? lightGreen : lightRed;
@@ -84,7 +84,11 @@ export function OldSubmissionCard({ review, isLastSubmission }: OldSubmissionCar
               />
             )}
           </Box>
-          <OldSubmissionsAnswers submission={review.submission} isLastSubmission={isLastSubmission} />
+          <DonorReviewsAnswers
+            submission={review.submission}
+            isLastSubmission={isLastSubmission}
+            notesVisible={notesVisible}
+          />
         </CardContent>
       </Collapse>
     </Card>

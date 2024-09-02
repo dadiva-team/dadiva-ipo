@@ -1,22 +1,22 @@
 import React from 'react';
 import { Box, Button, Divider } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { FormDetails } from './FormDetails';
+import { PendingSubmissionAnswers } from './PendingSubmissionAnswers';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import CloseIcon from '@mui/icons-material/Close';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { usePendingSubmissionResults } from './usePendingSubmissionResults';
-import { ReviewDialog } from './ReviewDialog';
+import { useDonorPendingSubmission } from './useDonorPendingSubmission';
+import { ReviewDialog } from './dialog/ReviewDialog';
 import { InfoAlert } from '../../../../components/shared/InfoAlert';
 import { SubmissionModel } from '../../../../services/doctors/models/SubmissionOutputModel';
 
-interface PendingSubmissionPendingProps {
+interface DonorPendingSubmissionProps {
   submission: SubmissionModel;
   onSubmittedSuccessfully: () => void;
 }
 
-export function PendingSubmissionResults({ submission, onSubmittedSuccessfully }: PendingSubmissionPendingProps) {
+export function DonorPendingSubmission({ submission, onSubmittedSuccessfully }: DonorPendingSubmissionProps) {
   const {
     formWithAnswers,
     inconsistencies,
@@ -32,7 +32,7 @@ export function PendingSubmissionResults({ submission, onSubmittedSuccessfully }
     handleDialogClose,
     handleDialogSubmit,
     setFinalNote,
-  } = usePendingSubmissionResults({ submission, onSubmittedSuccessfully });
+  } = useDonorPendingSubmission({ submission, onSubmittedSuccessfully });
 
   return (
     <Box>
@@ -76,7 +76,7 @@ export function PendingSubmissionResults({ submission, onSubmittedSuccessfully }
       </Box>
       {showDetails && formWithAnswers && (
         <Box sx={{ pt: 2 }}>
-          <FormDetails
+          <PendingSubmissionAnswers
             formWithAnswers={formWithAnswers}
             inconsistencies={inconsistencies}
             notes={notes}

@@ -4,8 +4,8 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { NoteDialog } from './NoteDialog';
-import { useFormDetails } from './useFormDetails';
+import { NoteDialog } from './dialog/NoteDialog';
+import { usePendingSubmissionAnswers } from './usePendingSubmissionAnswers';
 import { Note } from '../../../../domain/Submission/Submission';
 import React from 'react';
 import { Uris } from '../../../../utils/navigation/Uris';
@@ -15,18 +15,24 @@ import {
 } from '../../../../services/doctors/models/SubmissionOutputModel';
 import DOCTOR_MEDICATION_INFORMATION_COMPLETE = Uris.DOCTOR_MEDICATION_INFORMATION_COMPLETE;
 
-interface FormDetailsProps {
+interface PendingSubmissionAnswersProps {
   formWithAnswers: SubmissionAnsweredQuestionModel[];
   inconsistencies?: string[][];
   notes: Note[];
   handleSaveNote: (questionId: string, noteContent: string) => void;
 }
 
-export function FormDetails({ formWithAnswers, inconsistencies, notes, handleSaveNote }: FormDetailsProps) {
-  const { open, selectedQuestion, handleClickOpen, handleClose, saveNote, getNoteContent } = useFormDetails({
-    notes,
-    handleSaveNote,
-  });
+export function PendingSubmissionAnswers({
+  formWithAnswers,
+  inconsistencies,
+  notes,
+  handleSaveNote,
+}: PendingSubmissionAnswersProps) {
+  const { open, selectedQuestion, handleClickOpen, handleClose, saveNote, getNoteContent } =
+    usePendingSubmissionAnswers({
+      notes,
+      handleSaveNote,
+    });
 
   return (
     <Box sx={{ border: 0.5, maxHeight: 300, overflowY: 'auto' }}>
@@ -87,28 +93,66 @@ export const renderAnswer = (questionWAnswer: SubmissionAnsweredQuestionModel) =
   if (questionWAnswer.question.type == QuestionType.boolean) {
     return answer ? <CheckIcon color="success" /> : <CloseIcon color="error" />;
   } else if (questionWAnswer.question.type == QuestionType.text) {
-    return <Typography variant="body1">{answer.toString()}</Typography>;
-  } else if (typeof answer === 'object') {
-    if (questionWAnswer.question.type == QuestionType.medications) {
-      return (
-        <Grid container direction="column">
+    return (
+      <Typography
+        variant="body1"
+        sx={{
+          wordBreak: 'break-word',
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'break-word',
+        }}
+      >
+        {answer.toString()}
+      </Typography>
+    );
+  } else if (questionWAnswer.question.type == QuestionType.medications && Array.isArray(answer)) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Grid container direction="column" sx={{ alignItems: 'flex-end' }}>
           {answer.map(ans => (
-            <Link target="_blank" key={ans} href={DOCTOR_MEDICATION_INFORMATION_COMPLETE(ans)}>
-              {ans}
+            <Link
+              target="_blank"
+              key={ans}
+              href={DOCTOR_MEDICATION_INFORMATION_COMPLETE(ans)}
+              sx={{
+                wordBreak: 'break-word',
+                overflowWrap: 'break-word',
+              }}
+            >
+              {ans + ' '}
             </Link>
           ))}
         </Grid>
-      );
-    } else {
-      return (
-        <Grid container direction="column">
-          {answer.map(ans => (
-            <p key={ans}>{ans}</p>
-          ))}
-        </Grid>
-      );
-    }
+      </Box>
+    );
+  } else if (
+    (questionWAnswer.question.type == QuestionType.dropdown ||
+      questionWAnswer.question.type == QuestionType.countries) &&
+    Array.isArray(answer)
+  ) {
+    return (
+      <Typography
+        sx={{
+          wordBreak: 'break-word',
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'break-word',
+        }}
+      >
+        {answer.join(', ')}
+      </Typography>
+    );
   } else {
-    return <Typography variant="body1">{answer}</Typography>;
+    return (
+      <Typography
+        variant="body1"
+        sx={{
+          wordBreak: 'break-word',
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'break-word',
+        }}
+      >
+        {answer}
+      </Typography>
+    );
   }
 };
