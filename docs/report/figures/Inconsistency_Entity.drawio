@@ -1,0 +1,47 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" version="24.7.4">
+  <diagram name="Page-1" id="_AJAc0d17FaqXnhJjRDk">
+    <mxGraphModel dx="500" dy="269" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="QlzKkjJCL40SeH64I0l2-1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;endArrow=none;endFill=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="QlzKkjJCL40SeH64I0l2-2" target="QlzKkjJCL40SeH64I0l2-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="459" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-2" value="Inconsistency" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="399" y="350" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="QlzKkjJCL40SeH64I0l2-12" target="QlzKkjJCL40SeH64I0l2-9">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="400" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-8" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="QlzKkjJCL40SeH64I0l2-9" target="QlzKkjJCL40SeH64I0l2-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-9" value="has" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="340" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-11" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="QlzKkjJCL40SeH64I0l2-12" target="QlzKkjJCL40SeH64I0l2-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-12" value="Rule" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="350" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-14" value="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="519" y="350" width="21" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-15" value="N" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="650" y="350" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-17" value="&lt;u&gt;Id&lt;/u&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="695" y="290" width="70" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="QlzKkjJCL40SeH64I0l2-18" value="&lt;u&gt;Id&lt;/u&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="424" y="290" width="70" height="37.5" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

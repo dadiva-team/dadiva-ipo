@@ -1,0 +1,11 @@
+\chapter{Future Work} \label{cap:future}
+
+The IPST medication guideline are organized in a table like manner, in the following column layout:
+\begin{enumerate}
+	\item Class/Group of Medication: This column categorizes medications.
+	\item Active Substance/Commercial Name: This column lists either the active ingredient or the brand name of the medication.
+	\item Criteria: This column specifies if a particular class or group of medications affects eligibility for blood donation, including details such as the duration of ineligibility and other relevant conditions.
+\end{enumerate}
+The terms used in the first column are, from what we can access, similar to the available pharmacotherapeutic classifications. A reliable source of a drug's pharmacotherapeutic classification is a portal provided by Infarmed to it's partner organizations, such as Lisbon's IPO.
+As such, upon a donor's form submission, assuming they were taking some medication, our application would perform requests to said portal, get the appropriate pharmacotherapeutic classification and, by cross-checking the classification with the term used in the first column of the guidelines, return the relevant interaction information.
+However, the terms used in the guidelines don't always reflect the available classifications, and, as such, the platform would need to employ some form of automated categorization, and allow for manual manipulation of these associations by the administrators.

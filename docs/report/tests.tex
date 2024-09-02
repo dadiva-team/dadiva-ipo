@@ -1,0 +1,30 @@
+\chapter{Tests} \label{cap:tests}
+
+Testing is a crucial step in ensuring the reliability and functionality of our application. This chapter outlines the approaches and tools used to validate the correctness of our code.
+
+\section{Manual Testing}
+
+During the development of the application, particularly on the backend, manual testing was employed to verify that the system behaved as expected. The primary tools used for manual testing were:
+
+\begin{itemize} 
+	\item \textbf{Swagger:} Swagger was utilized to test the API through HTTP requests. Although Swagger is primarily an API documentation and automation tool, it provides the necessary features for effective manual testing of APIs. 
+	\item \textbf{Postman:} Postman was occasionally used to interact with ElasticSearch, specifically for data retrieval and storage operations. 
+\end{itemize}
+
+\section{Programmatic Testing}
+Programmatic testing involves the use of specialized software tools to ensure the correctness and robustness of the application. This approach allows for repetitive and comprehensive testing of the codebase, improving efficiency and coverage.
+
+\subsection{Unit Tests}
+Unit tests are designed to verify the behavior of individual components or modules in isolation. We followed the Arrange-Act-Assert (AAA) pattern to structure our unit tests:
+
+\begin{itemize} 
+	\item \textbf{Arrange:} Prepare the necessary preconditions and inputs for the test. 
+	\item \textbf{Act:} Execute the operation or function being tested. 
+	\item \textbf{Assert:} Verify that the outcome matches the expected result. 
+\end{itemize}
+
+We employed xUnit.net, a free and open-source unit testing tool for the .NET framework, to execute our unit tests.
+
+\subsection{Integration Tests}
+
+TODO
