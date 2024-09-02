@@ -32,7 +32,7 @@ import DOCTOR_MEDICATION_INFORMATION = Uris.DOCTOR_MEDICATION_INFORMATION;
 import DOCTOR_MEDICATION_SEARCH = Uris.DOCTOR_MEDICATION_SEARCH;
 import { MedicationSearch } from './pages/doctor/medications/MedicationSearch';
 import { MedicationInformation } from './pages/doctor/medications/MedicationInformation';
-import { PendingSubmissions } from './pages/doctor/PendingSubmissions';
+import { PendingSubmissions } from './pages/doctor/pendingSubmissions/PendingSubmissions';
 import { StatsPage } from './components/backoffice/statistics/StatsPage';
 
 export default function App() {

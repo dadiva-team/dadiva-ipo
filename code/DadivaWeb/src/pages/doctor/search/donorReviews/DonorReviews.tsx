@@ -17,7 +17,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { ReviewStatus, ReviewHistoryModel } from '../../../../services/doctors/models/SubmissionHistoryOutputModel';
-import { OldSubmissionCard } from './OldSubmissionCard';
+import { DonorReviewsCard } from './DonorReviewsCard';
 
 type FilterStatus = ReviewStatus | 'all';
 
@@ -27,16 +27,12 @@ export enum ViewMode {
 }
 
 interface OldSubmissionsPendingProps {
-  submissions: ReviewHistoryModel[];
-  loadMoreSubmissions: () => void;
-  hasMoreSubmissions: boolean;
+  reviews: ReviewHistoryModel[];
+  loadMoreReviews: () => void;
+  hasMoreReviews: boolean;
 }
 
-export function OldSubmissionsResults({
-  submissions,
-  loadMoreSubmissions,
-  hasMoreSubmissions,
-}: OldSubmissionsPendingProps) {
+export function DonorReviews({ reviews, loadMoreReviews, hasMoreReviews }: OldSubmissionsPendingProps) {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.Grid);
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('all');
   const [yearFilter, setYearFilter] = useState<string>('all');
@@ -60,7 +56,7 @@ export function OldSubmissionsResults({
     setFiltersVisible(!filtersVisible);
   };
 
-  const filteredSubmissions = Array.from(submissions.values()).filter(submission => {
+  const filteredSubmissions = Array.from(reviews.values()).filter(submission => {
     const statusMatches = statusFilter === 'all' || submission.status === statusFilter;
     const yearMatches = yearFilter === 'all' || new Date(submission.reviewDate).getFullYear().toString() === yearFilter;
     return statusMatches && yearMatches;
@@ -94,7 +90,7 @@ export function OldSubmissionsResults({
             <Select labelId="year-filter-label" value={yearFilter} onChange={handleYearFilterChange} label="Ano">
               <MenuItem value="all">-</MenuItem>
               {Array.from(
-                new Set(Array.from(submissions.values()).map(sub => new Date(sub.reviewDate).getFullYear().toString()))
+                new Set(Array.from(reviews.values()).map(sub => new Date(sub.reviewDate).getFullYear().toString()))
               ).map(year => (
                 <MenuItem key={year} value={year}>
                   {year}
@@ -128,12 +124,12 @@ export function OldSubmissionsResults({
       >
         {filteredSubmissions.map((submission, index) => (
           <Box key={index}>
-            <OldSubmissionCard review={submission} isLastSubmission={index === filteredSubmissions.length - 1} />
+            <DonorReviewsCard review={submission} isLastSubmission={index === filteredSubmissions.length - 1} />
           </Box>
         ))}
       </Box>
-      <Button onClick={loadMoreSubmissions} disabled={!hasMoreSubmissions} variant="contained" sx={{ mt: 2 }}>
-        {hasMoreSubmissions ? 'Carregar mais' : 'Não há mais submissões'}
+      <Button onClick={loadMoreReviews} disabled={!hasMoreReviews} variant="contained" sx={{ mt: 2 }}>
+        {hasMoreReviews ? 'Carregar mais' : 'Não há mais submissões'}
       </Button>
     </Box>
   );

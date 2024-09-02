@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, DialogActions, DialogContentText, Divider, IconButton, Modal, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Close } from '@mui/icons-material';
-import { PendingSubmissionResults } from './search/pendingSubmission/PendingSubmissionResults';
+import { DonorPendingSubmission } from '../search/pendingSubmission/DonorPendingSubmission';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import { handleRequest } from '../../services/utils/fetch';
-import { DoctorServices } from '../../services/doctors/DoctorServices';
-import { useNavigate } from 'react-router-dom';
-import { Uris } from '../../utils/navigation/Uris';
+import { handleRequest } from '../../../services/utils/fetch';
+import { DoctorServices } from '../../../services/doctors/DoctorServices';
+import { Uris } from '../../../utils/navigation/Uris';
 import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
-import { SubmissionModel } from '../../services/doctors/models/SubmissionOutputModel';
+import { SubmissionModel } from '../../../services/doctors/models/SubmissionOutputModel';
 
 export interface PendingSubmissionCardProps {
   submission: SubmissionModel;
@@ -34,7 +33,6 @@ export function PendingSubmissionCard({
   onSubmitedSuccessfully,
   forceCloseModal,
 }: PendingSubmissionCardProps) {
-  const nav = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
@@ -116,7 +114,7 @@ export function PendingSubmissionCard({
             </IconButton>
           </Box>
           <Divider sx={{ p: 0.5 }} />
-          <PendingSubmissionResults
+          <DonorPendingSubmission
             submission={submission}
             onSubmittedSuccessfully={() => {
               handleCloseModal();
@@ -125,7 +123,7 @@ export function PendingSubmissionCard({
           />
           <Button
             sx={{ pt: 2 }}
-            onClick={() => nav(DOCTOR_SEARCH_NIC + `?nic=${submission.donor.nic}`)}
+            onClick={() => window.open(DOCTOR_SEARCH_NIC + `?nic=${submission.donor.nic}`)}
             endIcon={<OpenInNewIcon />}
           >
             Ver perfil do dador
