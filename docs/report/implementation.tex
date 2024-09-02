@@ -45,7 +45,7 @@ The .NET framework makes use of a dependency injection container, aka the servic
 Beyond this, the framework also makes use of the builder pattern, meaning to build a web application we first instantiate a builder, i.e. a class that "knows" how to build a web application, and then supply the needed middlewares to build it, with the desired lifetime.
 The aforementioned middlewares, which refer to the services and repositories, are registered as services in the container. In our application these services were registered with the Scoped scope, as follows:
 
-\begin{lstlisting}[style=sharpc]
+\begin{lstlisting}[style=sharpc, caption=Adding middlewares using dependency injection and inversion of control]
 	builder.Services.AddScoped<IUsersService, UsersService>();
 	builder.Services.AddScoped<IFormService, FormService>();
 	builder.Services.AddScoped<ITermsService, TermsService>();
@@ -60,7 +60,7 @@ Using this registration method, for example, when a dependency of type IUsersSer
 
 To allow for cross-origin resource sharing, i.e. to allow the frontend client to access the resources in the backend, we also had to create CORS policy, as follows:
 
-\begin{lstlisting}[style=sharpc]
+\begin{lstlisting}[style=sharpc, caption={Configuring CORS Policy in ASP.NET Core: Allowing Specific Origin with Full Access Control.}]
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("MyCorsPolicy",
@@ -79,9 +79,9 @@ Notice that request originating from port 8000 of the localhost ip can have any 
 \subsubsection{Authentication JWT}
 
 Our platform uses JSON Web Tokens, \textbf{JWT} \cite{rfc7519}, to represent user claims.
-These token's issuer, audience and key, refered to as jwtIssuer, jwtAudience and jwtKey in the listing below, are stored in the appsettings.json file.
+These token's issuer, audience and key, refered to as jwtIssuer, jwtAudience and jwtKey in listing \ref{authentication} below, are stored in the appsettings.json file.
 
-\begin{lstlisting}[style=sharpc]
+\begin{lstlisting}[style=sharpc, caption={Custom JWT Authentication Middleware in ASP.NET Core: Handling Unauthorized Access with Detailed Problem Responses.}, label={authentication}] 
 builder.Services.AddAuthentication(x =>
 {
 	x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
