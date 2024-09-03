@@ -106,7 +106,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
         {
             var success = await repository.DeleteUser(nic);
             return !success
-                ? Result.Fail(new UserError.TokenCreationError())
+                ? Result.Fail(new UserError.UserNotDeletedError())
                 : //TODO: Custom error
                 Result.Ok();
         });
@@ -118,7 +118,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
         {
             var user = await repository.GetUserByNic(nic);
             return user == null
-                ? Result.Fail(new UserError.TokenCreationError()) //TODO: Custom Error
+                ? Result.Fail(new UserError.UserNotFoundError())
                 : Result.Ok(new UserWithNameExternalInfo(user.Name, user.Nic));
         });
     }

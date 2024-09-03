@@ -205,6 +205,22 @@ public static class HttpExtensions
                     Status = StatusCodes.Status500InternalServerError,
                     Detail = "Ocorreu um erro ao tentar criar o token."
                 };
+            case UserError.UserNotDeletedError:
+                return new ProblemDetails
+                {
+                    Type = $"{BaseUrl}/probs/user-not-deleted",
+                    Title = "Conta do Dador não apagada",
+                    Status = StatusCodes.Status500InternalServerError,
+                    Detail = "Occoreu um error ao apagar a conta do Dador."
+                };
+            case UserError.UserNotFoundError:
+                return new ProblemDetails
+                {
+                    Type = $"{BaseUrl}/probs/user-not-found",
+                    Title = "Dador não encontrado",
+                    Status = StatusCodes.Status404NotFound,
+                    Detail = "O dador com esse NIC não foi encontrado."
+                };
             case UserError.UnknownDonorError:
                 return new ProblemDetails
                 {
