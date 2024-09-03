@@ -165,7 +165,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
                 : Result.Ok();
         });
     }
-    
+
     public async Task<Result> AddPendingReviewSuspension(string donorNic, string startDate)
     {
         return await context.WithTransaction(async () =>
@@ -244,17 +244,17 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             var suspensionEntity = await repository.GetSuspension(userNic);
             if (suspensionEntity is null)
             {
-                return Result.Fail(new UserError.TokenCreationError()); //TODO: Custom Error
+                return Result.Fail(new UserError.UserHasNoSuspensionError());
             }
 
             return Result.Ok(new SuspensionWithNamesExternalInfo(
-                suspensionEntity.Donor.Nic,
-                suspensionEntity.Donor.Name,
-                suspensionEntity.Doctor.Nic,
-                suspensionEntity.Doctor.Name,
+                new UserWithNameExternalInfo(suspensionEntity.Donor.Name, suspensionEntity.Donor.Nic),
+                suspensionEntity.Doctor is null
+                    ? null
+                    : new UserWithNameExternalInfo(suspensionEntity.Doctor.Name, suspensionEntity.Doctor.Nic),
                 suspensionEntity.Type,
-                suspensionEntity.StartDate.ToString(),
-                suspensionEntity.EndDate?.ToString(),
+                suspensionEntity.StartDate.ToString("yyyy-MM-dd"),
+                suspensionEntity.EndDate?.ToString("yyyy-MM-dd"),
                 suspensionEntity.Reason,
                 suspensionEntity.Note
             ));

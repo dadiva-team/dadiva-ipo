@@ -1,19 +1,37 @@
-import { AllConditions, ConditionProperties, RuleProperties } from 'json-rules-engine';
 import React from 'react';
-import { Box, Button, IconButton } from '@mui/material';
+import { Box, Button, Divider, IconButton, TextField, Typography } from '@mui/material';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import { Group } from '../../../domain/Form/Form';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Typography from '@mui/material/Typography';
+import { AllConditions, ConditionProperties, RuleProperties } from 'json-rules-engine';
+import { Group } from '../../../domain/Form/Form';
+import { translateResponse } from '../editForm/utils';
+import { Edit } from '@mui/icons-material';
 
 export interface InconsistencyProps {
   inconsistency: RuleProperties;
   groups: Group[];
   onAddCondition: () => void;
-  onDelete: () => void;
+  onDelete: (index: number) => void;
+  onDeleteGroup: () => void;
+  onOpenEditDialog: (index: number, condition: ConditionProperties) => void;
+  setReason: (reason: string) => void;
+  reason: string;
 }
 
-export function Inconsistency({ inconsistency, groups, onAddCondition, onDelete }: InconsistencyProps) {
+function translateOperator(operator: string): string {
+  return translations[operator] || operator;
+}
+
+export function Inconsistency({
+  inconsistency,
+  groups,
+  onAddCondition,
+  onDelete,
+  onDeleteGroup,
+  reason,
+  setReason,
+  onOpenEditDialog,
+}: InconsistencyProps) {
   return (
     <Box
       sx={{
@@ -22,65 +40,97 @@ export function Inconsistency({ inconsistency, groups, onAddCondition, onDelete 
         flexDirection: 'column',
         justifyContent: 'space-between',
         border: 1,
+        p: 2,
       }}
     >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+        }}
+      >
+        <TextField
+          autoFocus
+          margin="dense"
+          id="reason"
+          label="Razão da incoerência"
+          type="text"
+          fullWidth
+          variant="outlined"
+          value={reason}
+          sx={{ width: '75%' }}
+          onChange={e => setReason(e.target.value)}
+        />
+        <Button
+          color="warning"
+          variant="outlined"
+          onClick={() => onDeleteGroup()}
+          startIcon={<DeleteIcon />}
+          sx={{ borderRadius: 50 }}
+        >
+          Apagar grupo
+        </Button>
+      </Box>
+
+      <Divider sx={{ mt: 1 }} />
+
       {(inconsistency.conditions as AllConditions).all.map((_condition, index) => {
         const condition = _condition as ConditionProperties;
+        const questionText = groups
+          .flatMap(group => group.questions)
+          .find(question => question.id === condition.fact)?.text;
+
         return (
-          <Box
-            key={index}
-            sx={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
+          <>
             <Box
+              key={index}
               sx={{
-                pl: 0.5,
-                width: '50%',
-                border: 1,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                mb: 1,
+                mt: 1,
               }}
             >
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                {groups.flatMap(group => group.questions).find(question => question.id === condition.fact)?.text ??
-                  'INVALID QUESTION ID'}
-              </Typography>
+              <Box sx={{ width: '50%' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  Questão:
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  {questionText ?? 'INVALID QUESTION ID'}
+                </Typography>
+              </Box>
+              <Box sx={{ width: '10%' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  Condição:
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  {translateOperator(condition.operator)}
+                </Typography>
+              </Box>
+              <Box sx={{ width: '25%', ml: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                  Resposta:
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  {translateResponse(condition.value)}
+                </Typography>
+              </Box>
+              <Button
+                color="warning"
+                variant="outlined"
+                onClick={() => onDelete(index)}
+                startIcon={<DeleteIcon />}
+                sx={{ borderRadius: 50, height: 40 }}
+              />
+              <IconButton edge="end" aria-label="down" onClick={() => onOpenEditDialog(index, condition)}>
+                <Edit />
+              </IconButton>
             </Box>
-            <Box
-              sx={{
-                pl: 0.5,
-                width: '15%',
-                border: 1,
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                {condition.operator}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                pl: 0.5,
-                width: '25%',
-                border: 1,
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                {' '}
-                {condition.value}{' '}
-              </Typography>
-            </Box>
-            <Button
-              color="warning"
-              variant="outlined"
-              onClick={() => onDelete()}
-              startIcon={<DeleteIcon />}
-              sx={{ borderRadius: 50, height: 40 }}
-            >
-              Apagar
-            </Button>
-          </Box>
+            <Divider />
+          </>
         );
       })}
       <Box
@@ -97,3 +147,18 @@ export function Inconsistency({ inconsistency, groups, onAddCondition, onDelete 
     </Box>
   );
 }
+
+type OperatorTranslations = {
+  [key: string]: string;
+};
+
+const translations: OperatorTranslations = {
+  equal: 'igual a',
+  notEqual: 'diferente de',
+  greaterThan: 'maior que',
+  greaterThanInclusive: 'maior ou igual a',
+  lessThan: 'menor que',
+  lessThanInclusive: 'menor ou igual a',
+  in: 'em',
+  notIn: 'não em',
+};

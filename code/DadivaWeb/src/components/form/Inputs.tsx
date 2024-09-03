@@ -100,8 +100,32 @@ type SubmitFormButtonProps = {
 
 export function SubmitFormButton({ onSubmit }: SubmitFormButtonProps) {
   return (
-    <Button variant="contained" onClick={onSubmit} startIcon={<PublishIcon />} sx={{ borderRadius: 50 }}>
+    <Button
+      variant="contained"
+      onClick={onSubmit}
+      startIcon={<PublishIcon />}
+      sx={{ borderRadius: 50, alignItems: 'center' }}
+    >
       Submeter formulario
+    </Button>
+  );
+}
+
+type SubmitInconsistenciesButtonProps = {
+  onSubmit: () => void;
+  disabled: boolean;
+};
+
+export function SubmitInconsistenciesButton({ onSubmit, disabled }: SubmitInconsistenciesButtonProps) {
+  return (
+    <Button
+      variant="contained"
+      onClick={onSubmit}
+      startIcon={<PublishIcon />}
+      disabled={disabled}
+      sx={{ borderRadius: 50, alignItems: 'center' }}
+    >
+      Submeter Inconsistências
     </Button>
   );
 }

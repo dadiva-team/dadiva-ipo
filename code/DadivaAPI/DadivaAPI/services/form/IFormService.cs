@@ -17,11 +17,11 @@ public interface IFormService
         string nic
     );
 
-    public Task<Result<GetInconsistenciesOutputModel>> GetInconsistencies();
+    public Task<Result<GetInconsistenciesOutputModel>> GetInconsistencies(string language);
     public Task<Result> EditInconsistencies(
         List<RuleModel> inconsistencies,
         string nic,
         string language,
-        string? reason
+        List<string>? reason
     );
 }

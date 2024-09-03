@@ -15,7 +15,7 @@ public static class FormRoutes
             .AllowAnonymous();//.RequireAuthorization("doctor");
         group.MapPut("/structure", AddForm).RequireAuthorization("admin");
 
-        group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor");
+        group.MapGet("/inconsistencies/{language}", GetInconsistencies).RequireAuthorization("doctor");
         group.MapPut("/inconsistencies", EditInconsistencies).RequireAuthorization("admin");
     }
 
@@ -41,9 +41,10 @@ public static class FormRoutes
             .HandleRequest(Results.NoContent);
     }
 
-    private static async Task<IResult> GetInconsistencies( IFormService service)
+
+    private static async Task<IResult> GetInconsistencies([FromRoute] string language,  IFormService service)
     {
-        return (await service.GetInconsistencies()).HandleRequest(Results.Ok);
+        return (await service.GetInconsistencies(language)).HandleRequest(Results.Ok);
     }
 
     private static async Task<IResult> EditInconsistencies(

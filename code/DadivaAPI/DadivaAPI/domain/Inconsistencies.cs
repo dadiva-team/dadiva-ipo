@@ -6,7 +6,7 @@ namespace DadivaAPI.domain;
 
 public record Inconsistencies(
     List<Rule> InconsistencyList,
-    string? Reason,
+    List<string>? Reason,
     DateTime Date,
     user.User Admin,
     Form Form
@@ -15,7 +15,6 @@ public record Inconsistencies(
     public int Id { get; init; }
     public InconsistencyEntity ToEntity()
     {
-        // Convert the Inconsistencies to a list of RuleEntity objects
         var ruleEntities = InconsistencyList.Select(r => r.ToEntity()).ToList();
 
         return new InconsistencyEntity
@@ -24,7 +23,7 @@ public record Inconsistencies(
             Reason = Reason,
             Rules = ruleEntities,
             Admin = DomainToFromEntityExtensions.ToEntity(Admin),
-            Form = this.Form.ToEntity(null, Form.AddedBy.ToEntity(), Reason)
+            Form = this.Form.ToEntity(null, Form.AddedBy.ToEntity(), null)
         };
     }
     

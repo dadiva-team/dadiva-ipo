@@ -7,7 +7,7 @@ public class InconsistencyEntity
 {
     public int Id { get; set; }
     public required DateTime Date { get; set; }
-    [MaxLength(256)] public required string? Reason { get; set; }
+    [MaxLength(256)] public List<string>? Reason { get; set; }
     
     public required List<RuleEntity> Rules { get; set; }
     

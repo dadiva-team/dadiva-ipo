@@ -85,7 +85,7 @@ export function PendingSubmissionCard({
   return (
     <Box sx={{ pl: 2 }}>
       <Typography>
-        <strong>Formulario submetido: </strong> {submission.submissionDate}
+        <strong>Formulário submetido: </strong> {new Date(submission.submissionDate).toLocaleString()}
       </Typography>
       <Button endIcon={<OpenInNewIcon />} onClick={handleOpenModal} disabled={locked || isReviewing}>
         {locked ? 'Submissão a ser revista' : 'Rever'}

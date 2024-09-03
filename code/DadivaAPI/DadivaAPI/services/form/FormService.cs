@@ -2,6 +2,7 @@ using DadivaAPI.domain;
 using DadivaAPI.repositories;
 using DadivaAPI.repositories.Entities;
 using DadivaAPI.routes.form.models;
+using DadivaAPI.services.submissions.dtos;
 using DadivaAPI.services.users;
 using DadivaAPI.utils;
 using FluentResults;
@@ -21,7 +22,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
 
             if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
                 return Result.Fail(new FormErrors.InvalidLanguageError());
-            
+
             var formEntity = await repository.GetForm(language);
             if (formEntity is null && parsedLanguage != FormLanguages.En)
             {
@@ -75,22 +76,38 @@ public class FormService(IRepository repository, DadivaDbContext context)
     }
 
 
-    public async Task<Result<GetInconsistenciesOutputModel>> GetInconsistencies()
+    public async Task<Result<GetInconsistenciesOutputModel>> GetInconsistencies(string language)
     {
         return await context.WithTransaction(async () =>
         {
-            var inconsistencyDto = await repository.GetInconsistencies();
+            var formEntity = await repository.GetForm(language);
+            var inconsistencyDto = await repository.GetInconsistencies(formEntity?.Id);
             if (inconsistencyDto is null)
             {
                 return Result.Fail(new FormErrors.NoInconsistenciesError());
             }
-            List<RuleModel>? inconsistencies = Inconsistencies.CreateMinimalSubmissionDomain(inconsistencyDto)?.InconsistencyList
+
+            Inconsistencies? inconsistencies = Inconsistencies.CreateMinimalSubmissionDomain(inconsistencyDto);
+
+            List<RuleModel>? rules = inconsistencies?.InconsistencyList
                 .Select(RuleModel.FromDomain)
                 .ToList();
-            
-            if (inconsistencies is null) return Result.Fail(new FormErrors.UnknownError());
-            
-            return Result.Ok(new GetInconsistenciesOutputModel(inconsistencies));
+            List<string> reasons = inconsistencies?.Reason ?? new List<string>();
+
+            if (rules == null || rules.Count != reasons.Count)
+            {
+                return Result.Fail(new FormErrors.UnknownError());
+            }
+
+            var ruleWithReasonList = rules
+                .Select((rule, index) => new RuleWithReason
+                {
+                    Rule = rule,
+                    Reason = reasons[index]
+                })
+                .ToList();
+
+            return Result.Ok(new GetInconsistenciesOutputModel(ruleWithReasonList));
         });
     }
 
@@ -98,7 +115,7 @@ public class FormService(IRepository repository, DadivaDbContext context)
         List<RuleModel> inconsistencies,
         string nic,
         string language,
-        string? reason
+        List<string>? reason
     )
     {
         return await context.WithTransaction(async () =>
@@ -106,12 +123,12 @@ public class FormService(IRepository repository, DadivaDbContext context)
             var admin = await repository.GetUserByNic(nic);
 
             if (admin is null) return Result.Fail(new UserError.UnknownAdminError());
-            
+
 
             if (!Enum.TryParse<FormLanguages>(language, out var parsedLanguage))
                 return Result.Fail(new FormErrors.InvalidLanguageError());
-            
-             List<Rule> rules = inconsistencies.Select(rm => RuleModel.ToDomain(rm)).ToList();
+
+            List<Rule> rules = inconsistencies.Select(rm => RuleModel.ToDomain(rm)).ToList();
 
             var formEntity = await repository.GetForm(language);
             if (formEntity is null)

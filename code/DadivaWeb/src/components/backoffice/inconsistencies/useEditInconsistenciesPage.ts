@@ -3,7 +3,7 @@ import { Form } from '../../../domain/Form/Form';
 import { useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { FormServices } from '../../../services/from/FormServices';
-import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
+import { ConditionProperties, RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { useTranslation } from 'react-i18next';
 
 export function useEditInconsistenciesPage() {
@@ -14,8 +14,16 @@ export function useEditInconsistenciesPage() {
   const [inconsistencies, setInconsistencies] = useState<RuleProperties[]>();
 
   const [addingCondition, setAddingCondition] = useState<number>(null);
+  const [editingCondition, setEditingCondition] = useState<{
+    groupIdx: number;
+    incIdx: number;
+    condition: ConditionProperties;
+  } | null>(null);
   const [addingInconsistency, setAddingInconsistency] = useState<boolean>(false);
   const [creatingGroup, setCreatingGroup] = useState<boolean>(false);
+  const [showForm, setShowForm] = useState<boolean>(false);
+
+  const [reasons, setReasons] = useState<string[]>([]);
 
   const nav = useNavigate();
 
@@ -27,7 +35,7 @@ export function useEditInconsistenciesPage() {
         return;
       }
       setFormFetchData(formRes);
-      const [incError, inconsistenciesRes] = await handleRequest(FormServices.getInconsistencies());
+      const [incError, inconsistenciesRes] = await handleRequest(FormServices.getInconsistencies(i18n.language));
 
       if (incError) {
         handleError(incError, setError, nav);
@@ -35,7 +43,8 @@ export function useEditInconsistenciesPage() {
       }
 
       console.log(inconsistenciesRes);
-      setInconsistencies(inconsistenciesRes);
+      setInconsistencies(inconsistenciesRes.map(inc => inc.rule));
+      setReasons(inconsistenciesRes.map(inc => inc.reason || ''));
       setIsLoading(false);
     };
 
@@ -46,15 +55,68 @@ export function useEditInconsistenciesPage() {
     setInconsistencies(old => {
       return [...old, { conditions: { all: [] }, event: { type: 'showInconsistency' } } as RuleProperties];
     });
+    setReasons(old => [...old, '']);
   }
 
   function onAddCondition(index: number) {
     setAddingCondition(index);
   }
 
-  function onDeletingInconsistency(index: number, inc: RuleProperties) {
-    console.log(inc);
+  function onDeletingInconsistencyGroup(index: number) {
     setInconsistencies(inconsistencies.filter((_, i) => i !== index));
+    setReasons(reasons.filter((_, i) => i !== index));
+  }
+
+  function onDeletingInconsistency(groupIdx: number, incIdx: number) {
+    setInconsistencies(
+      inconsistencies.map((group, i) => {
+        if (i === groupIdx) {
+          return {
+            ...group,
+            conditions: {
+              ...group.conditions,
+              all:
+                group.conditions && 'all' in group.conditions
+                  ? group.conditions.all.filter((_, j) => j !== incIdx)
+                  : [],
+            },
+          };
+        }
+        return group;
+      })
+    );
+  }
+
+  function onOpenEditDialog(groupIdx: number, incIdx: number, condition: ConditionProperties) {
+    setEditingCondition({ groupIdx, incIdx, condition });
+  }
+
+  function onEditCondition(groupIdx: number, incIdx: number, fact: string, value: string) {
+    setInconsistencies(
+      inconsistencies.map((group, i) => {
+        if (i === groupIdx) {
+          return {
+            ...group,
+            conditions: {
+              ...group.conditions,
+              all:
+                group.conditions && 'all' in group.conditions
+                  ? group.conditions.all.map((condition, j) =>
+                      j === incIdx
+                        ? {
+                            ...condition,
+                            fact,
+                            value,
+                          }
+                        : condition
+                    )
+                  : [],
+            },
+          };
+        }
+        return group;
+      })
+    );
   }
 
   function conditionAllIsEmpty(conditions?: TopLevelCondition) {
@@ -63,11 +125,36 @@ export function useEditInconsistenciesPage() {
   }
 
   function saveInconsistencies() {
+    const hasEmptyGroups = inconsistencies.some(inc => !('all' in inc.conditions) || inc.conditions.all.length === 0);
+    const hasEmptyReasons = reasons.some(reason => !reason || reason.trim() === '');
+
+    if (hasEmptyGroups) {
+      setError('É necessário adicionar pelo menos uma condição para cada grupo de inconsistências.');
+      return;
+    }
+
+    if (hasEmptyReasons) {
+      setError('É necessário adicionar um razão para cada grupo de inconsistências.');
+      return;
+    }
+
     const filteredInconsistencies = inconsistencies.filter(
       inc => 'all' in inc.conditions && inc.conditions.all.length !== 0
     );
-    FormServices.saveInconsistencies(filteredInconsistencies, i18n.language, 'TODO').then(res => {
+    FormServices.saveInconsistencies(filteredInconsistencies, i18n.language, reasons).then(res => {
       if (res) nav('/');
+    });
+  }
+
+  function onShowForm() {
+    setShowForm(!showForm);
+  }
+
+  function onAddReason(index: number, reason: string) {
+    setReasons(old => {
+      const newReasons = [...old];
+      newReasons[index] = reason;
+      return newReasons;
     });
   }
 
@@ -86,8 +173,17 @@ export function useEditInconsistenciesPage() {
     setError,
     onAddInconsistency,
     onAddCondition,
+    onEditCondition,
+    onDeletingInconsistencyGroup,
     onDeletingInconsistency,
     conditionAllIsEmpty,
     saveInconsistencies,
+    showForm,
+    onShowForm,
+    onAddReason,
+    reasons,
+    onOpenEditDialog,
+    editingCondition,
+    setEditingCondition,
   };
 }
