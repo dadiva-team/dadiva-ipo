@@ -1,10 +1,8 @@
 namespace DadivaAPI.services.users.dtos;
 
 public record SuspensionWithNamesExternalInfo(
-    string DonorNic,
-    string DonorName,
-    string DoctorNic,
-    string DoctorName,
+    UserWithNameExternalInfo Donor,
+    UserWithNameExternalInfo? Doctor,
     string SuspensionType,
     string SuspensionStartDate,
     string? SuspensionEndDate,

@@ -30,7 +30,7 @@ public class SubmissionService(
                 return Result.Fail(new UserError.SuspendedDonorError(donor.Suspensions.Last().Reason));
 
             if (!Enum.TryParse<SubmissionLanguages>(language, out var parsedLanguage))
-                return Result.Fail(new SubmissionError.InvalidLanguageError());
+                return Result.Fail(new SubmissionErrors.InvalidLanguageErrors());
 
             var form = await repository.GetForm(language);
             if (form is null)
@@ -62,7 +62,7 @@ public class SubmissionService(
 
             return submitted
                 ? Result.Ok(new SubmitSubmissionExternalInfo(submissionDate))
-                : Result.Fail(new SubmissionError.SubmissionNotSavedError());
+                : Result.Fail(new SubmissionErrors.SubmissionNotSavedErrors());
         });
     }
 
@@ -79,7 +79,7 @@ public class SubmissionService(
             if (lockEntity != null)
             {
                 if (lockEntity.Doctor.Nic == doctorNic) await repository.UpdatedLockedSubmission(lockEntity);
-                else return Result.Fail(new SubmissionError.AlreadyLockedByAnotherDoctor(lockEntity.Doctor.Name));
+                else return Result.Fail(new SubmissionErrors.AlreadyLockedByAnotherDoctor(lockEntity.Doctor.Name));
             }
             else
             {
@@ -103,14 +103,14 @@ public class SubmissionService(
             LockEntity? lockEntity = await repository.GetLock(submissionId);
 
             if (lockEntity is null)
-                return Result.Fail(new SubmissionError.SubmissionNotLockedError());
+                return Result.Fail(new SubmissionErrors.SubmissionNotLockedErrors());
 
             if (lockEntity.Doctor.Nic != doctorNic)
-                return Result.Fail(new SubmissionError.NotYourSubmissionToUnlock(lockEntity.Doctor.Name));
+                return Result.Fail(new SubmissionErrors.NotYourSubmissionToUnlock(lockEntity.Doctor.Name));
 
             var unlocked = await repository.UnlockSubmission(lockEntity);
             if (!unlocked)
-                return Result.Fail(new SubmissionError.SubmissionNotLockedError());
+                return Result.Fail(new SubmissionErrors.SubmissionNotLockedErrors());
 
 
             await notificationService.NotifyAllAsync(JsonSerializer.Serialize(new { type = "unlock", submissionId }));
@@ -139,7 +139,7 @@ public class SubmissionService(
             }
 
             return possibleErrors.Any()
-                ? Result.Fail(new SubmissionError.SubmissionNotLockedTimeoutError(possibleErrors))
+                ? Result.Fail(new SubmissionErrors.SubmissionNotLockedTimeoutErrors(possibleErrors))
                 : Result.Ok();
         });
     }
@@ -154,7 +154,7 @@ public class SubmissionService(
 
             var pendingSubmissions = await repository.GetPendingSubmissions();
             if (pendingSubmissions == null || !pendingSubmissions.Any())
-                return Result.Fail(new SubmissionError.NoPendingSubmissionsError());
+                return Result.Fail(new SubmissionErrors.NoPendingSubmissionsErrors());
 
             var formCache = new Dictionary<int, FormEntity>();
             var submissionResults = new List<SubmissionWithLockExternalInfo>();
@@ -196,7 +196,7 @@ public class SubmissionService(
 
             var submissionDto = await repository.GetLatestPendingSubmissionByUser(userNic);
             if (submissionDto is null)
-                return Result.Fail(new SubmissionError.SubmissionNotFoundError());
+                return Result.Fail(new SubmissionErrors.SubmissionNotFoundErrors());
 
             var submissionDomain = Submission.CreateMinimalSubmissionDomain(submissionDto);
             var inconsistenciesDomain = await repository.GetInconsistencies(submissionDomain.Form.Id);
@@ -222,7 +222,7 @@ public class SubmissionService(
             var (reviewsDto, hasMoreSubmissions) = await repository.GetSubmissionHistoryByUser(nic, limit, skip);
 
             if (reviewsDto == null || !reviewsDto.Any())
-                return Result.Fail(new SubmissionError.NoSubmissionsHistoryError());
+                return Result.Fail(new SubmissionErrors.NoSubmissionsHistoryErrors());
 
             var inconsistenciesCache = new Dictionary<int, List<RuleModel>?>();
             var reviewsResults = new List<ReviewHistoryFromReviewExternalInfo>();

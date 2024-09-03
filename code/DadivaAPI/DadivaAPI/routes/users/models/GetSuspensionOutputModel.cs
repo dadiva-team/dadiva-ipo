@@ -1,10 +1,10 @@
+using DadivaAPI.services.users.dtos;
+
 namespace DadivaAPI.routes.users.models;
 
 public record GetSuspensionOutputModel(
-    string DonorNic,
-    string DonorName,
-    string DoctorNic,
-    string DoctorName,
+    UserWithNameExternalInfo Donor,
+    UserWithNameExternalInfo? Doctor,
     string SuspensionType,
     string SuspensionStartDate,
     string? SuspensionEndDate,

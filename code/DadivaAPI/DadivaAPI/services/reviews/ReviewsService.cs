@@ -24,17 +24,17 @@ public class ReviewsService(IRepository repository, DadivaDbContext context,  IN
             
             var submissionDto = await repository.GetSubmissionById(submissionId);
             if (submissionDto is null)
-                return Result.Fail(new SubmissionError.SubmissionNotFoundError());
+                return Result.Fail(new SubmissionErrors.SubmissionNotFoundErrors());
             if (submissionDto.Status != SubmissionStatus.Pending)
-                return Result.Fail(new SubmissionError.SubmissionNotPendingStatusError());
+                return Result.Fail(new SubmissionErrors.SubmissionNotPendingStatusErrors());
             if (submissionDto.LockedBy != null && submissionDto.LockedBy.Doctor.Nic != doctorNic)
-                return Result.Fail(new SubmissionError.AlreadyLockedByAnotherDoctor(submissionDto.LockedBy?.Doctor.Name!));
+                return Result.Fail(new SubmissionErrors.AlreadyLockedByAnotherDoctor(submissionDto.LockedBy?.Doctor.Name!));
             
             var submissionDomain = Submission.CreateMinimalSubmissionDomain(submissionDto);
             submissionDomain = submissionDomain.UpdateStatusFromBoolean(status);
             
             if (!submissionDomain.ValidateDoctorNotes())
-                return Result.Fail(new SubmissionError.InvalidDoctorNotesError());
+                return Result.Fail(new SubmissionErrors.InvalidDoctorNotesErrors());
 
             if (notes != null)
                 submissionDomain = submissionDomain.AddNotesToAnsweredQuestions(notes);
