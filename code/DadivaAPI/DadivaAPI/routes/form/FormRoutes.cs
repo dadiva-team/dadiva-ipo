@@ -11,8 +11,7 @@ public static class FormRoutes
     public static void AddFormRoutes(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/forms");
-        group.MapGet("/structure/{language}", GetForm)
-            .AllowAnonymous();//.RequireAuthorization("doctor");
+        group.MapGet("/structure/{language}", GetForm).RequireAuthorization("donor");
         group.MapPut("/structure", AddForm).RequireAuthorization("admin");
 
         group.MapGet("/inconsistencies/{language}", GetInconsistencies).RequireAuthorization("doctor");

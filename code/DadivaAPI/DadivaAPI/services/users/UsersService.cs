@@ -1,11 +1,9 @@
 using DadivaAPI.domain;
 using DadivaAPI.domain.user;
 using DadivaAPI.repositories;
-using DadivaAPI.routes.users.models;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
 using FluentResults;
-using Microsoft.EntityFrameworkCore;
 using DomainToFromEntityExtensions = DadivaAPI.domain.DomainToFromEntityExtensions;
 
 namespace DadivaAPI.services.users;

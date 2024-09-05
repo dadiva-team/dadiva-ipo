@@ -7,6 +7,7 @@ import { FormServices } from '../../../services/from/FormServices';
 import Typography from '@mui/material/Typography';
 import LoadingSpinner from '../../shared/LoadingSpinner';
 import { Box, Card, CardContent, Grid } from '@mui/material';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 export interface SubmissionStats {
   total: number;
@@ -15,6 +16,7 @@ export interface SubmissionStats {
 }
 
 export function StatsPage() {
+  const { t } = useTranslation();
   const [startUnix, setStartUnix] = React.useState<Dayjs>(dayjs(Date.now()).subtract(7, 'days'));
   const [endUnix, setEndUnix] = React.useState<Dayjs>(dayjs(Date.now()));
   const [data, setData] = React.useState<SubmissionStats | null>(null);
@@ -29,16 +31,19 @@ export function StatsPage() {
 
   return (
     <>
+      <Typography variant="h5" sx={{ mb: 5 }}>
+        {t('Settings')}
+      </Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
-          label="startLabel"
+          label={t('Start')}
           value={startUnix}
           defaultValue={startUnix}
           onChange={newValue => setStartUnix(newValue)}
           maxDate={dayjs(Date.now())}
         />
         <DatePicker
-          label="endLabel"
+          label={t('End')}
           value={endUnix}
           defaultValue={endUnix}
           onChange={newValue => setEndUnix(newValue)}
@@ -48,7 +53,7 @@ export function StatsPage() {
       </LocalizationProvider>
       {data == null ? (
         <Box sx={{ mt: 1 }}>
-          <LoadingSpinner text={'A carregar as perguntas...'} />
+          <LoadingSpinner text={t('Loading Questions')} />
         </Box>
       ) : (
         <>
@@ -56,7 +61,7 @@ export function StatsPage() {
             <Grid item xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6">Total Submissions</Typography>
+                  <Typography variant="h6">{t('Submissions')}</Typography>
                   <Typography variant="h4">{data.total}</Typography>
                 </CardContent>
               </Card>
@@ -64,7 +69,7 @@ export function StatsPage() {
             <Grid item xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6">Approved</Typography>
+                  <Typography variant="h6">{t('Approved')}</Typography>
                   <Typography variant="h4">{data.approved}</Typography>
                 </CardContent>
               </Card>
@@ -72,7 +77,7 @@ export function StatsPage() {
             <Grid item xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6">Denied</Typography>
+                  <Typography variant="h6">{t('Denied')}</Typography>
                   <Typography variant="h4">{data.denied}</Typography>
                 </CardContent>
               </Card>
@@ -80,7 +85,7 @@ export function StatsPage() {
             <Grid item xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6">Pending</Typography>
+                  <Typography variant="h6">{t('Pending')}</Typography>
                   <Typography variant="h4">{data.total - data.approved - data.denied}</Typography>
                 </CardContent>
               </Card>

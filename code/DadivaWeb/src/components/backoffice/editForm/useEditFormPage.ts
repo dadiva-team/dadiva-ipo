@@ -8,9 +8,11 @@ import { Uris } from '../../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
 import { useTranslation } from 'react-i18next';
 import { compareForms, FormChanges } from './utils';
+import { useLanguage } from '../LanguageProvider';
 
 export function useEditFormPage() {
   const { i18n } = useTranslation();
+  const { backofficeLanguage } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState<Question>(null);
   const [editingSubQuestion, setEditingSubQuestion] = useState<Question>(null);
@@ -42,7 +44,7 @@ export function useEditFormPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [error, res] = await handleRequest(FormServices.getForm(i18n.language));
+      const [error, res] = await handleRequest(FormServices.getForm(backofficeLanguage));
       if (error) {
         handleError(error, setError, nav);
         return;
@@ -53,7 +55,7 @@ export function useEditFormPage() {
     };
 
     if (isLoading) fetch();
-  }, [i18n.language, isLoading, nav]);
+  }, [backofficeLanguage, isLoading, nav]);
 
   function calculateFromShowConditions(showCondition: ShowCondition): TopLevelCondition {
     const condition: TopLevelCondition = { all: [] };

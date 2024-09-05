@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { UpdateTermsOutputModel } from '../../../services/terms/models/UpdateTermsOutputModel';
 import { TermsHistoryItem } from '../../../services/terms/models/TermsHistoryOutputModel';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../LanguageProvider';
 
 export function useEditTermsPage() {
   const { i18n } = useTranslation();
+  const { backofficeLanguage } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +24,7 @@ export function useEditTermsPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [termError, termsRes] = await handleRequest(TermsServices.getTerms(i18n.language));
+      const [termError, termsRes] = await handleRequest(TermsServices.getTerms(backofficeLanguage));
       if (termError) {
         handleError(termError, setError, nav);
         return;
@@ -35,11 +37,7 @@ export function useEditTermsPage() {
     };
 
     if (isLoading) fetch();
-  }, [isLoading, nav, i18n.language]);
-
-  i18n.on('languageChanged', () => {
-    setIsLoading(true);
-  });
+  }, [backofficeLanguage, isLoading, nav]);
 
   function handleTermClick(termIdx: number) {
     setSelectedTermIdx(termIdx);

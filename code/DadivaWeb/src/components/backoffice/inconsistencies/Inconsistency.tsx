@@ -6,6 +6,7 @@ import { AllConditions, ConditionProperties, RuleProperties } from 'json-rules-e
 import { Group } from '../../../domain/Form/Form';
 import { translateResponse } from '../editForm/utils';
 import { Edit } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 export interface InconsistencyProps {
   inconsistency: RuleProperties;
@@ -32,30 +33,18 @@ export function Inconsistency({
   setReason,
   onOpenEditDialog,
 }: InconsistencyProps) {
+  const { t } = useTranslation();
+
   return (
     <Box
-      sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        border: 1,
-        p: 2,
-      }}
+      sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: 1, p: 2 }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-around',
-        }}
-      >
+      <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
         <TextField
           autoFocus
           margin="dense"
           id="reason"
-          label="Razão da incoerência"
+          label={t('Reason for Inconsistency')}
           type="text"
           fullWidth
           variant="outlined"
@@ -70,7 +59,7 @@ export function Inconsistency({
           startIcon={<DeleteIcon />}
           sx={{ borderRadius: 50 }}
         >
-          Apagar grupo
+          {t('Delete Group')}
         </Button>
       </Box>
 
@@ -84,27 +73,18 @@ export function Inconsistency({
 
         return (
           <>
-            <Box
-              key={index}
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                mb: 1,
-                mt: 1,
-              }}
-            >
+            <Box key={index} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mb: 1, mt: 1 }}>
               <Box sx={{ width: '50%' }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Questão:
+                  {t('Question')}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>
-                  {questionText ?? 'INVALID QUESTION ID'}
+                  {questionText ?? t('INVALID QUESTION ID')}
                 </Typography>
               </Box>
               <Box sx={{ width: '10%' }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Condição:
+                  {t('Condition')}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   {translateOperator(condition.operator)}
@@ -112,7 +92,7 @@ export function Inconsistency({
               </Box>
               <Box sx={{ width: '25%', ml: 1 }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  Resposta:
+                  {t('Response')}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   {translateResponse(condition.value)}
@@ -133,13 +113,7 @@ export function Inconsistency({
           </>
         );
       })}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <IconButton color="primary" onClick={() => onAddCondition()}>
           <ControlPointIcon />
         </IconButton>

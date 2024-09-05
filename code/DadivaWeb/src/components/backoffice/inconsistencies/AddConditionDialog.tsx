@@ -14,6 +14,7 @@ import {
 import { Close } from '@mui/icons-material';
 import { Question } from '../../../domain/Form/Form';
 import { createQuestionAnswersInput } from '../editForm/dialogs/shared/CreateQuestionAnswersInput';
+import { useTranslation } from 'react-i18next';
 
 export interface AddConditionDialogProps {
   open: boolean;
@@ -23,6 +24,7 @@ export interface AddConditionDialogProps {
 }
 
 export function AddConditionDialog({ open, questions, onAnswer, onClose }: AddConditionDialogProps) {
+  const { t } = useTranslation();
   const [questionCondition, setQuestionCondition] = useState<string | null>(null);
   const [conditionAnswer, setConditionAnswer] = useState<string | null>(null);
 
@@ -33,51 +35,31 @@ export function AddConditionDialog({ open, questions, onAnswer, onClose }: AddCo
 
   return (
     <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
-      <DialogTitle id="edit-dialog-title">Criar Condição</DialogTitle>
+      <DialogTitle id="edit-dialog-title">{t('Create Condition')}</DialogTitle>
       <IconButton
-        aria-label="close"
+        aria-label={t('Close')}
         color="inherit"
         size="small"
         onClick={() => onClose()}
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: '5%',
-        }}
+        sx={{ position: 'absolute', right: 8, top: '5%' }}
       >
         <Close fontSize="inherit" />
       </IconButton>
       <DialogContent dividers>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 1,
-                width: '100%',
-              }}
-            >
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1, width: '100%' }}>
               <FormControl fullWidth margin="normal">
-                <InputLabel id="selecionar-questao-label">Questão</InputLabel>
+                <InputLabel id="select-question-label">{t('Question')}</InputLabel>
                 <Select
-                  labelId="selecionar-questao-label"
-                  id="selecionar-questao"
+                  labelId="select-question-label"
+                  id="select-question"
                   value={questionCondition ?? ''}
-                  label="Questão"
+                  label={t('Question')}
                   onChange={event => {
                     const newValue = event.target.value;
                     setQuestionCondition(newValue);
 
-                    // Ensure conditionAnswer is also valid for the selected question
                     const selectedQuestion = questions.find(q => q.id === newValue);
                     if (selectedQuestion) {
                       setConditionAnswer('');
@@ -105,12 +87,9 @@ export function AddConditionDialog({ open, questions, onAnswer, onClose }: AddCo
               <Button
                 disabled={!questionCondition || !conditionAnswer}
                 onClick={handleCloseAndAnswer}
-                sx={{
-                  mt: 1,
-                  alignSelf: 'center',
-                }}
+                sx={{ mt: 1, alignSelf: 'center' }}
               >
-                Guardar
+                {t('Save')}
               </Button>
             </FormControl>
           </>

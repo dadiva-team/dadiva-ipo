@@ -5,9 +5,11 @@ import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { FormServices } from '../../../services/from/FormServices';
 import { ConditionProperties, RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../LanguageProvider';
 
 export function useEditInconsistenciesPage() {
   const { i18n } = useTranslation();
+  const { backofficeLanguage } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formFetchData, setFormFetchData] = useState<Form>();
@@ -29,13 +31,13 @@ export function useEditInconsistenciesPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [formError, formRes] = await handleRequest(FormServices.getForm(i18n.language));
+      const [formError, formRes] = await handleRequest(FormServices.getForm(backofficeLanguage));
       if (formError) {
         handleError(formError, setError, nav);
         return;
       }
       setFormFetchData(formRes);
-      const [incError, inconsistenciesRes] = await handleRequest(FormServices.getInconsistencies(i18n.language));
+      const [incError, inconsistenciesRes] = await handleRequest(FormServices.getInconsistencies(backofficeLanguage));
 
       if (incError) {
         handleError(incError, setError, nav);
@@ -49,7 +51,7 @@ export function useEditInconsistenciesPage() {
     };
 
     if (isLoading) fetch();
-  }, [i18n.language, isLoading, nav]);
+  }, [backofficeLanguage, isLoading, nav]);
 
   function onAddInconsistency() {
     setInconsistencies(old => {

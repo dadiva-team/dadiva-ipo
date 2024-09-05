@@ -13,16 +13,18 @@ import {
 import { Close } from '@mui/icons-material';
 import { Question } from '../../../domain/Form/Form';
 import { createQuestionAnswersInput } from '../editForm/dialogs/shared/CreateQuestionAnswersInput';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 export interface EditConditionDialogProps {
   open: boolean;
   questions: Question[];
-  condition: { fact: string; value: string }; // The condition to edit
+  condition: { fact: string; value: string };
   onAnswer: (fact: string, answer: string) => void;
   onClose: () => void;
 }
 
 export function EditConditionDialog({ open, questions, condition, onAnswer, onClose }: EditConditionDialogProps) {
+  const { t } = useTranslation();
   const [questionCondition, setQuestionCondition] = useState<string | null>(condition?.fact);
   const [conditionAnswer, setConditionAnswer] = useState<string | null>(condition?.value);
 
@@ -40,34 +42,23 @@ export function EditConditionDialog({ open, questions, condition, onAnswer, onCl
 
   return (
     <Dialog onClose={onClose} open={open} aria-labelledby="edit-dialog-title" maxWidth="md" fullWidth>
-      <DialogTitle id="edit-dialog-title">Editar Condição</DialogTitle>
+      <DialogTitle id="edit-dialog-title">{t('Edit Condition')}</DialogTitle>
       <IconButton
-        aria-label="close"
+        aria-label={t('Close')}
         color="inherit"
         size="small"
         onClick={() => onClose()}
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: '5%',
-        }}
+        sx={{ position: 'absolute', right: 8, top: '5%' }}
       >
         <Close fontSize="inherit" />
       </IconButton>
       <DialogContent dividers>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <Typography variant="h6" gutterBottom>
-            {selectedQuestion?.text ?? 'Questão não encontrada'}
+            {selectedQuestion?.text ?? t('Question not found')}
           </Typography>
           <FormControl fullWidth margin="normal">
-            <InputLabel id="resposta-condicao-label">Resposta</InputLabel>
+            <InputLabel id="response-label">{t('Response')}</InputLabel>
             {createQuestionAnswersInput({
               question: questions?.find(q => q.id === questionCondition),
               questionCondition,
@@ -78,12 +69,9 @@ export function EditConditionDialog({ open, questions, condition, onAnswer, onCl
           <Button
             disabled={!questionCondition || !conditionAnswer}
             onClick={handleSaveAndClose}
-            sx={{
-              mt: 2,
-              alignSelf: 'center',
-            }}
+            sx={{ mt: 2, alignSelf: 'center' }}
           >
-            Guardar alterações
+            {t('Save Changes')}
           </Button>
         </Box>
       </DialogContent>
