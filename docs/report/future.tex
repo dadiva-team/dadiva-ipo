@@ -1,5 +1,10 @@
-\chapter{Future Work} \label{cap:future}
+\chapter{Conclusions and Future Work} \label{cap:future}
+In the final chapter of this report, we will summarize the accomplishments of this project, discuss the challenges encountered, and outline potential improvements and features that were envisioned but not implemented due to time constraints.
+\section{Accomplishments}
 
+\section{Challenges}
+
+\section{Future Work}
 The IPST medication guideline are organized in a table like manner, in the following column layout:
 \begin{enumerate}
 	\item Class/Group of Medication: This column categorizes medications.
@@ -9,3 +14,5 @@ The IPST medication guideline are organized in a table like manner, in the follo
 The terms used in the first column are, from what we can access, similar to the available pharmacotherapeutic classifications. A reliable source of a drug's pharmacotherapeutic classification is a portal provided by Infarmed to it's partner organizations, such as Lisbon's IPO.
 As such, upon a donor's form submission, assuming they were taking some medication, our application would perform requests to said portal, get the appropriate pharmacotherapeutic classification and, by cross-checking the classification with the term used in the first column of the guidelines, return the relevant interaction information.
 However, the terms used in the guidelines don't always reflect the available classifications, and, as such, the platform would need to employ some form of automated categorization, and allow for manual manipulation of these associations by the administrators.
+
+It would also be a valuable feature to have the platform automatically check if the donor had any vaccinations and/or prescriptions that could be medically relevant. It would require integration with the SNS, and/or Infarmed systems.

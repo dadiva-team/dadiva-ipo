@@ -1,7 +1,7 @@
 %
 % Capítulo 2
 %
-\chapter{Problem Description} \label{cap:problem_description}
+\chapter{Problem Description And Proposed Solution} \label{cap:problem_description}
 
 Current blood donation workflow faces a set of challenges like screening time for more complex cases, since higher complexity cases may require cross-checking information about drug and pathology interaction, a process that, beyond being time-consuming,  may lead to imprecisions with severe consequences. Currently upon form changes the previously printed forms are disregarded, this process can be expedited by supporting a digital form that can be easily updated, helping IPO reduce its paper consumption.
 
@@ -62,34 +62,27 @@ It is intended as an alternative to the current, and less versatile, paper form 
 	\item Good software engineering practices to ensure the fast development of the system.
 \end{itemize}
 
-\subsection{Optional Features}
-\begin{itemize}
-	\item After filling out the pre-donation form, the system could automatically check if the donor had any vaccinations and/or prescriptions that could be medically relevant. It would require integration with the SNS, and/or Infarmed systems.
-	\item The medical interview may be based on a pre-analysis, with the system having already identified possible risk vectors and logical incongruencies that better assist the doctor when deciding on accepting or refusing the donor.
-	\item It is possible that the IPST has already implemented a digital system to maintain pathology and medication interaction information. If so, it would be possible to integrate this into our system, so that this information does not have to be manually updated.
-	\item Users can authenticate using the Digital Mobile Key (CMD). It would require integration with the AMA (Administrative Modernization Agency) systems.
-\end{itemize}
-
-\pagebreak
-
 \subsection{Use Cases}\label{sec:use_cases}
 With the requirements listed above, we have identified the use cases that the platform
 shall support. A use case is a written description of how users will perform tasks on
 a system. It outlines, from the user's perspective, the behavior of the system as it
 responds to a request. This approach attempts to predict the users of the platform, their allowed actions and objectives, and how the platform should respond to each action.
 The use cases are divided into three categories, each representing one type of user.
-The Donor use case is presented in Figure ~\ref{fig:donor_use_case}. The donor user can request the current form and can submit their form responses.
+The Donor use case is presented in Figure ~\ref{fig:donor_use_case}.
 
-\begin{figure}[H]
+\begin{figure}[h]
 	\begin{center}
 		\resizebox{100mm}{!}{\includegraphics[trim={0 540 70 0},clip]{./figures/useCases.pdf}}
 	\end{center}
 	\caption{Donor use case.}\label{fig:donor_use_case}
 \end{figure}
+The donor user can request the current form and can submit their form responses.
+
+\pagebreak
 
 After a donor submits their form responses a doctor user will be able to access their answers by searching by the user's unique id as presented in Figure~\ref{fig:doctor_use_case}.
 
-\begin{figure}[H]
+\begin{figure}[h]
 	\begin{center}
 		\resizebox{100mm}{!}{\includegraphics[trim={0 330 70 220},clip]{./figures/useCases.pdf}}
 	\end{center}
@@ -100,8 +93,7 @@ Furthermore the doctor user is able to search for pathology/medication interacti
 
 Finally the administrator user can update the form structure and flow, update the interaction information and manage the platform's users.
 The administrator use case is presented in Figure ~\ref{fig:administrator_use_case}.
-
-\begin{figure}[H]
+\begin{figure}[h]
 	\begin{center}
 		\resizebox{100mm}{!}{\includegraphics[trim={0 0 0 450},clip]{./figures/useCases.pdf}}
 	\end{center}
