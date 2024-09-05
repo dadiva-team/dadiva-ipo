@@ -12,10 +12,10 @@ public class TermsRepository : ITermsRepository
     {
         _context = context;
     }
-    
+
     public async Task<TermsEntity?> GetActiveTerms(string language)
     {
-        return await _context.Terms.OrderBy(term => term.Date).LastOrDefaultAsync(t=>t.Language==language);
+        return await _context.Terms.OrderBy(term => term.Date).LastOrDefaultAsync(t => t.Language == language);
     }
 
     public async Task<List<TermsEntity>?> GetTermsHistory(string language)

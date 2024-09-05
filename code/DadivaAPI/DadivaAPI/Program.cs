@@ -45,6 +45,12 @@ if (jwtKey == null || jwtIssuer == null || jwtAudience == null)
     throw new Exception("Jwt:Issuer and Jwt:Key must be provided in appsettings.json");
 }
 
+string? frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
+if (frontendUrl == null)
+{
+    throw new Exception("FRONTEND_URL must be provided in the environment variables.");
+}
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -67,7 +73,7 @@ builder.Services.AddAuthentication(x =>
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             var problemDetails = new
             {
-                type = "https://localhost:8000/errors/unauthorized",
+                type = frontendUrl + "/errors/unauthorized",
                 title = "Unauthorized",
                 detail = "You are not authorized to access this resource. Please provide valid credentials.",
                 status = StatusCodes.Status401Unauthorized
@@ -169,7 +175,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("MyCorsPolicy",
         policy =>
         {
-            policy.WithOrigins("http://localhost:8000") // Frontend server address
+            policy.WithOrigins(frontendUrl) // Frontend server address
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials(); // Important if you are sending credentials (like cookies or basic auth)
