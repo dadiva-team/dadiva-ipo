@@ -44,9 +44,9 @@ It is intended as an alternative to the current, and less versatile, paper form 
 	
 	\item Doctors should be able to find all relevant data on pathology and/or medication interactions with the donation in a digital format.
 	
-	\item Doctors and administrators should be able to access a back office used for customizing the pre-donation form and for updating the pathology and/or medication interaction information. The back office should also allow for user management.
-	
-	\item Google-like search and results by relevance - Search should be as simple as possible. There may be a need to increase the number of filters, but this complexity should be hidden. The results returned should be sorted based on relevance.
+	\item Administrators should be able to access a back office used for customizing the pre-donation form. The back office should also allow for user management.
+%	
+%	\item Google-like search and results by relevance - Search should be as simple as possible. There may be a need to increase the number of filters, but this complexity should be hidden. The results returned should be sorted based on relevance.
 \end{itemize}
 
 \subsection{Non-Functional Requirements}
@@ -72,30 +72,35 @@ The Donor use case is presented in Figure ~\ref{fig:donor_use_case}.
 
 \begin{figure}[h]
 	\begin{center}
-		\resizebox{100mm}{!}{\includegraphics[trim={0 540 70 0},clip]{./figures/useCases.pdf}}
+		\resizebox{160mm}{!}{\includegraphics[trim={0 380 70 310},clip]{./figures/useCases.pdf}}
 	\end{center}
 	\caption{Donor use case.}\label{fig:donor_use_case}
 \end{figure}
+
 The donor user can request the current form and can submit their form responses.
 
 \pagebreak
 
-After a donor submits their form responses a doctor user will be able to access their answers by searching by the user's unique id as presented in Figure~\ref{fig:doctor_use_case}.
+A doctor user can request the submissions that are pending review as illustrated in Figure~\ref{fig:doctor_use_case}.
 
 \begin{figure}[h]
 	\begin{center}
-		\resizebox{100mm}{!}{\includegraphics[trim={0 330 70 220},clip]{./figures/useCases.pdf}}
+		\resizebox{140mm}{!}{\includegraphics[trim={0 540 70 0},clip]{./figures/useCases.pdf}}
 	\end{center}
 	\caption{Doctor use case.}\label{fig:doctor_use_case}
 \end{figure}
 
-Furthermore the doctor user is able to search for pathology/medication interactions to resolve any inquiries that might appear during the screening.
+Furthermore the doctor user is able to access a donor's profile to request the submissions for that specific donor, the previous reviews for this donor and can suspend the donor, as well as search for pathology/medication interactions to resolve any inquiries that might appear during the screening.
 
-Finally the administrator user can update the form structure and flow, update the interaction information and manage the platform's users.
+\pagebreak
+
+Finally the administrator user can also request the submission pending review.
+This type of user can also, update the form structure and navigation, as well as the form's inconsistencies and the legal terms.
+The administrator user can also manage the platforms users.
 The administrator use case is presented in Figure ~\ref{fig:administrator_use_case}.
 \begin{figure}[h]
 	\begin{center}
-		\resizebox{100mm}{!}{\includegraphics[trim={0 0 0 450},clip]{./figures/useCases.pdf}}
+		\resizebox{140mm}{!}{\includegraphics[trim={0 150 50 460},clip]{./figures/useCases.pdf}}
 	\end{center}
 	\caption{Administrator use case.}\label{fig:administrator_use_case}
 \end{figure}

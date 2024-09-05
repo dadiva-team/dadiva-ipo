@@ -75,7 +75,7 @@ builder.Services.AddCors(options =>
 	options.AddPolicy("MyCorsPolicy",
 	policy =>
 	{
-		policy.WithOrigins("http://localhost:8000")
+		policy.WithOrigins(frontendUrl)
 		.AllowAnyHeader()
 		.AllowAnyMethod()
 		.AllowCredentials();
@@ -86,10 +86,35 @@ builder.Services.AddCors(options =>
 Notice that request originating from port 8000 of the localhost ip can have any type of header, any HTTP method and can include credentials, such as cookies.
 \newpage
 
-\subsubsection{Authentication JWT}
+\subsubsection{Role Based Access Control}
+In our system, users are assigned at least one of three roles: donor, doctor, or admin. Each of these roles grants access to a specific set of endpoints, ensuring that users can only interact with the parts of the application that are relevant to their role. To enforce this, we have configured authorization policies within the ASP.NET Core framework, which restrict access based on the role claims present in the requests JSON Web Token (JWT).
+
+As shown in Listing \ref{rbac}, we define three authorization policies — one for each role. The AddAuthorization method is used to add these policies to the service container. Each policy requires that the user’s JWT contains a claim of type ClaimTypes.Role with a corresponding value of either donor, doctor", or admin.
+
+\begin{lstlisting}[style=sharpc, caption={Configuring Role-Based Authorization Policies in ASP.NET Core: Defining Access Control for Donor, Doctor, and Admin Roles.}, label={rbac}] 
+	builder.Services.AddAuthorization(options =>
+	{
+		options.AddPolicy("donor", policy => policy.RequireClaim(ClaimTypes.Role, "donor"));
+		options.AddPolicy("doctor", policy => policy.RequireClaim(ClaimTypes.Role, "doctor"));
+		options.AddPolicy("admin", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
+	});
+\end{lstlisting}
+
+When defining an endpoint, we can specify which authorization policy should be applied. For instance, an endpoint that should only be accessible to doctors can be protected by the "admin" policy or allow for anonymous requests, as illustrated in Listing \ref{endpoint_auth}
+
+\begin{lstlisting}[style=sharpc, caption={Examples of endoint policies}, label={endpoint_auth}] 
+	usersGroup.MapPost("/login", CreateToken).AllowAnonymous();
+	usersGroup.MapPost("", CreateUser).RequireAuthorization("admin");
+\end{lstlisting}
+
+By leveraging these role-based authorization policies, we enforce a clear and secure access control mechanism, ensuring that users can only perform actions that are appropriate for their role. This approach not only enhances security but also simplifies the management of user permissions across the application.
+
+\newpage
+
+\subsubsection{Authentication}
 
 Our platform uses JSON Web Tokens, \textbf{JWT} \cite{rfc7519}, to represent user claims.
-These token's issuer, audience and key, refered to as jwtIssuer, jwtAudience and jwtKey in listing \ref{authentication} below, are stored in the appsettings.json file.
+These token's issuer, audience and key, refered to as jwtIssuer, jwtAudience and jwtKey in Listing \ref{authentication} below, are stored in the appsettings.json file.
 
 \begin{lstlisting}[style=sharpc, caption={Custom JWT Authentication Middleware in ASP.NET Core: Handling Unauthorized Access with Detailed Problem Responses.}, label={authentication}] 
 builder.Services.AddAuthentication(x =>
@@ -100,7 +125,7 @@ builder.Services.AddAuthentication(x =>
 {
 	options.Events = new JwtBearerEvents
 	{
-		...
+		(...)
 		OnChallenge = context =>
 		{
 			context.HandleResponse();
@@ -109,7 +134,7 @@ builder.Services.AddAuthentication(x =>
 			context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 			var problemDetails = new
 			{
-				type = "https://localhost:8000/errors/unauthorized",
+				type = frontendUrl + "/errors/unauthorized",
 				title = "Unauthorized",
 				detail = "You are not authorized to access this resource. Please provide valid credentials.",
 				status = StatusCodes.Status401Unauthorized
@@ -118,39 +143,84 @@ builder.Services.AddAuthentication(x =>
 			return context.Response.WriteAsync(problemJson);
 		}
 	};
-	options.SaveToken = true;
-	options.TokenValidationParameters = new TokenValidationParameters
-	{
-		ValidateIssuer = true,
-		ValidateAudience = true,
-		ValidateLifetime = true,
-		ValidateIssuerSigningKey = true,
-		ValidIssuer = jwtIssuer,
-		ValidAudience = jwtAudience,
-		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-	};
+	(...)
 });
 \end{lstlisting}
 
 Notice that in case the \textbf{JWT} isn't valid the default behavior of responding with a 401 status code and an empty body is suppressed by "context.HandleResponse()" and instead a Problem response is sent with more details.
 
-\subsubsection{Role Based Access Control}
-In our system, users are assigned one of three roles: donor, doctor, or admin. Each of these roles grants access to a specific set of endpoints, ensuring that users can only interact with the parts of the application that are relevant to their role. To enforce this, we have configured authorization policies within the ASP.NET Core framework, which restrict access based on the role claims present in the user's JSON Web Token (JWT).
+This token is created when a user logs in, the \textbf{User} domain object contains a method to create the token given the mentioned issuer, audience and key, using the JwtSecurityTokenHandler and SecurityTokenDescriptor types, and supplying the claims, i.e. the Id of the user, its name and roles, as illustrated in Listing \ref{jwt_creation}
 
-As shown in Listing \ref{rbac}, we define three authorization policies—one for each role. The AddAuthorization method is used to add these policies to the service container. Each policy requires that the user’s JWT contains a claim of type ClaimTypes.Role with a corresponding value of either donor, doctor", or admin.
-
-\begin{lstlisting}[style=sharpc, caption={Configuring Role-Based Authorization Policies in ASP.NET Core: Defining Access Control for Donor, Doctor, and Admin Roles.}, label={rbac}] 
-builder.Services.AddAuthorization(options =>
+\begin{lstlisting}[style=sharpc, caption={JWT creation}, label={jwt_creation}] 
+public string GenerateToken(string key, string issuer, string audience)
 {
-	options.AddPolicy("donor", policy => policy.RequireClaim(ClaimTypes.Role, "donor"));
-	options.AddPolicy("doctor", policy => policy.RequireClaim(ClaimTypes.Role, "doctor"));
-	options.AddPolicy("admin", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
-});
+	var tokenHandler = new JwtSecurityTokenHandler();
+	var claims = new List<Claim>
+	{
+		new Claim(ClaimTypes.Name, Nic),
+		new Claim("fullName", Name),
+	};
+	
+	claims.AddRange(Roles.Select(role => new Claim(ClaimTypes.Role, role.ToString())));
+	
+	var tokenDescriptor = new SecurityTokenDescriptor
+	{
+		Subject = new ClaimsIdentity(claims),
+		Expires = DateTime.UtcNow.AddDays(1),
+		SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+		SecurityAlgorithms.HmacSha256Signature),
+		Issuer = issuer,
+		Audience = audience
+	};
+	
+	var token = tokenHandler.CreateToken(tokenDescriptor);
+	return tokenHandler.WriteToken(token);
+}
 \end{lstlisting}
 
-When defining an endpoint, we can specify which authorization policy should be applied. For instance, an endpoint that should only be accessible to doctors can be protected by the "doctor" policy.
+This generated token is then persisted in the database.
+To mitigate the risk of Cross-Site scripting the httpOnly flag is set to true and since all communication is done via HTTPS the secure flag is also set to true, as illustrated in Listing \ref{login_reponse}.
 
-By leveraging these role-based authorization policies, we enforce a clear and secure access control mechanism, ensuring that users can only perform actions that are appropriate for their role. This approach not only enhances security but also simplifies the management of user permissions across the application.
+\begin{lstlisting}[style=sharpc, caption={Login Reponse, note the HttpOnly and Secure flags are set to true.}, label={login_reponse}] 
+private static async Task<IResult> CreateToken(HttpContext http, [FromBody] CreateTokenInputModel input,
+IUsersService service)
+{
+	return (await service.CreateToken(input.Nic, input.Password)).HandleRequest(
+	ulei =>
+	{
+		var cookieOptions = new CookieOptions
+		{
+			HttpOnly = true,
+			Secure = true,
+			SameSite = SameSiteMode.None,
+			Expires = DateTime.UtcNow.AddDays(1)
+		};
+		http.Response.Cookies.Append("token", ulei.Token, cookieOptions);
+		
+		return Results.Created((string?)null, CreateTokenOutputModel.FromExternalInfo(ulei));
+	}
+	);
+}
+\end{lstlisting}
+
+\subsection{Locks and SSE Mechanisms}\label{SSE_backend}
+The doctor submission review system is designed to coordinate multiple doctors reviewing medical submissions simultaneously, ensuring that only one doctor can work on a submission at any given time. This is achieved through the use of a Lock entity and Server-Sent Events (SSE) for real-time notifications. These mechanisms prevent conflicts, ensure data consistency, and streamline the workflow.
+
+Locking Mechanism
+As mentioned in Section \ref{sec:lock_entity}, the Lock entity was introduced to prevent multiple users from manipulating the same resource (submission) simultaneously. When a doctor begins reviewing a submission, the system checks if the submission is already locked by another doctor. If not, a lock is created for that doctor using the LockSubmission method. This lock ensures that other doctors cannot access the submission while it's being reviewed.
+
+Once the doctor completes the review or manually releases the submission, the lock is removed using the UnlockSubmission method. If a doctor leaves a submission locked for an extended period without completing the review, the UnlockExpiredSubmissionsService automatically releases the lock after a timeout period (e.g., 10 minutes). This service runs periodically in the background, ensuring that submissions don’t remain unnecessarily locked, and it uses the NotificationService to inform all connected clients when locks expire.
+
+
+Handling Expired Locks
+In addition to manual unlocking, the system incorporates an automatic lock expiration mechanism to handle cases where doctors fail to release a lock in a timely manner. The UnlockExpiredSubmissionsService is a background service that runs at regular intervals, checking for submissions that have been locked beyond a defined timeout period. If a lock is found to have expired, the service automatically releases it, ensuring the submission becomes available to other doctors.
+
+When an expired lock is released, the NotificationService sends an SSE update to notify all connected clients. This ensures that doctors are aware when a submission they were waiting for becomes available again, and prevents any submission from remaining locked indefinitely due to inactivity.
+
+Integration of Locking and SSE
+The interaction between locking and SSE is critical for ensuring real-time collaboration among doctors. Whenever a submission is locked or unlocked, the system sends notifications to all connected doctors, providing immediate feedback on the status of the submission. This dynamic interaction ensures that all doctors have the most up-to-date view of submission availability, reducing the risk of conflicts and improving overall efficiency.
+
+Moreover, the UnlockExpiredSubmissionsService plays a vital role in preventing submissions from becoming stuck in a locked state, providing a fallback mechanism to release locks after a timeout. This service, combined with SSE notifications, creates a responsive and reliable environment for managing submission reviews.
 
 %Beyond these, we also used an ElasticClient, however in this service registration, we use a different pattern, instead of using a type and implementation, only the latter was used, this method doesn't allow for multiple implementation, but since there was no need to mock the elastic search database, this feature wasn't needed.
 %
@@ -183,7 +253,7 @@ Utilizing a transaction manager in the service layer enables our solution to han
 
 \subsubsection{Form Repository}
 
-The form repository is responsible for the Form, Submission, Review, Inconsistency entities.
+The form repository is responsible for the Form, Submission, Review and Inconsistency entities.
 
 And this repository will have the following methods:
 
