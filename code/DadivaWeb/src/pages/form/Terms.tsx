@@ -4,14 +4,16 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useTerms } from '../../components/form/useTerms';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
+import { useTranslation } from 'react-i18next';
 
 export function Terms() {
   const { isLoading, error, setError, terms, nav } = useTerms();
+  const { t } = useTranslation();
   return (
     <div>
       {isLoading ? (
         <Box sx={{ mt: 1 }}>
-          <LoadingSpinner text={'A carregar os termos e condições...'} />
+          <LoadingSpinner text={t('Loading Terms')} />
           <ErrorAlert error={error} clearError={() => setError(null)} />
         </Box>
       ) : (
@@ -26,7 +28,7 @@ export function Terms() {
             startIcon={<NavigateNextIcon />}
             sx={{ borderRadius: 50 }}
           >
-            Aceito os termos e condições
+            {t('Accept Terms')}
           </Button>
         </Container>
       )}

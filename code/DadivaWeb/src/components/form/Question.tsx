@@ -4,6 +4,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import React from 'react';
 import { Answer, EMPTY_ANSWER } from './utils/formUtils';
+import { useTranslation } from 'react-i18next';
 
 type QuestionProps = {
   text: string;
@@ -13,6 +14,7 @@ type QuestionProps = {
 };
 
 export function Question({ text, color, answer, isEditing }: QuestionProps) {
+  const { t } = useTranslation();
   const isAnswerYes = answer?.type === 'boolean' && answer.value === true;
   const isAnswerNo = answer?.type === 'boolean' && answer.value === false;
 
@@ -64,7 +66,7 @@ export function Question({ text, color, answer, isEditing }: QuestionProps) {
                 variant="body1"
                 sx={{ maxWidth: '100%', whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-all' }}
               >
-                Resposta: {formattedAnswer}
+                {t('ResponseForm')}: {formattedAnswer}
               </Typography>
             </Box>
           )}

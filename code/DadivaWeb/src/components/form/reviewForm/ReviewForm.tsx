@@ -158,7 +158,7 @@ export function ReviewForm({
                                       wordBreak: 'break-all',
                                     }}
                                   >
-                                    Resposta: {formAnswers[groupIndex][question.id].value as string}
+                                    {t('ResponseForm')}: {formAnswers[groupIndex][question.id].value as string}
                                   </Typography>
                                 </Box>
                               )}
@@ -185,7 +185,8 @@ export function ReviewForm({
                                       wordBreak: 'break-all',
                                     }}
                                   >
-                                    Resposta: {(formAnswers[groupIndex][question.id].value as string[]).join(', ')}
+                                    {t('ResponseForm')}:{' '}
+                                    {(formAnswers[groupIndex][question.id].value as string[]).join(', ')}
                                   </Typography>
                                 </Box>
                               )}
@@ -198,7 +199,7 @@ export function ReviewForm({
                               disabled={submitDisabled}
                               sx={{ borderRadius: 5, marginRight: 1 }}
                             >
-                              Editar
+                              {t('Edit')}
                             </Button>
                           </Box>
                         </Box>

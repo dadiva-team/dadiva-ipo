@@ -15,6 +15,7 @@ import { SubQuestionEditDialog } from '../../components/backoffice/editForm/dial
 import { SubmitDialog } from '../../components/backoffice/editForm/dialogs/SubmitDialog';
 import { SubmitFormButton } from '../../components/form/Inputs';
 import { EditFormPlaygroundModal } from './EditFormPlaygroundModal';
+import { useTranslation } from 'react-i18next';
 
 export function EditFormPage() {
   const {
@@ -60,12 +61,13 @@ export function EditFormPage() {
     formChanges,
     handleSaveForm,
   } = useEditFormPage();
+  const { t } = useTranslation();
 
   return (
     <Box>
       {isLoading ? (
         <Box sx={{ mt: 1 }}>
-          <LoadingSpinner text={'A carregar as perguntas...'} />
+          <LoadingSpinner text={t('Loading Questions')} />
           <ErrorAlert error={error} clearError={() => setError(null)} />
         </Box>
       ) : (
@@ -78,14 +80,14 @@ export function EditFormPage() {
                 disabled={form.groups.length === 0}
                 onClick={() => setCreatingQuestion(true)}
               >
-                Criar Questão
+                {t('Create Question')}
               </Button>
               <Button variant="outlined" sx={{ borderRadius: 40 }} onClick={() => setCreatingGroup(true)}>
-                Criar Grupo
+                {t('Create Group')}
               </Button>
             </Box>
             <Button variant="contained" onClick={() => openModalPlayground()}>
-              Testar formulário
+              {t('Test Form')}
             </Button>
           </Box>
           {form.groups.map((group, index) => (
