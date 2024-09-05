@@ -34,6 +34,11 @@ import { MedicationSearch } from './pages/doctor/medications/MedicationSearch';
 import { MedicationInformation } from './pages/doctor/medications/MedicationInformation';
 import { PendingSubmissions } from './pages/doctor/pendingSubmissions/PendingSubmissions';
 import { StatsPage } from './components/backoffice/statistics/StatsPage';
+import STATISTICS = Uris.STATISTICS;
+import { SettingsPage } from './pages/backoffice/SettingsPage';
+import { LanguageProvider } from './components/backoffice/LanguageProvider';
+import SETTINGS = Uris.SETTINGS;
+import { Dashboard } from '@mui/icons-material';
 
 export default function App() {
   const user = useCurrentSession();
@@ -105,11 +110,15 @@ export default function App() {
             path={BACKOFFICE}
             element={
               <ProtectedRoute roles={[Role.ADMIN]}>
-                <Backoffice />
+                <LanguageProvider>
+                  <Backoffice />
+                </LanguageProvider>
               </ProtectedRoute>
             }
           >
-            <Route path="" element={<StatsPage />} />
+            <Route path="" element={<Dashboard />} />
+            <Route path={SETTINGS} element={<SettingsPage />} />
+            <Route path={STATISTICS} element={<StatsPage />} />
             <Route path={TERMS_CONDITIONS} element={<EditTermsPage />} />
             <Route path={EDIT_FORM} element={<EditFormPage />} />
             <Route path={MANAGE_USERS} element={<ManageUsersPage />} />

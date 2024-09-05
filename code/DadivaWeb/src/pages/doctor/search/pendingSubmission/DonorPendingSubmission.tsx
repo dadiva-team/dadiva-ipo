@@ -10,6 +10,7 @@ import { useDonorPendingSubmission } from './useDonorPendingSubmission';
 import { ReviewDialog } from './dialog/ReviewDialog';
 import { InfoAlert } from '../../../../components/shared/InfoAlert';
 import { SubmissionModel } from '../../../../services/doctors/models/SubmissionOutputModel';
+import { translateResponse } from '../../../../components/backoffice/editForm/utils';
 
 interface DonorPendingSubmissionProps {
   submission: SubmissionModel;
@@ -36,31 +37,55 @@ export function DonorPendingSubmission({ submission, onSubmittedSuccessfully }: 
 
   return (
     <Box>
-      <Typography>Formulario submetido: {submission.submissionDate}</Typography>
+      <Typography>Formulario submetido: {new Date(submission.submissionDate).toLocaleString()}</Typography>
       {inconsistencies?.length > 0 ? (
         <Box>
           <InfoAlert actionMessage={'Formulário parcialmente inválido'} type={'error'} />
           <Typography variant="h6">
-            Existem inconsistências no formulário. Por favor, reveja as seguintes questões:
+            Existem {inconsistencies.length <= 1 ? '' : 'grupos de '} inconsistências no formulário. Por favor, reveja
+            as seguintes questões:
           </Typography>
-          <Divider sx={{ p: 0.5 }} />
-          {formWithAnswers
-            .filter(item => inconsistencies?.flat().includes(item.question.id))
-            .map(item => (
+          <Divider sx={{ p: 0.5, mb: 1 }} />
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, justifyContent: 'space-evenly' }}>
+            {inconsistencies.map((inconsistencyGroup, index) => (
               <Box
-                key={item.id}
+                key={index}
                 sx={{
-                  pl: 1.5,
-                  pt: 1,
                   display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
                   justifyContent: 'space-between',
-                  width: '70%',
+                  border: 1,
+                  p: 1,
+                  borderRadius: 5,
                 }}
               >
-                <Typography sx={{ width: '70%' }}>{item.question.text}</Typography>
-                <Typography sx={{ width: '30%' }}>Resposta: {item.answer.toString()}</Typography>
+                {inconsistencyGroup.map(questionId => {
+                  const questionItem = formWithAnswers.find(item => item.question.id === questionId);
+                  if (!questionItem) return null;
+
+                  return (
+                    <Box
+                      key={questionId}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <Typography sx={{ flex: '1 1 85%', wordWrap: 'break-word' }}>
+                        {questionItem.question.text}
+                      </Typography>
+                      <Typography sx={{ flex: '1 1 15%', textAlign: 'right', wordWrap: 'break-word' }}>
+                        - {translateResponse(questionItem.answer.toString())}
+                      </Typography>
+                    </Box>
+                  );
+                })}
               </Box>
             ))}
+          </Box>
         </Box>
       ) : (
         <InfoAlert actionMessage={'Formulario parcialmente validado'} type={'info'} />
@@ -106,8 +131,6 @@ export function DonorPendingSubmission({ submission, onSubmittedSuccessfully }: 
         dialogOpen={dialogOpen}
         dialogType={dialogType}
         finalNote={finalNote}
-        invalidQuestionsLength={inconsistencies?.length || 0}
-        notesLength={notes.length}
         handleDialogClose={handleDialogClose}
         handleDialogSubmit={handleDialogSubmit}
         setFinalNote={setFinalNote}

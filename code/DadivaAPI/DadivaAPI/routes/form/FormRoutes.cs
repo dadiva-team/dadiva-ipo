@@ -11,11 +11,10 @@ public static class FormRoutes
     public static void AddFormRoutes(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/forms");
-        group.MapGet("/structure/{language}", GetForm)
-            .AllowAnonymous();//.RequireAuthorization("doctor");
+        group.MapGet("/structure/{language}", GetForm).RequireAuthorization("donor");
         group.MapPut("/structure", AddForm).RequireAuthorization("admin");
 
-        group.MapGet("/inconsistencies", GetInconsistencies).RequireAuthorization("doctor");
+        group.MapGet("/inconsistencies/{language}", GetInconsistencies).RequireAuthorization("doctor");
         group.MapPut("/inconsistencies", EditInconsistencies).RequireAuthorization("admin");
     }
 
@@ -41,9 +40,10 @@ public static class FormRoutes
             .HandleRequest(Results.NoContent);
     }
 
-    private static async Task<IResult> GetInconsistencies( IFormService service)
+
+    private static async Task<IResult> GetInconsistencies([FromRoute] string language,  IFormService service)
     {
-        return (await service.GetInconsistencies()).HandleRequest(Results.Ok);
+        return (await service.GetInconsistencies(language)).HandleRequest(Results.Ok);
     }
 
     private static async Task<IResult> EditInconsistencies(

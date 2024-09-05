@@ -26,7 +26,8 @@ import { useDialog } from './useDialog';
 import { DropdownOptionsForm } from './DropdownOptionsForm';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { PendingActionAlert } from '../../../shared/PendingActionAlert';
-import { MedicationsInput, mockCountries } from '../../../form/Inputs';
+import { createQuestionAnswersInput } from './shared/CreateQuestionAnswersInput';
+import { translateResponse } from '../utils';
 
 export interface QuestionEditDialogProps {
   open: boolean;
@@ -171,117 +172,6 @@ export function QuestionEditDialog({
       newShowCondition.if[questionCondition] = conditionAnswer;
       return newShowCondition;
     });
-  }
-
-  function translateResponse(response: string) {
-    return response === 'yes' ? 'Sim' : response === 'no' ? 'Não' : response;
-  }
-
-  function createQuestionAnswersInput(question?: Question) {
-    if (!question) {
-      return (
-        <>
-          <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-          <Select
-            disabled={true}
-            labelId="selecionar-resposta-label"
-            id="selecionar-resposta-label"
-            value=""
-            label="Resposta"
-          ></Select>
-        </>
-      );
-    }
-
-    switch (question.type) {
-      case 'boolean':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <Select
-              disabled={!questionCondition}
-              labelId="selecionar-resposta-label"
-              id="selecionar-resposta-label"
-              value={conditionAnswer ?? ''}
-              label="Resposta"
-              onChange={event => {
-                setConditionAnswer(event.target.value);
-              }}
-            >
-              <MenuItem value="yes">Sim</MenuItem>
-              <MenuItem value="no">Não</MenuItem>
-            </Select>
-          </>
-        );
-      case 'text':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <TextField
-              disabled={!questionCondition}
-              id="selecionar-resposta"
-              label="Resposta"
-              value={conditionAnswer ?? ''}
-              onChange={event => setConditionAnswer(event.target.value)}
-            />
-          </>
-        );
-      case 'dropdown':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <Select
-              disabled={!questionCondition}
-              labelId="selecionar-resposta-label"
-              id="selecionar-resposta-label"
-              value={conditionAnswer ?? ''}
-              label="Resposta"
-              onChange={event => {
-                setConditionAnswer(event.target.value);
-              }}
-            >
-              {question.options.map(option => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
-          </>
-        );
-      case 'countries':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <Select
-              disabled={!questionCondition}
-              labelId="selecionar-resposta-label"
-              id="selecionar-resposta-label"
-              value={conditionAnswer ?? ''}
-              label="Resposta"
-              onChange={event => {
-                setConditionAnswer(event.target.value);
-              }}
-            >
-              {mockCountries.map(option => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
-          </>
-        );
-      case 'medications':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <MedicationsInput
-              onChangeAnswer={selectedOptions => {
-                setConditionAnswer(selectedOptions.join(', '));
-              }}
-            />
-          </>
-        );
-    }
   }
 
   return (
@@ -456,7 +346,12 @@ export function QuestionEditDialog({
                   </Select>
                 </FormControl>
                 <FormControl fullWidth margin="normal">
-                  {createQuestionAnswersInput(questions?.find(q => q.id === questionCondition))}
+                  {createQuestionAnswersInput({
+                    question: questions?.find(q => q.id === questionCondition),
+                    questionCondition,
+                    conditionAnswer,
+                    setConditionAnswer,
+                  })}
                 </FormControl>
               </Box>
               <FormControl fullWidth>

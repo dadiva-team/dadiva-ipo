@@ -89,3 +89,12 @@ function compareGroup(originalGroup: Group, modifiedGroup: Group, i18n: TFunctio
 
   return changes;
 }
+
+export function translateResponse(response: string) {
+  const lowerCaseResponse = response.toLowerCase();
+  return lowerCaseResponse === 'yes' || lowerCaseResponse === 'true'
+    ? 'Sim'
+    : lowerCaseResponse === 'no' || lowerCaseResponse === 'false'
+      ? 'Não'
+      : response;
+}

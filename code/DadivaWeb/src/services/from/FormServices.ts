@@ -10,7 +10,7 @@ import {
 import { DomainToRules, FormOutputModel, ModelToDomain, RulesToDomain } from './models/FormOutputModel';
 import { Form } from '../../domain/Form/Form';
 import { RuleProperties } from 'json-rules-engine';
-import { InconsistenciesOutputModel } from './models/InconsistenciesOutputModel';
+import { InconsistenciesOutputModel, RuleWithReasonProperties } from './models/InconsistenciesOutputModel';
 import { SubmitFormOutputModel } from './models/SubmitFormOutputModel';
 import { AnsweredQuestionModel } from './models/AnsweredQuestionModel';
 import { SubmitFormRequest } from './models/SubmitFormRequest';
@@ -110,15 +110,20 @@ export namespace FormServices {
     return true;
   }
 
-  export async function getInconsistencies(): Promise<RuleProperties[]> {
-    const res = await get<InconsistenciesOutputModel>(getInconsistenciesUri);
-    return RulesToDomain(convertKeysToCamelCase(res.inconsistencies));
+  export async function getInconsistencies(language: string): Promise<RuleWithReasonProperties[]> {
+    const res = await get<InconsistenciesOutputModel>(getInconsistenciesUri(language));
+    const inconsistenciesWithReasons = convertKeysToCamelCase(res.inconsistencies);
+
+    return inconsistenciesWithReasons.map(inconsistency => ({
+      rule: RulesToDomain([inconsistency.rule])[0],
+      reason: inconsistency.reason,
+    }));
   }
 
   export async function saveInconsistencies(
     inconsistencies: RuleProperties[],
     language: string,
-    reason: string
+    reason: string[]
   ): Promise<boolean> {
     console.log(JSON.stringify({ inconsistencies: DomainToRules(inconsistencies) }));
 

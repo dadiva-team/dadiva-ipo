@@ -64,8 +64,6 @@ export function PendingSubmissionAnswers({
                   <Box display="flex" alignItems="center">
                     <Tooltip title={getNoteContent(item.question.id) ?? 'Sem Nota'} arrow>
                       <IconButton onClick={() => handleClickOpen(item.question)}>
-                        {' '}
-                        {/* TODO !!!! correct this*/}
                         {notes?.some(note => note.id === item.question.id) ? <EditNoteIcon /> : <NoteAddIcon />}
                       </IconButton>
                     </Tooltip>
@@ -108,7 +106,7 @@ export const renderAnswer = (questionWAnswer: SubmissionAnsweredQuestionModel) =
   } else if (questionWAnswer.question.type == QuestionType.medications && Array.isArray(answer)) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Grid container direction="column" sx={{ alignItems: 'flex-end' }}>
+        <Grid container direction="column">
           {answer.map(ans => (
             <Link
               target="_blank"

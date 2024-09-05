@@ -9,6 +9,7 @@ import Editor from '../../components/backoffice/editTerms/Editor';
 import { Jodit } from 'jodit-react';
 import Sidebar from '../../components/backoffice/editTerms/Sidebar';
 import './EditTermsPage.css';
+import { useTranslation } from 'react-i18next';
 
 export function EditTermsPage() {
   const {
@@ -26,7 +27,7 @@ export function EditTermsPage() {
     sidebarOpen,
     setSidebarOpen,
   } = useEditTermsPage();
-
+  const { t } = useTranslation();
   const editorRef = useRef<Jodit>();
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export function EditTermsPage() {
             <div style={{ padding: '10px' }}>
               <Editor ref={editorRef} initialState={content} setContent={setContent} setIsSubmitted={setIsSubmitted} />
               <Button disabled={isSubmitted} onClick={() => handleUpdateTermRequest(content)}>
-                {isSubmitted ? 'Submitted' : 'Submit Terms'}
+                {isSubmitted ? t('Submitted') : t('Submit Terms')}
               </Button>
             </div>
           </div>

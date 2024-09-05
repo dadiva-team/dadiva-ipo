@@ -12,12 +12,14 @@ import { Save } from '@mui/icons-material';
 import { MedicationsServices } from '../../services/medications/MedicationsServices';
 import { handleRequest } from '../../services/utils/fetch';
 import { sanitizeInput } from './utils/sanitizeUtils';
+import { useTranslation } from 'react-i18next';
 
 interface BooleanButtonsProps {
   onChangeAnswer: (answer: boolean) => void;
 }
 
 export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
+  const { t } = useTranslation();
   const [isYesClicked, setIsYesClicked] = React.useState(false);
   const [isNoClicked, setIsNoClicked] = React.useState(false);
 
@@ -48,7 +50,7 @@ export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
         startIcon={<CloseIcon />}
         sx={{ borderRadius: 50, marginRight: 5 }}
       >
-        Não
+        {t('No')}
       </Button>
       <Button
         variant={isYesClicked ? 'contained' : 'outlined'}
@@ -57,7 +59,7 @@ export function BooleanButtons({ onChangeAnswer }: BooleanButtonsProps) {
         startIcon={<CheckIcon />}
         sx={{ borderRadius: 50 }}
       >
-        Sim
+        {t('Yes')}
       </Button>
     </Box>
   );
@@ -69,6 +71,7 @@ type EditButtonnProps = {
 };
 
 export function EditButton({ onChangeAnswer, enableEdit }: EditButtonnProps) {
+  const { t } = useTranslation();
   return (
     <Button
       variant="outlined"
@@ -77,7 +80,7 @@ export function EditButton({ onChangeAnswer, enableEdit }: EditButtonnProps) {
       disabled={!enableEdit}
       sx={{ borderRadius: 50, height: 40 }}
     >
-      Editar
+      {t('Edit')}
     </Button>
   );
 }
@@ -87,21 +90,50 @@ type NextQuestionButtonProps = {
 };
 
 export function NextQuestionButton({ onNextQuestion }: NextQuestionButtonProps) {
+  const { t } = useTranslation();
   return (
     <Button variant="contained" onClick={onNextQuestion} startIcon={<NavigateNextIcon />} sx={{ borderRadius: 50 }}>
-      Próxima Pergunta
+      {t('Next Question')}
     </Button>
   );
 }
 
 type SubmitFormButtonProps = {
   onSubmit: () => void;
+  disabled: boolean;
 };
 
-export function SubmitFormButton({ onSubmit }: SubmitFormButtonProps) {
+export function SubmitFormButton({ onSubmit, disabled }: SubmitFormButtonProps) {
+  const { t } = useTranslation();
   return (
-    <Button variant="contained" onClick={onSubmit} startIcon={<PublishIcon />} sx={{ borderRadius: 50 }}>
-      Submeter formulario
+    <Button
+      variant="contained"
+      onClick={onSubmit}
+      disabled={disabled}
+      startIcon={<PublishIcon />}
+      sx={{ borderRadius: 50, alignItems: 'center' }}
+    >
+      {t('Submit Form')}
+    </Button>
+  );
+}
+
+type SubmitInconsistenciesButtonProps = {
+  onSubmit: () => void;
+  disabled: boolean;
+};
+
+export function SubmitInconsistenciesButton({ onSubmit, disabled }: SubmitInconsistenciesButtonProps) {
+  const { t } = useTranslation();
+  return (
+    <Button
+      variant="contained"
+      onClick={onSubmit}
+      startIcon={<PublishIcon />}
+      disabled={disabled}
+      sx={{ borderRadius: 50, alignItems: 'center' }}
+    >
+      {t('Submit Inconsistencies')}
     </Button>
   );
 }
@@ -111,9 +143,10 @@ type ReviewFormButtonProps = {
 };
 
 export function ReviewFormButton({ onReview }: ReviewFormButtonProps) {
+  const { t } = useTranslation();
   return (
     <Button variant="contained" onClick={onReview} startIcon={<PublishIcon />} sx={{ borderRadius: 50 }}>
-      Rever o formulario
+      {t('ReviewForm')}
     </Button>
   );
 }
@@ -123,6 +156,7 @@ interface TextInputProps {
 }
 
 export function TextInput({ onChangeAnswer }: TextInputProps) {
+  const { t } = useTranslation();
   const [value, setValue] = useState<string>('');
   const handleChange = (value: React.ChangeEvent<HTMLInputElement>) => {
     setValue(value.target.value);
@@ -160,7 +194,7 @@ export function TextInput({ onChangeAnswer }: TextInputProps) {
         disabled={value.length === 0}
         sx={{ borderRadius: 50 }}
       >
-        Guardar
+        {t('Save')}
       </Button>
     </Box>
   );
@@ -175,6 +209,7 @@ type MedicationsInput = {
 };
 
 export function MedicationsInput({ onChangeAnswer }: MedicationsInput) {
+  const { t } = useTranslation();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [possibleOptions, setPossibleOptions] = useState<string[]>([]);
@@ -225,7 +260,7 @@ export function MedicationsInput({ onChangeAnswer }: MedicationsInput) {
         sx={{ borderRadius: 50 }}
         disabled={selectedOptions.length === 0}
       >
-        Guardar
+        {t('Save')}
       </Button>
     </div>
   );
@@ -373,6 +408,7 @@ type NavButtonsProps = {
 };
 
 export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQuestion }: NavButtonsProps) {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -391,7 +427,7 @@ export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQue
         disabled={!prevEnabled}
         sx={{ borderRadius: 50, border: 1, borderColor: 'black' }}
       >
-        Anterior
+        {t('Previous Question')}
       </Button>
       <Button
         variant="contained"
@@ -400,7 +436,7 @@ export function NavButtons({ onNextQuestion, prevEnabled, nextEnabled, onPrevQue
         endIcon={<NavigateNextIcon />}
         sx={{ borderRadius: 50, border: 1, borderColor: 'black' }}
       >
-        Seguinte
+        {t('Next Question')}
       </Button>
     </Box>
   );

@@ -23,3 +23,11 @@ export class Question {
   options: string[] | null;
   showCondition?: ShowCondition;
 }
+
+export function createEmptyForm(language: string): Form {
+  return {
+    groups: [] as Group[],
+    rules: [] as RuleProperties[],
+    language,
+  } as Form;
+}

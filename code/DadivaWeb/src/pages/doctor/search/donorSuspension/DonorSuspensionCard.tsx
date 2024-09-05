@@ -33,7 +33,7 @@ export function DonorSuspensionCard({ userSuspension }: DonorSuspensionCard) {
       )}
       {userSuspension.reason && <Typography>Motivo: {userSuspension.reason}</Typography>}
       {userSuspension.suspensionNote && <Typography>Nota: {userSuspension.suspensionNote}</Typography>}
-      <Typography>Suspenso pelo Medico/Amin com o NIC: {userSuspension.suspendedBy}</Typography>
+      <Typography>Suspenso pelo Medico: {userSuspension?.doctor?.name}</Typography>
     </Box>
   );
 }

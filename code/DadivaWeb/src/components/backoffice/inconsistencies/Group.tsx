@@ -9,11 +9,6 @@ interface GroupProps {
 
 export function Group(props: GroupProps) {
   const renderQuestions = (questions: QuestionModel[], parentQuestionId: string | null = null) => {
-    /*console.log('renderQuestions:');
-    questions.forEach(console.log);
-    console.log('q.showCondition.if');
-    questions.forEach(q => q.showCondition && console.log(q.showCondition.if));*/
-
     const questionList = questions.filter(q =>
       parentQuestionId ? q.showCondition?.if?.[parentQuestionId] : !q.showCondition
     );

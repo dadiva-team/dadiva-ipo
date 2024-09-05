@@ -17,7 +17,7 @@ public record MinimalSubmissionDto(
 public record MinimalInconsistencyDto(
     int Id,
     DateTime Date,
-    string? Reason,
+    List<string>? Reason,
     List<RuleEntity> Rules,
     MinimalUserDto Admin,
     MinimalFormDto Form

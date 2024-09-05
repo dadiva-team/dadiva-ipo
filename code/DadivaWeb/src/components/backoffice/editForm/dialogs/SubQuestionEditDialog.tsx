@@ -26,6 +26,7 @@ import { ErrorAlert } from '../../../shared/ErrorAlert';
 import { useDialog } from './useDialog';
 import { DropdownOptionsForm } from './DropdownOptionsForm';
 import { PendingActionAlert } from '../../../shared/PendingActionAlert';
+import { createQuestionAnswersInput } from './shared/CreateQuestionAnswersInput';
 
 export interface SubQuestionEditDialogProps {
   open: boolean;
@@ -171,80 +172,6 @@ export function SubQuestionEditDialog({
     return response === 'yes' ? 'Sim' : response === 'no' ? 'Não' : response;
   }
 
-  function createQuestionAnswersInput(question?: Question) {
-    if (!question) {
-      return (
-        <>
-          <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-          <Select
-            disabled={true}
-            labelId="selecionar-resposta-label"
-            id="selecionar-resposta-label"
-            value=""
-            label="Resposta"
-          ></Select>
-        </>
-      );
-    }
-
-    switch (question.type) {
-      case 'boolean':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <Select
-              disabled={!questionCondition}
-              labelId="selecionar-resposta-label"
-              id="selecionar-resposta-label"
-              value={conditionAnswer ?? ''}
-              label="Resposta"
-              onChange={event => {
-                setConditionAnswer(event.target.value);
-              }}
-            >
-              <MenuItem value="yes">Sim</MenuItem>
-              <MenuItem value="no">Não</MenuItem>
-            </Select>
-          </>
-        );
-      case 'text':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <TextField
-              disabled={!questionCondition}
-              id="selecionar-resposta"
-              label="Resposta"
-              value={conditionAnswer ?? ''}
-              onChange={event => setConditionAnswer(event.target.value)}
-            />
-          </>
-        );
-      case 'dropdown':
-        return (
-          <>
-            <InputLabel id="selecionar-resposta-label">Resposta</InputLabel>
-            <Select
-              disabled={!questionCondition}
-              labelId="selecionar-resposta-label"
-              id="selecionar-resposta-label"
-              value={conditionAnswer ?? ''}
-              label="Resposta"
-              onChange={event => {
-                setConditionAnswer(event.target.value);
-              }}
-            >
-              {question.options.map(option => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
-          </>
-        );
-    }
-  }
-
   function handleAddNewCondition() {
     console.log('handleAddNewCondition');
     console.log(newConditionQuestion, conditionAnswer);
@@ -312,6 +239,8 @@ export function SubQuestionEditDialog({
               <MenuItem value={'boolean'}>Sim ou Não</MenuItem>
               <MenuItem value={'text'}>Texto</MenuItem>
               <MenuItem value={'dropdown'}>Escolha Múltipla</MenuItem>
+              <MenuItem value={'countries'}>Países</MenuItem>
+              <MenuItem value={'medications'}>Medicamentos</MenuItem>
             </Select>
           </FormControl>
           {questionType === 'dropdown' && (
@@ -408,7 +337,12 @@ export function SubQuestionEditDialog({
                         </Select>
                       </FormControl>
                       <FormControl fullWidth margin="normal">
-                        {createQuestionAnswersInput(questions?.find(q => q.id === newConditionQuestion))}
+                        {createQuestionAnswersInput({
+                          question: questions?.find(q => q.id === newConditionQuestion),
+                          questionCondition,
+                          conditionAnswer,
+                          setConditionAnswer,
+                        })}
                       </FormControl>
                       <IconButton
                         aria-label="add"
@@ -436,7 +370,12 @@ export function SubQuestionEditDialog({
                     {editingConditionKey === fact ? (
                       <Box flexDirection="column" sx={{ width: '25%' }}>
                         <FormControl fullWidth margin="normal" sx={{ width: '100%' }}>
-                          {createQuestionAnswersInput(questions?.find(q => q.id === questionCondition))}
+                          {createQuestionAnswersInput({
+                            question: questions?.find(q => q.id === questionCondition),
+                            questionCondition,
+                            conditionAnswer,
+                            setConditionAnswer,
+                          })}
                         </FormControl>
                         <Button
                           disabled={!questionCondition || !conditionAnswer}

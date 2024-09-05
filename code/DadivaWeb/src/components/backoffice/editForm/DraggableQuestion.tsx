@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import { ErrorAlert } from '../../shared/ErrorAlert';
+import { useTranslation } from 'react-i18next';
 
 interface DraggableQuestionProps {
   question: Question;
@@ -21,6 +22,7 @@ interface DraggableQuestionProps {
 }
 
 export function DraggableQuestion(props: DraggableQuestionProps) {
+  const { t } = useTranslation();
   const [isListVisible, setIsListVisible] = useState(false);
   const isSubquestion = props.parentQuestions.length > 0;
   return (
@@ -58,7 +60,7 @@ export function DraggableQuestion(props: DraggableQuestionProps) {
               bgcolor: 'red',
             }}
           >
-            Subquestão
+            {t('Subquestion')}
           </Button>
         )}
         <Box
@@ -92,7 +94,7 @@ export function DraggableQuestion(props: DraggableQuestionProps) {
               startIcon={<DeleteIcon />}
               sx={{ borderRadius: 50, height: 40 }}
             >
-              Apagar
+              {t('Delete')}
             </Button>
           </Box>
         </Box>

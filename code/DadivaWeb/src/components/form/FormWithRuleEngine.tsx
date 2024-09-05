@@ -9,6 +9,7 @@ import { ErrorAlert } from '../shared/ErrorAlert';
 import { Form } from '../../domain/Form/Form';
 import { getInputComponent } from './utils/GetInputComponent';
 import { Answer } from './utils/formUtils';
+import { useTranslation } from 'react-i18next';
 
 interface FormWithRuleEngineProps {
   isLoading: boolean;
@@ -49,13 +50,15 @@ export default function FormWithRuleEngine({
   onPrevQuestion,
   onReviewMode,
 }: FormWithRuleEngineProps) {
+  const { t } = useTranslation();
+
   return (
     <Container>
       {
         <Box display="flex" justifyContent="center">
           {isLoading ? (
             <Box sx={{ mt: 1 }}>
-              <LoadingSpinner text={'A carregar as perguntas...'} />
+              <LoadingSpinner text={t('Loading Form')} />
               <ErrorAlert error={error} clearError={cleanError} />
             </Box>
           ) : (

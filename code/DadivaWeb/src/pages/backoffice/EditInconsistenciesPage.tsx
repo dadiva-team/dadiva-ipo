@@ -7,8 +7,9 @@ import { Inconsistency } from '../../components/backoffice/inconsistencies/Incon
 import Typography from '@mui/material/Typography';
 import { AddConditionDialog } from '../../components/backoffice/inconsistencies/AddConditionDialog';
 import { useEditInconsistenciesPage } from '../../components/backoffice/inconsistencies/useEditInconsistenciesPage';
-
-const SHOW_FORM = false;
+import { FormShowModal } from '../../components/backoffice/inconsistencies/FormShowDialog';
+import { SubmitInconsistenciesButton } from '../../components/form/Inputs';
+import { EditConditionDialog } from '../../components/backoffice/inconsistencies/EditConditionDialog';
 
 export function EditInconsistenciesPage() {
   const {
@@ -22,48 +23,32 @@ export function EditInconsistenciesPage() {
     setError,
     onAddInconsistency,
     onAddCondition,
+    onEditCondition,
+    onDeletingInconsistencyGroup,
     onDeletingInconsistency,
     conditionAllIsEmpty,
     saveInconsistencies,
+    showForm,
+    onShowForm,
+    onAddReason,
+    reasons,
+    onOpenEditDialog,
+    editingCondition,
+    setEditingCondition,
   } = useEditInconsistenciesPage();
 
   return (
-    <div>
-      <div>
-        {isLoading ? (
-          <Box sx={{ mt: 1 }}>
-            <LoadingSpinner text={'A carregar as incoerências...'} />
-            <ErrorAlert error={error} clearError={() => setError(null)} />
-          </Box>
-        ) : (
-          <>
-            <List sx={{ width: '100%' }}>
-              {inconsistencies.map((inc, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                    margin: 2,
-                    border: 1.5,
-                    borderColor: 'black',
-                  }}
-                >
-                  <Inconsistency
-                    inconsistency={inc}
-                    groups={formFetchData.groups}
-                    onAddCondition={() => onAddCondition(index)}
-                    onDelete={() => onDeletingInconsistency(index, inc)}
-                  />
-                  {index !== inconsistencies.length - 1 && <Divider />}
-                </Card>
-              ))}
-            </List>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
+    <Box>
+      {isLoading ? (
+        <Box sx={{ mt: 1 }}>
+          <LoadingSpinner text={'A carregar as incoerências...'} />
+          <ErrorAlert error={error} clearError={() => setError(null)} />
+        </Box>
+      ) : (
+        <>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pl: 1, pr: 2 }}>
+            <Typography variant="h6">Incoerências</Typography>
+            <Box>
               <Button
                 color="primary"
                 disabled={conditionAllIsEmpty(inconsistencies[inconsistencies.length - 1]?.conditions)}
@@ -72,36 +57,77 @@ export function EditInconsistenciesPage() {
                 Criar Grupo
               </Button>
             </Box>
-            <Box>
-              {SHOW_FORM && <Typography variant="h6">Formulário</Typography> &&
-                formFetchData.groups.map(group => <Group group={group} key={group.name} />)}
-            </Box>
-            <AddConditionDialog
-              open={addingCondition !== null}
-              questions={formFetchData.groups.flatMap(g => g.questions)}
-              onAnswer={(fact, type, answer) => {
-                setInconsistencies(prev => {
-                  return prev.map((rule, i) => {
-                    if (i == addingCondition && 'all' in rule.conditions)
-                      return {
-                        ...rule,
-                        conditions: {
-                          all: [...rule.conditions.all, { fact, operator: type, value: answer }],
-                        },
-                      };
-
-                    return rule;
-                  });
-                });
-              }}
-              onClose={() => setAddingCondition(null)}
-            />
-            <Button disabled={inconsistencies.length == 0} onClick={saveInconsistencies}>
-              Guardar Incoerências
+            <Button variant="contained" onClick={() => onShowForm()}>
+              Ver fomulário
             </Button>
-          </>
-        )}
-      </div>
-    </div>
+          </Box>
+          <List sx={{ width: '100%' }}>
+            {inconsistencies.map((inc, groupIndex) => (
+              <Card
+                key={groupIndex}
+                sx={{
+                  margin: 2,
+                  border: 1.5,
+                  borderColor: 'black',
+                }}
+              >
+                <Inconsistency
+                  inconsistency={inc}
+                  groups={formFetchData.groups}
+                  onAddCondition={() => onAddCondition(groupIndex)}
+                  onDelete={ind => onDeletingInconsistency(groupIndex, ind)}
+                  onDeleteGroup={() => onDeletingInconsistencyGroup(groupIndex)}
+                  onOpenEditDialog={(incIdx, updatedCondition) =>
+                    onOpenEditDialog(groupIndex, incIdx, updatedCondition)
+                  }
+                  reason={reasons[groupIndex]}
+                  setReason={reason => onAddReason(groupIndex, reason)}
+                />
+                {groupIndex !== inconsistencies.length - 1 && <Divider />}
+              </Card>
+            ))}
+          </List>
+          <Box>
+            {showForm && <Typography variant="h6">Formulário</Typography> &&
+              formFetchData.groups.map(group => <Group group={group} key={group.name} />)}
+          </Box>
+          <FormShowModal form={formFetchData} openModal={showForm} handleCloseModal={onShowForm} />
+          <AddConditionDialog
+            open={addingCondition !== null}
+            questions={formFetchData.groups.flatMap(g => g.questions)}
+            onAnswer={(fact, type, answer) => {
+              setInconsistencies(prev => {
+                return prev.map((rule, i) => {
+                  if (i == addingCondition && 'all' in rule.conditions)
+                    return {
+                      ...rule,
+                      conditions: {
+                        all: [...rule.conditions.all, { fact, operator: type, value: answer }],
+                      },
+                    };
+
+                  return rule;
+                });
+              });
+            }}
+            onClose={() => setAddingCondition(null)}
+          />
+          <EditConditionDialog
+            open={editingCondition !== null}
+            questions={formFetchData.groups.flatMap(g => g.questions)}
+            condition={editingCondition?.condition}
+            onAnswer={(fact, answer) => {
+              onEditCondition(editingCondition.groupIdx, editingCondition.incIdx, fact, answer);
+              setEditingCondition(null);
+            }}
+            onClose={() => setEditingCondition(null)}
+          />
+          {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <SubmitInconsistenciesButton onSubmit={saveInconsistencies} disabled={inconsistencies.length == 0} />
+          </Box>
+        </>
+      )}
+    </Box>
   );
 }

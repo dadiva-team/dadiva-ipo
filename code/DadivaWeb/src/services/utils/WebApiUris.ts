@@ -22,7 +22,7 @@ export const unlockSubmissionUri = (submissionId: number) => `${API_URL}/submiss
 export const reviewSubmissionUri = (submissionId: number) => `${API_URL}/review/${submissionId}`;
 export const notificationsUri = `${API_URL}/submissions/pending/notifications`;
 export const notesFromReviewUri = (reviewId: number) => `${API_URL}/forms/review/${reviewId}/notes`;
-export const getInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
+export const getInconsistenciesUri = (language: string) => `${API_URL}/forms/inconsistencies/${language}`;
 export const editInconsistenciesUri = `${API_URL}/forms/inconsistencies`;
 
 export const getSubmissionsStatsUri = `${API_URL}/submissions/stats`;

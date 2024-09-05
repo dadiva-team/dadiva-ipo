@@ -1,11 +1,9 @@
 using DadivaAPI.domain;
 using DadivaAPI.domain.user;
 using DadivaAPI.repositories;
-using DadivaAPI.routes.users.models;
 using DadivaAPI.services.users.dtos;
 using DadivaAPI.utils;
 using FluentResults;
-using Microsoft.EntityFrameworkCore;
 using DomainToFromEntityExtensions = DadivaAPI.domain.DomainToFromEntityExtensions;
 
 namespace DadivaAPI.services.users;
@@ -106,7 +104,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
         {
             var success = await repository.DeleteUser(nic);
             return !success
-                ? Result.Fail(new UserError.TokenCreationError())
+                ? Result.Fail(new UserError.UserNotDeletedError())
                 : //TODO: Custom error
                 Result.Ok();
         });
@@ -118,7 +116,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
         {
             var user = await repository.GetUserByNic(nic);
             return user == null
-                ? Result.Fail(new UserError.TokenCreationError()) //TODO: Custom Error
+                ? Result.Fail(new UserError.UserNotFoundError())
                 : Result.Ok(new UserWithNameExternalInfo(user.Name, user.Nic));
         });
     }
@@ -165,7 +163,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
                 : Result.Ok();
         });
     }
-    
+
     public async Task<Result> AddPendingReviewSuspension(string donorNic, string startDate)
     {
         return await context.WithTransaction(async () =>
@@ -244,17 +242,17 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             var suspensionEntity = await repository.GetSuspension(userNic);
             if (suspensionEntity is null)
             {
-                return Result.Fail(new UserError.TokenCreationError()); //TODO: Custom Error
+                return Result.Fail(new UserError.UserHasNoSuspensionError());
             }
 
             return Result.Ok(new SuspensionWithNamesExternalInfo(
-                suspensionEntity.Donor.Nic,
-                suspensionEntity.Donor.Name,
-                suspensionEntity.Doctor.Nic,
-                suspensionEntity.Doctor.Name,
+                new UserWithNameExternalInfo(suspensionEntity.Donor.Name, suspensionEntity.Donor.Nic),
+                suspensionEntity.Doctor is null
+                    ? null
+                    : new UserWithNameExternalInfo(suspensionEntity.Doctor.Name, suspensionEntity.Doctor.Nic),
                 suspensionEntity.Type,
-                suspensionEntity.StartDate.ToString(),
-                suspensionEntity.EndDate?.ToString(),
+                suspensionEntity.StartDate.ToString("yyyy-MM-dd"),
+                suspensionEntity.EndDate?.ToString("yyyy-MM-dd"),
                 suspensionEntity.Reason,
                 suspensionEntity.Note
             ));

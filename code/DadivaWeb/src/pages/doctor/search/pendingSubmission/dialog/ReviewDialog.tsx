@@ -5,7 +5,6 @@ import {
   DialogTitle,
   Button,
   TextField,
-  Typography,
   IconButton,
   Box,
   CircularProgress,
@@ -16,8 +15,6 @@ interface ReviewDialogProps {
   dialogOpen: boolean;
   dialogType: boolean;
   finalNote: string;
-  invalidQuestionsLength: number;
-  notesLength: number;
   handleDialogClose: () => void;
   handleDialogSubmit: () => void;
   setFinalNote: (note: string) => void;
@@ -28,8 +25,6 @@ export function ReviewDialog({
   dialogOpen,
   dialogType,
   finalNote,
-  invalidQuestionsLength,
-  notesLength,
   handleDialogClose,
   handleDialogSubmit,
   setFinalNote,
@@ -75,12 +70,12 @@ export function ReviewDialog({
               onChange={e => setFinalNote(e.target.value)}
             />
           )}
-          {dialogType && invalidQuestionsLength !== notesLength && (
+          {/*dialogType  && (
             <Typography color="error">
               Há questões inválidas que não tem notas associadas. Por favor, adicione notas a todas as questões
               inválidas.
             </Typography>
-          )}
+          )*/}
           {isSubmitting && <CircularProgress sx={{ display: 'block', margin: '0 auto' }} />}
           <Box display="flex" justifyContent="space-between" width="70%">
             <Button onClick={handleDialogClose}>Cancelar</Button>

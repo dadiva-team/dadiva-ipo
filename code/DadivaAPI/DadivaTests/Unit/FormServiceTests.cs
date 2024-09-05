@@ -67,7 +67,7 @@ public class FormServiceTests
     [Fact]
     public async Task GetInconsistenciesReturnsErrorIfNoInconsistenciesAreFound()
     {
-        var inconsistencies = await FormService.GetInconsistencies();
+        var inconsistencies = await FormService.GetInconsistencies("Pt");
         Assert.True(inconsistencies.IsFailed);
         Assert.IsType<FormErrors.NoInconsistenciesError>(inconsistencies.Errors.First());
     }
@@ -77,10 +77,10 @@ public class FormServiceTests
     {
         var admin = new UserEntity { Nic = "12345678", HashedPassword = "", Name="Test", Roles = ["admin"]};
         var form = new FormEntity { Language = "En", Date = DateTime.Now, Submissions = null, Admin = admin, Rules = [], Inconsistencies = null, QuestionGroups = []};
-        var inconsistencyEntity = new InconsistencyEntity { Admin = admin, Date = DateTime.Now, Form = form, Reason = "Reason", Rules = []};
+        var inconsistencyEntity = new InconsistencyEntity { Admin = admin, Date = DateTime.Now, Form = form, Reason = null, Rules = []};
         await Context.Inconsistencies.AddAsync(inconsistencyEntity);
         await Context.SaveChangesAsync();
-        var inconsistencies = await FormService.GetInconsistencies();
+        var inconsistencies = await FormService.GetInconsistencies(form.Language);
         Assert.True(inconsistencies.IsSuccess);
         Context.Inconsistencies.Remove(inconsistencyEntity);
         Context.Forms.Remove(form);

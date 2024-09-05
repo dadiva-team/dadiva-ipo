@@ -70,6 +70,6 @@ export function checkInconsistencies(
       invalidGroups.push(invalidIds);
     }
   }
-
+  console.log('invalidGroups', invalidGroups);
   return invalidGroups;
 }

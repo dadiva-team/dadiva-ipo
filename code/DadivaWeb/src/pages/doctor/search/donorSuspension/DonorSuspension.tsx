@@ -45,7 +45,6 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
   const [duration, setDuration] = useState<number>(0);
 
   const submitSuspension = async () => {
-    console.log('submit suspension');
     const request = {
       userNic: Number(nic),
       suspensionType: suspensionType,

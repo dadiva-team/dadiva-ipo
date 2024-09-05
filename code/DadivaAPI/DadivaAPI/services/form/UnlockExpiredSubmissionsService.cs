@@ -8,8 +8,8 @@ namespace DadivaAPI.services.form
     public class UnlockExpiredSubmissionsService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly TimeSpan _unlockInterval = TimeSpan.FromMinutes(1);
-        private readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
+        private readonly TimeSpan _unlockInterval = TimeSpan.FromMinutes(30);
+        private readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(10);
 
         public UnlockExpiredSubmissionsService(IServiceScopeFactory scopeFactory)
         {

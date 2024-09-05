@@ -9,9 +9,11 @@ export namespace Uris {
 
   export const FORM = 'form';
   export const BACKOFFICE = '/backoffice';
+  export const STATISTICS = '/backoffice/statistics';
   export const TERMS_CONDITIONS = '/backoffice/terms-conditions';
   export const EDIT_FORM = '/backoffice/form';
   export const MANAGE_USERS = '/backoffice/users';
+  export const SETTINGS = '/backoffice/settings';
 
   export const EDIT_INCONSISTENCIES = '/backoffice/inconsistencies';
 

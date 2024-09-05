@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { useNavigate } from 'react-router-dom';
-import { Form, Group as GroupDomain, Question, ShowCondition } from '../../../domain/Form/Form';
+import { createEmptyForm, Form, Group as GroupDomain, Question, ShowCondition } from '../../../domain/Form/Form';
 import { FormServices } from '../../../services/from/FormServices';
 import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { Uris } from '../../../utils/navigation/Uris';
 import BACKOFFICE = Uris.BACKOFFICE;
 import { useTranslation } from 'react-i18next';
 import { compareForms, FormChanges } from './utils';
+import { useLanguage } from '../LanguageProvider';
 
 export function useEditFormPage() {
   const { i18n } = useTranslation();
+  const { backofficeLanguage } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState<Question>(null);
   const [editingSubQuestion, setEditingSubQuestion] = useState<Question>(null);
@@ -42,9 +44,12 @@ export function useEditFormPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [error, res] = await handleRequest(FormServices.getForm(i18n.language));
+      const [error, res] = await handleRequest(FormServices.getForm(backofficeLanguage));
       if (error) {
         handleError(error, setError, nav);
+        setForm(createEmptyForm(backofficeLanguage));
+        setOriginalForm(createEmptyForm(backofficeLanguage));
+        setIsLoading(false);
         return;
       }
       setForm(res as Form);
@@ -53,7 +58,7 @@ export function useEditFormPage() {
     };
 
     if (isLoading) fetch();
-  }, [i18n.language, isLoading, nav]);
+  }, [backofficeLanguage, isLoading, nav]);
 
   function calculateFromShowConditions(showCondition: ShowCondition): TopLevelCondition {
     const condition: TopLevelCondition = { all: [] };
@@ -223,6 +228,7 @@ export function useEditFormPage() {
   }
 
   function handleAddQuestion(question: Question, groupName: string) {
+    console.log('handleAddQuestion:', question, groupName);
     setForm(oldForm => {
       const updatedGroups = oldForm.groups.map(group => {
         if (group.name === groupName) {

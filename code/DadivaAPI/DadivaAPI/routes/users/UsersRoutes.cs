@@ -104,10 +104,8 @@ public static class UsersRoutes
             suspension =>
             {
                 var outputModel = new GetSuspensionOutputModel(
-                    suspension.DonorNic,
-                    suspension.DonorName,
-                    suspension.DoctorNic,
-                    suspension.DoctorName,
+                    suspension.Donor,
+                    suspension.Doctor,
                     suspension.SuspensionType,
                     suspension.SuspensionStartDate,
                     suspension.SuspensionEndDate,
