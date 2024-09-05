@@ -100,14 +100,16 @@ export function NextQuestionButton({ onNextQuestion }: NextQuestionButtonProps) 
 
 type SubmitFormButtonProps = {
   onSubmit: () => void;
+  disabled: boolean;
 };
 
-export function SubmitFormButton({ onSubmit }: SubmitFormButtonProps) {
+export function SubmitFormButton({ onSubmit, disabled }: SubmitFormButtonProps) {
   const { t } = useTranslation();
   return (
     <Button
       variant="contained"
       onClick={onSubmit}
+      disabled={disabled}
       startIcon={<PublishIcon />}
       sx={{ borderRadius: 50, alignItems: 'center' }}
     >

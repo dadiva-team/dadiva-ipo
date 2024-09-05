@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { useNavigate } from 'react-router-dom';
-import { Form, Group as GroupDomain, Question, ShowCondition } from '../../../domain/Form/Form';
+import { createEmptyForm, Form, Group as GroupDomain, Question, ShowCondition } from '../../../domain/Form/Form';
 import { FormServices } from '../../../services/from/FormServices';
 import { RuleProperties, TopLevelCondition } from 'json-rules-engine';
 import { Uris } from '../../../utils/navigation/Uris';
@@ -47,6 +47,9 @@ export function useEditFormPage() {
       const [error, res] = await handleRequest(FormServices.getForm(backofficeLanguage));
       if (error) {
         handleError(error, setError, nav);
+        setForm(createEmptyForm(backofficeLanguage));
+        setOriginalForm(createEmptyForm(backofficeLanguage));
+        setIsLoading(false);
         return;
       }
       setForm(res as Form);
@@ -225,6 +228,7 @@ export function useEditFormPage() {
   }
 
   function handleAddQuestion(question: Question, groupName: string) {
+    console.log('handleAddQuestion:', question, groupName);
     setForm(oldForm => {
       const updatedGroups = oldForm.groups.map(group => {
         if (group.name === groupName) {

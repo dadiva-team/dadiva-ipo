@@ -41,6 +41,9 @@ export function useEditInconsistenciesPage() {
 
       if (incError) {
         handleError(incError, setError, nav);
+        setInconsistencies([]);
+        setReasons([]);
+        setIsLoading(false);
         return;
       }
 

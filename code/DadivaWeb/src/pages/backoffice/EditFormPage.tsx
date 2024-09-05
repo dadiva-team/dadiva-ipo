@@ -160,7 +160,11 @@ export function EditFormPage() {
 
           <QuestionAddDialog
             open={creatingQuestion}
-            groups={creatingQuestionInGroup ? [creatingQuestionInGroup] : form.groups.map(group => group.name)}
+            groups={
+              creatingQuestionInGroup || creatingQuestionInGroup !== undefined
+                ? [creatingQuestionInGroup]
+                : form.groups.map(group => group.name)
+            }
             onAnswer={(question, groupName) => {
               handleAddQuestion(question, groupName);
               setCreatingQuestionInGroup(null);
@@ -223,6 +227,7 @@ export function EditFormPage() {
             onAnswer={groupName => {
               setFormFetchData((oldForm: Form) => {
                 const newGroups = [...oldForm.groups, { name: groupName, questions: [] }];
+                console.log('new groups', newGroups);
                 return {
                   groups: newGroups,
                   rules: calculateRules(newGroups),
@@ -250,7 +255,10 @@ export function EditFormPage() {
             changes={formChanges}
           />
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <SubmitFormButton onSubmit={handleOpenSubmitDialog} />
+            <SubmitFormButton
+              onSubmit={handleOpenSubmitDialog}
+              disabled={form.groups.length == 0 || form.groups.some(value => value.questions.length == 0)}
+            />
           </Box>
         </Box>
       )}
