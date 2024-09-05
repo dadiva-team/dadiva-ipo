@@ -16,6 +16,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{makecell}
+\usepackage{listings}
 
 % Define colors
 \definecolor{codeblue}{rgb}{0.13,0.13,1}
@@ -196,6 +197,10 @@ The proposed project aims to digitalize the blood donation process at IPO. This 
 \listoftables 
 \cleardoublepage
 
+\setcounter{tocdepth}{3}
+\lstlistoflistings
+\cleardoublepage
+
 
 % Reiniciar a numeração de páginas
 \setcounter{page}{1}
@@ -211,16 +216,20 @@ The proposed project aims to digitalize the blood donation process at IPO. This 
 \include{architecture}
 
 % Capitulo 4
-\include{technologies}
+%\include{technologies}
+\include{data_model}
 
 % Capitulo 5
-\include{implementation}
+\include{frontend_implementation}
+
+% Capitulo 6
+\include{backend_implementation}
 
 % Capitulo 6
 %\include{state}
 
-% Capitulo 6
-\include{tests}
+% Capitulo 7
+%\include{tests}
 
 % Capitulo 7
 \include{future}
