@@ -32,7 +32,7 @@ export function StatsPage() {
   return (
     <>
       <Typography variant="h5" sx={{ mb: 5 }}>
-        {t('Settings')}
+        {t('Statistics')}
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker

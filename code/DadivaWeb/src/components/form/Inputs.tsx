@@ -146,7 +146,7 @@ export function ReviewFormButton({ onReview }: ReviewFormButtonProps) {
   const { t } = useTranslation();
   return (
     <Button variant="contained" onClick={onReview} startIcon={<PublishIcon />} sx={{ borderRadius: 50 }}>
-      {t('ReviewForm')}
+      {t('Review Form')}
     </Button>
   );
 }

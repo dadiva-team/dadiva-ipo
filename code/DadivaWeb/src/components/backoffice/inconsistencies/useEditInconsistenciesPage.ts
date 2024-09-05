@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
 import { FormServices } from '../../../services/from/FormServices';
 import { ConditionProperties, RuleProperties, TopLevelCondition } from 'json-rules-engine';
-import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../LanguageProvider';
+import { Uris } from '../../../utils/navigation/Uris';
+import BACKOFFICE = Uris.BACKOFFICE;
 
 export function useEditInconsistenciesPage() {
-  const { i18n } = useTranslation();
   const { backofficeLanguage } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,8 +146,8 @@ export function useEditInconsistenciesPage() {
     const filteredInconsistencies = inconsistencies.filter(
       inc => 'all' in inc.conditions && inc.conditions.all.length !== 0
     );
-    FormServices.saveInconsistencies(filteredInconsistencies, i18n.language, reasons).then(res => {
-      if (res) nav('/');
+    FormServices.saveInconsistencies(filteredInconsistencies, backofficeLanguage, reasons).then(res => {
+      if (res) nav(BACKOFFICE);
     });
   }
 

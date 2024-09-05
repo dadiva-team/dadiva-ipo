@@ -47,8 +47,9 @@ export function useEditFormPage() {
       const [error, res] = await handleRequest(FormServices.getForm(backofficeLanguage));
       if (error) {
         handleError(error, setError, nav);
-        setForm(createEmptyForm(backofficeLanguage));
-        setOriginalForm(createEmptyForm(backofficeLanguage));
+        const emptyForm = createEmptyForm(backofficeLanguage);
+        setForm(emptyForm);
+        setOriginalForm(emptyForm);
         setIsLoading(false);
         return;
       }

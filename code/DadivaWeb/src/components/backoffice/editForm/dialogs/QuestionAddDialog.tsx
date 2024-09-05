@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -21,11 +21,18 @@ import { DropdownOptionsForm } from './DropdownOptionsForm';
 export interface QuestionAddDialogProps {
   open: boolean;
   groups: string[];
+  creatingQuestionInGroup: string | null;
   onAnswer: (question: Question, groupName: string) => void;
   onClose: () => void;
 }
 
-export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionAddDialogProps) {
+export function QuestionAddDialog({
+  open,
+  groups,
+  creatingQuestionInGroup,
+  onAnswer,
+  onClose,
+}: QuestionAddDialogProps) {
   const {
     questionText,
     setQuestionText,
@@ -42,7 +49,15 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionA
     moveOptionDown,
   } = useDialog();
 
-  const [questionGroup, setQuestionGroup] = React.useState(groups[0]);
+  useEffect(() => {
+    if (creatingQuestionInGroup) {
+      setQuestionGroup(creatingQuestionInGroup);
+    } else {
+      setQuestionGroup(null);
+    }
+  }, [creatingQuestionInGroup]);
+
+  const [questionGroup, setQuestionGroup] = React.useState<string | null>(creatingQuestionInGroup || null);
 
   const handleCloseAndAnswer = React.useCallback(() => {
     if (questionText.trim() === '') {
@@ -92,16 +107,18 @@ export function QuestionAddDialog({ open, groups, onAnswer, onClose }: QuestionA
           }}
         >
           <FormControl fullWidth>
-            <InputLabel id="selecionar-grupo-label">Grupo da Resposta</InputLabel>
+            <InputLabel id="selecionar-grupo-label" shrink={!!questionGroup}>
+              Grupo da Resposta
+            </InputLabel>
             <Select
               labelId="selecionar-grupo-label"
-              disabled={groups.length === 1}
               id="selecionar-grupo"
-              value={questionGroup}
+              value={questionGroup || ''}
               label="Grupo da Resposta"
               onChange={event => {
                 setQuestionGroup(event.target.value);
               }}
+              disabled={!!creatingQuestionInGroup}
             >
               {groups.map(group => (
                 <MenuItem key={group} value={group}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import { Group } from '../../components/backoffice/editForm/Group';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -63,6 +63,16 @@ export function EditFormPage() {
   } = useEditFormPage();
   const { t } = useTranslation();
 
+  // Monitors
+  useEffect(() => {
+    //console.log('Form Data: ' + JSON.stringify(formRawFetchData));
+    console.log('creatingQuestion ' + JSON.stringify(creatingQuestion));
+    console.log('editingGroup: ' + JSON.stringify(editingGroup));
+    //console.log('Question Colors: ' + JSON.stringify(questionColors));
+    //console.log('Form answers: ' + JSON.stringify(formAnswers));
+    //console.log('Current Group: ' + currentGroup);
+  }, [creatingQuestion, editingGroup]);
+
   return (
     <Box>
       {isLoading ? (
@@ -78,7 +88,10 @@ export function EditFormPage() {
                 variant="outlined"
                 sx={{ borderRadius: 40, marginRight: 2 }}
                 disabled={form.groups.length === 0}
-                onClick={() => setCreatingQuestion(true)}
+                onClick={() => {
+                  setCreatingQuestionInGroup(null);
+                  setCreatingQuestion(true);
+                }}
               >
                 {t('Create Question')}
               </Button>
@@ -160,11 +173,8 @@ export function EditFormPage() {
 
           <QuestionAddDialog
             open={creatingQuestion}
-            groups={
-              creatingQuestionInGroup || creatingQuestionInGroup !== undefined
-                ? [creatingQuestionInGroup]
-                : form.groups.map(group => group.name)
-            }
+            groups={creatingQuestionInGroup ? [creatingQuestionInGroup] : form.groups.map(group => group.name)}
+            creatingQuestionInGroup={creatingQuestionInGroup}
             onAnswer={(question, groupName) => {
               handleAddQuestion(question, groupName);
               setCreatingQuestionInGroup(null);
@@ -234,8 +244,12 @@ export function EditFormPage() {
                   language: oldForm.language,
                 };
               });
+              setCreatingQuestionInGroup(null);
             }}
-            onClose={() => setCreatingGroup(false)}
+            onClose={() => {
+              setCreatingQuestionInGroup(null);
+              setCreatingGroup(false);
+            }}
           />
           <DeleteGroupDialog
             open={deletingGroup !== null}
