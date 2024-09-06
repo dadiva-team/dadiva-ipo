@@ -1,5 +1,6 @@
 const API_URL = 'https://localhost:7011/api';
 export const createTokenUri = `${API_URL}/users/login`;
+export const revokeTokenUri = `${API_URL}/users/logout`;
 export const createUserUri = `${API_URL}/users`;
 export const getUsersUri = `${API_URL}/users`;
 export const getUserByNicUri = (nic: number) => `${API_URL}/users/${nic}`;

@@ -68,6 +68,7 @@
   "Delete": "Delete",
   "Subquestion": "Subquestion",
   "Loading Terms": "Loading terms and conditions...",
+  "Loading Stats": "Loading statistics...",
   "Accept Terms": "I accept the terms and conditions",
   "Next Question": "Next Question",
   "Previous Question": "Previous Question",
@@ -77,5 +78,16 @@
   "Submit Inconsistencies": "Submit Inconsistencies",
   "Edit": "Edit",
   "Review Form": "Review Form",
-  "ResponseForm": "Answer"
+  "ResponseForm": "Answer",
+  "Submission Graph": "Submission Graph",
+  "Logout Message": "Are you sure you want to log out?",
+  "Cancel": "Cancel",
+  "Logout": "Logout",
+  "Logout Title Message": "Logout",
+  "Welcome to DADIVA IPO": "Welcome to DADIVA IPO",
+  "Your journey towards making a difference starts here": "Your journey towards making a difference starts here!",
+  "Account State": "Account State:",
+  "Admin Dashboard": "Administrator Dashboard",
+  "Go to Backoffice": "Go to Backoffice",
+  "Go to Doctor Page": "Go to Doctor Page"
 }

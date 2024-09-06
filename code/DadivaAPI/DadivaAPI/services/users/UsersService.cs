@@ -45,6 +45,29 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
             return Result.Ok(ulei);
         });
     }
+    
+    public async Task<Result<bool>> RevokeToken(string nic)
+    {
+        return await context.WithTransaction(async () =>
+        {
+            var user = (await repository.GetUserByNic(nic))?.ToDomain();
+
+            if (user == null)
+            {
+                return Result.Fail(new UserError.UserNotFoundError());
+            }
+
+            var newUser = user with { Token = null };
+
+            var newUserEntity = DomainToFromEntityExtensions.ToEntity(newUser);
+
+            var success = await repository.UpdateUser(newUserEntity);
+
+            return !success
+                ? Result.Fail(new UserError.TokenRevokeError())
+                : Result.Ok(true);
+        });
+    }
 
 
     public async Task<Result<UserExternalInfo>> CreateUser(

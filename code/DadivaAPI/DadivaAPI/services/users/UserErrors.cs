@@ -5,6 +5,7 @@ namespace DadivaAPI.services.users;
 public abstract class UserError : Error
 {
     public class TokenCreationError() : UserError;
+    public class TokenRevokeError() : UserError;
     public class UserNotFoundError() : UserError;
     public class UserNotDeletedError() : UserError;
     public class UnknownDonorError() : UserError;

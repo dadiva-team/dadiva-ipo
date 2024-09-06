@@ -3,7 +3,7 @@ import { Role, Session, useSessionManager } from '../../../session/Session';
 import * as React from 'react';
 import reduce from '../utils/Reduce';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
-import { loginNIC } from '../../../services/users/UserServices';
+import { UserServices } from '../../../services/users/UserServices';
 import { SuspensionAccountStatus } from '../../../services/users/models/LoginOutputModel';
 
 export function useLogin(returnTo: string) {
@@ -50,7 +50,7 @@ export function useLogin(returnTo: string) {
 
     const { nic, password } = state.inputs;
 
-    const [error, res] = await handleRequest(loginNIC(nic, password));
+    const [error, res] = await handleRequest(UserServices.loginNIC(nic, password));
     if (error) {
       handleError(error, setError, navigate);
       dispatch({ type: 'error', message: `${error}` });

@@ -205,6 +205,16 @@ public static class HttpExtensions
                     Status = StatusCodes.Status500InternalServerError,
                     Detail = "Ocorreu um erro ao tentar criar o token."
                 };
+            
+            case UserError.TokenRevokeError:
+                return new ProblemDetails
+                {
+                    Type = $"{BaseUrl}/probs/token-revoke-error",
+                    Title = "Erro na revogação do token",
+                    Status = StatusCodes.Status500InternalServerError,
+                    Detail = "Ocorreu um erro ao tentar revogar o token."
+                };
+                
             case UserError.UserNotDeletedError:
                 return new ProblemDetails
                 {

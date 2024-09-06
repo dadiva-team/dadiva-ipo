@@ -74,6 +74,10 @@ public interface IRepository
     public Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout);
 
     public Task<bool> SubmissionExists(int id);
+    
+    public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate);
+    
+    public Task<List<DailySubmissionStats>> GetDailyStats(DateTime startDate, DateTime endDate);
 
 
     /*MEDICATIONS*/
@@ -84,6 +88,5 @@ public interface IRepository
     Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts);
 
     public Task<List<string>> GetCfts(string productName);
-
-    public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate);
+    
 }

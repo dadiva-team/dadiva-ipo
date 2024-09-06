@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { handleError, handleRequest } from '../../../services/utils/fetch';
-import { getUsers, register } from '../../../services/users/UserServices';
+import { UserServices } from '../../../services/users/UserServices';
 
 export function useManageUsers() {
   const [isLoading, setIsLoading] = useState(true);
@@ -14,7 +14,7 @@ export function useManageUsers() {
   useEffect(() => {
     const fetch = async () => {
       console.log('Fetching users');
-      const [error, res] = await handleRequest(getUsers());
+      const [error, res] = await handleRequest(UserServices.getUsers());
       console.log('Error: ' + error);
       console.log('Users: ', res);
       if (error) {
@@ -35,7 +35,7 @@ export function useManageUsers() {
   }
 
   function handleCreateUser(nic: string, password: string, name: string, role: string) {
-    register(nic, password, name, role).then(res => {
+    UserServices.register(nic, password, name, role).then(res => {
       if (res) {
         setIsCreating(false);
         setIsLoading(true);

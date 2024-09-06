@@ -23,7 +23,11 @@ export function Header() {
     >
       <LogoIPO />
       <LanguageSwitcher />
-      {loggedIn ? <UserInfo name={session.session.name} nic={`${session.session.nic}`} /> : <> {} </>}
+      {loggedIn ? (
+        <UserInfo name={session.session.name} nic={`${session.session.nic}`} roles={session.session.perms} />
+      ) : (
+        <> {} </>
+      )}
     </Container>
   );
 }

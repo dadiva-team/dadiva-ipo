@@ -15,7 +15,7 @@ import { SubmitFormOutputModel } from './models/SubmitFormOutputModel';
 import { AnsweredQuestionModel } from './models/AnsweredQuestionModel';
 import { SubmitFormRequest } from './models/SubmitFormRequest';
 import { EditFormRequest } from './models/EditFormRequest';
-import { SubmissionStats } from '../../components/backoffice/statistics/StatsPage';
+import { DailySubmissionStats } from '../../components/backoffice/statistics/StatsPage';
 import { Answer } from '../../components/form/utils/formUtils';
 import { EditInconsistenciesRequest } from './models/EditInconsistenciesRequest';
 
@@ -72,9 +72,9 @@ function transformFormAnswers(formAnswers: Record<string, Answer>[]): AnsweredQu
 }
 
 export namespace FormServices {
-  export async function getSubmissionsStats(start?: number, end?: number): Promise<SubmissionStats> {
+  export async function getSubmissionsStats(start?: number, end?: number): Promise<DailySubmissionStats[]> {
     const queries = !start && !end ? '' : '?' + (start ? `unixStart=${start}&` : '') + (end ? `unixEnd=${end}` : '');
-    const res = await get<SubmissionStats>(getSubmissionsStatsUri + queries);
+    const res = await get<DailySubmissionStats[]>(getSubmissionsStatsUri + queries);
     console.log(res);
     return res;
   }

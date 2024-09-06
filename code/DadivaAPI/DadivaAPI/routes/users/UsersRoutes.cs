@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DadivaAPI.routes.users.models;
 using DadivaAPI.routes.utils;
 using DadivaAPI.services.users;
@@ -12,11 +13,11 @@ public static class UsersRoutes
     {
         var usersGroup = app.MapGroup("/users");
         usersGroup.MapPost("/login", CreateToken).AllowAnonymous();
-
+        usersGroup.MapPost("/logout", RevokeToken).RequireAuthorization("donor");
         usersGroup.MapGet("/{nic}", CheckNicExistence).AllowAnonymous(); //RequireAuthorization("doctor");
 
         usersGroup.MapPost("", CreateUser).RequireAuthorization("admin");
-        usersGroup.MapGet("", GetUsers).AllowAnonymous();//.RequireAuthorization("admin");
+        usersGroup.MapGet("", GetUsers).AllowAnonymous(); //.RequireAuthorization("admin");
         usersGroup.MapDelete("/{nic}", DeleteUser).RequireAuthorization("admin");
 
         usersGroup.MapPost("/suspension", AddSuspension).AllowAnonymous();
@@ -45,6 +46,20 @@ public static class UsersRoutes
             }
         );
     }
+
+    private static async Task<IResult> RevokeToken(HttpContext context, IUsersService service)
+    {
+        var nic = context.User.Claims.First(claim => claim.Type == ClaimTypes.Name).Value.ToString();
+
+        return (await service.RevokeToken(nic)).HandleRequest(
+            success =>
+            {
+                context.Response.Cookies.Delete("token");
+                return Results.Ok();
+            }
+        );
+    }
+
 
     private static async Task<IResult> CreateUser([FromBody] CreateUserInputModel input, IUsersService service)
     {
@@ -118,7 +133,7 @@ public static class UsersRoutes
             }
         );
     }
-    
+
     private static async Task<IResult> GetSuspensions([FromRoute] string nic, IUsersService service)
     {
         return (await service.GetSuspensions(nic)).HandleRequest(
@@ -140,7 +155,7 @@ public static class UsersRoutes
             }
         );
     }
-    
+
 
     private static async Task<IResult> DeleteSuspension([FromRoute] string nic, IUsersService service)
     {

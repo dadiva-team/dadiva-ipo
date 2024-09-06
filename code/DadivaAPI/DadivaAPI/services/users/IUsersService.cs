@@ -6,7 +6,7 @@ namespace DadivaAPI.services.users;
 public interface IUsersService
 {
     public Task<Result<UserLoginExternalInfo>> CreateToken(string nic, string password);
-
+    public Task<Result<bool>> RevokeToken(string nic);
     public Task<Result<UserExternalInfo>> CreateUser(
         string nic,
         string name,
@@ -46,7 +46,7 @@ public interface IUsersService
     );
 
     public Task<Result<SuspensionWithNamesExternalInfo>> GetSuspension(string userNic);
-    
+
     public Task<Result<List<SuspensionWithNamesExternalInfo>>> GetSuspensions(string userNic);
 
     public Task<Result> DeleteSuspension(string userNic);

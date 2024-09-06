@@ -199,6 +199,16 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return SubmissionRepository.SubmissionExists(id);
     }
+    
+    public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate)
+    {
+        return SubmissionRepository.GetStats(startDate, endDate);
+    }
+    
+    public Task<List<DailySubmissionStats>> GetDailyStats(DateTime startDate, DateTime endDate)
+    {
+        return SubmissionRepository.GetDailyStats(startDate, endDate);
+    }
 
     /*MEDICATIONS*/
 
@@ -219,8 +229,5 @@ public class Repository(DadivaDbContext context) : IRepository
         return MedicationRepository.GetCfts(productName);
     }
     
-    public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate)
-    {
-        return SubmissionRepository.GetStats(startDate, endDate);
-    }
+
 }

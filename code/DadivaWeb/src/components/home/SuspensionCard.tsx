@@ -22,8 +22,14 @@ export function SuspensionCard({ suspensionStartDate, suspensionEndDate, suspens
         width: '40%',
         elevation: 16,
         justifyContent: 'space-between',
+        border: 1,
+        borderRadius: 2,
       }}
     >
+      <Typography variant="h5" sx={{ mb: 5 }}>
+        <strong>{t('Account State')}</strong>
+      </Typography>
+
       {suspensionType === SuspensionType.PendingReview && (
         <>
           <Typography variant="h6" sx={{ pb: 2 }}>
