@@ -30,4 +30,5 @@ public interface ISubmissionRepository
     public Task<bool> SubmissionExists(int id);
 
     public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate);
+    public Task<List<DailySubmissionStats>> GetDailyStats(DateTime startDate, DateTime endDate);
 }

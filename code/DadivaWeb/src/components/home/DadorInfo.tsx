@@ -17,6 +17,7 @@ import { Role, useSessionManager } from '../../session/Session';
 import { handleRequest } from '../../services/utils/fetch';
 import { UserServices } from '../../services/users/UserServices';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 type UserProps = {
   name: string;
@@ -38,6 +39,7 @@ const MyIcon = () => <PersonIcon sx={{ fontSize: 50 }} />;
 
 const DadorInfo = ({ name, nic, roles }: UserProps) => {
   const { t } = useTranslation();
+  const nav = useNavigate();
   const sessionManager = useSessionManager();
   const prefix = getPrefix(roles);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -58,6 +60,7 @@ const DadorInfo = ({ name, nic, roles }: UserProps) => {
     }
 
     setDialogOpen(false);
+    nav('/');
   };
 
   return (

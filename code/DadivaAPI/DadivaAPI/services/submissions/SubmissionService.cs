@@ -261,13 +261,13 @@ public class SubmissionService(
         });
     }
 
-    public async Task<Result<SubmissionStatsExternalInfo>> GetStats(DateTime? startDate, DateTime? endDate)
+    public async Task<Result<List<DailySubmissionStats>>> GetStats(DateTime? startDate, DateTime? endDate)
     {
         return await context.WithTransaction(async () =>
         {
-            var (total, approved, denied) =
-                await repository.GetStats(startDate ?? DateTime.Now.AddDays(-7), endDate ?? DateTime.Now);
-            return Result.Ok(new SubmissionStatsExternalInfo(total, approved, denied));
+            var dailyStats = await repository.GetDailyStats(startDate ?? DateTime.Now.AddDays(-7), endDate ?? DateTime.Now);
+            return Result.Ok(dailyStats);
         });
     }
+
 }

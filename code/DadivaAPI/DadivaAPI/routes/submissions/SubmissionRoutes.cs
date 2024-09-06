@@ -43,8 +43,20 @@ public static class SubmissionRoutes
         if (startDate == null && endDate != null)
             startDate = DateTime.MinValue;
 
-        return (await service.GetStats(startDate, endDate)).HandleRequest(stats =>
-            Results.Ok(new GetStatsOutputModel(stats.Total, stats.Approved, stats.Denied)));
+        var result = await service.GetStats(startDate, endDate);
+        
+        return result.HandleRequest(dailyStats =>
+        {
+            var output = dailyStats.Select(stats => new GetDailyStatsOutputModel
+            {
+                Date = stats.Date,
+                Total = stats.Total,
+                Approved = stats.Approved,
+                Denied = stats.Denied
+            }).ToList();
+
+            return Results.Ok(output);
+        });
     }
 
     private static async Task<IResult> SubmitSubmission(HttpContext context, [FromBody] SubmitSubmissionRequest input,

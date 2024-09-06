@@ -28,6 +28,24 @@ namespace DadivaAPI.repositories.submissions
 
             return (total, approved, denied);
         }
+        
+       public async Task<List<DailySubmissionStats>> GetDailyStats(DateTime startDate, DateTime endDate)
+        {
+            var stats = await _context.Submissions
+                .Where(s => s.Date >= startDate.ToUniversalTime() && s.Date <= endDate.ToUniversalTime())
+                .GroupBy(s => s.Date.Date)
+                .Select(g => new DailySubmissionStats
+                {
+                    Date = g.Key,
+                    Total = g.Count(),
+                    Approved = g.Count(s => s.Status == SubmissionStatus.Approved),
+                    Denied = g.Count(s => s.Status == SubmissionStatus.Rejected)
+                })
+                .OrderBy(d => d.Date)
+                .ToListAsync();
+
+            return stats;
+        }
 
         public async Task<bool> SubmitSubmission(SubmissionEntity submission)
         {
