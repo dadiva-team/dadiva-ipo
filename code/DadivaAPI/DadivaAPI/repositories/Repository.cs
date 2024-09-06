@@ -84,6 +84,16 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return UserRepository.DeleteSuspension(userNic);
     }
+    
+    public Task<List<SuspensionEntity>> GetSuspensionsEndingTodayOrEarlier()
+    {
+        return UserRepository.GetSuspensionsEndingTodayOrEarlier();
+    }
+    
+    public Task<bool> DeactivateSuspension(SuspensionEntity suspension)
+    {
+        return UserRepository.DeactivateSuspension(suspension);
+    }
 
     /*FORMS*/
     public Task<FormEntity?> GetForm(string language)

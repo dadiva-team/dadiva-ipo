@@ -151,7 +151,11 @@ builder.Services.AddSingleton(new ElasticsearchClient(settings));
 // SSE
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 builder.Services.AddSingleton<NotificationEndpoint>();
+
+// Background services
 builder.Services.AddHostedService<UnlockExpiredSubmissionsService>();
+builder.Services.AddHostedService<DeactivateExpiredSuspensionsService>();
+
 
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IFormService, FormService>();

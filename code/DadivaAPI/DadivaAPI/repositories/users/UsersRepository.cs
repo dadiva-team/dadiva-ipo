@@ -136,6 +136,24 @@ public class UsersRepository : IUsersRepository
         return await _context.SaveChangesAsync() > 0;
     }
     
+    public async Task<List<SuspensionEntity>> GetSuspensionsEndingTodayOrEarlier()
+    {
+        var today = DateTime.UtcNow.Date; 
+
+        return await _context.Suspensions
+            .Where(s => s.IsActive && s.EndDate != null && s.EndDate.Value.Date <= today)
+            .ToListAsync();
+    }
+
+    
+    public async Task<bool> DeactivateSuspension(SuspensionEntity suspension)
+    {
+        suspension.IsActive = false;
+        _context.Suspensions.Update(suspension);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    
     public async Task<bool> UpdateSuspensionsTypeAndDate(string userNic, SuspensionType type, DateTime startDate, DateTime? endDate)
     {
         var suspension = await _context.Suspensions.FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);

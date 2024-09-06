@@ -34,6 +34,9 @@ public interface IRepository
     public Task<bool> UpdateSuspensionIsActive(string userNic, bool isActive);
     public Task<bool> UpdateSuspensionsTypeAndDate(string userNic, SuspensionType type, DateTime startDate, DateTime? endDate);
     public Task<bool> DeleteSuspension(string userNic);
+    
+    public Task<List<SuspensionEntity>> GetSuspensionsEndingTodayOrEarlier();
+    public Task<bool> DeactivateSuspension(SuspensionEntity suspension);
 
     /*FORM*/
     public Task<FormEntity?> GetForm(string language);

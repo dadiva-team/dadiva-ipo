@@ -308,6 +308,20 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
         });
     }
 
+    public async Task DeactivateSuspensionsEndingToday()
+    {
+        var suspensions = await repository.GetSuspensionsEndingTodayOrEarlier();
+        if(suspensions.Count == 0)
+            return;
+
+        foreach (var suspension in suspensions)
+        {
+            
+            await repository.DeactivateSuspension(suspension);
+        }
+    }
+
+
     public async Task<Result> DeleteSuspension(string userNic)
     {
         return await context.WithTransaction(async () =>

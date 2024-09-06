@@ -23,5 +23,8 @@ public interface IUsersRepository
     public Task<bool> UpdateSuspensionsTypeAndDate(string userNic, SuspensionType type, DateTime startDate, DateTime? endDate);
     
     public Task<bool> UpdateSuspensionIsActive(string userNic, bool isActive);
+
+    public Task<List<SuspensionEntity>> GetSuspensionsEndingTodayOrEarlier();
+    public Task<bool> DeactivateSuspension(SuspensionEntity suspension);
     public Task<bool> DeleteSuspension(string userNic);
 }
