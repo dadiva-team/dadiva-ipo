@@ -26,10 +26,12 @@ export function useDoctorSearch() {
   const [user, setUser] = useState<User | null>(null);
 
   const [fetchedSuspension, setFetchedSuspension] = useState<UserSuspension | null>(null);
+  const [suspensionHistory, setSuspensionHistory] = useState<UserSuspension[] | null>(null);
 
   const [pendingView, setPendingView] = useState<boolean | null>(null);
   const [reviewHistoryView, setReviewHistoryView] = useState<boolean | null>(null);
   const [suspensionView, setSuspensionView] = useState<boolean | null>(null);
+  const [suspensionHistoryView, setSuspensionHistoryView] = useState<boolean | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [submissionLimit, setSubmissionLimit] = useState(2);
@@ -51,6 +53,7 @@ export function useDoctorSearch() {
     setUser(null);
     setPendingView(false);
     setReviewHistoryView(false);
+    setSuspensionHistoryView(false);
     resetErrors();
   };
 
@@ -106,6 +109,7 @@ export function useDoctorSearch() {
     setPendingView(true);
     setReviewHistoryView(false);
     setSuspensionView(false);
+    setSuspensionHistoryView(false);
   };
 
   const fetchReviewHistory = async (limit: number, skip: number, reset: boolean) => {
@@ -132,6 +136,7 @@ export function useDoctorSearch() {
     setReviewHistoryView(true);
     setPendingView(false);
     setSuspensionView(false);
+    setSuspensionHistoryView(false);
   };
 
   const fetchSuspension = async () => {
@@ -149,6 +154,23 @@ export function useDoctorSearch() {
       setFetchedSuspension(res);
 
       setSuspensionView(true);
+      setSuspensionHistoryView(false);
+      setReviewHistoryView(false);
+      setPendingView(false);
+    }
+  };
+
+  const fetchSuspensionHistory = async () => {
+    const [error, res] = await handleRequest(DoctorServices.getDonorSuspensionHistory(Number(nic)));
+    if (error) {
+      handleError(error, setError, nav, location.pathname);
+    }
+    console.log('Suspension history:', res);
+    console.log('Suspension :', res.suspensions);
+    if (res) {
+      setSuspensionHistory(res.suspensions);
+      setSuspensionHistoryView(true);
+      setSuspensionView(false);
       setReviewHistoryView(false);
       setPendingView(false);
     }
@@ -181,18 +203,28 @@ export function useDoctorSearch() {
     setReviewHistoryView(false);
     setSuspensionView(false);
     setPendingView(true);
+    setSuspensionHistoryView(false);
   };
 
   const toggleOldView = () => {
     setPendingView(false);
     setSuspensionView(false);
     setReviewHistoryView(true);
+    setSuspensionHistoryView(false);
   };
 
   const toggleSuspensionView = () => {
     setPendingView(false);
     setReviewHistoryView(false);
     setSuspensionView(true);
+    setSuspensionHistoryView(false);
+  };
+
+  const toggleSuspensionHistoryView = () => {
+    setSuspensionHistoryView(true);
+    setReviewHistoryView(false);
+    setPendingView(false);
+    setSuspensionView(false);
   };
 
   const onSubmitedSuccessfully = () => {
@@ -222,9 +254,11 @@ export function useDoctorSearch() {
     reviewsHistory,
     user,
     fetchedSuspension,
+    suspensionHistory,
     pendingView,
     reviewHistoryView,
     suspensionView,
+    suspensionHistoryView,
     submissionLimit,
     submissionSkip,
     hasMoreSubmissions,
@@ -235,10 +269,12 @@ export function useDoctorSearch() {
     fetchPendingSubmission,
     fetchReviewHistory,
     fetchSuspension,
+    fetchSuspensionHistory,
     loadMoreReviews,
     togglePendingView,
     toggleOldView,
     toggleSuspensionView,
+    toggleSuspensionHistoryView,
     handleSearchAndUpdateQuery,
     onSubmitedSuccessfully,
   };

@@ -17,7 +17,7 @@ public static class ReviewRoutes
         IReviewsService service)
     {
         var nic = context.User.Claims.First(claim => claim.Type==ClaimTypes.Name).Value.ToString();
-        return (await service.ReviewSubmission(submissionId, nic, input.Status, input.Notes, input.FinalNote))
+        return (await service.ReviewSubmission(submissionId, nic, input.Status, input.Notes, input.FinalNote, input.Suspend))
             .HandleRequest(submission => Results.Ok());
     }
 }

@@ -4,6 +4,7 @@ public enum SuspensionType
 {
     permanent,
     betweenBloodDonations,
+    betweenReviewAndDonation,
     pendingReview,
     other,
 }

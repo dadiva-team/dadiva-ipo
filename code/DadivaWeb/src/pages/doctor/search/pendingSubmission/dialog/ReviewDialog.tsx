@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,8 @@ import {
   IconButton,
   Box,
   CircularProgress,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
@@ -16,7 +18,7 @@ interface ReviewDialogProps {
   dialogType: boolean;
   finalNote: string;
   handleDialogClose: () => void;
-  handleDialogSubmit: () => void;
+  handleDialogSubmit: (applySuspension: boolean, openProfileAfterReject: boolean) => void;
   setFinalNote: (note: string) => void;
   isSubmitting: boolean;
 }
@@ -30,6 +32,16 @@ export function ReviewDialog({
   setFinalNote,
   isSubmitting,
 }: ReviewDialogProps) {
+  const [applySuspension, setApplySuspension] = useState(false);
+  const [openProfileAfterReject, setOpenProfileAfterReject] = useState(false);
+
+  useEffect(() => {
+    if (!dialogOpen) {
+      setApplySuspension(false);
+      setOpenProfileAfterReject(false);
+    }
+  }, [dialogOpen]);
+
   return (
     <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
       <DialogTitle>{dialogType ? 'Aprovar Submissão' : 'Rejeitar Submissão'}</DialogTitle>
@@ -70,16 +82,29 @@ export function ReviewDialog({
               onChange={e => setFinalNote(e.target.value)}
             />
           )}
-          {/*dialogType  && (
-            <Typography color="error">
-              Há questões inválidas que não tem notas associadas. Por favor, adicione notas a todas as questões
-              inválidas.
-            </Typography>
-          )*/}
+
+          {!dialogType && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={openProfileAfterReject}
+                  onChange={() => setOpenProfileAfterReject(!openProfileAfterReject)}
+                />
+              }
+              label="Abrir o perfil do dador para suspensão"
+            />
+          )}
+
+          {dialogType && (
+            <FormControlLabel
+              control={<Checkbox checked={applySuspension} onChange={() => setApplySuspension(!applySuspension)} />}
+              label="Suspender o dador entre a revisão e a próxima doação"
+            />
+          )}
           {isSubmitting && <CircularProgress sx={{ display: 'block', margin: '0 auto' }} />}
           <Box display="flex" justifyContent="space-between" width="70%">
             <Button onClick={handleDialogClose}>Cancelar</Button>
-            <Button onClick={handleDialogSubmit}>Confirmar</Button>
+            <Button onClick={() => handleDialogSubmit(applySuspension, openProfileAfterReject)}>Confirmar</Button>
           </Box>
         </Box>
       </DialogContent>

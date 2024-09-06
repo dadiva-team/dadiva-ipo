@@ -44,6 +44,8 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
   const [suspensionEndDate, setSuspensionEndDate] = useState('');
   const [duration, setDuration] = useState<number>(0);
 
+  const [isEditing, setIsEditing] = useState(false); // New state to track editing
+
   const submitSuspension = async () => {
     const request = {
       userNic: Number(nic),
@@ -69,7 +71,6 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
   };
 
   useEffect(() => {
-    console.log(`suspensionStartDate ${suspensionStartDate}, ${suspensionEndDate}`);
     const calculateDuration = () => {
       const startDate = new Date(suspensionStartDate);
       const endDate = new Date(suspensionEndDate);
@@ -92,12 +93,20 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {fetchedSuspension ? (
-        <DonorSuspensionCard userSuspension={fetchedSuspension} />
-      ) : (
+      {fetchedSuspension && (
+        <Box sx={{ mb: 1 }}>
+          <DonorSuspensionCard userSuspension={fetchedSuspension} />
+          <Button variant="contained" color="primary" onClick={() => setIsEditing(!isEditing)} sx={{ mt: 3 }}>
+            {!isEditing ? 'Editar Suspensão' : 'Cancelar Edição'}
+          </Button>
+        </Box>
+      )}
+      {!fetchedSuspension || isEditing ? (
         <>
           {error && <ErrorAlert error={error} clearError={() => setError(null)} />}
-          <Typography>Suspender Dador</Typography>
+          <Typography>
+            <strong>{isEditing ? 'Editar Suspensão' : 'Suspender Dador'} </strong>
+          </Typography>
           <FormControl>
             <FormLabel>Tipo de suspensão</FormLabel>
             <RadioGroup
@@ -119,6 +128,7 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
               <FormControlLabel value={SuspensionType.Permanent} control={<Radio color="error" />} label="Permanente" />
             </RadioGroup>
           </FormControl>
+
           {suspensionType === SuspensionType.BetweenBloodDonations && (
             <FormControl sx={{ width: '50%' }}>
               <InputLabel>Duração</InputLabel>
@@ -136,17 +146,7 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
               </Select>
             </FormControl>
           )}
-          {suspensionType === SuspensionType.Permanent && (
-            <TextField
-              sx={{ width: '70%' }}
-              multiline={true}
-              rows={3}
-              label="Motivo"
-              value={reason}
-              onChange={e => setReason(e.target.value)}
-              required
-            />
-          )}
+
           {suspensionType === SuspensionType.Other && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
@@ -193,6 +193,19 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
               />
             </Box>
           )}
+
+          {suspensionType === SuspensionType.Permanent && (
+            <TextField
+              sx={{ width: '70%' }}
+              multiline={true}
+              rows={3}
+              label="Motivo"
+              value={reason}
+              onChange={e => setReason(e.target.value)}
+              required
+            />
+          )}
+
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {suspensionStartDate && suspensionEndDate && (
               <>
@@ -206,6 +219,7 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
           {suspensionStartDate && suspensionEndDate && duration >= 0 && (
             <Typography>Duração: {duration} dia(s)</Typography>
           )}
+
           <Button
             disabled={
               !suspensionStartDate ||
@@ -219,7 +233,7 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
             Suspender
           </Button>
         </>
-      )}
+      ) : null}
     </Box>
   );
 }

@@ -22,6 +22,7 @@ public static class UsersRoutes
         usersGroup.MapPost("/suspension", AddSuspension).AllowAnonymous();
         usersGroup.MapPost("/suspension/update", UpdateSuspension).AllowAnonymous();
         usersGroup.MapGet("/suspension/{nic}", GetSuspension).AllowAnonymous();
+        usersGroup.MapGet("/suspension/{nic}/history", GetSuspensions).AllowAnonymous();
         usersGroup.MapDelete("/suspension/{nic}", DeleteSuspension).AllowAnonymous();
     }
 
@@ -117,6 +118,29 @@ public static class UsersRoutes
             }
         );
     }
+    
+    private static async Task<IResult> GetSuspensions([FromRoute] string nic, IUsersService service)
+    {
+        return (await service.GetSuspensions(nic)).HandleRequest(
+            suspensions =>
+            {
+                var outputModel = new GetSuspensionsOutputModel(
+                    suspensions.Select(suspension => new GetSuspensionOutputModel(
+                        suspension.Donor,
+                        suspension.Doctor,
+                        suspension.SuspensionType,
+                        suspension.SuspensionStartDate,
+                        suspension.SuspensionEndDate,
+                        suspension.Reason,
+                        suspension.SuspensionNote
+                    )).ToList()
+                );
+
+                return Results.Ok(outputModel);
+            }
+        );
+    }
+    
 
     private static async Task<IResult> DeleteSuspension([FromRoute] string nic, IUsersService service)
     {

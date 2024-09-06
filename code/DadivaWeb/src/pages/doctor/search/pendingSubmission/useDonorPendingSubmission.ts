@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Note } from '../../../../domain/Submission/Submission';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { handleRequest, handleError } from '../../../../services/utils/fetch';
-import { useCurrentSession } from '../../../../session/Session';
 import { ReviewFormRequestModel } from '../../../../services/doctors/models/ReviewFormRequestModel';
 import { DoctorServices } from '../../../../services/doctors/DoctorServices';
 import {
@@ -10,6 +9,8 @@ import {
   SubmissionModel,
 } from '../../../../services/doctors/models/SubmissionOutputModel';
 import { checkInconsistencies } from '../utils/DoctorSearchUtils';
+import { Uris } from '../../../../utils/navigation/Uris';
+import DOCTOR_SEARCH_NIC = Uris.DOCTOR_SEARCH_NIC;
 
 interface useDonorPendingSubmissionProps {
   submission: SubmissionModel;
@@ -31,8 +32,6 @@ export function useDonorPendingSubmission({ submission, onSubmittedSuccessfully 
   const [dialogType, setDialogType] = useState<boolean | null>(null);
   const [finalNote, setFinalNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const doctor = useCurrentSession();
 
   useEffect(() => {
     console.log('submission', submission);
@@ -66,22 +65,27 @@ export function useDonorPendingSubmission({ submission, onSubmittedSuccessfully 
     setFinalNote('');
   };
 
-  const handleDialogSubmit = async () => {
+  const handleDialogSubmit = async (suspend: boolean, openProfileAfterReject: boolean) => {
     setIsSubmitting(true);
-    await submitReview(dialogType, finalNote);
+    await submitReview(dialogType, suspend, openProfileAfterReject, finalNote);
     handleDialogClose();
     setIsSubmitting(false);
   };
 
-  const submitReview = async (status: boolean, finalNote?: string) => {
+  const submitReview = async (
+    status: boolean,
+    suspend: boolean,
+    openProfileAfterReject: boolean,
+    finalNote?: string
+  ) => {
     const reviewData = {
-      doctorNic: doctor.nic,
       status,
       finalNote,
       notes: notes.map(note => ({
         questionId: note.id,
         noteText: note.note,
       })),
+      suspend,
     } as ReviewFormRequestModel;
 
     const [error, res] = await handleRequest(DoctorServices.reviewSubmission(submission.id, reviewData));
@@ -93,6 +97,9 @@ export function useDonorPendingSubmission({ submission, onSubmittedSuccessfully 
     if (res) {
       console.log('Review submitted successfully');
       onSubmittedSuccessfully();
+      if (openProfileAfterReject) {
+        window.open(DOCTOR_SEARCH_NIC + `?nic=${submission.donor.nic}`);
+      }
     }
   };
 

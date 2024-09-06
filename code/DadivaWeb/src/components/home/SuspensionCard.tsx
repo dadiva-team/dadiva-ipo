@@ -51,6 +51,14 @@ export function SuspensionCard({ suspensionStartDate, suspensionEndDate, suspens
           </Typography>
         </>
       )}
+      {suspensionType === SuspensionType.BetweenReviewAndDonation && (
+        <>
+          <Typography variant="h6">{t('Suspension Card Title BetweenReviewAndDonation')}</Typography>
+          <Typography component="h1" variant="body1" sx={{ pt: 1 }}>
+            {t('Suspension Card Body BetweenReviewAndDonation')}
+          </Typography>
+        </>
+      )}
       {suspensionType === SuspensionType.Permanent && (
         <>
           <Typography variant="h6">{t('Suspension Card Title Permanent')}</Typography>

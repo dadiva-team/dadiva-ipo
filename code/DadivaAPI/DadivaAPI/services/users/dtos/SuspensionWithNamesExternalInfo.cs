@@ -7,6 +7,7 @@ public record SuspensionWithNamesExternalInfo(
     string SuspensionStartDate,
     string? SuspensionEndDate,
     string? Reason,
-    string? SuspensionNote
+    string? SuspensionNote,
+    bool IsActive
 );
 

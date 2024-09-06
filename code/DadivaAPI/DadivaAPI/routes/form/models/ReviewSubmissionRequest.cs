@@ -5,6 +5,7 @@ namespace DadivaAPI.routes.form.models
         public Boolean Status { get; set; }
         public string? FinalNote { get; set; }
         public List<NoteModel> Notes { get; set; }
+        public Boolean Suspend { get; set; } 
     }
 
     public class NoteModel

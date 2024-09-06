@@ -8,4 +8,5 @@ export interface UserSuspension {
   suspensionEndDate?: Date;
   reason?: string;
   suspensionNote?: string;
+  isActive: boolean;
 }

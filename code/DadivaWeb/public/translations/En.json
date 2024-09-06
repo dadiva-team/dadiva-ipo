@@ -12,6 +12,8 @@
   "Suspension Card Title BetweenBloodDonations": "Account temporarily suspended between blood donations",
   "Suspension Card Body BetweenBloodDonations": "Please wait until the suspension is lifted to submit a new form.",
   "Suspension Card Date BetweenBloodDonations": "You can donate blood again from: ",
+  "Suspension Card Title BetweenReviewAndDonation": "Your submission was approved!",
+  "Suspension Card Body BetweenReviewAndDonation": "Please schedule your donation as soon as possible.",
   "Suspension Card Title Permanent": "Account permanently suspended",
   "Suspension Card Body Permanent": "Please contact support for more information.",
   "Suspension Card Title Other": "Account temporarily suspended",

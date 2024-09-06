@@ -7,6 +7,7 @@ export const getUserByNicUri = (nic: number) => `${API_URL}/users/${nic}`;
 //export const getUserUri = (nic: number) => `${API_URL}/users/${nic}`;
 export const suspendUserUri = `${API_URL}/users/suspension`;
 export const getUserSuspensionByNicUri = (nic: number) => `${API_URL}/users/suspension/${nic}`;
+export const getUserSuspensionHistoryByNicUri = (nic: number) => `${API_URL}/users/suspension/${nic}/history`;
 export const deleteUserUri = `${API_URL}/users/`;
 export const getFormUri = (language: string) => `${API_URL}/forms/structure/${language}`;
 export const getDrugsAndDiseases = `${API_URL}/dnd`;

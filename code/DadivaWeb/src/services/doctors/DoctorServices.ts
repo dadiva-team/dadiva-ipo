@@ -6,6 +6,7 @@ import {
   getUserByNicUri,
   getUsersUri,
   getUserSuspensionByNicUri,
+  getUserSuspensionHistoryByNicUri,
   lockSubmissionUri,
   notesFromReviewUri,
   reviewSubmissionUri,
@@ -21,6 +22,7 @@ import { SuspendUserRequestModel } from './models/SuspendeUserRequestModel';
 import { UserSuspension } from '../../domain/User/UserSuspension';
 import { GetSubmissionsOutputModel } from './models/GetSubmissionsOutputModel';
 import { SubmissionUnlockRequestModel } from './models/SubmissionUnlockRequestModel';
+import { GetSuspensionsOutputModel } from './models/GetSuspensionsOutputModel';
 
 export namespace DoctorServices {
   export async function getUsers(): Promise<{ nic: number }[]> {
@@ -75,6 +77,10 @@ export namespace DoctorServices {
 
   export async function getDonorSuspension(nic: number): Promise<UserSuspension> {
     return await get(getUserSuspensionByNicUri(nic));
+  }
+
+  export async function getDonorSuspensionHistory(nic: number): Promise<GetSuspensionsOutputModel> {
+    return await get(getUserSuspensionHistoryByNicUri(nic));
   }
 
   export async function reviewSubmission(sumbission: number, requestBody: ReviewFormRequestModel): Promise<boolean> {

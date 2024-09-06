@@ -180,7 +180,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
 
             bool success = await repository.AddSuspension(suspension.ToEntity());
             return !success
-                ? Result.Fail(new UserError.UnknownError())
+                ? Result.Fail(new UserError.SuspensionNotAddedError())
                 : Result.Ok();
         });
     }
@@ -254,8 +254,34 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
                 suspensionEntity.StartDate.ToString("yyyy-MM-dd"),
                 suspensionEntity.EndDate?.ToString("yyyy-MM-dd"),
                 suspensionEntity.Reason,
-                suspensionEntity.Note
+                suspensionEntity.Note,
+                suspensionEntity.IsActive
             ));
+        });
+    }
+    
+    public async Task<Result<List<SuspensionWithNamesExternalInfo>>> GetSuspensions(string userNic)
+    {
+        return await context.WithTransaction(async () =>
+        {
+            var suspensionEntities = await repository.GetSuspensions(userNic);
+            if (suspensionEntities is null)
+            {
+                return Result.Fail(new UserError.UserHasNoSuspensionError());
+            }
+
+            return Result.Ok(suspensionEntities.Select(suspensionEntity => new SuspensionWithNamesExternalInfo(
+                new UserWithNameExternalInfo(suspensionEntity.Donor.Name, suspensionEntity.Donor.Nic),
+                suspensionEntity.Doctor is null
+                    ? null
+                    : new UserWithNameExternalInfo(suspensionEntity.Doctor.Name, suspensionEntity.Doctor.Nic),
+                suspensionEntity.Type,
+                suspensionEntity.StartDate.ToString("yyyy-MM-dd"),
+                suspensionEntity.EndDate?.ToString("yyyy-MM-dd"),
+                suspensionEntity.Reason,
+                suspensionEntity.Note,
+                suspensionEntity.IsActive
+            )).ToList());
         });
     }
 

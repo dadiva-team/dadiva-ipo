@@ -46,6 +46,8 @@ public interface IUsersService
     );
 
     public Task<Result<SuspensionWithNamesExternalInfo>> GetSuspension(string userNic);
+    
+    public Task<Result<List<SuspensionWithNamesExternalInfo>>> GetSuspensions(string userNic);
 
     public Task<Result> DeleteSuspension(string userNic);
 }

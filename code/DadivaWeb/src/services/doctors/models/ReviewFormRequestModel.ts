@@ -1,8 +1,8 @@
 export interface ReviewFormRequestModel {
-  doctorNic: number;
   status: boolean;
   finalNote?: string;
   notes: NoteModel[];
+  suspend: boolean;
 }
 
 interface NoteModel {

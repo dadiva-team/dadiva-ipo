@@ -253,6 +253,15 @@ public static class HttpExtensions
                     Status = StatusCodes.Status403Forbidden,
                     Detail = suspendedDonorError.Message ?? "O doador foi suspenso."
                 };
+            
+            case UserError.SuspensionNotAddedError:
+                return new ProblemDetails
+                {
+                    Type = $"{BaseUrl}/probs/suspension-not-added",
+                    Title = "Suspensão não adicionada",
+                    Status = StatusCodes.Status500InternalServerError,
+                    Detail = "Ocorreu um erro ao tentar adicionar a suspensão."
+                };
             case UserError.InvalidSuspensionTypeError:
                 return new ProblemDetails
                 {
@@ -276,6 +285,15 @@ public static class HttpExtensions
                     Title = "Suspensão não deletada",
                     Status = StatusCodes.Status500InternalServerError,
                     Detail = "Ocorreu um erro ao tentar deletar a suspensão."
+                };
+            
+            case UserError.SuspensionNotUpdatedError:
+                return new ProblemDetails
+                {
+                    Type = $"{BaseUrl}/probs/suspension-not-updated",
+                    Title = "Suspensão não atualizada",
+                    Status = StatusCodes.Status500InternalServerError,
+                    Detail = "Ocorreu um erro ao tentar atualizar a suspensão."
                 };
             case UserError.InvalidEndDateTypeError:
                 return new ProblemDetails

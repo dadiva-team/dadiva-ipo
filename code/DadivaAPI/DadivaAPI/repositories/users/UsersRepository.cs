@@ -1,3 +1,4 @@
+using DadivaAPI.domain.user;
 using DadivaAPI.repositories.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -85,6 +86,15 @@ public class UsersRepository : IUsersRepository
             .Include(s => s.Doctor)
             .FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
     }
+    
+    public async Task<List<SuspensionEntity>> GetSuspensions(string userNic)
+    {
+        return await _context.Suspensions
+            .Include(s => s.Donor)
+            .Include(s => s.Doctor)
+            .Where(suspension => suspension.Donor.Nic == userNic)
+            .ToListAsync();
+    }
 
     public async Task<SuspensionEntity?> GetSuspensionIfActive(string userNic)
     {
@@ -111,6 +121,32 @@ public class UsersRepository : IUsersRepository
         }
 
         _context.Suspensions.Remove(suspension);
+        return await _context.SaveChangesAsync() > 0;
+    }
+    
+    public async Task<bool> UpdateSuspensionIsActive(string userNic, bool isActive)
+    {
+        var suspension = await _context.Suspensions.FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
+        if (suspension == null)
+        {
+            return false;
+        }
+
+        suspension.IsActive = isActive;
+        return await _context.SaveChangesAsync() > 0;
+    }
+    
+    public async Task<bool> UpdateSuspensionsTypeAndDate(string userNic, SuspensionType type, DateTime startDate, DateTime? endDate)
+    {
+        var suspension = await _context.Suspensions.FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
+        if (suspension == null)
+        {
+            return false;
+        }
+
+        suspension.Type = type.ToString();
+        suspension.StartDate = startDate;
+        suspension.EndDate = endDate;
         return await _context.SaveChangesAsync() > 0;
     }
 }

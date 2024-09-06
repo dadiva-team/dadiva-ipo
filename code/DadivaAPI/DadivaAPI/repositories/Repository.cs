@@ -1,3 +1,4 @@
+using DadivaAPI.domain.user;
 using DadivaAPI.repositories.Entities;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.manual;
@@ -53,15 +54,30 @@ public class Repository(DadivaDbContext context) : IRepository
     {
         return UserRepository.UpdateSuspension(suspension);
     }
-
+    
+    public Task<bool> UpdateSuspensionsTypeAndDate(string userNic, SuspensionType type, DateTime startDate, DateTime? endDate)
+    {
+        return UserRepository.UpdateSuspensionsTypeAndDate(userNic, type, startDate, endDate);
+    }
+ 
     public Task<SuspensionEntity?> GetSuspension(string userNic)
     {
         return UserRepository.GetSuspension(userNic);
+    }
+    
+    public Task<List<SuspensionEntity>> GetSuspensions(string userNic)
+    {
+        return UserRepository.GetSuspensions(userNic);
     }
 
     public Task<SuspensionEntity?> GetSuspensionIfActive(string userNic)
     {
         return UserRepository.GetSuspensionIfActive(userNic);
+    }
+    
+    public Task<bool> UpdateSuspensionIsActive(string userNic, bool isActive)
+    {
+        return UserRepository.UpdateSuspensionIsActive(userNic, isActive);
     }
 
     public Task<bool> DeleteSuspension(string userNic)

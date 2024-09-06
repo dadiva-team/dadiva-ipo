@@ -11,3 +11,5 @@ public record GetSuspensionOutputModel(
     string? Reason,
     string? SuspensionNote
 );
+
+public record GetSuspensionsOutputModel(List<GetSuspensionOutputModel> Suspensions);

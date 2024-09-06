@@ -1,3 +1,4 @@
+using DadivaAPI.domain.user;
 using DadivaAPI.repositories.Entities;
 using DadivaAPI.repositories.form;
 using DadivaAPI.repositories.manual;
@@ -28,12 +29,15 @@ public interface IRepository
     public Task<bool> AddSuspension(SuspensionEntity suspension);
     public Task<bool> UpdateSuspension(SuspensionEntity suspension);
     public Task<SuspensionEntity?> GetSuspension(string userNic);
+    public Task<List<SuspensionEntity>> GetSuspensions(string userNic);
     public Task<SuspensionEntity?> GetSuspensionIfActive(string userNic);
+    public Task<bool> UpdateSuspensionIsActive(string userNic, bool isActive);
+    public Task<bool> UpdateSuspensionsTypeAndDate(string userNic, SuspensionType type, DateTime startDate, DateTime? endDate);
     public Task<bool> DeleteSuspension(string userNic);
 
     /*FORM*/
     public Task<FormEntity?> GetForm(string language);
-    
+
     public Task<FormEntity?> GetFormById(int id);
     public Task<bool> AddForm(FormEntity form);
     public Task<MinimalInconsistencyDto?> GetInconsistencies(int? formId = null);
@@ -46,7 +50,7 @@ public interface IRepository
     public Task<bool> SubmitTerms(TermsEntity terms);
 
     /*SUBMISSIONS*/
-    
+
     public Task<bool> SubmitSubmission(SubmissionEntity submission);
     public Task<bool> UpdateSubmission(SubmissionEntity submission);
     public Task<bool> SubmitReview(ReviewEntity review);
@@ -70,15 +74,15 @@ public interface IRepository
     public Task<List<LockEntity>> GetExpiredLocks(TimeSpan timeout);
 
     public Task<bool> SubmissionExists(int id);
-    
-    
+
+
     /*MEDICATIONS*/
     public Task<List<string>> SearchMedications(string query);
 
-    
+
     /*MANUAL*/
     Task<List<ManualEntryEntity>> GetManualEntries(List<string> cfts);
-    
+
     public Task<List<string>> GetCfts(string productName);
 
     public Task<(int, int, int)> GetStats(DateTime startDate, DateTime endDate);

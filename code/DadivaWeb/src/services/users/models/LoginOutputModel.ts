@@ -14,6 +14,7 @@ export interface SuspensionAccountStatus {
 export enum SuspensionType {
   PendingReview = 'pendingReview',
   Permanent = 'permanent',
+  BetweenReviewAndDonation = 'betweenReviewAndDonation',
   BetweenBloodDonations = 'betweenBloodDonations',
   Other = 'other',
 }
