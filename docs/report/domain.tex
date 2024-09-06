@@ -6,3 +6,188 @@
 	\end{center}
 	\caption{ER Model.}
 \end{figure}
+
+
+
+\chapter{Mocks}\label{mocks}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Form.pdf}}
+	\end{center}
+	\caption{Form Page Mock.}\label{fig:form}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Form_Answer_No.pdf}}
+	\end{center}
+	\caption{Form Page Negative Answer Mock.}\label{fig:form_no}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Form_Answer_Yes.pdf}}
+	\end{center}
+	\caption{Form Page Positive Answer Mock.}\label{fig:form_yes}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Backoffice.pdf}}
+	\end{center}
+	\caption{Backoffice Page Mock.}\label{fig:backoffice}
+\end{figure}
+
+
+
+
+\chapter{Example JSON Form}\label{Form_JSON}
+
+
+\begin{lstlisting}[style=sharpc]
+{
+	"language": "en",
+	"groups": [
+	{
+		"name": "Previous Donations",
+		"questions": [
+		{
+			"id": "1",
+			"text": "Are you healthy and able to donate blood?",
+			"type": "boolean"
+		},
+		{
+			"id": "2",
+			"text": "Have you ever donated blood or blood components?",
+			"type": "boolean"
+		},
+		{
+			"id": "3",
+			"text": "Did you donate blood less than 2 months ago?",
+			"type": "boolean"
+		}
+		]
+	},
+	{
+		"name": "Travel",
+		"questions": [
+		{
+			"id": "4",
+			"text": "Have you ever traveled outside the country?",
+			"type": "boolean"
+		}
+		]
+	},
+	{
+		"name": "Health",
+		"questions": [
+		{
+			"id": "5",
+			"text": "Have you had any major illnesses or accidents?",
+			"type": "boolean"
+		}
+		]
+	},
+	{
+		"name": "Risk Behaviors",
+		"questions": [
+		{
+			"id": "6",
+			"text": "Have you had sexual contact with a new partner in the last 3 months?",
+			"type": "boolean"
+		}
+		]
+	}
+	],
+	"rules": [
+	{
+		"conditions": {
+			"all": [
+			{
+				"fact": "2",
+				"operator": "equal",
+				"value": "yes"
+			}
+			]
+		},
+		"event": {
+			"type": "showQuestion",
+			"params": {
+				"id": "3"
+			}
+		}
+	},
+	{
+		"conditions": {
+			"all": [
+			{
+				"fact": "4",
+				"operator": "equal",
+				"value": "yes"
+			}
+			]
+		},
+		"event": {
+			"type": "showQuestion",
+			"params": {
+				"id": "5"
+			}
+		}
+	}
+	]
+}
+
+\end{lstlisting}
+
+\chapter{User Interface Pages}\label{UI}
+
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Views/Home.pdf}}
+	\end{center}
+	\caption{Home Page.}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Views/Login.pdf}}
+	\end{center}
+	\caption{Login Page.}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Views/Backoffice.pdf}}
+	\end{center}
+	\caption{Backoffice Page.}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Views/Doctor_Page.pdf}}
+	\end{center}
+	\caption{Doctor Page.}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Views/Manage_Users.pdf}}
+	\end{center}
+	\caption{Manage Users Page.}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Views/Medication_Search.pdf}}
+	\end{center}
+	\caption{Medication Search Page.}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Views/User_Terms.pdf}}
+	\end{center}
+	\caption{User Terms Page.}
+\end{figure}

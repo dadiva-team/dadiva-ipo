@@ -3,11 +3,25 @@
 %
 \chapter{Frontend Implementation} \label{cap:frontend_implementation}
 
-The frontend application is tasked with data visualization and user interaction. The objective is for the application to provide an intuitive interface for the various users to be able to fulfill the set use cases outlined in section ~\ref{sec:use_cases}.
+This chapter focuses on the frontend implementation, which is responsible for data visualization and user interaction. The main objective is to provide an intuitive interface that allows various users to fulfill the use cases outlined in Section ~\ref{sec:use_cases}. The frontend is built using TypeScript \cite{TypeScript} and React\cite{React}, incorporating the JSON-Rules-Engine to enforce the form's rules and makes use of Material UI \cite{Material_UI} components to build the UI. In the sections that follow, we will dive into the detailed interactions between the components and how the state management is handled throughout the application.
 
-The frontend is implemented in Typescript and React, and makes use of JSON-Rules-Engine to enforce the form's rules.
+Figure \ref{fig:frontend_implementation} shows a simplified view of the component structure used in the frontend of the application. At the top, we have the I18nextProvider, which handles the user's language preferences, ensuring internationalization support. Below that, the AuthnContainer manages session information, such as user authentication and credentials.
 
-A simplified overview of the component interaction and organization is presented in figure \ref{fig:frontend_implementation}.
+The App component is the main container of the application, housing the FormPage and useNewForm, which are responsible for displaying the form to the donor users and managing its state using the JSON-Rules-Engine. 
+
+The EditFormPage and useEditFormPage components handle the back-office form display and allow administrators to modify the form structure.
+
+Additionally, the Editor component is used in the EditTermsPage, providing a user-friendly interface for administrators to modify terms and conditions. This interface is integrated with a rich-text editor to allow flexibility in content editing.
+
+The sections below will go into more detail about each of these components:
+
+\begin{itemize}
+	\item I18nextProvider: Manages language preferences for the application (Section \ref{I18n_component}).
+	\item AuthnContainer: Handles session information (Section \ref{authcontainer}).
+	\item FormPage \& useNewForm: Manages donor forms and their state using the JSON-Rules-Engine (Section \ref{form_implementation}).
+	\item EditFormPage \& useEditFormPage: Manages the display and editing of forms for administrators in the back-office (Section \ref{edit_form}).
+	\item Editor: Used in the EditTermsPage for editing terms and conditions (Section \ref{edit_terms}).
+\end{itemize}
 
 \begin{figure}[h]
 	\begin{center}
@@ -48,7 +62,7 @@ Furthermore, besides the aforementioned folders, the src folder also contains an
 
 \section{Services}
 
-The frontend services are responsible for communicating with the backend application and, as such, each frontend service as a backend counterpart.
+The frontend services are responsible for communicating with the backend application and, as such, each frontend service has a backend counterpart.
 
 To facilitate this communication we used the Fetch API \cite{Fetch_API}, which enables asynchronous resource requests by returning a promise that resolves to a response for that request.
 
@@ -65,7 +79,7 @@ In this chapter we'll mainly focus on the:
 \begin{itemize}
 	\item \textbf{I18nextProvider}: manages the language preferences of the user;
 	\item \textbf{AuthnContainer}: manages the session information;
-	\item \textbf{FormPage \& useNewForm}:used to display form to the donor and manage it's state using JSON-Rules-Engine;
+	\item \textbf{FormPage \& useNewForm}: used to display form to the donor and manage it's state using JSON-Rules-Engine;
 	\item \textbf{EditFormPage \& useEditFormPage}:  displays form in the backoffice, to the administrators, and allows to perform change's to the structure, also manage it's state;
 	\item \textbf{Editor}: used to display the terms to the administrators and allows to change them. 
 \end{itemize}
@@ -77,14 +91,15 @@ In this chapter we'll mainly focus on the:
 	\caption{Simplified React Component Tree.}\label{fig:reactComponentTree}
 \end{figure}
 
-\subsection{I18nextProvider}
+When suitable there will be figures to illustrate the visuals of these components, a more complete list of the visuals for all components is available in Appendix \ref{UI}.
+\subsection{I18nextProvider}\label{I18n_component}
 
 The I18nextProvider component is part of the i18next library ecosystem, which is used for internationalization (i18n) in JavaScript applications. The purpose of the I18nextProvider component is to integrate i18next into React applications by providing the i18n instance to the component tree.
 
 By accessing the i18n instance, we can set the desired language for the application. This is useful for both the frontend and to request certain resources from the backend, i.e. requesting the resource with the user's language preferences, or default to a certain resource if that isn't available.
 
 
-\subsection{AuthnContainer}
+\subsection{AuthnContainer}\label{authcontainer}
 The AuthnContainer component plays a crucial role in enabling user authentication and consequent storage of the authentication information within the application state.
 
 To do so it uses the React Context API \cite{React_Context_API}, which allows to pass data trough the component tree without having to pass props down manually at every level, thus enabling seamless data sharing between components.
@@ -102,8 +117,30 @@ The FormPage is responsible for form display to donor users. It leverages the us
 
 The useNewForm hook is a custom React hook designed to manage the state and logic of the form within the frontend application. This hook integrates several important functionalities, including handling form data, managing user interactions, and executing business rules, making it a critical part of the form-handling process.
 
-To do this the hook makes use of the JSON-Rules-Engine. After the form is fetched using the frontend service layer the initial state of the engine is set, an illustration of the following example is presented in Figure \ref{fig:form_implementation}.
-Firstly the facts, i.e. the answers, are added to the engine, which state that all the questions haven't been answered, and secondly the rules, which contain the navigation and display logic.
+To do this the hook makes use of the JSON-Rules-Engine \cite{JSON-Rules-Engine} and states, mainly: 
+\begin{itemize}
+	\item \textbf{showQuestions:} stores the questions that are being displayed;
+	\item \textbf{canGoNext:} stores if the next group of questions should be available,  by default false when initializing;
+	\item \textbf{canGoReview:} stores if all questions where answered and the form can be reviewed, by default false when initializing;
+	\item \textbf{formAnswers:} stores all the answers given at any point.
+\end{itemize}
+
+Figure \ref{fig:form_implementation} illustrates this process which has the following steps:
+
+\begin{itemize}
+	\item \textbf{Fetch Form (Step 1):} The form data is fetched from the Services layer and passed to the useNewForm hook.
+	\item \textbf{Set Facts and Rules (Step 2):} Inside the useNewForm hook, the form’s data is divided into facts (user's answers) and rules (logic for navigation and question visibility). These are added to a rule engine which runs via the function engine.run().
+	\item \textbf{Handle Events (Step 3):} The rule engine emits events that determine question visibility and navigation options.
+	\item \textbf{Update State (Step 4):} The FormPage component displays the form questions and buttons (e.g., "Next Group", "Review") based on the current state, showing the appropriate group of questions.
+	\item \textbf{Update Form Answers (Step 5):} As users interact, their answers update the formAnswers state, which triggers the rule engine to re-evaluate, ensuring the form behaves as expected.
+\end{itemize}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{150mm}{!}{\includegraphics{./figures/JRE_implementation.pdf}}
+	\end{center}
+	\caption{Form implementation.}\label{fig:form_implementation}
+\end{figure}
 
 To make sure all questions that should show by default are visible the form has a rule, per question, in which the top level condition, no matter the type, is empty with an event of type showQuestion and referring to the question that should be visible by default, as illustrated in Listing \ref{default_question}.
 Once the engine is run, these conditions are met and the respective events are returned.
@@ -120,19 +157,32 @@ event: {
 }
 \end{lstlisting}
 
-The hook's states are then updated, mainly, the showQuestions, canGoNext, canGoReview and formAnswers. The showQuestions state stores the questions that are being displayed. The canGoNext state stores if the next group should be available,  by default false when initializing. The canGoReview state stores if all questions where answered and the form can be reviewed, by default false when initializing. The formAnswers state stores all the answers given at any point.
-As the user answers the form's questions the formAnswers state is updated and is fed to the engine, which runs again, returning the relevant events.
+A view of this component is illustrated in Figures \ref{fig:form1} through \ref{fig:form3}.
 
 \begin{figure}[h]
 	\begin{center}
-		\resizebox{150mm}{!}{\includegraphics{./figures/JRE_implementation.pdf}}
+		\resizebox{120mm}{!}{\includegraphics{./figures/Form1.pdf}}
 	\end{center}
-	\caption{Form implementation.}\label{fig:form_implementation}
+	\caption{Form Page with no answer.}\label{fig:form1}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{120mm}{!}{\includegraphics{./figures/Form2.pdf}}
+	\end{center}
+	\caption{Form Page with answers and no sub questions.}\label{fig:form2}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{center}
+		\resizebox{120mm}{!}{\includegraphics{./figures/Form3.pdf}}
+	\end{center}
+	\caption{Form Page with answers and no sub questions.}\label{fig:form3}
 \end{figure}
 
 \newpage
 
-\subsection{EditFormPage \& useEditFormPage}
+\subsection{EditFormPage \& useEditFormPage} \label{edit_form}
 The EditFormPage component acts a an outlet for the backoffice component page. It leverages the useEditFormPage hook to retrieve the form structure from the backend and manage it's state.
 
 As mentioned in Section \ref{arc_jre}, the type of form events in our system are:
@@ -193,11 +243,28 @@ As the user edit's the form's structure the changes are reflected in the hook's 
 
 To solve this issue the hook can reassign questions upon deletion, by finding the group with the parent question and setting the show condition of it's child question as undefined, which means they're automatically shown.
 
-\subsection{EditTermsPage}
+A view of this component is illustrated in Figure \ref{fig:edit_form}.
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Edit_Form.pdf}}
+	\end{center}
+	\caption{Form Page with answers and no sub questions.}\label{fig:edit_form}
+\end{figure}
+
+\subsection{EditTermsPage} \label{edit_terms}
 
 The EditTermsPage component acts as an outlet for the backoffice component page. It provides an interface for editing the terms and conditions. This component leverages the Editor component, which integrates the Jodit WYSIWYG editor, offering a rich text editing experience. The state management is handled using the useEditTerms custom hook, which ensures seamless interaction with the backend.
 The content of the editor is stored as HTML allowing for flexible presentation and formatting when displayed to end-users.
 
+A view of this component is illustrated in Figure \ref{fig:edit_terms}.
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Terms_Editor.pdf}}
+	\end{center}
+	\caption{Form Page with answers and no sub questions.}\label{fig:edit_terms}
+\end{figure}
 
 \newpage
 
@@ -233,8 +300,6 @@ This interaction works as follows:
 	\item \textbf{Unlocking:} When the doctor unlocks the submission or if the lock expires due to a timeout, an SSE notification is broadcasted, informing clients that the submission is now available.
 	The frontend component (e.g., PendingSubmissions.tsx) listens for these SSE messages and updates the UI in real time to reflect the current status of submissions. This ensures doctors are always aware of which submissions are locked, preventing conflicts.
 \end{itemize}
-\section{Testing}
-TO-DO
 
 
 

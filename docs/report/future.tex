@@ -2,7 +2,19 @@
 In the final chapter of this report, we will summarize the accomplishments of this project, discuss the challenges encountered, and outline potential improvements and features that were envisioned but not implemented due to time constraints.
 \section{Accomplishments}
 
+In the introduction of this report, we outlined the current state of blood donation in Portugal, emphasizing the concerning decline in both donors and donations. We identified a platform with the potential to not only improve donor participation but also simplify the screening process for healthcare professionals.
+
+A notable achievement was the development of functionalities that allow for the display and editing of form structures and rules as detailed in this document. These features are not limited to a specific domain, making the solution versatile and capable of being applied to various other challenges.
+
 \section{Challenges}
+The biggest challenge we faced in this project stemmed from our lack of experience in three critical areas: working with clients, defining project scopes, and estimating timelines.
+
+Interacting with clients can be particularly challenging, especially when one lacks both general experience and specific knowledge of the domain. Understanding client needs, managing expectations, and maintaining clear communication proved difficult due to this inexperience. As a result, the project scope remained somewhat unclear and continued to evolve throughout development. This led us to stray from a more focused approach on delivering a smaller set of essential functionalities.
+
+Additionally, our unfamiliarity with the .NET framework and the use of a rules engine made it difficult to accurately estimate how much time would be needed to develop an effective solution. This lack of technical familiarity further compounded the challenges of project planning and execution.
+
+
+
 
 \section{Future Work}
 The IPST medication guideline are organized in a table like manner, in the following column layout:
@@ -11,8 +23,12 @@ The IPST medication guideline are organized in a table like manner, in the follo
 	\item Active Substance/Commercial Name: This column lists either the active ingredient or the brand name of the medication.
 	\item Criteria: This column specifies if a particular class or group of medications affects eligibility for blood donation, including details such as the duration of ineligibility and other relevant conditions.
 \end{enumerate}
-The terms used in the first column are, from what we can access, similar to the available pharmacotherapeutic classifications. A reliable source of a drug's pharmacotherapeutic classification is a portal provided by Infarmed to it's partner organizations, such as Lisbon's IPO.
+The terms used in the first column are, from what we can access, similar to the available pharmacotherapeutic classifications. A reliable source of a drug's pharmacotherapeutic classification is a portal provided by Infarmed\cite{CITS} to it's partner organizations, such as Lisbon's IPO.
 As such, upon a donor's form submission, assuming they were taking some medication, our application would perform requests to said portal, get the appropriate pharmacotherapeutic classification and, by cross-checking the classification with the term used in the first column of the guidelines, return the relevant interaction information.
 However, the terms used in the guidelines don't always reflect the available classifications, and, as such, the platform would need to employ some form of automated categorization, and allow for manual manipulation of these associations by the administrators.
 
 It would also be a valuable feature to have the platform automatically check if the donor had any vaccinations and/or prescriptions that could be medically relevant. It would require integration with the SNS, and/or Infarmed systems.
+
+\section{Acknowledgements}
+
+We would like to extend our heartfelt gratitude to our supervisors, whose guidance and expertise have been instrumental throughout this project. Their support has been invaluable in shaping our approach and overcoming the challenges we faced. Additionally, we would like to express our sincere thanks to the staff at the Instituto Português de Oncologia (IPO) in Lisbon for their collaboration and insights, with a special thanks to Dr. Luís Ribeiro who allowed us to follow along with real time blood donations to give us a complete understanding of the procedure. Their contributions and feedback were essential in ensuring that the platform aligns with real-world needs and healthcare standards. This project would not have been possible without the collective efforts of everyone involved.

@@ -7,13 +7,13 @@ This chapter offers a comprehensive overview of the system's components and thei
 
 \section{Overview}
 
-Figure ~\ref{fig:architecture} presents a diagram illustrating the main components of the system and their interactions. 
+This section outlines the system’s architecture, highlighting the main components and their interactions as illustrated in Figure \ref{fig:architecture}.
 
 \begin{figure}[h]
 	\begin{center}
 		\resizebox{160mm}{!}{\includegraphics{./figures/Architecture.pdf}}
 	\end{center}
-	\caption{Application Architecture, gray squares represent containerized components of the solution.}\label{fig:architecture}
+	\caption{Application Architecture}\label{fig:architecture}
 \end{figure}
 
 
@@ -40,10 +40,19 @@ The frontend application is a web-based interface designed to facilitate seamles
 \begin{itemize}
 	\item Donor Users: Can fill out the current donation form;
 	\item Doctor Users: Can search for pathology and medication interactions with blood donation, request form submissions pending review and access the donor profile in which they can request form submission for that donor, as well as submission reviews and suspend that user;
-	\item Administrator Users: Can also request submissions pending review, as well as, customize the current form, the inconsistencies and the legal terms and manage the platforms users.
+	\item Administrator Users: Can customize the current form, the inconsistencies and the legal terms and manage the platforms users.
 \end{itemize}
 
-The application is organized into multiple pages and components, each serving distinct purposes. It utilizes Material UI, a popular React component library, to ensure a consistent and responsive user interface across these components. Material UI provides pre-built components and design elements that streamline the development process and enhance the application's visual appeal.
+The application is organized into multiple pages and components, each serving distinct purposes. It utilizes Material UI \cite{Material_UI}, a popular React component library, to ensure a consistent and responsive user interface across these components. Material UI provides pre-built components and design elements that streamline the development process and enhance the application's visual appeal.
+
+During planning some mockups of the final result for some pages where created, using visily.ai\cite{Visily}, Figure \ref{fig:login} illustrates the mock for the login page, the remaining mocks can be viewed in Appendix \ref{mocks}.
+
+\begin{figure}[h]
+	\begin{center}
+		\resizebox{160mm}{!}{\includegraphics{./figures/Login.pdf}}
+	\end{center}
+	\caption{Login Page Mock.}\label{fig:login}
+\end{figure}
 
 In addition to the user interface, the application includes a service layer responsible for communicating with the backend application through the REST API.
 
@@ -51,14 +60,14 @@ This chapter serves as an overview, for implementation details refer to chapter 
 
 \subsection{JSON-Rules-Engine and Form structure}\label{arc_jre}
 
-As illustrated in figure \ref{fig:architecture} we used a rules engine in the frontend, more specifically the \textbf{JSON-Rules-Engine}, for the purpose of enforcing form rules.
+As illustrated in figure \ref{fig:architecture} we used a rules engine in the frontend, more specifically the \textbf{JSON-Rules-Engine}\cite{JSON-Rules-Engine}, for the purpose of enforcing form rules.
 
 Forms consist of a list of questions, divided into groups, along with a set of rules that are added to the engine instance. These rules are defined by conditions and events. When the engine runs, all conditions that evaluate as true will trigger their respective events.
 
 Conditions can be categorized into \textbf{top-level conditions} and \textbf{condition properties}, following the types specified in the JSON-Rules-Engine library. 
 \textbf{Top level conditions} refer to logical operators, more specifically \textit{all}, \textit{any} and \textit{not}, meanwhile \textbf{condition properties} refer to a boolean evaluation, i.e. does a given input equal a certain value.
 
-These rules are described in a JSON format, with an example illustrated in Figure \ref{fig:jre_diagram}.
+These rules are described in a JSON format, with an example illustrated in Figure \ref{fig:jre_diagram}, for a complete example of the form JSON structure refer to Appendix \ref{Form_JSON}.
 
 \begin{figure}[h]
 	\begin{center}
@@ -78,50 +87,6 @@ In our case we decided, not only that the before-mentioned fields would pertain 
 
 For implementation details, i.e. how the questions become visible and the rules are added to the engine, refer to section \ref{form_implementation}.
 \newpage
-
-
-\subsection{Mocks}
-During planning some mockups where created of the final result for some pages, the login page is presented in Figure ~\ref{fig:login}, the form pages are presented in Figures ~\ref{fig:form},~\ref{fig:form_no} and ~\ref{fig:form_yes}, the backoffice page is presented in Figure ~\ref{fig:backoffice}.
-
-\begin{figure}[H]
-	\begin{center}
-		\resizebox{160mm}{!}{\includegraphics{./figures/Login.pdf}}
-	\end{center}
-	\caption{Login Page Mock.}\label{fig:login}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-		\resizebox{160mm}{!}{\includegraphics{./figures/Form.pdf}}
-	\end{center}
-	\caption{Form Page Mock.}\label{fig:form}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-		\resizebox{160mm}{!}{\includegraphics{./figures/Form_Answer_No.pdf}}
-	\end{center}
-	\caption{Form Page Negative Answer Mock.}\label{fig:form_no}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-		\resizebox{160mm}{!}{\includegraphics{./figures/Form_Answer_Yes.pdf}}
-	\end{center}
-	\caption{Form Page Positive Answer Mock.}\label{fig:form_yes}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-		\resizebox{160mm}{!}{\includegraphics{./figures/Backoffice.pdf}}
-	\end{center}
-	\caption{Backoffice Page Mock.}\label{fig:backoffice}
-\end{figure}
-
-\newpage
-
-
-
 
 
 \section{Backend Application}

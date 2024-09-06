@@ -61,6 +61,7 @@ It is intended as an alternative to the current, and less versatile, paper form 
 	
 	\item Good software engineering practices to ensure the fast development of the system.
 \end{itemize}
+\newpage
 
 \subsection{Use Cases}\label{sec:use_cases}
 With the requirements listed above, we have identified the use cases that the platform
@@ -72,27 +73,33 @@ The Donor use case is presented in Figure ~\ref{fig:donor_use_case}.
 
 \begin{figure}[h]
 	\begin{center}
-		\resizebox{160mm}{!}{\includegraphics[trim={0 380 70 310},clip]{./figures/useCases.pdf}}
+		\resizebox{160mm}{!}{\includegraphics[trim={0 220 70 270},clip]{./figures/useCases.pdf}}
 	\end{center}
 	\caption{Donor use case.}\label{fig:donor_use_case}
 \end{figure}
 
-The donor user can request the current form and can submit their form responses.
+A Potential Donor interacts with the platform in two main steps:
 
-\pagebreak
+\begin{itemize}
+	\item Request Form: The donor requests the current form, which is fetched in the language defined by the application's settings, according to the language selected by the user. This ensures the form is presented in the donor's preferred language for better accessibility;
+	\item Submit Form: After filling out the form, the donor submits their responses to the platform for processing.
+\end{itemize}
+
+
+\newpage
 
 A doctor user can request the submissions that are pending review as illustrated in Figure~\ref{fig:doctor_use_case}.
 
 \begin{figure}[h]
 	\begin{center}
-		\resizebox{140mm}{!}{\includegraphics[trim={0 540 70 0},clip]{./figures/useCases.pdf}}
+		\resizebox{140mm}{!}{\includegraphics[trim={0 360 0 0},clip]{./figures/useCases.pdf}}
 	\end{center}
 	\caption{Doctor use case.}\label{fig:doctor_use_case}
 \end{figure}
 
 Furthermore the doctor user is able to access a donor's profile to request the submissions for that specific donor, the previous reviews for this donor and can suspend the donor, as well as search for pathology/medication interactions to resolve any inquiries that might appear during the screening.
 
-\pagebreak
+\newpage
 
 Finally the administrator user can also request the submission pending review.
 This type of user can also, update the form structure and navigation, as well as the form's inconsistencies and the legal terms.
@@ -100,7 +107,9 @@ The administrator user can also manage the platforms users.
 The administrator use case is presented in Figure ~\ref{fig:administrator_use_case}.
 \begin{figure}[h]
 	\begin{center}
-		\resizebox{140mm}{!}{\includegraphics[trim={0 150 50 460},clip]{./figures/useCases.pdf}}
+		\resizebox{140mm}{!}{\includegraphics[trim={0 30 0 410},clip]{./figures/useCases.pdf}}
 	\end{center}
 	\caption{Administrator use case.}\label{fig:administrator_use_case}
 \end{figure}
+
+These use cases define the core interactions between different user roles and the platform, ensuring that the system meets the functional requirements of each user type. By addressing these scenarios, the platform guarantees a streamlined, efficient process for blood donation services. The following chapter will explore the system's architecture, offering a detailed look at how these functionalities are implemented to support the use cases described above.

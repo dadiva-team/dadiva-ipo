@@ -5,9 +5,13 @@
 
 The backend application is tasked with handling http requests, business logic and data persistence. 
 
-The backend logic is implemented in C{\#} and data is persisted in a postgreSQL database, interaction with this database is done trough EF CORE.
+The backend logic is implemented in C{\#} and data is persisted in a postgreSQL database, interaction with this database is done through EF CORE.
 
-An overview of the backend implementation is presented in Figure ~\ref{fig:backend_implementation}.
+Entity Framework Core (EF Core) \cite{EF_Core} is a modern, open-source Object-Relational Mapper (ORM) for .NET \cite{.NET}, designed to simplify database operations in applications. By using EF Core, developers can interact with databases like PostgreSQL \cite{PGSQL} through C{\#} code, eliminating the need to write raw SQL queries. It maps C{\#} classes to database tables, making data management more intuitive and aligned with object-oriented programming principles. EF Core supports key features such as automatic tracking of changes, lazy loading of data, and efficient query generation. Additionally, it includes migration tools to help developers update the database schema alongside application changes, ensuring the database structure stays in sync with evolving business needs.
+
+
+Figure ~\ref{fig:backend_implementation} illustrates a block diagram of the backend solution architecture. The Frontend Client interacts with the system through Routes that direct requests to the appropriate Service Interface and its corresponding Service Implementation. The services then interact with the Repository Interface, which connects to both the Repository Implementation (managing internal data) and the Medication Database Client (handling communication with the external IPO Medication Database). The internal repository is backed by a local PostgreSQL database.
+
 \begin{figure}[h]
 	\begin{center}
 		\resizebox{90mm}{!}{\includegraphics{./figures/backend_implementation.pdf}}
@@ -33,7 +37,7 @@ The structure for the backend application is as follows:
 	\item utils: contains auxiliary classes and methods.
 \end{itemize}
 
-\section{Program.cs}
+\section{Dependency Injection and Service Registration}
 
 The .NET framework makes use of a dependency injection container, aka the service container. As with the Spring Framework, dependencies can have various lifetimes, which in the .NET framework are as follows:
 \begin{itemize}
@@ -58,13 +62,14 @@ builder.Services.AddScoped<IRepository, Repository>();
 
 Using this registration method, for example, when a dependency of type IUsersService is needed, the service container creates a UsersService object to fufill that dependency, hence the inversion of control.
 
-The services that don't make use of the scoped lifetime are associated with the lock management and server sent events, are illustrated in \ref{SSE_listing}, these services are elaborated on section \ref{label}.
+The services that don't make use of the scoped lifetime are associated with the lock and suspension management and server sent events, are illustrated in \ref{SSE_listing}, these services are elaborated on section \ref{SSE_backend}.
 
 \begin{lstlisting}[style=sharpc, caption={Registering Scoped Services in ASP.NET Core Dependency Injection Container:}, label={SSE_listing}]
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 builder.Services.AddSingleton<NotificationEndpoint>();
-builder.Services.AddHostedService<UnlockExpiredSubmissionsService>();
 
+builder.Services.AddHostedService<UnlockExpiredSubmissionsService>();
+builder.Services.AddHostedService<DeactivateExpiredSuspensionsService>();
 \end{lstlisting}
 
 To allow for cross-origin resource sharing, i.e. to allow the frontend client to access the resources in the backend, we also had to create CORS policy, as follows:
@@ -86,7 +91,7 @@ builder.Services.AddCors(options =>
 Notice that request originating from port 8000 of the localhost ip can have any type of header, any HTTP method and can include credentials, such as cookies.
 \newpage
 
-\subsubsection{Role Based Access Control}
+\section{Role Based Access Control}
 In our system, users are assigned at least one of three roles: donor, doctor, or admin. Each of these roles grants access to a specific set of endpoints, ensuring that users can only interact with the parts of the application that are relevant to their role. To enforce this, we have configured authorization policies within the ASP.NET Core framework, which restrict access based on the role claims present in the requests JSON Web Token (JWT).
 
 As shown in Listing \ref{rbac}, we define three authorization policies — one for each role. The AddAuthorization method is used to add these policies to the service container. Each policy requires that the user’s JWT contains a claim of type ClaimTypes.Role with a corresponding value of either donor, doctor", or admin.
@@ -111,7 +116,7 @@ By leveraging these role-based authorization policies, we enforce a clear and se
 
 \newpage
 
-\subsubsection{Authentication}
+\section{Authentication}
 
 Our platform uses JSON Web Tokens, \textbf{JWT} \cite{rfc7519}, to represent user claims.
 These token's issuer, audience and key, refered to as jwtIssuer, jwtAudience and jwtKey in Listing \ref{authentication} below, are stored in the appsettings.json file.
@@ -203,16 +208,47 @@ IUsersService service)
 }
 \end{lstlisting}
 
-\subsection{Locks and SSE Mechanisms}\label{SSE_backend}
+\section{Password Security}\label{sec:security}
+
+Two common password attacks are brute force attacks, and side-channel attacks.
+
+Brute force attacks leverage the high computational power of Graphics Processing Units (GPUs) to paralelize password hashing tasks.
+
+Side-channel attacks try get indirect information leaked during the execution of cryptographic algorithms, ie the time or power it takes for a system to hash a password.
+
+\subsection{Mitigation}
+
+Password hashing is a crucial security measure used to protect stored passwords. Instead of saving passwords in plaintext, which can be easily compromised, passwords are transformed into a hashed format using a hashing algorithm.
+
+The work factor is the number of iterations of the hashing algorithm that are performed for each password. The work factor is typically stored in the hash output. It makes calculating the hash more computationally expensive, which in turn reduces the speed and/or increases the cost for which an attacker can attempt to crack the password hash \cite{owasp_password_storage}, which increases the brute-force attack further.
+Choosing a work factor requires a compromise between security and performance, since, if to much computing power is required to hash a password the system becomes targetable to denial of service attacks.
+
+Hashing algorithms that employ constant time operations and parallelism whenever possible help mitigate the risk of side channel attacks, as these factors increases the difficulty to extract information form side-channels.  
+
+
+\subsection{Argon2id}
+Argon2\cite{rfc9106} is a state-of-the-art password hashing algorithm that won the Password Hashing Competition in 2015. It comes in three variants: Argon2d, Argon2i, and Argon2id. Argon2id is a hybrid version that combines the benefits of both Argon2d (which provides resistance against brute-force attacks) and Argon2i (which is designed for side-channel attack resistance), and will be the algorithm used to secure the passwords for our platform.
+
+Argon2id takes in configurable parameter, such as:
+\begin{itemize}
+	\item \textbf{Memory Cost}: The amount of memory (in kilobytes) used by the algorithm;
+	\item \textbf{Time Cost} : The number of iterations the algorithm runs, which affects the computation time;
+	\item \textbf{Parallelism} : The number of parallel threads used to process the hash.
+\end{itemize}
+
+Since these parameters are configurable it is possible to adjust them throughout the lifetime of an application, for example increase the time cost as the hosting hardware's capacity increases, and decrease it if concurrent accesses increase.
+
+\section{Locks and SSE Mechanisms}\label{SSE_backend}
 The doctor submission review system is designed to coordinate multiple doctors reviewing medical submissions simultaneously, ensuring that only one doctor can work on a submission at any given time. This is achieved through the use of a Lock entity and Server-Sent Events (SSE) for real-time notifications. These mechanisms prevent conflicts, ensure data consistency, and streamline the workflow.
 
-Locking Mechanism
+\subsection{Locking Mechanism}
+
 As mentioned in Section \ref{sec:lock_entity}, the Lock entity was introduced to prevent multiple users from manipulating the same resource (submission) simultaneously. When a doctor begins reviewing a submission, the system checks if the submission is already locked by another doctor. If not, a lock is created for that doctor using the LockSubmission method. This lock ensures that other doctors cannot access the submission while it's being reviewed.
 
 Once the doctor completes the review or manually releases the submission, the lock is removed using the UnlockSubmission method. If a doctor leaves a submission locked for an extended period without completing the review, the UnlockExpiredSubmissionsService automatically releases the lock after a timeout period (e.g., 10 minutes). This service runs periodically in the background, ensuring that submissions don’t remain unnecessarily locked, and it uses the NotificationService to inform all connected clients when locks expire.
 
+\subsubsection{Handling Expired Locks}
 
-Handling Expired Locks
 In addition to manual unlocking, the system incorporates an automatic lock expiration mechanism to handle cases where doctors fail to release a lock in a timely manner. The UnlockExpiredSubmissionsService is a background service that runs at regular intervals, checking for submissions that have been locked beyond a defined timeout period. If a lock is found to have expired, the service automatically releases it, ensuring the submission becomes available to other doctors.
 
 When an expired lock is released, the NotificationService sends an SSE update to notify all connected clients. This ensures that doctors are aware when a submission they were waiting for becomes available again, and prevents any submission from remaining locked indefinitely due to inactivity.
@@ -221,7 +257,6 @@ Integration of Locking and SSE
 The interaction between locking and SSE is critical for ensuring real-time collaboration among doctors. Whenever a submission is locked or unlocked, the system sends notifications to all connected doctors, providing immediate feedback on the status of the submission. This dynamic interaction ensures that all doctors have the most up-to-date view of submission availability, reducing the risk of conflicts and improving overall efficiency.
 
 Moreover, the UnlockExpiredSubmissionsService plays a vital role in preventing submissions from becoming stuck in a locked state, providing a fallback mechanism to release locks after a timeout. This service, combined with SSE notifications, creates a responsive and reliable environment for managing submission reviews.
-
 %Beyond these, we also used an ElasticClient, however in this service registration, we use a different pattern, instead of using a type and implementation, only the latter was used, this method doesn't allow for multiple implementation, but since there was no need to mock the elastic search database, this feature wasn't needed.
 %
 %\begin{lstlisting}[style=sharpc]
@@ -247,89 +282,74 @@ The Repository layer acts as a vital intermediary for data access within the app
 
 By defining a well-known interface contract, we can abstract the implementation details.
 
-Utilizing a transaction manager in the service layer enables our solution to handle multiple concurrent accesses across various resources and provides rollback capabilities for effective error handling.
+Utilizing a transaction manager in the service layer enables our solution to handle multiple concurrent accesses across various resources and provides rollback capabilities for effective error handling, the code for the transaction manager is illustrated in Listing \ref{transaction_manager}.
 
+\begin{lstlisting}[style=sharpc, caption={Database transaction wrapper ensuring commit or rollback on exception.}, label={transaction_manager}]
+public static async Task<T> WithTransaction<T>(this DbContext context, Func<Task<T>> func)
+{
+	await using var transaction = await context.Database.BeginTransactionAsync();
+	try
+	{
+		var value = await func();
+		await transaction.CommitAsync();
+		return value;
+	}
+	catch (Exception)
+	{
+		await transaction.RollbackAsync();
+		throw;
+	}
+}
+\end{lstlisting}
+
+The DbContext object, context, is a dependency in the repository layer and must be registered with the service container so that it can be properly resolved. This process is illustrated in Listing \ref{DI_DB}.
+
+\begin{lstlisting}[style=sharpc, caption={Registering DbContext in the service container}, label={DI_DB}] 
+builder.Services.AddDbContext<DadivaDbContext>(options =>
+{
+	options.UseNpgsql(connectionString);
+	options.EnableSensitiveDataLogging();
+} 
+\end{lstlisting}
+
+Here, connectionString is an environment variable that contains the necessary details for connecting to the PostgreSQL database.
 %The main idea in the repositories is to allow for CRUD operations, ie create users/forms, read users/forms, update users/forms and delete users/forms, on data that is or will be stored in an Elastic Search database. As such the repositories have a dependency on the ElasticsearchClient mentioned before, and they'll use the same client but target different indexes.
-
-\subsubsection{Form Repository}
-
-The form repository is responsible for the Form, Submission, Review and Inconsistency entities.
-
-And this repository will have the following methods:
-
-\begin{lstlisting}[style=sharpc]
-	public interface IFormRepository
-	{
-		public Task<Form> GetForm();
-		
-		public Task<Form?> GetFormWithVersion(int version);
-		
-		public Task<Form> EditForm(Form form);
-		
-		public Task<bool> SubmitForm(Submission submission);
-		
-		public Task<List<Submission>?> GetPendingSubmissions();
-		
-		public Task<Submission> GetSubmission(int nic);
-		
-		public Task<Submission?> GetSubmissionById(int id);
-		
-		public Task<Submission?> GetLatestPendingSubmissionByUser(int userNic);
-		
-		public Task<(List<SubmissionHistoryDto>? Submissions, bool HasMoreSubmissions)> GetSubmissionHistoryByNic(int nic, int limit, int skip);
-		
-		public Task<Inconsistencies> GetInconsistencies();
-		
-		public Task<bool> LockSubmission(int submissionId, int doctorId);
-		
-		public Task<bool> UnlockSubmission(int submissionId, int doctorId);
-		
-		public Task<List<SubmissionLock>> GetExpiredLocks(TimeSpan timeout);
-		
-		public Task<bool> SubmissionExists(int id);
-		
-		public Task<Review> AddReview(Review review);
-		
-		public Task<bool> AddNote(Note note);
-		
-		public Task<bool> EditInconsistencies(Inconsistencies inconsistencies);
-	}
-\end{lstlisting}
-
-\subsubsection{User Repository}
-
-The user repository will be responsible for the User, UserAccountStatus and UserSuspension entities
-
-And this repository will have the following methods:
-\begin{lstlisting}[style=sharpc]
-	public interface IUsersRepository
-	{
-		public Task<bool> AddUser(User user);
-		
-		public Task<List<User>?> GetUsers();
-		
-		public Task<User?> GetUserByNic(int nic);
-		
-		public Task<Boolean> DeleteUser(int nic);
-		
-		public Task<UserAccountStatus?> GetUserAccountStatus(int userNic);
-		
-		public Task<Boolean> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
-		
-		public Task<bool> AddSuspension(UserSuspension suspension);
-		public Task<bool> UpdateSuspension(UserSuspension suspension);
-		public Task<UserSuspension?> GetSuspension(int userNic);
-		public Task<bool> DeleteSuspension(int userNic);
-		
-	}
-\end{lstlisting}
 
 \newpage
 
 \subsection{Services}
-Each service is responsible for managing a certain group of requests, i.e. the logic to fulfill a request to the /users endpoint will be in the user services. Each service as a dependency on their corresponding repository, which is handled by the service container.
+Each service is responsible for handling a specific group of requests. For instance, the logic to fulfill requests to the /users endpoint resides within the user services.
 
-The methods within each service will reflect the possible actions outlined in Chapter ~\ref{cap:problem_description}'s section on uses cases.
+Similar to the repository layer, the service layer depends on the context object to access the transaction manager. Additionally, it relies on the repository layer. An example of a service is illustrated in Listing \ref{fetch_terms_with_fallback}.
+
+\begin{lstlisting}[style=sharpc, caption={Retrieving active terms with language fallback}, label={fetch_terms_with_fallback}] 
+public async Task<Result<TermsExternalInfo>> GetActiveTerms(string language)
+{
+	return await context.WithTransaction(async () =>
+	{
+		if (!Enum.TryParse<TermsLanguages>(language, out var parsedLanguage))
+		{
+			return Result.Fail(new TermsErrors.InvalidLanguageError());
+		}
+		
+		var termsEntity = await repository.GetActiveTerms(language);
+		
+		//defaulting to english terms if desired language isn't available, questionable
+		if (termsEntity is null && language != "en")
+		{
+			termsEntity = await repository.GetActiveTerms("en");
+		}
+		
+		if (termsEntity is null) return Result.Fail(new TermsErrors.NoTermsError());
+		
+		return Result.Ok(
+		new TermsExternalInfo(termsEntity.Content)
+		);
+	});
+}
+\end{lstlisting}
+
+\newpage
 
 \subsubsection{Error Handling Implementation}
 As mentioned in section \ref{service_layer_error_handling} we will utilize a \textbf{Result} class which can encapsulate either a successful outcome or an error.
@@ -369,108 +389,6 @@ Similarly, the second HandleRequest method, defined on lines 9-13, handles cases
 The private ErrorToProblem method (lines 15-19) converts an IError object into a ProblemDetails object. This method is responsible for translating internal error details into a standardized format that can be returned as part of an HTTP problem response. The method currently includes a line to output the error details to the console for debugging purposes.
 
 By employing these extension methods, we simplify the process of handling success and error scenarios across the entire application. This ensures that all HTTP responses are consistent, well-structured, and easy to manage, which enhances both the maintainability and reliability of the codebase.
-
-\subsubsection{User Service}
-
-\begin{lstlisting}[style=sharpc]
-	public interface IUsersService
-	{
-		public Task<Result<Token, Problem>> CreateToken(int nic, string password);
-		
-		public Task<Result<UserExternalInfo, Problem>> CreateUser(int nic, string name, string password, Role role);
-		
-		public Task<Result<List<UserExternalInfo>, Problem>> GetUsers(string token);
-		
-		public Task<Result<Boolean, Problem>> DeleteUser(int nic);
-		
-		public Task<Result<UserAccountStatus?, Problem>> GetUserAccountStatus(int userNic);
-		
-		public Task<Result<Boolean, Problem>> UpdateUserAccountStatus(UserAccountStatus userAccountStatus);
-		
-		public Task<Result<UserWithNameExternalInfo?, Problem>> CheckNicExistence(int nic);
-		
-		public Task<Result<bool, Problem>> AddSuspension(UserSuspensionRequest suspension);
-		
-		public Task<Result<bool, Problem>> UpdateSuspension(UserSuspension suspension);
-		
-		public Task<Result<UserSuspension?, Problem>> GetSuspension(int userNic);
-		
-		public Task<Result<bool, Problem>> DeleteSuspension(int userNic);
-	}
-\end{lstlisting}
-
-\newpage
-
-\subsubsection{Terms Service}
-
-\begin{lstlisting}[style=sharpc]
-	public interface ITermsService
-	{
-		public Task<Result<List<Terms>, Problem>> GetTerms();
-		public Task<Result<Terms, Problem>> GetActiveTerms();
-		public Task<Result<bool, Problem>> SubmitTerms(Terms terms);
-		
-		public Task<Result<bool, Problem>> UpdateTerms(int termId, int updatedBy, string newContent);
-		
-		public Task<Result<List<TermsChangeLog>?, Problem>> GetTermsChangeLog(int termId);
-	}
-\end{lstlisting}
-
-
-\subsubsection{Form Service}
-
-\begin{lstlisting}[style=sharpc]
-	public interface IFormService
-	{
-		public Task<Result<GetFormOutputModel, Problem>> GetForm();
-		
-		public Task<Result<GetFormWithVersionOutputModel, Problem>> GetFormWithVersion(int version);
-		
-		public Task<Result<Form, Problem>> EditForm(List<QuestionGroupModel> groups, List<RuleModel> rules, User user);
-		
-		public Task<Result<SubmitFormOutputModel, Problem>> SubmitForm(Dictionary<string,IAnswer> answers, int nic, int formVersion);
-		
-		public Task<Result<Submission, Problem>> GetSubmission(int id);
-		
-		public Task<Result<bool, Problem>> LockSubmission(int submissionId, int doctorId);
-		
-		public Task<Result<bool, Problem>> UnlockSubmission(int submissionId, int doctorId);
-		
-		public Task UnlockExpiredSubmissions(TimeSpan lockTimeout);
-		
-		public Task<Result<Review, Problem>> ReviewForm(int submissionId, int doctorNic, string status, string? finalNote, List<NoteModel>? noteModels = null);
-		
-		public Task<Result<List<Submission>, Problem>> GetPendingSubmissions();
-		
-		public Task<Result<Inconsistencies, Problem>> GetInconsistencies();
-		
-		public Task<Result<Submission?, Problem>> GetPendingSubmissionsByUserNic(int userNic);
-		
-		public Task<Result<SubmissionHistoryOutputModel, Problem>> GetSubmissionHistoryByNic(int nic, int limit, int skip);
-		
-		public Task<Result<bool, Problem>> EditInconsistencies(Inconsistencies inconsistencies);
-	}
-\end{lstlisting}
-
-
-\subsubsection{Manual Service}
-
-\begin{lstlisting}[style=sharpc]
-	public interface IManualService
-	{
-		public Task<Result<List<ManualInformation>, Problem>> GetManualInformation(string productName);
-	}
-\end{lstlisting}
-
-
-\subsubsection{Medication Service}
-
-\begin{lstlisting}[style=sharpc]
-	public interface IMedicationsService
-	{
-		Task<Result<List<string>, Problem>> SearchMedications(string query);
-	}
-\end{lstlisting}
 
 \newpage
 
@@ -551,6 +469,7 @@ The available endpoints, HTTP method and corresponding operation for all the for
 \end{table}
 
 \subsubsection{Terms Routes}
+The available endpoints, HTTP method and corresponding operation for all the terms routes are available in Table ~\ref{tab:term_endpoints}. 
 \begin{table}[h!]
 	\begin{center}
 		\begin{tabular}{l|c|l} 
@@ -567,11 +486,12 @@ The available endpoints, HTTP method and corresponding operation for all the for
 			/terms/change-log/\{termsId:int\} & GET & \makecell{Gets the change-logs\\ for the terms with  specified termsId} \\
 		\end{tabular}
 		
-		\caption{API endpoints related to the form}\label{tab:term_endpoints}
+		\caption{API endpoints related to the terms}\label{tab:term_endpoints}
 	\end{center}
 \end{table}
 
 \subsubsection{Medication and Manual Routes}
+The available endpoints, HTTP method and corresponding operation for all the medication and manual information routes are available in Table ~\ref{tab:medication_manual_endpoints}.
 \begin{table}[h!]
 	\begin{center}
 		\begin{tabular}{l|c|l} 
@@ -582,39 +502,9 @@ The available endpoints, HTTP method and corresponding operation for all the for
 			/manual/\{product:string\} & GET & \makecell{Retrieves the blood donation information relevant to the specific product} \\
 		\end{tabular}
 		
-		\caption{API endpoints related to the form}\label{tab:medication_manual_endpoints}
+		\caption{API endpoints related to medication and manual information}\label{tab:medication_manual_endpoints}
 	\end{center}
 \end{table}
-
-\section{Password Security}\label{sec:security}
-
-Two common password attacks are brute force attacks, and side-channel attacks.
-
-Brute force attacks leverage the high computational power of Graphics Processing Units (GPUs) to paralelize password hashing tasks.
-
-Side-channel attacks try get indirect information leaked during the execution of cryptographic algorithms, ie the time or power it takes for a system to hash a password.
-
-\subsection{Mitigation}
-
-Password hashing is a crucial security measure used to protect stored passwords. Instead of saving passwords in plaintext, which can be easily compromised, passwords are transformed into a hashed format using a hashing algorithm.
-
-The work factor is the number of iterations of the hashing algorithm that are performed for each password. The work factor is typically stored in the hash output. It makes calculating the hash more computationally expensive, which in turn reduces the speed and/or increases the cost for which an attacker can attempt to crack the password hash \cite{owasp_password_storage}, which increases the brute-force attack further.
-Choosing a work factor requires a compromise between security and performance, since, if to much computing power is required to hash a password the system becomes targetable to denial of service attacks.
-
-Hashing algorithms that employ constant time operations and parallelism whenever possible help mitigate the risk of side channel attacks, as these factors increases the difficulty to extract information form side-channels.  
-
-
-\subsection{Argon2id}
-Argon2\cite{rfc9106} is a state-of-the-art password hashing algorithm that won the Password Hashing Competition in 2015. It comes in three variants: Argon2d, Argon2i, and Argon2id. Argon2id is a hybrid version that combines the benefits of both Argon2d (which provides resistance against brute-force attacks) and Argon2i (which is designed for side-channel attack resistance), and will be the algorithm used to secure the passwords for our platform.
-
-Argon2id takes in configurable parameter, such as:
-\begin{itemize}
-	\item \textbf{Memory Cost}: The amount of memory (in kilobytes) used by the algorithm;
-	\item \textbf{Time Cost} : The number of iterations the algorithm runs, which affects the computation time;
-	\item \textbf{Parallelism} : The number of parallel threads used to process the hash.
-\end{itemize}
-
-Since these parameters are configurable it is possible to adjust them throughout the lifetime of an application, for example increase the time cost as the hosting hardware's capacity increases, and decrease it if concurrent accesses increase.
 
 \newpage
 
@@ -627,8 +517,8 @@ Testing is a crucial step in ensuring the reliability and functionality of our a
 During the development of the application, particularly on the backend, manual testing was employed to verify that the system behaved as expected. The primary tools used for manual testing were:
 
 \begin{itemize} 
-	\item \textbf{Swagger:} Swagger was utilized to test the API through HTTP requests. Although Swagger is primarily an API documentation and automation tool, it provides the necessary features for effective manual testing of APIs. 
-	\item \textbf{Postman:} Postman was occasionally used to interact with ElasticSearch, specifically for data retrieval and storage operations. 
+	\item \textbf{Swagger:} Swagger\cite{Swagger} was utilized to test the API through HTTP requests. Although Swagger is primarily an API documentation and automation tool, it provides the necessary features for effective manual testing of APIs. 
+	\item \textbf{Postman:} Postman\cite{Postman} was occasionally used to interact with ElasticSearch, specifically for data retrieval and storage operations. 
 \end{itemize}
 
 \subsection{Programmatic Testing}
@@ -644,7 +534,3 @@ Unit tests are designed to verify the behavior of individual components or modul
 \end{itemize}
 
 We employed xUnit.net, a free and open-source unit testing tool for the .NET framework, to execute our unit tests.
-
-\subsubsection{Integration Tests}
-
-TODO
