@@ -4,6 +4,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import LockIcon from '@mui/icons-material/Lock';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useTranslation } from 'react-i18next';
 
 interface PasswordFieldProps {
   value: string;
@@ -18,6 +19,7 @@ export function PasswordField({
   handleChangePassword,
   handleClickShowPassword,
 }: PasswordFieldProps) {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -32,7 +34,7 @@ export function PasswordField({
         id="password"
         type={showPassword ? 'text' : 'password'}
         name="password"
-        label="Palavra-passe"
+        label={t('Password')}
         required
         fullWidth
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChangePassword(event)}

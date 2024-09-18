@@ -183,7 +183,7 @@ export function PendingSubmissions() {
                   locked={false}
                   doctorNic={doc.nic}
                   isReviewing={currentReviewSubmission === lockedByCurrentDoctor.id}
-                  onSubmitedSuccessfully={() => {
+                  onSubmittedSuccessfully={() => {
                     setLockedByCurrentDoctor(null);
                   }}
                   onOpenReview={() => handleOpenReview(lockedByCurrentDoctor.id)}
@@ -238,7 +238,7 @@ export function PendingSubmissions() {
                     <PendingSubmissionCard
                       submission={submission}
                       locked={lockedSubmissions.has(submission.id)}
-                      onSubmitedSuccessfully={() => {
+                      onSubmittedSuccessfully={() => {
                         console.log('Submission reviewed successfully.');
                         setSnackbarSuccessOpen(true);
                       }}

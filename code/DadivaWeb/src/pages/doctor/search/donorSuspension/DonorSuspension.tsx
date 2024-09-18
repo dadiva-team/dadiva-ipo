@@ -44,7 +44,7 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
   const [suspensionEndDate, setSuspensionEndDate] = useState('');
   const [duration, setDuration] = useState<number>(0);
 
-  const [isEditing, setIsEditing] = useState(false); // New state to track editing
+  const [isEditing, setIsEditing] = useState(false);
 
   const submitSuspension = async () => {
     const request = {
@@ -124,8 +124,8 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
                 control={<Radio />}
                 label="Entre Dadivas"
               />
-              <FormControlLabel value={SuspensionType.Other} control={<Radio />} label="Outro" />
               <FormControlLabel value={SuspensionType.Permanent} control={<Radio color="error" />} label="Permanente" />
+              <FormControlLabel value={SuspensionType.Other} control={<Radio />} label="Outro" />
             </RadioGroup>
           </FormControl>
 

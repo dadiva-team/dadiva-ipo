@@ -7,8 +7,10 @@ import Typography from '@mui/material/Typography';
 import { ErrorAlert } from '../../components/shared/ErrorAlert';
 import { NicField } from '../../components/authentication/Login/NicField';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const returnTo = searchParams.get('returnUrl') || '/';
@@ -32,10 +34,10 @@ export default function Login() {
       >
         <form onSubmit={handleSubmit}>
           <Typography variant="h4" component="h1" className="welcome">
-            Bem-Vindo
+            {t('Welcome')}
           </Typography>
           <Typography variant="subtitle1" align="center">
-            Entre na sua conta
+            {t('Enter your credentials')}
           </Typography>
 
           <Box sx={{ flexDirection: 'row', justifyContent: 'space-around', mt: 2 }}>
@@ -49,11 +51,11 @@ export default function Login() {
           </Box>
           <ErrorAlert error={error} clearError={() => setError(null)} />
           <Button type="submit" variant="contained" className="login-button" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Entrar'}
+            {loading ? <CircularProgress size={24} /> : t('Entrar')}
           </Button>
           <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
             <Divider sx={{ flex: 1, borderBottomWidth: '1,5px', borderColor: 'primary' }} />
-            <Typography sx={{ margin: '0 8px' }}>Alternativamente</Typography>
+            <Typography sx={{ margin: '0 8px' }}>{t('Alternative')}</Typography>
             <Divider sx={{ flex: 1, borderBottomWidth: '1,5px', borderColor: 'primary' }} />
           </Box>
           <Button type="button" variant="outlined" className="auth-button">

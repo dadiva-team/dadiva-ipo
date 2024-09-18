@@ -19,7 +19,7 @@ export interface PendingSubmissionCardProps {
   isReviewing: boolean;
   onOpenReview: () => void;
   onCloseReview: () => void;
-  onSubmitedSuccessfully: () => void;
+  onSubmittedSuccessfully: () => void;
   forceCloseModal: boolean;
 }
 
@@ -30,7 +30,7 @@ export function PendingSubmissionCard({
   isReviewing,
   onOpenReview,
   onCloseReview,
-  onSubmitedSuccessfully,
+  onSubmittedSuccessfully,
   forceCloseModal,
 }: PendingSubmissionCardProps) {
   const [openModal, setOpenModal] = useState(false);
@@ -118,7 +118,7 @@ export function PendingSubmissionCard({
             submission={submission}
             onSubmittedSuccessfully={() => {
               handleCloseModal();
-              onSubmitedSuccessfully();
+              onSubmittedSuccessfully();
             }}
           />
           <Button

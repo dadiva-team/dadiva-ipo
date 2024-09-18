@@ -9,7 +9,8 @@ interface DonorSuspensionHistoryCardProps {
 }
 
 export function DonorSuspensionHistoryCard({ suspension, isLastSuspension }: DonorSuspensionHistoryCardProps) {
-  const { suspensionType, suspensionStartDate, suspensionEndDate, reason, suspensionNote, doctor } = suspension;
+  const { suspensionType, suspensionStartDate, suspensionEndDate, reason, suspensionNote, doctor, isActive } =
+    suspension;
 
   const suspensionTypeText = () => {
     switch (suspensionType) {
@@ -51,6 +52,10 @@ export function DonorSuspensionHistoryCard({ suspension, isLastSuspension }: Don
           <strong>Data de Fim:</strong> {new Date(suspensionEndDate).toLocaleDateString()}
         </Typography>
       )}
+      <Typography variant="body2">
+        <strong>Estado:</strong> {isActive ? 'Ativo' : 'Inativo'}
+      </Typography>
+
       {reason && (
         <Typography variant="body2">
           <strong>Motivo:</strong> {reason}

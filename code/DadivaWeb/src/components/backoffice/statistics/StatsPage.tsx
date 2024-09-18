@@ -38,13 +38,14 @@ export function StatsPage() {
   useEffect(() => {
     if (!endUnix.isBefore(startUnix)) {
       FormServices.getSubmissionsStats(startUnix.valueOf(), endUnix.add(1, 'day').valueOf()).then(response => {
+        console.log(response);
         setData(response);
       });
     }
   }, [startUnix, endUnix]);
 
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (data) {
       const total = data.reduce((sum, d) => sum + d.total, 0) || 0;
       const approved = data.reduce((sum, d) => sum + d.approved, 0) || 0;
       const denied = data.reduce((sum, d) => sum + d.denied, 0) || 0;
@@ -70,7 +71,7 @@ export function StatsPage() {
 
   return (
     <>
-      {!data || data.length === 0 ? (
+      {!data ? (
         <Box sx={{ mt: 1 }}>
           <LoadingSpinner text={t('Loading Questions')} />
           <ErrorAlert error={error} clearError={() => setError(null)} />
