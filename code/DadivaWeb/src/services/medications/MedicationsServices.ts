@@ -12,6 +12,6 @@ export namespace MedicationsServices {
 
   export async function getManualInformation(product: string) {
     console.log('Getting Manual Information :)');
-    return await get<{ manualInformations: ManualInformation[] }>(getManualInformationUri(product));
+    return await get<ManualInformation>(getManualInformationUri(product));
   }
 }

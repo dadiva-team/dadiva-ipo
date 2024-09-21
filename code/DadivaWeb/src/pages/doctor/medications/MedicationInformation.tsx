@@ -10,6 +10,10 @@ export interface Example {
 }
 
 export interface ManualInformation {
+  manualEntries: ManualEntry[];
+}
+
+export interface ManualEntry {
   groupName: string;
   examples: Example[];
 }
@@ -21,7 +25,7 @@ export interface MedicationInformationProps {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function MedicationInformation() {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [productInformation, setProductInformation] = React.useState<ManualInformation[]>([]);
+  const [productInformation, setProductInformation] = React.useState<ManualEntry[]>([]);
 
   const { product } = useParams();
 
@@ -35,7 +39,7 @@ export function MedicationInformation() {
 
       console.log(res);
 
-      setProductInformation(res.manualInformations);
+      setProductInformation(res.manualEntries);
       setIsLoading(false);
     };
     fetch();
