@@ -46,7 +46,17 @@ export function DonorPendingSubmission({ submission, onSubmittedSuccessfully }: 
             as seguintes questões:
           </Typography>
           <Divider sx={{ p: 0.5, mb: 1 }} />
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, justifyContent: 'space-evenly' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 1,
+              justifyContent: 'space-evenly',
+              overflowX: 'auto', // Enable horizontal scrolling
+              padding: 2, // Optional: Add some padding for better visuals
+              width: '100%', // Ensures it takes full width of the parent container
+            }}
+          >
             {inconsistencies.map((inconsistencyGroup, index) => (
               <Box
                 key={index}
@@ -58,6 +68,8 @@ export function DonorPendingSubmission({ submission, onSubmittedSuccessfully }: 
                   border: 1,
                   p: 1,
                   borderRadius: 5,
+                  minWidth: '300px', // Ensure each group has a minimum width
+                  flexShrink: 0, // Prevent the items from shrinking when many groups are present
                 }}
               >
                 {inconsistencyGroup.map(questionId => {

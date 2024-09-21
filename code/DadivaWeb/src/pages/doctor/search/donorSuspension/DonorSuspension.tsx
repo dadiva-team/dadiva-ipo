@@ -48,13 +48,16 @@ export function DonorSuspension({ nic, fetchedSuspension, onSubmittedSuccessfull
 
   const submitSuspension = async () => {
     const request = {
-      userNic: Number(nic),
-      suspensionType: suspensionType,
-      suspensionStartDate: suspensionStartDate,
-      suspensionEndDate: suspensionEndDate,
+      donorNic: nic,
+      doctorNic: doctor.nic.toString(),
+      type: suspensionType,
+      startDate: suspensionStartDate,
+      endDate: suspensionEndDate,
       reason: reason,
-      suspendedBy: doctor.nic,
+      note: null,
     } as SuspendUserRequestModel;
+    console.log('Request:');
+    console.log(JSON.stringify(request));
     const [error, res] = await handleRequest(DoctorServices.suspendUser(request));
     if (error) {
       handleError(error, setError, nav);

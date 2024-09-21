@@ -78,6 +78,7 @@ export function useDonorPendingSubmission({ submission, onSubmittedSuccessfully 
     openProfileAfterReject: boolean,
     finalNote?: string
   ) => {
+    console.log('submitting review');
     const reviewData = {
       status,
       finalNote,
@@ -97,6 +98,7 @@ export function useDonorPendingSubmission({ submission, onSubmittedSuccessfully 
     if (res) {
       console.log('Review submitted successfully');
       onSubmittedSuccessfully();
+      console.log('openProfileAfterReject', openProfileAfterReject);
       if (openProfileAfterReject) {
         window.open(DOCTOR_SEARCH_NIC + `?nic=${submission.donor.nic}`);
       }

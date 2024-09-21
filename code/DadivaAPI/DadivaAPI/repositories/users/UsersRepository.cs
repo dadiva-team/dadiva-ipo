@@ -93,6 +93,7 @@ public class UsersRepository : IUsersRepository
             .Include(s => s.Donor)
             .Include(s => s.Doctor)
             .Where(suspension => suspension.Donor.Nic == userNic)
+            .OrderByDescending(s => s.StartDate)
             .ToListAsync();
     }
 
@@ -102,7 +103,7 @@ public class UsersRepository : IUsersRepository
             .Include(s => s.Donor)
             .Include(s => s.Doctor)
             .Where(suspension => suspension.Donor.Nic == userNic && suspension.IsActive)
-            .OrderBy(suspension => suspension.StartDate)
+            .OrderByDescending(suspension => suspension.StartDate)
             .FirstOrDefaultAsync();
     }
 
@@ -126,7 +127,7 @@ public class UsersRepository : IUsersRepository
     
     public async Task<bool> UpdateSuspensionIsActive(string userNic, bool isActive)
     {
-        var suspension = await _context.Suspensions.FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic);
+        var suspension = await _context.Suspensions.FirstOrDefaultAsync(suspension => suspension.Donor.Nic == userNic && suspension.IsActive);
         if (suspension == null)
         {
             return false;

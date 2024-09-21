@@ -72,7 +72,7 @@ public class ReviewsService(IRepository repository, DadivaDbContext context, INo
             // Adds user suspension - between review and donation
             if (suspend)
             {
-                bool success = await repository.AddSuspension(new Suspension(submissionDomain.Donor, null, DateTime.UtcNow,
+                bool success = await repository.AddSuspension(new Suspension(submissionDomain.Donor, doctorEntity.ToDomain(), DateTime.UtcNow,
                     SuspensionType.betweenReviewAndDonation, true, null, "Suspensão temporaria ", null).ToEntity());
                 if(!success)
                     return Result.Fail(new UserError.SuspensionNotAddedError());

@@ -179,6 +179,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
 
             var suspension = new Suspension(suspendedUser, doctorUser, suspensionStartDate,
                 parsedType, true, note, reason, suspensionEndDate);
+            await repository.UpdateSuspensionIsActive(donorNic, false);
 
             bool success = await repository.AddSuspension(suspension.ToEntity());
             return !success
@@ -262,7 +263,7 @@ public class UsersService(IConfiguration config, IRepository repository, DadivaD
     {
         return await context.WithTransaction(async () =>
         {
-            var suspensionEntity = await repository.GetSuspension(userNic);
+            var suspensionEntity = await repository.GetSuspensionIfActive(userNic);
             if (suspensionEntity is null)
             {
                 return Result.Fail(new UserError.UserHasNoSuspensionError());

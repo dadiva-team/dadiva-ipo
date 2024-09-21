@@ -21,7 +21,7 @@ public static class UsersRoutes
         usersGroup.MapDelete("/{nic}", DeleteUser).RequireAuthorization("admin");
 
         usersGroup.MapPost("/suspension", AddSuspension).AllowAnonymous();
-        usersGroup.MapPost("/suspension/update", UpdateSuspension).AllowAnonymous();
+        usersGroup.MapPost("/suspension/update", UpdateSuspension).RequireAuthorization("doctor");
         usersGroup.MapGet("/suspension/{nic}", GetSuspension).AllowAnonymous();
         usersGroup.MapGet("/suspension/{nic}/history", GetSuspensions).AllowAnonymous();
         usersGroup.MapDelete("/suspension/{nic}", DeleteSuspension).AllowAnonymous();
