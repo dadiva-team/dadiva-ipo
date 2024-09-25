@@ -3,7 +3,7 @@ Francisco Medeiros - 46631\
 Luís Macário - 47671\
 Ricardo Pinto - 47673
 
-# Menthors
+# Mentors
 PhD Filipe Freitas\
 Eng João Pereira (Cofidis)
 
@@ -11,4 +11,4 @@ Eng João Pereira (Cofidis)
 Run instructions on docs/organization_description.pdf
 
 # Grade
-TBD
+20/20
